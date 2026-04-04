@@ -4,27 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Maha Mrityunjay Mess</title>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#ff5722">
+    <link rel="manifest" href="data:application/manifest+json,{'name':'Maha Mrityunjay Mess','short_name':'MM Mess','display':'standalone','background_color':'#f8fafc','theme_color':'#ff5722'}">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap');
-        
-        /* BLOCK TEXT SELECTION */
-        * {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        /* ALLOW SELECTION ONLY IN INPUT BOXES */
-        input, textarea {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
-        }
-
+        * { -webkit-user-select: none; user-select: none; }
+        input { -webkit-user-select: text; user-select: text; }
         body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         .mess-orange { background: linear-gradient(135deg, #ff5722 0%, #ff8a65 100%); }
         .card-pro { background: white; border-radius: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; position: relative; }
@@ -34,6 +25,7 @@
         .sidebar-open { transform: translateX(0) !important; }
         .blink-red { animation: blinker 1.2s linear infinite; border: 2px solid #ef4444 !important; }
         @keyframes blinker { 50% { background-color: #fee2e2; } }
+        .input-box { width: 100%; padding: 12px; background: white; border-radius: 12px; border: 1px solid #e2e8f0; font-weight: 600; font-size: 14px; outline: none; margin-bottom: 10px; }
     </style>
 </head>
 <body class="max-w-md mx-auto min-h-screen pb-10" oncontextmenu="return false">
@@ -41,26 +33,25 @@
     <div id="overlay" onclick="toggleMenu()" class="hidden fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm"></div>
 
     <div id="sidebar" class="fixed top-0 left-0 h-full w-4/5 max-w-xs bg-white z-[101] -translate-x-full shadow-2xl p-6 flex flex-col">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-xl font-900 text-orange-600 uppercase tracking-tighter">Admin Menu</h2>
-            <button onclick="toggleMenu()" class="text-gray-400 text-2xl"><i class="fa-solid fa-xmark"></i></button>
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-xl font-900 text-orange-600 uppercase">Admin Panel</h2>
+            <button onclick="toggleMenu()"><i class="fa-solid fa-xmark text-2xl text-gray-300"></i></button>
         </div>
-        <div class="space-y-6 flex-1">
+
+        <div class="space-y-4 flex-1 overflow-y-auto pr-2">
             <div class="bg-gray-50 p-4 rounded-3xl border border-gray-100">
-                <p class="text-[10px] font-900 text-gray-400 uppercase mb-3 tracking-widest">Register Member</p>
-                <input type="text" id="new-name" placeholder="Student Name" class="w-full p-3 bg-white rounded-xl mb-3 outline-none border border-gray-100 font-bold text-sm focus:border-orange-500">
-                <div class="flex flex-col gap-2">
-                    <label class="h-12 bg-white rounded-xl flex items-center justify-center cursor-pointer border border-dashed border-gray-200">
-                        <span class="text-xs font-bold text-gray-400" id="photo-status">Click Photo</span>
-                        <input type="file" accept="image/*" capture="user" id="camera-input" class="hidden" onchange="previewFile()">
-                    </label>
-                    <button onclick="saveStudent()" class="h-12 mess-orange text-white rounded-xl font-black text-xs uppercase shadow-lg">Register Member</button>
-                </div>
+                <p class="text-[10px] font-900 text-gray-400 uppercase mb-3 tracking-widest">Register New Student</p>
+                <input type="text" id="new-name" placeholder="Full Name" class="input-box">
+                <input type="number" id="new-phone" placeholder="WhatsApp Number" class="input-box">
+                <label class="h-12 bg-white rounded-xl flex items-center justify-center cursor-pointer border border-dashed border-gray-200 mb-3">
+                    <span class="text-xs font-bold text-gray-400" id="photo-status">Click Photo</span>
+                    <input type="file" accept="image/*" capture="user" id="camera-input" class="hidden" onchange="previewFile()">
+                </label>
+                <button onclick="saveStudent()" class="w-full h-12 mess-orange text-white rounded-xl font-black text-xs uppercase shadow-lg active:scale-95 transition-transform">Register Member</button>
             </div>
-            <div class="pt-4 space-y-2">
-                <button onclick="exportData()" class="w-full flex items-center gap-4 p-4 hover:bg-orange-50 rounded-2xl transition-all"><i class="fa-solid fa-file-export text-orange-500"></i><span class="font-bold text-gray-700 uppercase text-xs">Export Backup</span></button>
-                <label class="w-full flex items-center gap-4 p-4 hover:bg-orange-50 rounded-2xl transition-all cursor-pointer"><i class="fa-solid fa-file-import text-orange-500"></i><span class="font-bold text-gray-700 uppercase text-xs">Restore Data</span><input type="file" class="hidden" onchange="importData(event)"></label>
-            </div>
+
+            <button onclick="exportData()" class="w-full flex items-center gap-4 p-4 hover:bg-orange-50 rounded-2xl transition-all font-bold text-gray-700 text-xs uppercase"><i class="fa-solid fa-file-export text-orange-500"></i> Export Backup</button>
+            <label class="w-full flex items-center gap-4 p-4 hover:bg-orange-50 rounded-2xl transition-all font-bold text-gray-700 text-xs uppercase cursor-pointer"><i class="fa-solid fa-file-import text-orange-500"></i> Restore Data <input type="file" class="hidden" onchange="importData(event)"></label>
         </div>
     </div>
 
@@ -80,7 +71,7 @@
     <div class="px-5 mb-6 space-y-4">
         <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
             <i class="fa-solid fa-magnifying-glass text-gray-300"></i>
-            <input type="text" id="search-input" oninput="render()" placeholder="Search members..." class="bg-transparent outline-none w-full font-bold text-sm">
+            <input type="text" id="search-input" oninput="render()" placeholder="Search student name..." class="bg-transparent outline-none w-full font-bold text-sm">
         </div>
         <div class="bg-gray-200 p-1.5 rounded-2xl flex font-bold text-[10px] relative">
             <button id="mode-lunch" onclick="setMode('Lunch', false)" class="flex-1 py-3 rounded-xl z-10 uppercase transition-all">Lunch</button>
@@ -93,32 +84,25 @@
 
     <div id="pay-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[110] flex items-center justify-center p-6 text-center">
         <div class="bg-white w-full rounded-[3rem] p-8 shadow-2xl">
-            <h2 id="pay-name" class="text-2xl font-black mb-1 text-gray-800">Student Name</h2>
+            <h2 id="pay-name" class="text-2xl font-black mb-1 text-gray-800">Name</h2>
             <input type="number" id="pay-amt" class="w-full text-5xl font-black text-green-600 border-b-4 border-gray-100 outline-none py-2 mb-8 text-center" placeholder="0">
-            
             <div id="payment-actions">
                 <button onclick="confirmPayment()" class="w-full mess-orange text-white font-bold py-5 rounded-2xl uppercase text-sm shadow-lg mb-4">Confirm Payment</button>
                 <button onclick="closePayModal()" class="text-gray-300 font-bold text-xs uppercase">Cancel</button>
             </div>
-
             <div id="success-actions" class="hidden">
-                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-check text-2xl"></i>
-                </div>
-                <p class="font-bold text-gray-800 mb-6 uppercase text-xs tracking-widest">Payment Recorded</p>
-                <button id="whatsapp-btn" class="w-full bg-green-500 text-white font-bold py-5 rounded-2xl uppercase text-sm flex items-center justify-center gap-2 mb-4">
-                    <i class="fa-brands fa-whatsapp text-xl"></i> Share Receipt
-                </button>
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-check text-2xl"></i></div>
+                <p class="font-bold text-gray-800 mb-6 uppercase text-xs">Payment Successful</p>
                 <button onclick="closePayModal()" class="w-full bg-gray-100 text-gray-500 font-bold py-3 rounded-2xl uppercase text-[10px]">Close</button>
             </div>
         </div>
     </div>
 
     <div id="history-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[150] flex items-end">
-        <div class="bg-white w-full rounded-t-[3rem] p-8 max-h-[80vh] flex flex-col">
+        <div class="bg-white w-full rounded-t-[3rem] p-8 max-h-[80vh] flex flex-col shadow-2xl">
             <div class="flex justify-between items-center mb-6">
-                <div><h2 id="hist-name" class="text-xl font-900 text-gray-800 uppercase">Student History</h2></div>
-                <button onclick="closeHistory()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
+                <h2 id="hist-name" class="text-xl font-900 text-gray-800 uppercase">History</h2>
+                <button onclick="closeHistory()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500"><i class="fa-solid fa-times"></i></button>
             </div>
             <div id="history-list" class="overflow-y-auto space-y-3 pb-6"></div>
         </div>
@@ -127,16 +111,10 @@
     <canvas id="resize-canvas" class="hidden"></canvas>
 
     <script>
-        // SECURITY SCRIPT: BLOCK INSPECT & KEYBOARD SHORTCUTS
-        document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false; // Block F12
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Block Ctrl+Shift+I
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Block Ctrl+Shift+C
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Block Ctrl+Shift+J
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Block Ctrl+U
-        };
+        // Security logic
+        document.onkeydown = (e) => { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 67 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false; };
 
-        let users = JSON.parse(localStorage.getItem('mm_mess_ledger_v3')) || [];
+        let users = JSON.parse(localStorage.getItem('mm_mess_direct_wa_v5')) || [];
         let currentMode = 'Lunch';
         let isManualMode = false;
         let activeUserId = null;
@@ -144,6 +122,7 @@
         const ADMIN_PIN = "1234";
 
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('sidebar-open'); document.getElementById('overlay').classList.toggle('hidden'); }
+        
         function updateClock() {
             const now = new Date();
             document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
@@ -169,7 +148,7 @@
                     canvas.width = 300; canvas.height = 300;
                     canvas.getContext('2d').drawImage(img, 0, 0, 300, 300);
                     tempPhotoData = canvas.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('photo-status').innerText = "Photo Ready ✓";
+                    document.getElementById('photo-status').innerText = "Photo Ready ✅";
                     document.getElementById('photo-status').style.color = "#22c55e";
                 }
             }
@@ -178,31 +157,44 @@
 
         function saveStudent() {
             const name = document.getElementById('new-name').value;
-            if(!name || !tempPhotoData) return alert("Missing Info!");
-            users.push({ id: Date.now(), name, photo: tempPhotoData, balance: 0, logs: [] });
-            document.getElementById('new-name').value = ""; document.getElementById('photo-status').innerText = "Click Photo";
-            document.getElementById('photo-status').style.color = "#9ca3af"; tempPhotoData = null;
+            const phone = document.getElementById('new-phone').value;
+            if(!name || !tempPhotoData || !phone) return alert("All fields are mandatory!");
+            
+            users.push({ id: Date.now(), name, phone, photo: tempPhotoData, balance: 0, logs: [] });
+            
+            // AUTOMATED WELCOME MESSAGE LOGIC
+            const welcomeMsg = encodeURIComponent(`*Welcome to Maha Mrityunjay Mess!*\n--------------------------\nHi ${name}, your registration is successful.\n\n_Eat Healthy, Live Healthy!_\n--------------------------`);
+            const waLink = `https://wa.me/91${phone}?text=${welcomeMsg}`;
+            
+            // Open WhatsApp immediately
+            window.open(waLink, '_blank');
+
+            // Reset UI
+            document.getElementById('new-name').value = ""; 
+            document.getElementById('new-phone').value = "";
+            document.getElementById('photo-status').innerText = "Click Photo";
+            document.getElementById('photo-status').style.color = "#9ca3af"; 
+            tempPhotoData = null;
+            
             save(); render(); toggleMenu();
         }
 
         function toggleMeal(id) {
             const u = users.find(x => x.id === id);
             const date = new Date().toLocaleDateString('en-GB');
-            const logEntry = { type: 'meal', date: date, session: currentMode, amount: 50 };
             const idx = u.logs.findIndex(l => l.type === 'meal' && l.date === date && l.session === currentMode);
-            if(idx === -1) { u.logs.push(logEntry); u.balance += 50; }
+            if(idx === -1) { u.logs.push({ type: 'meal', date: date, session: currentMode, amount: 50 }); u.balance += 50; }
             else { u.logs.splice(idx, 1); u.balance -= 50; }
             save(); render();
         }
 
         function openPay(id) { 
-            activeUserId = id; 
-            const u = users.find(x => x.id === id);
+            activeUserId = id; const u = users.find(x => x.id === id);
             document.getElementById('pay-name').innerText = u.name; 
-            document.getElementById('pay-amt').classList.remove('hidden');
-            document.getElementById('payment-actions').classList.remove('hidden');
-            document.getElementById('success-actions').classList.add('hidden');
             document.getElementById('pay-modal').classList.remove('hidden'); 
+            document.getElementById('success-actions').classList.add('hidden');
+            document.getElementById('payment-actions').classList.remove('hidden');
+            document.getElementById('pay-amt').classList.remove('hidden');
         }
 
         function confirmPayment() {
@@ -212,20 +204,18 @@
             if(isNaN(amt) || amt <= 0) return;
             u.balance -= amt;
             u.logs.push({ type: 'payment', date: new Date().toLocaleDateString('en-GB'), time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), amount: amt });
+            
+            // AUTO SEND RECEIPT LOGIC
+            const receiptMsg = encodeURIComponent(`*MAHA MRITYUNJAY MESS*\n--------------------------\nStudent: ${u.name}\nReceived: ₹${amt}\nTotal Balance: ₹${u.balance}\nDate: ${new Date().toLocaleDateString()}\n--------------------------\nThank you!`);
+            window.open(`https://wa.me/91${u.phone}?text=${receiptMsg}`, '_blank');
+
             amtInput.classList.add('hidden');
             document.getElementById('payment-actions').classList.add('hidden');
             document.getElementById('success-actions').classList.remove('hidden');
-            const message = encodeURIComponent(`*MAHA MRITYUNJAY MESS*\n--------------------------\nStudent: ${u.name}\nReceived: ₹${amt}\nTotal Balance: ₹${u.balance}\nDate: ${new Date().toLocaleDateString()}\n--------------------------\nThank you!`);
-            document.getElementById('whatsapp-btn').onclick = () => window.open(`https://wa.me/?text=${message}`, '_blank');
             save(); render();
         }
 
-        function deleteMember(id) {
-            if (prompt("ADMIN PIN (1234):") === ADMIN_PIN) {
-                users = users.filter(u => u.id !== id);
-                save(); render();
-            }
-        }
+        function deleteMember(id) { if (prompt("ADMIN PIN:") === ADMIN_PIN) { users = users.filter(u => u.id !== id); save(); render(); } }
 
         function openHistory(id) {
             const u = users.find(x => x.id === id);
@@ -233,23 +223,23 @@
             const list = document.getElementById('history-list');
             list.innerHTML = u.logs.length > 0 ? u.logs.slice().reverse().map(l => {
                 if(l.type === 'meal') return `<div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100"><span class="text-xs font-bold text-gray-600">${l.date} | ${l.session}</span><span class="text-[10px] text-red-500 font-black">+₹${l.amount}</span></div>`;
-                else return `<div class="flex justify-between items-center bg-green-50 p-4 rounded-2xl border border-green-100"><span class="text-xs font-bold text-green-700">${l.date} | PAID (${l.time})</span><span class="text-[10px] text-green-600 font-black">-₹${l.amount}</span></div>`;
-            }).join('') : '<div class="text-center py-10 opacity-30 font-bold italic">No Records Found</div>';
+                else return `<div class="flex justify-between items-center bg-green-50 p-4 rounded-2xl border border-green-100"><span class="text-xs font-bold text-green-700">${l.date} | PAID</span><span class="text-[10px] text-green-600 font-black">-₹${l.amount}</span></div>`;
+            }).join('') : '<div class="text-center py-10 opacity-30 font-bold">No Records Found</div>';
             document.getElementById('history-modal').classList.remove('hidden');
         }
 
         function closeHistory() { document.getElementById('history-modal').classList.add('hidden'); }
         function closePayModal() { document.getElementById('pay-modal').classList.add('hidden'); document.getElementById('pay-amt').value = ""; }
-        function save() { localStorage.setItem('mm_mess_ledger_v3', JSON.stringify(users)); }
-        function exportData() { const blob = new Blob([JSON.stringify(users)], {type: "application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `MessData.json`; a.click(); }
+        function save() { localStorage.setItem('mm_mess_direct_wa_v5', JSON.stringify(users)); }
+        function exportData() { const blob = new Blob([JSON.stringify(users)], {type: "application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `MessBackup.json`; a.click(); }
         function importData(e) { const reader = new FileReader(); reader.onload = (x) => { users = JSON.parse(x.target.result); save(); render(); }; reader.readAsText(e.target.files[0]); }
 
         function render() {
             const list = document.getElementById('user-list');
             const search = document.getElementById('search-input').value.toLowerCase();
-            const todayDate = new Date().toLocaleDateString('en-GB');
+            const today = new Date().toLocaleDateString('en-GB');
             list.innerHTML = users.filter(u => u.name.toLowerCase().includes(search)).map(u => {
-                const ate = u.logs.some(l => l.type === 'meal' && l.date === todayDate && l.session === currentMode);
+                const ate = u.logs.some(l => l.type === 'meal' && l.date === today && l.session === currentMode);
                 return `
                 <div class="card-pro p-3 ${u.balance >= 1000 ? 'blink-red' : ''} ${ate ? 'marked-green' : ''}">
                     <img src="${u.photo}" class="student-photo mb-2" onclick="toggleMeal(${u.id})">
@@ -257,10 +247,10 @@
                     <p class="text-[10px] font-black text-center ${u.balance > 0 ? 'text-red-500' : 'text-green-600'} mb-3">₹${u.balance}</p>
                     <div class="flex gap-1">
                         <button onclick="toggleMeal(${u.id})" class="flex-1 py-2 rounded-xl text-[9px] font-bold ${ate ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-400'} uppercase">${ate ? 'ATE' : 'MARK'}</button>
-                        <button onclick="openHistory(${u.id})" class="w-8 h-8 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center border border-slate-100"><i class="fa-solid fa-clock-rotate-left text-[10px]"></i></button>
-                        <button onclick="openPay(${u.id})" class="w-8 h-8 bg-green-50 text-green-600 rounded-lg flex items-center justify-center border border-green-100"><i class="fa-solid fa-receipt text-[10px]"></i></button>
+                        <button onclick="openHistory(${u.id})" class="w-9 h-9 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100"><i class="fa-solid fa-clock-rotate-left text-[11px]"></i></button>
+                        <button onclick="openPay(${u.id})" class="w-9 h-9 bg-green-50 text-green-600 rounded-xl flex items-center justify-center border border-green-100"><i class="fa-solid fa-receipt text-[11px]"></i></button>
                     </div>
-                    <button onclick="deleteMember(${u.id})" class="absolute top-1 right-1 text-gray-200 text-[12px] p-1"><i class="fa-solid fa-times"></i></button>
+                    <button onclick="deleteMember(${u.id})" class="absolute top-1 right-1 text-gray-200 text-[12px] p-1">&times;</button>
                 </div>`;
             }).join('');
         }
