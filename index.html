@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maha Mrityunjay Mess</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap');
+        
+        /* BLOCK TEXT SELECTION */
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* ALLOW SELECTION ONLY IN INPUT BOXES */
+        input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        .mess-orange { background: linear-gradient(135deg, #ff5722 0%, #ff8a65 100%); }
+        .card-pro { background: white; border-radius: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; position: relative; }
+        .student-photo { width: 100%; height: 110px; object-fit: cover; border-radius: 1.5rem; background: #e2e8f0; }
+        .marked-green { border: 2.5px solid #22c55e !important; background: #f0fdf4; transform: translateY(-2px); }
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        .sidebar-open { transform: translateX(0) !important; }
+        .blink-red { animation: blinker 1.2s linear infinite; border: 2px solid #ef4444 !important; }
+        @keyframes blinker { 50% { background-color: #fee2e2; } }
+    </style>
+</head>
+<body class="max-w-md mx-auto min-h-screen pb-10" oncontextmenu="return false">
+
+    <div id="overlay" onclick="toggleMenu()" class="hidden fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm"></div>
+
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-4/5 max-w-xs bg-white z-[101] -translate-x-full shadow-2xl p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-900 text-orange-600 uppercase tracking-tighter">Admin Menu</h2>
+            <button onclick="toggleMenu()" class="text-gray-400 text-2xl"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="space-y-6 flex-1">
+            <div class="bg-gray-50 p-4 rounded-3xl border border-gray-100">
+                <p class="text-[10px] font-900 text-gray-400 uppercase mb-3 tracking-widest">Register Member</p>
+                <input type="text" id="new-name" placeholder="Student Name" class="w-full p-3 bg-white rounded-xl mb-3 outline-none border border-gray-100 font-bold text-sm focus:border-orange-500">
+                <div class="flex flex-col gap-2">
+                    <label class="h-12 bg-white rounded-xl flex items-center justify-center cursor-pointer border border-dashed border-gray-200">
+                        <span class="text-xs font-bold text-gray-400" id="photo-status">Click Photo</span>
+                        <input type="file" accept="image/*" capture="user" id="camera-input" class="hidden" onchange="previewFile()">
+                    </label>
+                    <button onclick="saveStudent()" class="h-12 mess-orange text-white rounded-xl font-black text-xs uppercase shadow-lg">Register Member</button>
+                </div>
+            </div>
+            <div class="pt-4 space-y-2">
+                <button onclick="exportData()" class="w-full flex items-center gap-4 p-4 hover:bg-orange-50 rounded-2xl transition-all"><i class="fa-solid fa-file-export text-orange-500"></i><span class="font-bold text-gray-700 uppercase text-xs">Export Backup</span></button>
+                <label class="w-full flex items-center gap-4 p-4 hover:bg-orange-50 rounded-2xl transition-all cursor-pointer"><i class="fa-solid fa-file-import text-orange-500"></i><span class="font-bold text-gray-700 uppercase text-xs">Restore Data</span><input type="file" class="hidden" onchange="importData(event)"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="mess-orange text-white p-6 rounded-b-[3rem] shadow-2xl mb-6 sticky top-0 z-50">
+        <div class="flex justify-between items-start">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMenu()" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fa-solid fa-bars"></i></button>
+                <h1 class="text-xl font-900 tracking-tighter uppercase leading-none">Maha Mrityunjay<br>Mess</h1>
+            </div>
+            <div class="text-right">
+                <p id="live-date" class="text-[9px] font-bold opacity-80 uppercase tracking-wider"></p>
+                <span id="live-clock" class="text-xs font-black bg-white/20 px-3 py-1 rounded-full uppercase"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-5 mb-6 space-y-4">
+        <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
+            <i class="fa-solid fa-magnifying-glass text-gray-300"></i>
+            <input type="text" id="search-input" oninput="render()" placeholder="Search members..." class="bg-transparent outline-none w-full font-bold text-sm">
+        </div>
+        <div class="bg-gray-200 p-1.5 rounded-2xl flex font-bold text-[10px] relative">
+            <button id="mode-lunch" onclick="setMode('Lunch', false)" class="flex-1 py-3 rounded-xl z-10 uppercase transition-all">Lunch</button>
+            <button id="mode-dinner" onclick="setMode('Dinner', false)" class="flex-1 py-3 rounded-xl z-10 uppercase transition-all">Dinner</button>
+            <div id="mode-glider" class="absolute top-1.5 left-1.5 bottom-1.5 w-[47%] bg-white rounded-xl shadow-sm transition-all duration-300"></div>
+        </div>
+    </div>
+
+    <div class="px-5 grid grid-cols-2 gap-4" id="user-list"></div>
+
+    <div id="pay-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[110] flex items-center justify-center p-6 text-center">
+        <div class="bg-white w-full rounded-[3rem] p-8 shadow-2xl">
+            <h2 id="pay-name" class="text-2xl font-black mb-1 text-gray-800">Student Name</h2>
+            <input type="number" id="pay-amt" class="w-full text-5xl font-black text-green-600 border-b-4 border-gray-100 outline-none py-2 mb-8 text-center" placeholder="0">
+            
+            <div id="payment-actions">
+                <button onclick="confirmPayment()" class="w-full mess-orange text-white font-bold py-5 rounded-2xl uppercase text-sm shadow-lg mb-4">Confirm Payment</button>
+                <button onclick="closePayModal()" class="text-gray-300 font-bold text-xs uppercase">Cancel</button>
+            </div>
+
+            <div id="success-actions" class="hidden">
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-check text-2xl"></i>
+                </div>
+                <p class="font-bold text-gray-800 mb-6 uppercase text-xs tracking-widest">Payment Recorded</p>
+                <button id="whatsapp-btn" class="w-full bg-green-500 text-white font-bold py-5 rounded-2xl uppercase text-sm flex items-center justify-center gap-2 mb-4">
+                    <i class="fa-brands fa-whatsapp text-xl"></i> Share Receipt
+                </button>
+                <button onclick="closePayModal()" class="w-full bg-gray-100 text-gray-500 font-bold py-3 rounded-2xl uppercase text-[10px]">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[150] flex items-end">
+        <div class="bg-white w-full rounded-t-[3rem] p-8 max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <div><h2 id="hist-name" class="text-xl font-900 text-gray-800 uppercase">Student History</h2></div>
+                <button onclick="closeHistory()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div id="history-list" class="overflow-y-auto space-y-3 pb-6"></div>
+        </div>
+    </div>
+
+    <canvas id="resize-canvas" class="hidden"></canvas>
+
+    <script>
+        // SECURITY SCRIPT: BLOCK INSPECT & KEYBOARD SHORTCUTS
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false; // Block F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Block Ctrl+Shift+I
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Block Ctrl+Shift+C
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Block Ctrl+Shift+J
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Block Ctrl+U
+        };
+
+        let users = JSON.parse(localStorage.getItem('mm_mess_ledger_v3')) || [];
+        let currentMode = 'Lunch';
+        let isManualMode = false;
+        let activeUserId = null;
+        let tempPhotoData = null;
+        const ADMIN_PIN = "1234";
+
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('sidebar-open'); document.getElementById('overlay').classList.toggle('hidden'); }
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('live-date').innerText = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            if (!isManualMode) { const hr = now.getHours(); if(hr >= 17) setMode('Dinner', true); else setMode('Lunch', true); }
+            save();
+        }
+        setInterval(updateClock, 1000);
+
+        function setMode(mode, isAuto = false) {
+            currentMode = mode; if(!isAuto) isManualMode = true;
+            document.getElementById('mode-glider').style.left = (mode === 'Lunch') ? '6px' : '51%';
+            render();
+        }
+
+        function previewFile() {
+            const file = document.getElementById('camera-input').files[0];
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                const img = new Image(); img.src = reader.result;
+                img.onload = function() {
+                    const canvas = document.getElementById('resize-canvas');
+                    canvas.width = 300; canvas.height = 300;
+                    canvas.getContext('2d').drawImage(img, 0, 0, 300, 300);
+                    tempPhotoData = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('photo-status').innerText = "Photo Ready ✓";
+                    document.getElementById('photo-status').style.color = "#22c55e";
+                }
+            }
+            if (file) reader.readAsDataURL(file);
+        }
+
+        function saveStudent() {
+            const name = document.getElementById('new-name').value;
+            if(!name || !tempPhotoData) return alert("Missing Info!");
+            users.push({ id: Date.now(), name, photo: tempPhotoData, balance: 0, logs: [] });
+            document.getElementById('new-name').value = ""; document.getElementById('photo-status').innerText = "Click Photo";
+            document.getElementById('photo-status').style.color = "#9ca3af"; tempPhotoData = null;
+            save(); render(); toggleMenu();
+        }
+
+        function toggleMeal(id) {
+            const u = users.find(x => x.id === id);
+            const date = new Date().toLocaleDateString('en-GB');
+            const logEntry = { type: 'meal', date: date, session: currentMode, amount: 50 };
+            const idx = u.logs.findIndex(l => l.type === 'meal' && l.date === date && l.session === currentMode);
+            if(idx === -1) { u.logs.push(logEntry); u.balance += 50; }
+            else { u.logs.splice(idx, 1); u.balance -= 50; }
+            save(); render();
+        }
+
+        function openPay(id) { 
+            activeUserId = id; 
+            const u = users.find(x => x.id === id);
+            document.getElementById('pay-name').innerText = u.name; 
+            document.getElementById('pay-amt').classList.remove('hidden');
+            document.getElementById('payment-actions').classList.remove('hidden');
+            document.getElementById('success-actions').classList.add('hidden');
+            document.getElementById('pay-modal').classList.remove('hidden'); 
+        }
+
+        function confirmPayment() {
+            const amtInput = document.getElementById('pay-amt');
+            const amt = parseFloat(amtInput.value);
+            const u = users.find(x => x.id === activeUserId);
+            if(isNaN(amt) || amt <= 0) return;
+            u.balance -= amt;
+            u.logs.push({ type: 'payment', date: new Date().toLocaleDateString('en-GB'), time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), amount: amt });
+            amtInput.classList.add('hidden');
+            document.getElementById('payment-actions').classList.add('hidden');
+            document.getElementById('success-actions').classList.remove('hidden');
+            const message = encodeURIComponent(`*MAHA MRITYUNJAY MESS*\n--------------------------\nStudent: ${u.name}\nReceived: ₹${amt}\nTotal Balance: ₹${u.balance}\nDate: ${new Date().toLocaleDateString()}\n--------------------------\nThank you!`);
+            document.getElementById('whatsapp-btn').onclick = () => window.open(`https://wa.me/?text=${message}`, '_blank');
+            save(); render();
+        }
+
+        function deleteMember(id) {
+            if (prompt("ADMIN PIN (1234):") === ADMIN_PIN) {
+                users = users.filter(u => u.id !== id);
+                save(); render();
+            }
+        }
+
+        function openHistory(id) {
+            const u = users.find(x => x.id === id);
+            document.getElementById('hist-name').innerText = u.name;
+            const list = document.getElementById('history-list');
+            list.innerHTML = u.logs.length > 0 ? u.logs.slice().reverse().map(l => {
+                if(l.type === 'meal') return `<div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100"><span class="text-xs font-bold text-gray-600">${l.date} | ${l.session}</span><span class="text-[10px] text-red-500 font-black">+₹${l.amount}</span></div>`;
+                else return `<div class="flex justify-between items-center bg-green-50 p-4 rounded-2xl border border-green-100"><span class="text-xs font-bold text-green-700">${l.date} | PAID (${l.time})</span><span class="text-[10px] text-green-600 font-black">-₹${l.amount}</span></div>`;
+            }).join('') : '<div class="text-center py-10 opacity-30 font-bold italic">No Records Found</div>';
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
+
+        function closeHistory() { document.getElementById('history-modal').classList.add('hidden'); }
+        function closePayModal() { document.getElementById('pay-modal').classList.add('hidden'); document.getElementById('pay-amt').value = ""; }
+        function save() { localStorage.setItem('mm_mess_ledger_v3', JSON.stringify(users)); }
+        function exportData() { const blob = new Blob([JSON.stringify(users)], {type: "application/json"}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `MessData.json`; a.click(); }
+        function importData(e) { const reader = new FileReader(); reader.onload = (x) => { users = JSON.parse(x.target.result); save(); render(); }; reader.readAsText(e.target.files[0]); }
+
+        function render() {
+            const list = document.getElementById('user-list');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const todayDate = new Date().toLocaleDateString('en-GB');
+            list.innerHTML = users.filter(u => u.name.toLowerCase().includes(search)).map(u => {
+                const ate = u.logs.some(l => l.type === 'meal' && l.date === todayDate && l.session === currentMode);
+                return `
+                <div class="card-pro p-3 ${u.balance >= 1000 ? 'blink-red' : ''} ${ate ? 'marked-green' : ''}">
+                    <img src="${u.photo}" class="student-photo mb-2" onclick="toggleMeal(${u.id})">
+                    <h4 class="font-bold text-gray-800 text-[11px] truncate text-center">${u.name}</h4>
+                    <p class="text-[10px] font-black text-center ${u.balance > 0 ? 'text-red-500' : 'text-green-600'} mb-3">₹${u.balance}</p>
+                    <div class="flex gap-1">
+                        <button onclick="toggleMeal(${u.id})" class="flex-1 py-2 rounded-xl text-[9px] font-bold ${ate ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-400'} uppercase">${ate ? 'ATE' : 'MARK'}</button>
+                        <button onclick="openHistory(${u.id})" class="w-8 h-8 bg-slate-50 text-slate-400 rounded-lg flex items-center justify-center border border-slate-100"><i class="fa-solid fa-clock-rotate-left text-[10px]"></i></button>
+                        <button onclick="openPay(${u.id})" class="w-8 h-8 bg-green-50 text-green-600 rounded-lg flex items-center justify-center border border-green-100"><i class="fa-solid fa-receipt text-[10px]"></i></button>
+                    </div>
+                    <button onclick="deleteMember(${u.id})" class="absolute top-1 right-1 text-gray-200 text-[12px] p-1"><i class="fa-solid fa-times"></i></button>
+                </div>`;
+            }).join('');
+        }
+        updateClock(); render();
+    </script>
+</body>
+</html>
