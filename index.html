@@ -15,36 +15,47 @@
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap');
         * { -webkit-user-select: none; user-select: none; transition: all 0.2s ease-out; -webkit-tap-highlight-color: transparent; }
         input { -webkit-user-select: text; user-select: text; }
-        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
+        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; overflow: hidden; }
+        
         .mess-orange { background: linear-gradient(135deg, #ff5722 0%, #ff8a65 100%); }
         .card-pro { background: white; border-radius: 2rem; border: 1.5px solid #f1f5f9; position: relative; }
-        .content-blur { filter: blur(25px); pointer-events: none; opacity: 0.5; }
-        #lock-screen { backdrop-filter: blur(30px); z-index: 9999; background: rgba(255,255,255,0.95); }
-        .marked-green { border: 3px solid #22c55e !important; background: #f0fdf4; transform: scale(1.02); }
-        .blink-red { animation: soft-blink 1.5s infinite; border: 3px solid #ef4444 !important; }
-        @keyframes soft-blink { 50% { background-color: #fff1f1; box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); } }
+        
+        /* HARD GATE SECURITY */
+        .content-hidden { filter: blur(40px); opacity: 0; pointer-events: none; transform: scale(0.96); }
+        #lock-screen { backdrop-filter: blur(50px); z-index: 9999; background: rgba(255,255,255,0.98); position: fixed; inset: 0; }
+        
+        /* DYNAMIC STATES */
+        .marked-ate { border: 3px solid #22c55e !important; background-color: #f0fdf4 !important; transform: scale(1.02); }
+        .debt-alert { border: 3px solid #ef4444 !important; animation: soft-pulse 2s infinite; }
+        @keyframes soft-pulse { 50% { background-color: #fff1f1; box-shadow: 0 0 15px rgba(239,68,68,0.1); } }
+        
+        .student-photo { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 1.5rem; background: #f1f5f9; cursor: pointer; }
         .sidebar-open { transform: translateX(0) !important; }
-        .student-photo { width: 100%; height: 120px; object-fit: cover; border-radius: 1.5rem; background: #e2e8f0; cursor: pointer; }
+        
         @media print { body { display: none; } }
     </style>
 </head>
-<body class="max-w-md mx-auto min-h-screen pb-10" oncontextmenu="return false">
+<body oncontextmenu="return false">
 
-    <div id="lock-screen" class="hidden fixed inset-0 flex flex-col items-center justify-center p-10 text-center">
-        <div class="w-24 h-24 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-8 shadow-2xl"><i class="fa-solid fa-fingerprint text-4xl"></i></div>
-        <h2 class="text-3xl font-900 text-gray-800 mb-2 uppercase tracking-tighter text-center">Vault Access</h2>
-        <input type="password" id="unlock-pin" maxlength="4" class="w-32 text-center text-4xl font-black border-b-4 border-orange-500 outline-none pb-3 mb-12 bg-transparent" placeholder="****">
-        <button onclick="unlockSystem()" class="w-full py-5 mess-orange text-white rounded-[2rem] font-black uppercase text-xs shadow-2xl">Unlock</button>
+    <div id="lock-screen" class="flex flex-col items-center justify-center p-8 text-center">
+        <div class="w-24 h-24 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center mb-8 shadow-2xl border border-orange-100 animate-pulse">
+            <i class="fa-solid fa-fingerprint text-4xl"></i>
+        </div>
+        <h2 class="text-3xl font-900 text-gray-800 mb-2 uppercase tracking-tighter">Vault Locked</h2>
+        <p class="text-[10px] text-gray-400 font-black mb-12 uppercase tracking-[0.4em]">Maha Mrityunjay Mess v1.0</p>
+        <input type="password" id="unlock-pin" maxlength="4" class="w-36 text-center text-5xl font-black border-b-4 border-orange-500 outline-none pb-3 mb-12 bg-transparent text-gray-800" placeholder="••••">
+        <button onclick="unlockSystem()" class="w-full max-w-xs py-5 mess-orange text-white rounded-3xl font-black uppercase text-xs shadow-xl active:scale-95">Unlock System</button>
     </div>
 
-    <div id="main-app">
+    <div id="main-app" class="content-hidden max-w-6xl mx-auto min-h-screen pb-12">
+        
         <div id="overlay" onclick="toggleMenu()" class="hidden fixed inset-0 bg-black/40 z-[100] backdrop-blur-sm"></div>
-        <div id="sidebar" class="fixed top-0 left-0 h-full w-4/5 max-w-xs bg-white z-[101] -translate-x-full shadow-2xl p-8 flex flex-col transition-transform duration-300">
+        <div id="sidebar" class="fixed top-0 left-0 h-full w-[85%] sm:w-[350px] bg-white z-[101] -translate-x-full shadow-2xl p-8 flex flex-col transition-transform duration-300">
             <div class="flex justify-between items-center mb-10">
                 <h2 class="text-xl font-900 text-orange-600 uppercase tracking-tighter">Admin Menu</h2>
                 <button onclick="toggleMenu()"><i class="fa-solid fa-xmark text-2xl text-gray-300"></i></button>
             </div>
-            <div class="space-y-4 flex-1 overflow-y-auto">
+            <div class="space-y-4 flex-1 overflow-y-auto pr-2">
                 <div class="bg-gray-50 p-6 rounded-[2.5rem] border border-gray-100">
                     <input type="text" id="new-name" placeholder="Full Name" class="w-full p-4 bg-white rounded-2xl mb-3 outline-none border border-gray-200 font-bold text-sm">
                     <input type="number" id="new-phone" placeholder="WhatsApp Number" class="w-full p-4 bg-white rounded-2xl mb-4 outline-none border border-gray-200 font-bold text-sm">
@@ -54,61 +65,61 @@
                     </label>
                     <button onclick="saveStudent()" class="w-full h-14 mess-orange text-white rounded-2xl font-black text-xs uppercase shadow-lg">Join Member</button>
                 </div>
-                <button onclick="exportData()" class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase tracking-widest"><i class="fa-solid fa-file-shield text-orange-500"></i> Cloud Backup</button>
-                <label class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase cursor-pointer"><i class="fa-solid fa-rotate-left text-orange-500"></i> Restore Key <input type="file" class="hidden" onchange="importData(event)"></label>
+                <button onclick="exportData()" class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase"><i class="fa-solid fa-file-shield text-orange-500"></i> Export Backup</button>
+                <label class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase cursor-pointer"><i class="fa-solid fa-rotate-left text-orange-500"></i> Restore Data <input type="file" class="hidden" onchange="importData(event)"></label>
             </div>
             <div class="mt-auto border-t border-gray-100 pt-6 text-center">
                 <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">Version 1.0</p>
             </div>
         </div>
 
-        <div class="mess-orange text-white p-6 rounded-b-[3.5rem] shadow-2xl mb-6 sticky top-0 z-50">
+        <div class="mess-orange text-white p-6 rounded-b-[3.5rem] md:rounded-b-[5rem] shadow-2xl mb-6 sticky top-0 z-50">
             <div class="flex justify-between items-start">
                 <div class="flex items-center gap-4">
                     <button onclick="toggleMenu()" class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shadow-inner"><i class="fa-solid fa-bars-staggered"></i></button>
-                    <h1 class="text-2xl font-900 tracking-tighter uppercase leading-none">Maha<br>Mrityunjay</h1>
+                    <h1 class="text-2xl md:text-3xl font-900 tracking-tighter uppercase leading-none">Maha<br>Mrityunjay</h1>
                 </div>
                 <div class="text-right">
                     <p id="live-date" class="text-[10px] font-black opacity-80 uppercase tracking-widest mb-1"></p>
-                    <span id="live-clock" class="text-xs font-black bg-black/10 px-4 py-1.5 rounded-full uppercase tracking-tighter"></span>
+                    <span id="live-clock" class="text-xs md:text-sm font-black bg-black/10 px-4 py-1.5 rounded-full uppercase tracking-tighter"></span>
                 </div>
             </div>
         </div>
 
-        <div class="px-5 mb-6 space-y-4">
+        <div class="px-5 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
                 <i class="fa-solid fa-magnifying-glass text-gray-300"></i>
                 <input type="text" id="search-input" oninput="render()" placeholder="Search members..." class="bg-transparent outline-none w-full font-bold text-sm">
             </div>
-            <div class="bg-gray-200 p-1.5 rounded-2xl flex font-bold text-[10px] relative">
-                <button onclick="setMode('Lunch')" class="flex-1 py-3.5 rounded-xl z-10 uppercase">Lunch</button>
-                <button onclick="setMode('Dinner')" class="flex-1 py-3.5 rounded-xl z-10 uppercase">Dinner</button>
-                <div id="mode-glider" class="absolute top-1.5 left-1.5 bottom-1.5 w-[47%] bg-white rounded-xl shadow-md transition-all duration-300"></div>
+            <div class="bg-gray-200 p-1 rounded-2xl flex font-bold text-[10px] relative border border-gray-100">
+                <button onclick="setMode('Lunch')" class="flex-1 py-3.5 rounded-xl z-10 uppercase transition-colors">Lunch</button>
+                <button onclick="setMode('Dinner')" class="flex-1 py-3.5 rounded-xl z-10 uppercase transition-colors">Dinner</button>
+                <div id="mode-glider" class="absolute top-1 left-1 bottom-1 w-[48%] bg-white rounded-xl shadow-md transition-all duration-300"></div>
             </div>
         </div>
 
-        <div class="px-5 grid grid-cols-2 gap-5" id="user-list"></div>
+        <div class="px-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6" id="user-list"></div>
     </div>
 
     <div id="pay-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-6 text-center">
-        <div class="bg-white w-full rounded-[4rem] p-10 shadow-2xl">
-            <h2 id="pay-name" class="text-2xl font-900 uppercase mb-2 text-gray-800 tracking-tighter text-center">Payment</h2>
+        <div class="bg-white w-full max-w-sm rounded-[4rem] p-10 shadow-2xl">
+            <h2 id="pay-name" class="text-2xl font-900 uppercase mb-2 text-gray-800">Settlement</h2>
             <input type="number" id="pay-amt" class="w-full text-6xl font-black text-green-600 border-b-4 border-gray-100 outline-none py-3 mb-10 text-center bg-transparent" placeholder="0">
             <button onclick="confirmPayment()" class="w-full py-6 mess-orange text-white rounded-[2rem] font-black uppercase text-xs shadow-xl mb-4">Confirm Cash</button>
             <button onclick="closePayModal()" class="text-gray-400 font-bold text-[9px] uppercase tracking-widest">Cancel</button>
         </div>
     </div>
 
-    <div id="history-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-end">
-        <div class="bg-white w-full rounded-t-[4rem] p-10 max-h-[85vh] flex flex-col shadow-2xl border-t-4 border-orange-500">
+    <div id="history-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-end justify-center">
+        <div class="bg-white w-full max-w-3xl rounded-t-[4rem] p-10 max-h-[85vh] flex flex-col shadow-2xl border-t-4 border-orange-500">
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h2 id="hist-name" class="text-2xl font-900 text-gray-800 uppercase leading-none">History</h2>
-                    <p class="text-[9px] text-gray-400 font-black mt-3 uppercase tracking-widest">L=Lunch | D=Dinner</p>
+                    <p class="text-[9px] text-gray-400 font-black mt-3 uppercase tracking-widest">Status: L (Lunch), D (Dinner)</p>
                 </div>
                 <div class="flex gap-3">
-                    <button id="pdf-btn" class="w-14 h-14 bg-red-500 text-white rounded-2xl flex items-center justify-center shadow-xl"><i class="fa-solid fa-file-invoice text-xl"></i></button>
-                    <button onclick="closeHistory()" class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-500"><i class="fa-solid fa-times text-xl"></i></button>
+                    <button id="pdf-btn" class="w-14 h-14 bg-red-500 text-white rounded-2xl flex items-center justify-center shadow-xl active:scale-90"><i class="fa-solid fa-file-invoice text-xl"></i></button>
+                    <button onclick="closeHistory()" class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-500 active:scale-90"><i class="fa-solid fa-times text-xl"></i></button>
                 </div>
             </div>
             <div id="history-list" class="overflow-y-auto space-y-4 pb-12"></div>
@@ -119,20 +130,21 @@
 
     <script>
         const MASTER_PIN = "1234";
-        const CRYPTO_KEY = "MahaMess-Indore-v1";
+        const CRYPTO_KEY = "MahaMess-Indore-v1.2-Ironclad";
         const BUS_NAME = "MAHA MRITYUNJAY MESS";
         let users = [];
         let currentMode = 'Lunch';
         let idleTimer, activeUserId, tempPhotoData;
+        let isToggling = false; // Debounce loophole fix
 
         function save() {
             const raw = JSON.stringify(users);
             const cipher = CryptoJS.AES.encrypt(raw, CRYPTO_KEY).toString();
-            localStorage.setItem('mm_indore_vault_final_v1', cipher);
+            localStorage.setItem('mm_indore_ironclad_v1.2', cipher);
         }
 
         function load() {
-            const cipher = localStorage.getItem('mm_indore_vault_final_v1');
+            const cipher = localStorage.getItem('mm_indore_ironclad_v1.2');
             if (!cipher) return;
             try {
                 const bytes = CryptoJS.AES.decrypt(cipher, CRYPTO_KEY);
@@ -140,62 +152,61 @@
             } catch(e) { users = []; }
         }
 
+        // --- SECURITY ---
+        function unlockSystem() {
+            if (document.getElementById('unlock-pin').value === MASTER_PIN) {
+                document.getElementById('lock-screen').classList.add('hidden');
+                const app = document.getElementById('main-app');
+                app.classList.remove('content-hidden');
+                app.style.opacity = "1";
+                app.style.transform = "scale(1)";
+                document.body.style.overflow = "auto";
+                document.getElementById('unlock-pin').value = "";
+                resetTimer();
+            } else { alert("ACCESS DENIED"); document.getElementById('unlock-pin').value = ""; }
+        }
+
+        function resetTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => { 
+                document.getElementById('lock-screen').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('content-hidden');
+                document.body.style.overflow = "hidden";
+            }, 300000); // 5 Mins Idle Lock
+        }
+
+        // --- CORE LOGIC ---
         function toggleMeal(id) {
+            if(isToggling) return; // Prevent double-tap loophole
+            isToggling = true;
+
             const u = users.find(x => x.id === id);
-            const options = { timeZone: 'Asia/Kolkata', day: '2-digit', month: '2-digit', year: 'numeric' };
-            const date = new Date().toLocaleDateString('en-IN', options).replace(/-/g, '/');
-            const idx = u.logs.findIndex(l => l.date === date && l.session === currentMode);
+            const istDate = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+            const idx = u.logs.findIndex(l => l.date === istDate && l.session === currentMode);
             const now = Date.now();
+
             if (idx === -1) {
-                u.logs.push({ type: 'meal', date, session: currentMode, amount: 50, ts: now });
+                u.logs.push({ type: 'meal', date: istDate, session: currentMode, amount: 50, ts: now });
                 u.balance += 50;
                 save(); render();
             } else {
                 const diffMin = (now - (u.logs[idx].ts || 0)) / 60000;
-                if (diffMin < 5 && prompt("ENTER PIN TO MODIFY RECORD:") !== MASTER_PIN) return;
+                if (diffMin < 5 && prompt("ENTER ADMIN PIN TO MODIFY:") !== MASTER_PIN) { isToggling = false; return; }
                 u.balance -= 50; u.logs.splice(idx, 1);
                 save(); render();
             }
-        }
-
-        function generatePDF(u) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const today = new Date();
-            const cm = today.getMonth();
-            const cy = today.getFullYear();
-            doc.setFontSize(22); doc.setTextColor(255, 87, 34);
-            doc.text(BUS_NAME, 105, 20, { align: 'center' });
-            doc.setFontSize(10); doc.setTextColor(100);
-            doc.text(`Monthly Record: ${today.toLocaleString('en-IN', { month: 'long', timeZone: 'Asia/Kolkata' })} ${cy}`, 105, 28, { align: 'center' });
-            const days = new Date(cy, cm + 1, 0).getDate();
-            const first = new Date(cy, cm, 1).getDay();
-            let rows = []; let week = Array(7).fill("");
-            for (let i = 1; i <= days; i++) {
-                const dStr = i.toString().padStart(2, '0') + '/' + (cm + 1).toString().padStart(2, '0') + '/' + cy;
-                const L = u.logs.some(l => l.date === dStr && l.session === 'Lunch');
-                const D = u.logs.some(l => l.date === dStr && l.session === 'Dinner');
-                let st = (L && D) ? "\nL+D" : (L ? "\nL" : (D ? "\nD" : ""));
-                week[(first + i - 1) % 7] = `${i}${st}`;
-                if ((first + i - 1) % 7 === 6 || i === days) { rows.push(week); week = Array(7).fill(""); }
-            }
-            doc.autoTable({
-                startY: 50, head: [["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]], body: rows,
-                styles: { halign: 'center', minCellHeight: 18, fontSize: 10, valign: 'middle' },
-                headStyles: { fillColor: [50, 50, 50] }
-            });
-            doc.save(`${u.name}_Report.pdf`);
-            const msg = encodeURIComponent(`Hi ${u.name}, Attendance PDF generated.\n\n*Net Balance: ₹${u.balance}*\n\nRegards,\n${BUS_NAME}`);
-            window.open(`https://wa.me/91${u.phone}?text=${msg}`, '_blank');
+            setTimeout(() => { isToggling = false; }, 800); // Debounce duration
         }
 
         function saveStudent() {
             const n = document.getElementById('new-name').value.trim();
             const p = document.getElementById('new-phone').value.trim();
-            if (!n || p.length < 10 || !tempPhotoData) return alert("Missing details.");
+            if (!n || p.length < 10 || !tempPhotoData) return alert("Fill all details correctly.");
             users.push({ id: Date.now(), name: n, phone: p, photo: tempPhotoData, balance: 0, logs: [] });
-            const msg = encodeURIComponent(`Welcome, *${n}*!\nRegistration successful at Maha Mrityunjay Mess.\n\nRegards,\n${BUS_NAME}`);
+            
+            const msg = encodeURIComponent(`Welcome, *${n}*!\nRegistration at Maha Mrityunjay Mess is successful. Account Active.\n\nRegards,\n${BUS_NAME}`);
             window.open(`https://wa.me/91${p}?text=${msg}`, '_blank');
+            
             document.getElementById('new-name').value = ""; document.getElementById('new-phone').value = "";
             tempPhotoData = null; save(); render(); toggleMenu();
         }
@@ -203,15 +214,64 @@
         function confirmPayment() {
             const amt = parseFloat(document.getElementById('pay-amt').value);
             const u = users.find(x => x.id === activeUserId);
-            if (!amt || amt <= 0) return;
-            u.balance -= amt;
-            const istD = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
-            u.logs.push({ type: 'payment', date: istD, amount: amt, ts: Date.now() });
-            const msg = encodeURIComponent(`*PAYMENT RECEIPT*\n*Student:* ${u.name}\n*Amount:* ₹${amt}\n*Due:* ₹${u.balance}\n\nRegards,\n${BUS_NAME}`);
-            window.open(`https://wa.me/91${u.phone}?text=${msg}`, '_blank');
-            save(); render(); closePayModal();
+            if (amt > 0) {
+                u.balance -= amt;
+                u.logs.push({ type: 'payment', date: new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }), amount: amt, ts: Date.now() });
+                
+                const msg = encodeURIComponent(`*PAYMENT RECEIPT*\n--------------------------\n*Student:* ${u.name}\n*Amount:* ₹${amt}\n*Due Balance:* ₹${u.balance}\n--------------------------\nRegards,\n${BUS_NAME}`);
+                window.open(`https://wa.me/91${u.phone}?text=${msg}`, '_blank');
+                save(); render(); closePayModal();
+            }
         }
 
+        // --- RENDER ---
+        function render() {
+            const list = document.getElementById('user-list');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const istDate = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+            
+            list.innerHTML = users.filter(u => u.name.toLowerCase().includes(search)).map(u => {
+                const ate = u.logs.some(l => l.date === istDate && l.session === currentMode);
+                return `
+                <div class="card-pro p-4 ${u.balance >= 1500 ? 'debt-alert' : ''} ${ate ? 'marked-ate' : ''}">
+                    <img src="${u.photo}" class="student-photo mb-3 shadow-inner" onclick="toggleMeal(${u.id})">
+                    <h4 class="text-[12px] font-900 text-gray-800 truncate text-center uppercase tracking-tighter">${u.name}</h4>
+                    <p class="text-[11px] font-black text-center ${u.balance > 0 ? 'text-red-500' : 'text-green-600'} mb-4">₹${u.balance}</p>
+                    <div class="flex gap-1.5">
+                        <button onclick="toggleMeal(${u.id})" class="flex-1 py-3 rounded-xl text-[9px] font-black ${ate ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-400'} uppercase active:scale-95 transition-all">${ate ? 'ATE' : 'MARK'}</button>
+                        <button onclick="openHistory(${u.id})" class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100 active:scale-90"><i class="fa-solid fa-receipt text-[10px]"></i></button>
+                        <button onclick="openPay(${u.id})" class="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center border border-green-100 active:scale-90"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                    </div>
+                    <button onclick="deleteMember(${u.id})" class="absolute top-1 right-2 text-gray-200 text-xl font-bold">&times;</button>
+                </div>`;
+            }).join('');
+        }
+
+        function generatePDF(u) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const today = new Date();
+            doc.setFontSize(22); doc.setTextColor(255, 87, 34);
+            doc.text(BUS_NAME, 105, 20, { align: 'center' });
+            
+            const cm = today.getMonth(); const cy = today.getFullYear();
+            const days = new Date(cy, cm + 1, 0).getDate();
+            const first = new Date(cy, cm, 1).getDay();
+            let rows = []; let week = Array(7).fill("");
+            for (let i = 1; i <= days; i++) {
+                const dStr = i.toString().padStart(2, '0') + '/' + (cm + 1).toString().padStart(2, '0') + '/' + cy;
+                const L = u.logs.some(l => l.date === dStr && l.session === 'Lunch');
+                const D = u.logs.some(l => l.date === dStr && l.session === 'Dinner');
+                week[(first + i - 1) % 7] = `${i}${(L||D) ? '\n'+(L?'L':'')+(D?'D':''):''}`;
+                if ((first + i - 1) % 7 === 6 || i === days) { rows.push(week); week = Array(7).fill(""); }
+            }
+            doc.autoTable({ startY: 50, head: [["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]], body: rows, styles: { halign: 'center', minCellHeight: 18, fontSize: 10, valign: 'middle' }, headStyles: { fillColor: [50, 50, 50] } });
+            doc.save(`${u.name}_MahaMrityunjay_Report.pdf`);
+            const msg = encodeURIComponent(`Hi ${u.name}, Attendance PDF generated.\n\n*Net Balance: ₹${u.balance}*\n\nRegards,\n${BUS_NAME}`);
+            window.open(`https://wa.me/91${u.phone}?text=${msg}`, '_blank');
+        }
+
+        // --- UTILS ---
         function previewFile() {
             const file = document.getElementById('camera-input').files[0];
             const reader = new FileReader();
@@ -229,47 +289,21 @@
         }
 
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('sidebar-open'); document.getElementById('overlay').classList.toggle('hidden'); }
-        function setMode(m) { currentMode = m; document.getElementById('mode-glider').style.left = (m === 'Lunch') ? '6px' : '51%'; render(); }
-        function unlockSystem() { if (document.getElementById('unlock-pin').value === MASTER_PIN) { document.getElementById('lock-screen').classList.add('hidden'); document.getElementById('main-app').classList.remove('content-blur'); document.getElementById('unlock-pin').value = ""; resetTimer(); } else { alert("WRONG PIN"); } }
-        function resetTimer() { clearTimeout(idleTimer); idleTimer = setTimeout(() => { document.getElementById('lock-screen').classList.remove('hidden'); document.getElementById('main-app').classList.add('content-blur'); }, 120000); }
+        function setMode(m) { currentMode = m; document.getElementById('mode-glider').style.left = (m === 'Lunch') ? '4px' : '51%'; render(); }
         function deleteMember(id) { if (prompt("DELETE PIN:") === MASTER_PIN) { users = users.filter(u => u.id !== id); save(); render(); } }
-        function openHistory(id) { activeUserId = id; const u = users.find(x => x.id === id); renderHistory(u); document.getElementById('history-modal').classList.remove('hidden'); }
-        function renderHistory(u) {
-            const list = document.getElementById('history-list');
-            list.innerHTML = u.logs.slice().reverse().map(l => `<div class="p-5 bg-gray-50 rounded-2xl flex justify-between items-center border border-gray-100"><span>${l.date} ${l.session || 'PAID'}</span><b class="${l.type === 'meal'?'text-red-500':'text-green-600'}">₹${l.amount}</b></div>`).join('');
-            document.getElementById('pdf-btn').onclick = () => generatePDF(u);
-        }
+        function openHistory(id) { activeUserId = id; const u = users.find(x => x.id === id); document.getElementById('hist-name').innerText = u.name; const list = document.getElementById('history-list'); list.innerHTML = u.logs.slice().reverse().map(l => `<div class="p-5 bg-gray-50 rounded-2xl flex justify-between items-center border border-gray-100"><span>${l.date} ${l.session || 'PAID'}</span><b class="${l.type === 'meal'?'text-red-500':'text-green-600'}">₹${l.amount}</b></div>`).join(''); document.getElementById('pdf-btn').onclick = () => generatePDF(u); document.getElementById('history-modal').classList.remove('hidden'); }
         function openPay(id) { activeUserId = id; const u = users.find(x => x.id === id); document.getElementById('pay-name').innerText = u.name; document.getElementById('pay-modal').classList.remove('hidden'); }
         function closeHistory() { document.getElementById('history-modal').classList.add('hidden'); }
         function closePayModal() { document.getElementById('pay-modal').classList.add('hidden'); document.getElementById('pay-amt').value = ""; }
-        function exportData() { const b = new Blob([JSON.stringify(users)],{type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download='MM_v1_Backup.json'; a.click(); }
-        function importData(e) { const r = new FileReader(); r.onload=(x)=>{ users=JSON.parse(x.target.result); save(); render(); }; r.readAsText(e.target.files[0]); }
-
-        function render() {
-            const list = document.getElementById('user-list');
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const istDate = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
-            list.innerHTML = users.filter(u => u.name.toLowerCase().includes(search)).map(u => {
-                const ate = u.logs.some(l => l.date === istDate && l.session === currentMode);
-                return `
-                <div class="card-pro p-4 ${u.balance >= 1500 ? 'blink-red' : ''} ${ate ? 'marked-green' : ''}">
-                    <img src="${u.photo}" class="student-photo mb-3 shadow-inner" onclick="toggleMeal(${u.id})">
-                    <h4 class="text-[12px] font-900 text-gray-800 truncate text-center uppercase tracking-tighter">${u.name}</h4>
-                    <p class="text-[11px] font-black text-center ${u.balance > 0 ? 'text-red-500' : 'text-green-600'} mb-4">₹${u.balance}</p>
-                    <div class="flex gap-2">
-                        <button onclick="toggleMeal(${u.id})" class="flex-1 py-3 rounded-xl text-[9px] font-black ${ate ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-400'} uppercase">MARK</button>
-                        <button onclick="openHistory(${u.id})" class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100"><i class="fa-solid fa-receipt text-[11px]"></i></button>
-                        <button onclick="openPay(${u.id})" class="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center border border-green-100"><i class="fa-solid fa-plus text-[11px]"></i></button>
-                    </div>
-                    <button onclick="deleteMember(${u.id})" class="absolute top-1 right-2 text-gray-200 text-2xl font-bold">&times;</button>
-                </div>`;
-            }).join('');
-        }
+        function exportData() { const b = new Blob([JSON.stringify(users)],{type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download='MahaMrityunjay_Backup.json'; a.click(); }
+        function importData(e) { const r = new FileReader(); r.onload=(x)=>{ try { users=JSON.parse(x.target.result); save(); render(); } catch(e){ alert("Invalid File"); } }; r.readAsText(e.target.files[0]); }
 
         window.addEventListener('click', resetTimer);
         window.addEventListener('touchstart', resetTimer);
-        load(); render(); resetTimer();
         
+        load(); 
+        render(); 
+
         setInterval(() => { 
             const now = new Date();
             const tOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' };
