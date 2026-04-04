@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Maha Mrityunjay Mess - Professional Build</title>
+    <title>Maha Mrityunjay Mess - v1.0</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -32,17 +32,16 @@
 
     <div id="lock-screen" class="hidden fixed inset-0 flex flex-col items-center justify-center p-10 text-center">
         <div class="w-24 h-24 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-8 shadow-2xl"><i class="fa-solid fa-fingerprint text-4xl"></i></div>
-        <h2 class="text-3xl font-900 text-gray-800 mb-2 uppercase tracking-tighter">Identity Check</h2>
-        <p class="text-[10px] text-gray-400 font-black mb-12 uppercase tracking-[0.3em]">Maha Mrityunjay Mess Security</p>
+        <h2 class="text-3xl font-900 text-gray-800 mb-2 uppercase tracking-tighter text-center">Vault Access</h2>
         <input type="password" id="unlock-pin" maxlength="4" class="w-32 text-center text-4xl font-black border-b-4 border-orange-500 outline-none pb-3 mb-12 bg-transparent" placeholder="****">
-        <button onclick="unlockSystem()" class="w-full py-5 mess-orange text-white rounded-[2rem] font-black uppercase text-xs shadow-2xl">Unlock Vault</button>
+        <button onclick="unlockSystem()" class="w-full py-5 mess-orange text-white rounded-[2rem] font-black uppercase text-xs shadow-2xl">Unlock</button>
     </div>
 
     <div id="main-app">
         <div id="overlay" onclick="toggleMenu()" class="hidden fixed inset-0 bg-black/40 z-[100] backdrop-blur-sm"></div>
         <div id="sidebar" class="fixed top-0 left-0 h-full w-4/5 max-w-xs bg-white z-[101] -translate-x-full shadow-2xl p-8 flex flex-col transition-transform duration-300">
             <div class="flex justify-between items-center mb-10">
-                <h2 class="text-xl font-900 text-orange-600 uppercase tracking-tighter">Admin Panel</h2>
+                <h2 class="text-xl font-900 text-orange-600 uppercase tracking-tighter">Admin Menu</h2>
                 <button onclick="toggleMenu()"><i class="fa-solid fa-xmark text-2xl text-gray-300"></i></button>
             </div>
             <div class="space-y-4 flex-1 overflow-y-auto">
@@ -50,24 +49,28 @@
                     <input type="text" id="new-name" placeholder="Full Name" class="w-full p-4 bg-white rounded-2xl mb-3 outline-none border border-gray-200 font-bold text-sm">
                     <input type="number" id="new-phone" placeholder="WhatsApp Number" class="w-full p-4 bg-white rounded-2xl mb-4 outline-none border border-gray-200 font-bold text-sm">
                     <label class="h-14 bg-white rounded-2xl flex items-center justify-center cursor-pointer border-2 border-dashed border-orange-200 mb-5">
-                        <span class="text-xs font-black text-orange-500 uppercase tracking-widest" id="photo-status"><i class="fa-solid fa-camera mr-2"></i>Verify Photo</span>
+                        <span class="text-xs font-black text-orange-500 uppercase tracking-widest" id="photo-status"><i class="fa-solid fa-camera mr-2"></i>Verify Face</span>
                         <input type="file" accept="image/*" capture="user" id="camera-input" class="hidden" onchange="previewFile()">
                     </label>
-                    <button onclick="saveStudent()" class="w-full h-14 mess-orange text-white rounded-2xl font-black text-xs uppercase shadow-lg">Register Member</button>
+                    <button onclick="saveStudent()" class="w-full h-14 mess-orange text-white rounded-2xl font-black text-xs uppercase shadow-lg">Join Member</button>
                 </div>
-                <button onclick="exportData()" class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase tracking-widest"><i class="fa-solid fa-file-shield text-orange-500"></i> Export Backup</button>
-                <label class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase cursor-pointer"><i class="fa-solid fa-rotate-left text-orange-500"></i> Restore Data <input type="file" class="hidden" onchange="importData(event)"></label>
+                <button onclick="exportData()" class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase tracking-widest"><i class="fa-solid fa-file-shield text-orange-500"></i> Cloud Backup</button>
+                <label class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase cursor-pointer"><i class="fa-solid fa-rotate-left text-orange-500"></i> Restore Key <input type="file" class="hidden" onchange="importData(event)"></label>
+            </div>
+            <div class="mt-auto border-t border-gray-100 pt-6 text-center">
+                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">Version 1.0</p>
             </div>
         </div>
 
         <div class="mess-orange text-white p-6 rounded-b-[3.5rem] shadow-2xl mb-6 sticky top-0 z-50">
             <div class="flex justify-between items-start">
                 <div class="flex items-center gap-4">
-                    <button onclick="toggleMenu()" class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-bars-staggered"></i></button>
+                    <button onclick="toggleMenu()" class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shadow-inner"><i class="fa-solid fa-bars-staggered"></i></button>
                     <h1 class="text-2xl font-900 tracking-tighter uppercase leading-none">Maha<br>Mrityunjay</h1>
                 </div>
                 <div class="text-right">
-                    <span id="live-clock" class="text-sm font-black bg-black/10 px-4 py-1.5 rounded-full uppercase"></span>
+                    <p id="live-date" class="text-[10px] font-black opacity-80 uppercase tracking-widest mb-1"></p>
+                    <span id="live-clock" class="text-xs font-black bg-black/10 px-4 py-1.5 rounded-full uppercase tracking-tighter"></span>
                 </div>
             </div>
         </div>
@@ -87,10 +90,9 @@
         <div class="px-5 grid grid-cols-2 gap-5" id="user-list"></div>
     </div>
 
-    <div id="pay-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-6">
-        <div class="bg-white w-full rounded-[4rem] p-10 text-center shadow-2xl">
-            <h2 id="pay-name" class="text-2xl font-900 uppercase mb-2 text-gray-800">Settlement</h2>
-            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-10">Enter Cash Received</p>
+    <div id="pay-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-6 text-center">
+        <div class="bg-white w-full rounded-[4rem] p-10 shadow-2xl">
+            <h2 id="pay-name" class="text-2xl font-900 uppercase mb-2 text-gray-800 tracking-tighter text-center">Payment</h2>
             <input type="number" id="pay-amt" class="w-full text-6xl font-black text-green-600 border-b-4 border-gray-100 outline-none py-3 mb-10 text-center bg-transparent" placeholder="0">
             <button onclick="confirmPayment()" class="w-full py-6 mess-orange text-white rounded-[2rem] font-black uppercase text-xs shadow-xl mb-4">Confirm Cash</button>
             <button onclick="closePayModal()" class="text-gray-400 font-bold text-[9px] uppercase tracking-widest">Cancel</button>
@@ -98,7 +100,7 @@
     </div>
 
     <div id="history-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-end">
-        <div class="bg-white w-full rounded-t-[4rem] p-10 max-h-[88vh] flex flex-col shadow-2xl border-t-4 border-orange-500">
+        <div class="bg-white w-full rounded-t-[4rem] p-10 max-h-[85vh] flex flex-col shadow-2xl border-t-4 border-orange-500">
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h2 id="hist-name" class="text-2xl font-900 text-gray-800 uppercase leading-none">History</h2>
@@ -106,7 +108,7 @@
                 </div>
                 <div class="flex gap-3">
                     <button id="pdf-btn" class="w-14 h-14 bg-red-500 text-white rounded-2xl flex items-center justify-center shadow-xl"><i class="fa-solid fa-file-invoice text-xl"></i></button>
-                    <button onclick="closeHistory()" class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                    <button onclick="closeHistory()" class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-500"><i class="fa-solid fa-times text-xl"></i></button>
                 </div>
             </div>
             <div id="history-list" class="overflow-y-auto space-y-4 pb-12"></div>
@@ -117,7 +119,8 @@
 
     <script>
         const MASTER_PIN = "1234";
-        const CRYPTO_KEY = "MahaMess-UltraSecure-2026";
+        const CRYPTO_KEY = "MahaMess-Indore-v1";
+        const BUS_NAME = "MAHA MRITYUNJAY MESS";
         let users = [];
         let currentMode = 'Lunch';
         let idleTimer, activeUserId, tempPhotoData;
@@ -125,11 +128,11 @@
         function save() {
             const raw = JSON.stringify(users);
             const cipher = CryptoJS.AES.encrypt(raw, CRYPTO_KEY).toString();
-            localStorage.setItem('mm_indore_vault', cipher);
+            localStorage.setItem('mm_indore_vault_final_v1', cipher);
         }
 
         function load() {
-            const cipher = localStorage.getItem('mm_indore_vault');
+            const cipher = localStorage.getItem('mm_indore_vault_final_v1');
             if (!cipher) return;
             try {
                 const bytes = CryptoJS.AES.decrypt(cipher, CRYPTO_KEY);
@@ -139,17 +142,17 @@
 
         function toggleMeal(id) {
             const u = users.find(x => x.id === id);
-            const date = new Date().toLocaleDateString('en-GB');
+            const options = { timeZone: 'Asia/Kolkata', day: '2-digit', month: '2-digit', year: 'numeric' };
+            const date = new Date().toLocaleDateString('en-IN', options).replace(/-/g, '/');
             const idx = u.logs.findIndex(l => l.date === date && l.session === currentMode);
             const now = Date.now();
-
             if (idx === -1) {
                 u.logs.push({ type: 'meal', date, session: currentMode, amount: 50, ts: now });
                 u.balance += 50;
                 save(); render();
             } else {
                 const diffMin = (now - (u.logs[idx].ts || 0)) / 60000;
-                if (diffMin < 5 && prompt("SECURITY LOCK (5 MINS): Enter Admin PIN:") !== MASTER_PIN) return;
+                if (diffMin < 5 && prompt("ENTER PIN TO MODIFY RECORD:") !== MASTER_PIN) return;
                 u.balance -= 50; u.logs.splice(idx, 1);
                 save(); render();
             }
@@ -161,16 +164,13 @@
             const today = new Date();
             const cm = today.getMonth();
             const cy = today.getFullYear();
-
             doc.setFontSize(22); doc.setTextColor(255, 87, 34);
-            doc.text("MAHA MRITYUNJAY MESS", 105, 20, { align: 'center' });
+            doc.text(BUS_NAME, 105, 20, { align: 'center' });
             doc.setFontSize(10); doc.setTextColor(100);
-            doc.text(`Monthly Attendance Record: ${today.toLocaleString('default', { month: 'long' })} ${cy}`, 105, 28, { align: 'center' });
-
+            doc.text(`Monthly Record: ${today.toLocaleString('en-IN', { month: 'long', timeZone: 'Asia/Kolkata' })} ${cy}`, 105, 28, { align: 'center' });
             const days = new Date(cy, cm + 1, 0).getDate();
             const first = new Date(cy, cm, 1).getDay();
             let rows = []; let week = Array(7).fill("");
-
             for (let i = 1; i <= days; i++) {
                 const dStr = i.toString().padStart(2, '0') + '/' + (cm + 1).toString().padStart(2, '0') + '/' + cy;
                 const L = u.logs.some(l => l.date === dStr && l.session === 'Lunch');
@@ -179,25 +179,22 @@
                 week[(first + i - 1) % 7] = `${i}${st}`;
                 if ((first + i - 1) % 7 === 6 || i === days) { rows.push(week); week = Array(7).fill(""); }
             }
-
             doc.autoTable({
                 startY: 50, head: [["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]], body: rows,
                 styles: { halign: 'center', minCellHeight: 18, fontSize: 10, valign: 'middle' },
                 headStyles: { fillColor: [50, 50, 50] }
             });
-
-            doc.save(`${u.name}_MahaMrityunjay_Report.pdf`);
-            const msg = encodeURIComponent(`*MAHA MRITYUNJAY MESS*\n--------------------------\nHi ${u.name}, I have generated your Attendance & Payment Report for this month. Please find the PDF attached above.\n\n*Current Net Due: ₹${u.balance}*\n--------------------------\n_Thank you for choosing our service._`);
+            doc.save(`${u.name}_Report.pdf`);
+            const msg = encodeURIComponent(`Hi ${u.name}, Attendance PDF generated.\n\n*Net Balance: ₹${u.balance}*\n\nRegards,\n${BUS_NAME}`);
             window.open(`https://wa.me/91${u.phone}?text=${msg}`, '_blank');
         }
 
         function saveStudent() {
             const n = document.getElementById('new-name').value.trim();
             const p = document.getElementById('new-phone').value.trim();
-            if (!n || p.length < 10 || !tempPhotoData) return alert("Please fill all details correctly.");
+            if (!n || p.length < 10 || !tempPhotoData) return alert("Missing details.");
             users.push({ id: Date.now(), name: n, phone: p, photo: tempPhotoData, balance: 0, logs: [] });
-            
-            const msg = encodeURIComponent(`*MAHA MRITYUNJAY MESS*\n--------------------------\nWelcome, *${n}*!\nYour registration at Maha Mrityunjay Mess is successful. Your account is now active.\n\n_Healthy Food, Happy Life!_\n--------------------------`);
+            const msg = encodeURIComponent(`Welcome, *${n}*!\nRegistration successful at Maha Mrityunjay Mess.\n\nRegards,\n${BUS_NAME}`);
             window.open(`https://wa.me/91${p}?text=${msg}`, '_blank');
             document.getElementById('new-name').value = ""; document.getElementById('new-phone').value = "";
             tempPhotoData = null; save(); render(); toggleMenu();
@@ -207,15 +204,11 @@
             const amt = parseFloat(document.getElementById('pay-amt').value);
             const u = users.find(x => x.id === activeUserId);
             if (!amt || amt <= 0) return;
-            
-            const oldBal = u.balance;
             u.balance -= amt;
-            u.logs.push({ type: 'payment', date: new Date().toLocaleDateString('en-GB'), amount: amt, ts: Date.now() });
-            
-            const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            const msg = encodeURIComponent(`*MAHA MRITYUNJAY MESS*\n*PAYMENT RECEIPT*\n--------------------------\n*Student:* ${u.name}\n*Date:* ${new Date().toLocaleDateString()}\n*Time:* ${time}\n--------------------------\n*Previous Balance:* ₹${oldBal}\n*Amount Received:* ₹${amt}\n*Closing Due:* ₹${u.balance}\n--------------------------\n_Thank you! Your trust helps us maintain quality._`);
+            const istD = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+            u.logs.push({ type: 'payment', date: istD, amount: amt, ts: Date.now() });
+            const msg = encodeURIComponent(`*PAYMENT RECEIPT*\n*Student:* ${u.name}\n*Amount:* ₹${amt}\n*Due:* ₹${u.balance}\n\nRegards,\n${BUS_NAME}`);
             window.open(`https://wa.me/91${u.phone}?text=${msg}`, '_blank');
-            
             save(); render(); closePayModal();
         }
 
@@ -239,7 +232,7 @@
         function setMode(m) { currentMode = m; document.getElementById('mode-glider').style.left = (m === 'Lunch') ? '6px' : '51%'; render(); }
         function unlockSystem() { if (document.getElementById('unlock-pin').value === MASTER_PIN) { document.getElementById('lock-screen').classList.add('hidden'); document.getElementById('main-app').classList.remove('content-blur'); document.getElementById('unlock-pin').value = ""; resetTimer(); } else { alert("WRONG PIN"); } }
         function resetTimer() { clearTimeout(idleTimer); idleTimer = setTimeout(() => { document.getElementById('lock-screen').classList.remove('hidden'); document.getElementById('main-app').classList.add('content-blur'); }, 120000); }
-        function deleteMember(id) { if (prompt("PIN:") === MASTER_PIN) { users = users.filter(u => u.id !== id); save(); render(); } }
+        function deleteMember(id) { if (prompt("DELETE PIN:") === MASTER_PIN) { users = users.filter(u => u.id !== id); save(); render(); } }
         function openHistory(id) { activeUserId = id; const u = users.find(x => x.id === id); renderHistory(u); document.getElementById('history-modal').classList.remove('hidden'); }
         function renderHistory(u) {
             const list = document.getElementById('history-list');
@@ -249,22 +242,22 @@
         function openPay(id) { activeUserId = id; const u = users.find(x => x.id === id); document.getElementById('pay-name').innerText = u.name; document.getElementById('pay-modal').classList.remove('hidden'); }
         function closeHistory() { document.getElementById('history-modal').classList.add('hidden'); }
         function closePayModal() { document.getElementById('pay-modal').classList.add('hidden'); document.getElementById('pay-amt').value = ""; }
-        function exportData() { const b = new Blob([JSON.stringify(users)],{type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download='MM_Backup.json'; a.click(); }
+        function exportData() { const b = new Blob([JSON.stringify(users)],{type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download='MM_v1_Backup.json'; a.click(); }
         function importData(e) { const r = new FileReader(); r.onload=(x)=>{ users=JSON.parse(x.target.result); save(); render(); }; r.readAsText(e.target.files[0]); }
 
         function render() {
             const list = document.getElementById('user-list');
             const search = document.getElementById('search-input').value.toLowerCase();
-            const today = new Date().toLocaleDateString('en-GB');
+            const istDate = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
             list.innerHTML = users.filter(u => u.name.toLowerCase().includes(search)).map(u => {
-                const ate = u.logs.some(l => l.date === today && l.session === currentMode);
+                const ate = u.logs.some(l => l.date === istDate && l.session === currentMode);
                 return `
                 <div class="card-pro p-4 ${u.balance >= 1500 ? 'blink-red' : ''} ${ate ? 'marked-green' : ''}">
                     <img src="${u.photo}" class="student-photo mb-3 shadow-inner" onclick="toggleMeal(${u.id})">
                     <h4 class="text-[12px] font-900 text-gray-800 truncate text-center uppercase tracking-tighter">${u.name}</h4>
                     <p class="text-[11px] font-black text-center ${u.balance > 0 ? 'text-red-500' : 'text-green-600'} mb-4">₹${u.balance}</p>
                     <div class="flex gap-2">
-                        <button onclick="toggleMeal(${u.id})" class="flex-1 py-3 rounded-xl text-[9px] font-black ${ate ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-400'} uppercase">MARK</button>
+                        <button onclick="toggleMeal(${u.id})" class="flex-1 py-3 rounded-xl text-[9px] font-black ${ate ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-400'} uppercase">MARK</button>
                         <button onclick="openHistory(${u.id})" class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100"><i class="fa-solid fa-receipt text-[11px]"></i></button>
                         <button onclick="openPay(${u.id})" class="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center border border-green-100"><i class="fa-solid fa-plus text-[11px]"></i></button>
                     </div>
@@ -276,7 +269,14 @@
         window.addEventListener('click', resetTimer);
         window.addEventListener('touchstart', resetTimer);
         load(); render(); resetTimer();
-        setInterval(() => { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }, 1000);
+        
+        setInterval(() => { 
+            const now = new Date();
+            const tOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' };
+            const dOptions = { weekday: 'long', day: '2-digit', month: 'short', timeZone: 'Asia/Kolkata' };
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-IN', tOptions).toUpperCase(); 
+            document.getElementById('live-date').innerText = now.toLocaleDateString('en-IN', dOptions).toUpperCase();
+        }, 1000);
     </script>
 </body>
 </html>
