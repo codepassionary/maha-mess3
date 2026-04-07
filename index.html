@@ -9,14 +9,14 @@
             --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
             --muted: #64748b; --primary: #2563eb; --border: #e2e8f0;
             --green: #10b981; --orange: #f59e0b; --red: #ef4444;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
         .dark {
             --bg: #0f172a; --card: #1e293b; --text: #f1f5f9;
             --muted: #94a3b8; --border: #334155;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 40px; transition: 0.3s; }
+        body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 40px; transition: background 0.3s; }
         
         .container { max-width: 500px; margin: 0 auto; padding: 16px; }
         
@@ -26,48 +26,57 @@
         .header-btns { display: flex; gap: 10px; }
         .icon-btn { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 10px; cursor: pointer; font-size: 18px; box-shadow: var(--shadow); }
 
+        /* Status Bar */
         .status-bar { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
         #saveIndicator { color: var(--green); opacity: 0; transition: 0.3s; }
 
-        /* Quick Log UI with Sections */
-        .action-card { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
-        .meal-group-label { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin: 15px 0 8px 0; display: flex; align-items: center; gap: 8px; }
-        .meal-group-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-        .meal-group-label:first-child { margin-top: 0; }
-
+        /* Action Card */
+        .action-card { 
+            background: var(--card); padding: 20px; border-radius: 20px; 
+            box-shadow: var(--shadow); margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .section-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
         .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .toggle-btn { 
-            padding: 14px 10px; border-radius: 14px; border: 1px solid var(--border);
+            padding: 16px 10px; border-radius: 14px; border: 1px solid var(--border);
             background: var(--card); color: var(--text); cursor: pointer;
-            font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 6px;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .toggle-btn:active { transform: scale(0.95); }
         .toggle-btn.active { border-color: var(--primary); background: rgba(37, 99, 235, 0.1); color: var(--primary); border-width: 2px; }
-        .toggle-btn span { font-size: 10px; opacity: 0.7; }
+        .toggle-btn span { font-size: 11px; opacity: 0.7; font-weight: 500; }
 
-        /* Stats */
+        /* Smart Pulse Nudge */
+        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
+        .nudge { animation: pulse-blue 2s infinite; border-color: var(--primary); }
+
+        /* Stats & Progress */
         .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
         .stat-item { background: var(--card); padding: 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); }
         .stat-val { font-size: 20px; font-weight: 800; display: block; margin-top: 4px; }
         .stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
 
-        /* Progress Bar */
         .progress-box { background: var(--card); padding: 16px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
         .progress-container { height: 10px; background: var(--border); border-radius: 20px; overflow: hidden; margin-top: 10px; }
-        .progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.6s; }
+        .progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* History & Archive List */
-        .section-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
-        .table-wrap { display: none; background: var(--card); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
+        /* History Table */
+        .history-toggle { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 700; cursor: pointer; box-shadow: var(--shadow); }
+        .table-wrap { display: none; margin-top: 15px; background: var(--card); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        td, th { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); }
-        
-        .archive-item { background: var(--card); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .archive-info b { display: block; font-size: 14px; }
-        .archive-info small { color: var(--muted); font-size: 11px; }
+        th { background: rgba(0,0,0,0.02); padding: 12px; color: var(--muted); font-size: 11px; text-transform: uppercase; }
+        td { padding: 14px 10px; text-align: center; border-bottom: 1px solid var(--border); cursor: pointer; }
+        tr:hover td { background: rgba(37, 99, 235, 0.05); }
 
-        #settingsModal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-content { background: var(--card); padding: 24px; border-radius: 24px; width: 90%; max-width: 400px; }
+        /* Settings Modal */
+        #settingsModal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); display: none; z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--card); padding: 24px; border-radius: 24px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; color: var(--muted); text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-weight: 600; }
     </style>
 </head>
 <body>
@@ -76,36 +85,30 @@
     <div class="header">
         <h1>Nexus</h1>
         <div class="header-btns">
-            <button class="icon-btn" onclick="exportData()">💾</button>
+            <button class="icon-btn" onclick="exportData()" title="Backup Data">💾</button>
             <button class="icon-btn" onclick="document.getElementById('settingsModal').style.display='flex'">⚙️</button>
             <button class="icon-btn" onclick="toggleTheme()">🌙</button>
         </div>
     </div>
 
     <div class="status-bar">
-        <span>Editing: <b id="displayDate"></b></span>
+        <span>Managing Day: <b id="displayDate"></b></span>
         <span id="saveIndicator">✓ Saved</span>
     </div>
 
     <div class="action-card">
-        <div class="meal-group-label">Lunch</div>
+        <div class="section-title">Quick Log</div>
         <div class="grid-buttons">
-            <button class="toggle-btn" id="btnLA" onclick="toggleField('LA')">🍱 <span id="labelLA">Mess A</span></button>
-            <button class="toggle-btn" id="btnLB" onclick="toggleField('LB')">🍲 <span id="labelLB">Mess B</span></button>
+            <button class="toggle-btn" id="btnLA" onclick="toggleField('LA')">🍱 <span id="labelLA">Lunch A</span></button>
+            <button class="toggle-btn" id="btnLB" onclick="toggleField('LB')">🍲 <span id="labelLB">Lunch B</span></button>
+            <button class="toggle-btn" id="btnDA" onclick="toggleField('DA')">🍛 <span id="labelDA">Dinner A</span></button>
+            <button class="toggle-btn" id="btnDB" onclick="toggleField('DB')">🥘 <span id="labelDB">Dinner B</span></button>
         </div>
-
-        <div class="meal-group-label">Dinner</div>
-        <div class="grid-buttons">
-            <button class="toggle-btn" id="btnDA" onclick="toggleField('DA')">🍛 <span id="labelDA">Mess A</span></button>
-            <button class="toggle-btn" id="btnDB" onclick="toggleField('DB')">🥘 <span id="labelDB">Mess B</span></button>
-        </div>
-
-        <div class="meal-group-label">Others</div>
-        <div style="display: flex; gap: 12px;">
+        <div style="display: flex; gap: 12px; margin-top: 12px;">
             <button class="toggle-btn" id="btnW" style="flex: 1;" onclick="toggleField('W')">💧 <span>Water</span></button>
             <div class="toggle-btn" style="flex: 1; cursor: default;">
-                <span style="font-size: 10px; opacity:1">Extra Meal</span>
-                <input type="number" id="extraInput" value="0" min="0" onchange="updateExtra(this.value)" style="width: 50px; border:none; background:transparent; font-size:18px; font-weight:800; color:var(--primary); text-align:center;">
+                <span>Extra Meals</span>
+                <input type="number" id="extraInput" value="0" min="0" style="width: 60px; text-align: center; border:none; background:transparent; font-size:18px; font-weight:800; color:var(--primary)" onchange="updateExtra(this.value)">
             </div>
         </div>
     </div>
@@ -113,80 +116,140 @@
     <div class="progress-box">
         <div style="display:flex; justify-content: space-between; align-items: flex-end;">
             <span class="stat-label">Budget Usage</span>
-            <b id="budgetPct">0%</b>
+            <b id="budgetPct" style="font-size: 18px;">0%</b>
         </div>
         <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
     </div>
 
     <div class="stats">
-        <div class="stat-item"><span class="stat-label">Total Bill</span><span class="stat-val" id="statTotal">₹0</span></div>
-        <div class="stat-item"><span class="stat-label">Meals</span><span class="stat-val" id="statMeals">0</span></div>
+        <div class="stat-item">
+            <span class="stat-label">This Month</span>
+            <span class="stat-val" id="statTotal">₹0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Total Meals</span>
+            <span class="stat-val" id="statMeals">0</span>
+        </div>
     </div>
 
-    <button class="section-btn" onclick="toggleEl('historyTable')">📅 Current Month Ledger</button>
-    <div id="historyTable" class="table-wrap">
+    <button class="history-toggle" onclick="toggleHistory()">📅 View Detailed History</button>
+    
+    <div class="table-wrap" id="historyTable">
         <table>
-            <thead><tr><th>Day</th><th>L</th><th>D</th><th>W</th></tr></thead>
+            <thead><tr><th>Day</th><th>L</th><th>D</th><th>W</th><th>Ex</th></tr></thead>
             <tbody id="tbody"></tbody>
         </table>
     </div>
-
-    <button class="section-btn" style="background:var(--muted)" onclick="toggleEl('archiveBox')">📚 History Archives</button>
-    <div id="archiveBox" style="display:none"></div>
 </div>
 
 <div id="settingsModal" onclick="if(event.target==this) this.style.display='none'">
     <div class="modal-content">
-        <h3 style="margin:0 0 15px 0">Settings</h3>
-        <label style="font-size:11px; font-weight:bold; color:var(--muted)">MESS A</label>
-        <input type="text" id="setNameA" onchange="updateSet()" style="width:100%; padding:10px; margin:5px 0 15px 0; border-radius:8px; border:1px solid var(--border);">
-        <label style="font-size:11px; font-weight:bold; color:var(--muted)">MESS B</label>
-        <input type="text" id="setNameB" onchange="updateSet()" style="width:100%; padding:10px; margin:5px 0 15px 0; border-radius:8px; border:1px solid var(--border);">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div><label style="font-size:11px;">Meal ₹</label><input type="number" id="setPriceM" onchange="updateSet()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);"></div>
-            <div><label style="font-size:11px;">Water ₹</label><input type="number" id="setPriceW" onchange="updateSet()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);"></div>
+        <h3 style="margin-top:0; letter-spacing:-1px">Ledger Settings</h3>
+        <div class="input-group">
+            <label>Tracking Mode</label>
+            <select id="setMode" onchange="updateSet()">
+                <option value="1">Single Mess</option>
+                <option value="2">Dual Mess (A/B)</option>
+            </select>
         </div>
-        <button class="section-btn" style="margin-top:20px;" onclick="document.getElementById('settingsModal').style.display='none'">Close</button>
+        <div class="input-group"><label>Mess A Name</label><input type="text" id="setNameA" onchange="updateSet()"></div>
+        <div id="groupB" class="input-group"><label>Mess B Name</label><input type="text" id="setNameB" onchange="updateSet()"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="input-group"><label>Meal (₹)</label><input type="number" id="setPriceM" onchange="updateSet()"></div>
+            <div class="input-group"><label>Water (₹)</label><input type="number" id="setPriceW" onchange="updateSet()"></div>
+        </div>
+        <div class="input-group"><label>Monthly Budget (₹)</label><input type="number" id="setBudget" onchange="updateSet()"></div>
+        <button class="history-toggle" onclick="document.getElementById('settingsModal').style.display='none'">Save & Close</button>
     </div>
 </div>
 
 <script>
-    let config = JSON.parse(localStorage.getItem('m-conf')) || { nA: "Hostel", nB: "Outside", pM: 60, pW: 20, bud: 5000 };
-    let viewDate = new Date();
+    let config = JSON.parse(localStorage.getItem('m-conf')) || { mode: 2, nA: "Mess A", nB: "Mess B", pM: 60, pW: 20, bud: 5000 };
+    let viewDate = new Date(); // Date being viewed/edited
+    const realToday = new Date().getDate();
     const currentKey = `m-${viewDate.getFullYear()}-${viewDate.getMonth()}`;
     let data = JSON.parse(localStorage.getItem(currentKey)) || {};
 
-    // --- ARCHIVE ENGINE ---
-    function runArchive() {
-        const lastKey = localStorage.getItem('last-key');
-        if (lastKey && lastKey !== currentKey) {
-            const oldData = JSON.parse(localStorage.getItem(lastKey)) || {};
-            let meals = 0, water = 0, extras = 0;
-            Object.values(oldData).forEach(v => {
-                if(v.LA || v.LB) meals++; if(v.DA || v.DB) meals++;
-                if(v.W) water++; extras += (v.EX || 0);
-            });
-            const total = (meals + extras) * config.pM + (water * config.pW);
-            
-            let archives = JSON.parse(localStorage.getItem('m-archives')) || [];
-            archives.push({ date: lastKey.replace('m-', ''), bill: total, meals: meals + extras });
-            localStorage.setItem('m-archives', JSON.stringify(archives));
-        }
-        localStorage.setItem('last-key', currentKey);
+    function updateSet() {
+        config = {
+            mode: parseInt(document.getElementById('setMode').value),
+            nA: document.getElementById('setNameA').value,
+            nB: document.getElementById('setNameB').value,
+            pM: parseInt(document.getElementById('setPriceM').value),
+            pW: parseInt(document.getElementById('setPriceW').value),
+            bud: parseInt(document.getElementById('setBudget').value)
+        };
+        localStorage.setItem('m-conf', JSON.stringify(config));
+        applyUI();
     }
 
     function applyUI() {
         document.getElementById('displayDate').innerText = viewDate.toDateString();
+        document.getElementById('setMode').value = config.mode;
         document.getElementById('setNameA').value = config.nA;
         document.getElementById('setNameB').value = config.nB;
         document.getElementById('setPriceM').value = config.pM;
         document.getElementById('setPriceW').value = config.pW;
+        document.getElementById('setBudget').value = config.bud;
         
         document.getElementById('labelLA').innerText = config.nA;
         document.getElementById('labelDA').innerText = config.nA;
-        document.getElementById('labelLB').innerText = config.nB;
-        document.getElementById('labelDB').innerText = config.nB;
         
+        const isDual = config.mode === 2;
+        document.getElementById('groupB').style.display = isDual ? 'block' : 'none';
+        document.getElementById('btnLB').style.display = isDual ? 'flex' : 'none';
+        document.getElementById('btnDB').style.display = isDual ? 'flex' : 'none';
+        
+        renderActiveDay();
+        renderTable();
+        calc();
+        smartNudge();
+    }
+
+    function smartNudge() {
+        // Only nudge if we are looking at the actual current day
+        if (viewDate.getDate() !== realToday) {
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('nudge'));
+            return;
+        }
+        const hour = new Date().getHours();
+        document.getElementById('btnLA').classList.toggle('nudge', hour >= 11 && hour <= 15);
+        document.getElementById('btnDA').classList.toggle('nudge', hour >= 19 && hour <= 22);
+    }
+
+    function toggleField(field) {
+        const d = viewDate.getDate();
+        if(!data[d]) data[d] = {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
+        
+        if(field === 'LA') { data[d].LA = data[d].LA ? 0 : 1; data[d].LB = 0; }
+        if(field === 'LB') { data[d].LB = data[d].LB ? 0 : 1; data[d].LA = 0; }
+        if(field === 'DA') { data[d].DA = data[d].DA ? 0 : 1; data[d].DB = 0; }
+        if(field === 'DB') { data[d].DB = data[d].DB ? 0 : 1; data[d].DA = 0; }
+        if(field === 'W')  { data[d].W = data[d].W ? 0 : 1; }
+        
+        save();
+    }
+
+    function updateExtra(val) {
+        const d = viewDate.getDate();
+        if(!data[d]) data[d] = {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
+        data[d].EX = parseInt(val) || 0;
+        save();
+    }
+
+    function save() {
+        localStorage.setItem(currentKey, JSON.stringify(data));
+        showSaved();
+        applyUI();
+    }
+
+    function showSaved() {
+        const s = document.getElementById('saveIndicator');
+        s.style.opacity = 1;
+        setTimeout(() => s.style.opacity = 0, 1500);
+    }
+
+    function renderActiveDay() {
         const d = data[viewDate.getDate()] || {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
         document.getElementById('btnLA').classList.toggle('active', !!d.LA);
         document.getElementById('btnLB').classList.toggle('active', !!d.LB);
@@ -194,91 +257,69 @@
         document.getElementById('btnDB').classList.toggle('active', !!d.DB);
         document.getElementById('btnW').classList.toggle('active', !!d.W);
         document.getElementById('extraInput').value = d.EX;
-
-        renderStats();
-        renderTable();
-        renderArchives();
     }
 
-    function toggleField(field) {
-        const d = viewDate.getDate();
-        if(!data[d]) data[d] = {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
-        if(field === 'LA') { data[d].LA = !data[d].LA; data[d].LB = 0; }
-        if(field === 'LB') { data[d].LB = !data[d].LB; data[d].LA = 0; }
-        if(field === 'DA') { data[d].DA = !data[d].DA; data[d].DB = 0; }
-        if(field === 'DB') { data[d].DB = !data[d].DB; data[d].DA = 0; }
-        if(field === 'W')  { data[d].W = !data[d].W; }
-        save();
-    }
-
-    function updateExtra(v) {
-        const d = viewDate.getDate();
-        if(!data[d]) data[d] = {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
-        data[d].EX = parseInt(v) || 0;
-        save();
-    }
-
-    function save() {
-        localStorage.setItem(currentKey, JSON.stringify(data));
-        const s = document.getElementById('saveIndicator');
-        s.style.opacity = 1; setTimeout(() => s.style.opacity = 0, 1000);
-        applyUI();
-    }
-
-    function renderStats() {
+    function calc() {
         let meals = 0, water = 0, extras = 0;
         Object.values(data).forEach(v => {
-            if(v.LA || v.LB) meals++; if(v.DA || v.DB) meals++;
-            if(v.W) water++; extras += (v.EX || 0);
+            if(v.LA || v.LB) meals++;
+            if(v.DA || v.DB) meals++;
+            if(v.W) water++;
+            extras += (v.EX || 0);
         });
         const cost = (meals + extras) * config.pM + (water * config.pW);
         document.getElementById('statTotal').innerText = `₹${cost}`;
         document.getElementById('statMeals').innerText = meals + extras;
+        
         const pct = Math.min((cost / config.bud) * 100, 100);
         document.getElementById('progressBar').style.width = pct + '%';
         document.getElementById('budgetPct').innerText = Math.round(pct) + '%';
+        document.getElementById('progressBar').style.background = pct > 90 ? 'var(--red)' : pct > 75 ? 'var(--orange)' : 'var(--primary)';
     }
 
     function renderTable() {
-        const tbody = document.getElementById('tbody'); tbody.innerHTML = '';
+        const tbody = document.getElementById('tbody');
+        tbody.innerHTML = '';
         const days = new Date(viewDate.getFullYear(), viewDate.getMonth()+1, 0).getDate();
         for(let i=1; i<=days; i++) {
-            const r = data[i] || {LA:0, LB:0, DA:0, DB:0, W:0};
+            const r = data[i] || {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
             const tr = document.createElement('tr');
             if(i === viewDate.getDate()) tr.style.background = 'rgba(37,99,235,0.1)';
-            tr.onclick = () => { viewDate.setDate(i); applyUI(); window.scrollTo(0,0); };
-            tr.innerHTML = `<td>${i}</td><td>${r.LA?'A':(r.LB?'B':'-')}</td><td>${r.DA?'A':(r.DB?'B':'-')}</td><td>${r.W?'💧':'-'}</td>`;
+            tr.onclick = () => { viewDate.setDate(i); applyUI(); window.scrollTo({top:0, behavior:'smooth'}); };
+            tr.innerHTML = `<td><b>${i}</b></td>
+                <td>${r.LA?'A':(r.LB?'B':'-')}</td>
+                <td>${r.DA?'A':(r.DB?'B':'-')}</td>
+                <td>${r.W?'💧':'-'}</td>
+                <td>${r.EX || '-'}</td>`;
             tbody.appendChild(tr);
         }
     }
 
-    function renderArchives() {
-        const box = document.getElementById('archiveBox');
-        const archives = JSON.parse(localStorage.getItem('m-archives')) || [];
-        box.innerHTML = archives.map(a => `<div class="archive-item">
-            <div class="archive-info"><b>Month: ${a.date}</b><small>${a.meals} Meals logged</small></div>
-            <b style="color:var(--primary)">₹${a.bill}</b>
-        </div>`).join('') || '<p style="text-align:center; color:var(--muted)">No archives yet</p>';
+    function toggleHistory() {
+        const t = document.getElementById('historyTable');
+        t.style.display = t.style.display === 'block' ? 'none' : 'block';
     }
 
-    function updateSet() {
-        config.nA = document.getElementById('setNameA').value;
-        config.nB = document.getElementById('setNameB').value;
-        config.pM = parseInt(document.getElementById('setPriceM').value) || 0;
-        config.pW = parseInt(document.getElementById('setPriceW').value) || 0;
-        localStorage.setItem('m-conf', JSON.stringify(config));
-        applyUI();
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('dark-mode', document.body.classList.contains('dark'));
     }
 
-    function toggleEl(id) { 
-        const e = document.getElementById(id); 
-        e.style.display = e.style.display === 'block' ? 'none' : 'block'; 
+    function exportData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "mess_tracker_backup.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
     }
 
-    function toggleTheme() { document.body.classList.toggle('dark'); }
-    
-    runArchive();
+    // Auto-load theme
+    if(localStorage.getItem('dark-mode') === 'true') document.body.classList.add('dark');
+
     applyUI();
 </script>
+
 </body>
 </html>
