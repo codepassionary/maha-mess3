@@ -2,315 +2,283 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Maha Mrityunjay Mess - v1.0</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>Nexus Mess Tracker Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap');
-        * { -webkit-user-select: none; user-select: none; transition: all 0.2s ease-out; -webkit-tap-highlight-color: transparent; }
-        input { -webkit-user-select: text; user-select: text; }
-        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; overflow: hidden; }
+        :root {
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
+            --muted: #64748b; --primary: #2563eb; --border: #e2e8f0;
+            --green: #10b981; --orange: #f59e0b; --red: #ef4444;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .dark {
+            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9;
+            --muted: #94a3b8; --border: #334155;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 40px; transition: 0.3s; }
         
-        .mess-orange { background: linear-gradient(135deg, #ff5722 0%, #ff8a65 100%); }
-        .card-pro { background: white; border-radius: 2rem; border: 1.5px solid #f1f5f9; position: relative; }
+        .container { max-width: 500px; margin: 0 auto; padding: 16px; }
         
-        /* HARD GATE SECURITY */
-        .content-hidden { filter: blur(40px); opacity: 0; pointer-events: none; transform: scale(0.96); }
-        #lock-screen { backdrop-filter: blur(50px); z-index: 9999; background: rgba(255,255,255,0.98); position: fixed; inset: 0; }
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .header h1 { font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -1px; color: var(--primary); }
+        .header-btns { display: flex; gap: 10px; }
+        .icon-btn { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 10px; cursor: pointer; font-size: 18px; box-shadow: var(--shadow); }
+
+        .status-bar { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+        #saveIndicator { color: var(--green); opacity: 0; transition: 0.3s; }
+
+        /* Quick Log UI with Sections */
+        .action-card { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
+        .meal-group-label { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin: 15px 0 8px 0; display: flex; align-items: center; gap: 8px; }
+        .meal-group-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+        .meal-group-label:first-child { margin-top: 0; }
+
+        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .toggle-btn { 
+            padding: 14px 10px; border-radius: 14px; border: 1px solid var(--border);
+            background: var(--card); color: var(--text); cursor: pointer;
+            font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toggle-btn.active { border-color: var(--primary); background: rgba(37, 99, 235, 0.1); color: var(--primary); border-width: 2px; }
+        .toggle-btn span { font-size: 10px; opacity: 0.7; }
+
+        /* Stats */
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .stat-item { background: var(--card); padding: 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .stat-val { font-size: 20px; font-weight: 800; display: block; margin-top: 4px; }
+        .stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+
+        /* Progress Bar */
+        .progress-box { background: var(--card); padding: 16px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .progress-container { height: 10px; background: var(--border); border-radius: 20px; overflow: hidden; margin-top: 10px; }
+        .progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.6s; }
+
+        /* History & Archive List */
+        .section-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
+        .table-wrap { display: none; background: var(--card); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        td, th { padding: 12px; text-align: center; border-bottom: 1px solid var(--border); }
         
-        .marked-ate { border: 3px solid #22c55e !important; background-color: #f0fdf4 !important; transform: scale(1.02); }
-        .debt-alert { border: 3px solid #ef4444 !important; animation: soft-pulse 2s infinite; }
-        @keyframes soft-pulse { 50% { background-color: #fff1f1; } }
-        
-        .student-photo { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 1.5rem; background: #f1f5f9; cursor: pointer; }
-        .sidebar-open { transform: translateX(0) !important; }
-        @media print { body { display: none; } }
+        .archive-item { background: var(--card); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .archive-info b { display: block; font-size: 14px; }
+        .archive-info small { color: var(--muted); font-size: 11px; }
+
+        #settingsModal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--card); padding: 24px; border-radius: 24px; width: 90%; max-width: 400px; }
     </style>
 </head>
-<body oncontextmenu="return false">
+<body>
 
-    <div id="lock-screen" class="flex flex-col items-center justify-center p-8 text-center">
-        <div class="w-24 h-24 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center mb-8 shadow-2xl animate-pulse">
-            <i class="fa-solid fa-fingerprint text-4xl"></i>
-        </div>
-        <h2 class="text-3xl font-900 text-gray-800 mb-2 uppercase">Vault Locked</h2>
-        <p class="text-[10px] text-gray-400 font-black mb-12 uppercase tracking-[0.4em]">Maha Mrityunjay Mess v1.0</p>
-        <input type="password" id="unlock-pin" maxlength="4" class="w-36 text-center text-5xl font-black border-b-4 border-orange-500 outline-none pb-3 mb-12 bg-transparent" placeholder="••••">
-        <button onclick="unlockSystem()" class="w-full max-w-xs py-5 mess-orange text-white rounded-3xl font-black uppercase text-xs shadow-xl active:scale-95">Unlock System</button>
-    </div>
-
-    <div id="main-app" class="content-hidden max-w-6xl mx-auto min-h-screen pb-12">
-        <div id="overlay" onclick="toggleMenu()" class="hidden fixed inset-0 bg-black/40 z-[100] backdrop-blur-sm"></div>
-        <div id="sidebar" class="fixed top-0 left-0 h-full w-[85%] sm:w-[350px] bg-white z-[101] -translate-x-full shadow-2xl p-8 flex flex-col transition-transform duration-300">
-            <h2 class="text-xl font-900 text-orange-600 uppercase mb-10">Admin Menu</h2>
-            <div class="space-y-4 flex-1 overflow-y-auto pr-2">
-                <div class="bg-gray-50 p-6 rounded-[2.5rem] border border-gray-100">
-                    <input type="text" id="new-name" placeholder="Full Name" class="w-full p-4 bg-white rounded-2xl mb-3 outline-none border border-gray-200 font-bold text-sm">
-                    <input type="number" id="new-phone" placeholder="WhatsApp Number" class="w-full p-4 bg-white rounded-2xl mb-4 outline-none border border-gray-200 font-bold text-sm">
-                    <label class="h-14 bg-white rounded-2xl flex items-center justify-center cursor-pointer border-2 border-dashed border-orange-200 mb-5">
-                        <span class="text-xs font-black text-orange-500 uppercase tracking-widest" id="photo-status"><i class="fa-solid fa-camera mr-2"></i>Verify Face</span>
-                        <input type="file" accept="image/*" capture="user" id="camera-input" class="hidden" onchange="previewFile()">
-                    </label>
-                    <button onclick="saveStudent()" class="w-full h-14 mess-orange text-white rounded-2xl font-black text-xs uppercase shadow-lg">Join Member</button>
-                </div>
-                <button onclick="exportData()" class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase"><i class="fa-solid fa-file-shield text-orange-500"></i> Export Backup</button>
-                <label class="w-full flex items-center gap-4 p-5 hover:bg-orange-50 rounded-2xl font-bold text-gray-500 text-xs uppercase cursor-pointer"><i class="fa-solid fa-rotate-left text-orange-500"></i> Restore Data <input type="file" class="hidden" onchange="importData(event)"></label>
-            </div>
-            <div class="mt-auto border-t border-gray-100 pt-6 text-center">
-                <p class="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em]">Version 1.0</p>
-            </div>
-        </div>
-
-        <div class="mess-orange text-white p-6 rounded-b-[3.5rem] shadow-2xl mb-6 sticky top-0 z-50">
-            <div class="flex justify-between items-start">
-                <div class="flex items-center gap-4">
-                    <button onclick="toggleMenu()" class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shadow-inner"><i class="fa-solid fa-bars-staggered text-xl"></i></button>
-                    <h1 class="text-2xl font-900 tracking-tighter uppercase leading-none">Maha<br>Mrityunjay</h1>
-                </div>
-                <div class="text-right">
-                    <p id="live-date" class="text-[10px] font-black opacity-80 uppercase tracking-widest mb-1"></p>
-                    <span id="live-clock" class="text-xs font-black bg-black/10 px-4 py-1.5 rounded-full uppercase"></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="px-5 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-3">
-                <i class="fa-solid fa-magnifying-glass text-gray-300"></i>
-                <input type="text" id="search-input" oninput="render()" placeholder="Search members..." class="bg-transparent outline-none w-full font-bold text-sm">
-            </div>
-            <div class="bg-gray-200 p-1 rounded-2xl flex font-bold text-[10px] relative border border-gray-100">
-                <button onclick="setMode('Lunch')" class="flex-1 py-3.5 rounded-xl z-10 uppercase">Lunch</button>
-                <button onclick="setMode('Dinner')" class="flex-1 py-3.5 rounded-xl z-10 uppercase">Dinner</button>
-                <div id="mode-glider" class="absolute top-1 left-1 bottom-1 w-[48%] bg-white rounded-xl shadow-md transition-all duration-300"></div>
-            </div>
-        </div>
-
-        <div class="px-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" id="user-list"></div>
-    </div>
-
-    <div id="pay-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-center justify-center p-6 text-center">
-        <div class="bg-white w-full max-w-sm rounded-[4rem] p-10 shadow-2xl">
-            <h2 id="pay-name" class="text-2xl font-900 uppercase mb-2">Payment</h2>
-            <input type="number" id="pay-amt" class="w-full text-5xl font-black text-green-600 border-b-4 border-gray-100 outline-none py-3 mb-10 text-center bg-transparent" placeholder="0">
-            <button onclick="confirmPayment()" class="w-full py-6 mess-orange text-white rounded-[2rem] font-black uppercase text-xs">Confirm Cash</button>
-            <button onclick="closePayModal()" class="text-gray-400 font-bold text-[9px] uppercase tracking-widest mt-4">Cancel</button>
+<div class="container">
+    <div class="header">
+        <h1>Nexus</h1>
+        <div class="header-btns">
+            <button class="icon-btn" onclick="exportData()">💾</button>
+            <button class="icon-btn" onclick="document.getElementById('settingsModal').style.display='flex'">⚙️</button>
+            <button class="icon-btn" onclick="toggleTheme()">🌙</button>
         </div>
     </div>
 
-    <div id="history-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[200] flex items-end justify-center">
-        <div class="bg-white w-full max-w-3xl rounded-t-[4rem] p-10 max-h-[85vh] flex flex-col shadow-2xl border-t-4 border-orange-500">
-            <div class="flex justify-between items-center mb-8">
-                <div>
-                    <h2 id="hist-name" class="text-2xl font-900 text-gray-800 uppercase">History</h2>
-                    <p class="text-[9px] text-gray-400 font-black mt-3 uppercase tracking-widest">L=Lunch, D=Dinner</p>
-                </div>
-                <div class="flex gap-3">
-                    <button id="pdf-btn" class="w-14 h-14 bg-red-500 text-white rounded-2xl flex items-center justify-center shadow-xl"><i class="fa-solid fa-file-pdf text-xl"></i></button>
-                    <button onclick="closeHistory()" class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-500"><i class="fa-solid fa-times text-xl"></i></button>
-                </div>
+    <div class="status-bar">
+        <span>Editing: <b id="displayDate"></b></span>
+        <span id="saveIndicator">✓ Saved</span>
+    </div>
+
+    <div class="action-card">
+        <div class="meal-group-label">Lunch</div>
+        <div class="grid-buttons">
+            <button class="toggle-btn" id="btnLA" onclick="toggleField('LA')">🍱 <span id="labelLA">Mess A</span></button>
+            <button class="toggle-btn" id="btnLB" onclick="toggleField('LB')">🍲 <span id="labelLB">Mess B</span></button>
+        </div>
+
+        <div class="meal-group-label">Dinner</div>
+        <div class="grid-buttons">
+            <button class="toggle-btn" id="btnDA" onclick="toggleField('DA')">🍛 <span id="labelDA">Mess A</span></button>
+            <button class="toggle-btn" id="btnDB" onclick="toggleField('DB')">🥘 <span id="labelDB">Mess B</span></button>
+        </div>
+
+        <div class="meal-group-label">Others</div>
+        <div style="display: flex; gap: 12px;">
+            <button class="toggle-btn" id="btnW" style="flex: 1;" onclick="toggleField('W')">💧 <span>Water</span></button>
+            <div class="toggle-btn" style="flex: 1; cursor: default;">
+                <span style="font-size: 10px; opacity:1">Extra Meal</span>
+                <input type="number" id="extraInput" value="0" min="0" onchange="updateExtra(this.value)" style="width: 50px; border:none; background:transparent; font-size:18px; font-weight:800; color:var(--primary); text-align:center;">
             </div>
-            <div id="history-list" class="overflow-y-auto space-y-4 pb-12"></div>
         </div>
     </div>
 
-    <canvas id="resize-canvas" class="hidden"></canvas>
+    <div class="progress-box">
+        <div style="display:flex; justify-content: space-between; align-items: flex-end;">
+            <span class="stat-label">Budget Usage</span>
+            <b id="budgetPct">0%</b>
+        </div>
+        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
 
-    <script>
-        const MASTER_PIN = "1234";
-        const CRYPTO_KEY = "MahaMess-v1.0-Fixed";
-        const BUS_NAME = "MAHA MRITYUNJAY MESS";
-        let users = [];
-        let currentMode = 'Lunch';
-        let idleTimer, activeUserId, tempPhotoData;
+    <div class="stats">
+        <div class="stat-item"><span class="stat-label">Total Bill</span><span class="stat-val" id="statTotal">₹0</span></div>
+        <div class="stat-item"><span class="stat-label">Meals</span><span class="stat-val" id="statMeals">0</span></div>
+    </div>
 
-        function save() {
-            localStorage.setItem('mm_v1_fixed_vault', CryptoJS.AES.encrypt(JSON.stringify(users), CRYPTO_KEY).toString());
-        }
+    <button class="section-btn" onclick="toggleEl('historyTable')">📅 Current Month Ledger</button>
+    <div id="historyTable" class="table-wrap">
+        <table>
+            <thead><tr><th>Day</th><th>L</th><th>D</th><th>W</th></tr></thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
 
-        function load() {
-            const cipher = localStorage.getItem('mm_v1_fixed_vault');
-            if (!cipher) return;
-            try {
-                users = JSON.parse(CryptoJS.AES.decrypt(cipher, CRYPTO_KEY).toString(CryptoJS.enc.Utf8));
-            } catch(e) { users = []; }
-        }
+    <button class="section-btn" style="background:var(--muted)" onclick="toggleEl('archiveBox')">📚 History Archives</button>
+    <div id="archiveBox" style="display:none"></div>
+</div>
 
-        function unlockSystem() {
-            if (document.getElementById('unlock-pin').value === MASTER_PIN) {
-                document.getElementById('lock-screen').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('content-hidden');
-                document.getElementById('main-app').style.opacity = "1";
-                document.body.style.overflow = "auto";
-                document.getElementById('unlock-pin').value = "";
-                resetTimer();
-            } else { alert("WRONG PIN"); document.getElementById('unlock-pin').value = ""; }
-        }
+<div id="settingsModal" onclick="if(event.target==this) this.style.display='none'">
+    <div class="modal-content">
+        <h3 style="margin:0 0 15px 0">Settings</h3>
+        <label style="font-size:11px; font-weight:bold; color:var(--muted)">MESS A</label>
+        <input type="text" id="setNameA" onchange="updateSet()" style="width:100%; padding:10px; margin:5px 0 15px 0; border-radius:8px; border:1px solid var(--border);">
+        <label style="font-size:11px; font-weight:bold; color:var(--muted)">MESS B</label>
+        <input type="text" id="setNameB" onchange="updateSet()" style="width:100%; padding:10px; margin:5px 0 15px 0; border-radius:8px; border:1px solid var(--border);">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div><label style="font-size:11px;">Meal ₹</label><input type="number" id="setPriceM" onchange="updateSet()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);"></div>
+            <div><label style="font-size:11px;">Water ₹</label><input type="number" id="setPriceW" onchange="updateSet()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);"></div>
+        </div>
+        <button class="section-btn" style="margin-top:20px;" onclick="document.getElementById('settingsModal').style.display='none'">Close</button>
+    </div>
+</div>
 
-        function resetTimer() {
-            clearTimeout(idleTimer);
-            idleTimer = setTimeout(() => { 
-                document.getElementById('lock-screen').classList.remove('hidden');
-                document.getElementById('main-app').classList.add('content-hidden');
-                document.body.style.overflow = "hidden";
-            }, 300000); 
-        }
+<script>
+    let config = JSON.parse(localStorage.getItem('m-conf')) || { nA: "Hostel", nB: "Outside", pM: 60, pW: 20, bud: 5000 };
+    let viewDate = new Date();
+    const currentKey = `m-${viewDate.getFullYear()}-${viewDate.getMonth()}`;
+    let data = JSON.parse(localStorage.getItem(currentKey)) || {};
 
-        function toggleMeal(id) {
-            const u = users.find(x => x.id === id);
-            const istDate = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
-            const idx = u.logs.findIndex(l => l.date === istDate && l.session === currentMode);
-            const now = Date.now();
-
-            if (idx === -1) {
-                u.logs.push({ type: 'meal', date: istDate, session: currentMode, amount: 50, ts: now });
-                u.balance += 50;
-            } else {
-                const diffMin = (now - (u.logs[idx].ts || 0)) / 60000;
-                if (diffMin < 5 && prompt("ADMIN PIN:") !== MASTER_PIN) return;
-                u.balance -= 50; u.logs.splice(idx, 1);
-            }
-            save(); render();
-        }
-
-        // --- FIXED PDF ENGINE ---
-        function generatePDF(u) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const today = new Date();
-            const cm = today.getMonth();
-            const cy = today.getFullYear();
-            const istMonth = today.toLocaleString('en-IN', { month: 'long', timeZone: 'Asia/Kolkata' });
-
-            doc.setFontSize(22); doc.setTextColor(255, 87, 34);
-            doc.text(BUS_NAME, 105, 20, { align: 'center' });
-            doc.setFontSize(10); doc.setTextColor(100);
-            doc.text(`Monthly Attendance: ${istMonth} ${cy}`, 105, 28, { align: 'center' });
-
-            const daysInMonth = new Date(cy, cm + 1, 0).getDate();
-            const startDay = new Date(cy, cm, 1).getDay();
-            let rows = [];
-            let week = Array(7).fill("");
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                // Correctly Format the date to match the saved logs
-                const dObj = new Date(cy, cm, i);
-                const dStr = dObj.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
-                
-                const hasLunch = u.logs.some(l => l.date === dStr && l.session === 'Lunch');
-                const hasDinner = u.logs.some(l => l.date === dStr && l.session === 'Dinner');
-                
-                let mark = "";
-                if (hasLunch && hasDinner) mark = "\nL,D";
-                else if (hasLunch) mark = "\nL";
-                else if (hasDinner) mark = "\nD";
-
-                week[(startDay + i - 1) % 7] = `${i}${mark}`;
-                
-                if ((startDay + i - 1) % 7 === 6 || i === daysInMonth) {
-                    rows.push(week);
-                    week = Array(7).fill("");
-                }
-            }
-
-            doc.autoTable({
-                startY: 40,
-                head: [["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]],
-                body: rows,
-                styles: { halign: 'center', minCellHeight: 20, fontSize: 10, valign: 'middle', cellPadding: 2 },
-                headStyles: { fillColor: [50, 50, 50] },
-                theme: 'grid'
+    // --- ARCHIVE ENGINE ---
+    function runArchive() {
+        const lastKey = localStorage.getItem('last-key');
+        if (lastKey && lastKey !== currentKey) {
+            const oldData = JSON.parse(localStorage.getItem(lastKey)) || {};
+            let meals = 0, water = 0, extras = 0;
+            Object.values(oldData).forEach(v => {
+                if(v.LA || v.LB) meals++; if(v.DA || v.DB) meals++;
+                if(v.W) water++; extras += (v.EX || 0);
             });
-
-            doc.setFontSize(10);
-            doc.text(`Total Due: Rs. ${u.balance}`, 20, doc.lastAutoTable.finalY + 15);
-            doc.text(`Regards, ${BUS_NAME}`, 20, doc.lastAutoTable.finalY + 22);
-
-            doc.save(`${u.name}_Report.pdf`);
-        }
-
-        function saveStudent() {
-            const n = document.getElementById('new-name').value.trim();
-            const p = document.getElementById('new-phone').value.trim();
-            if (!n || p.length < 10 || !tempPhotoData) return alert("Fill all details.");
-            users.push({ id: Date.now(), name: n, phone: p, photo: tempPhotoData, balance: 0, logs: [] });
-            save(); render(); toggleMenu();
-            window.open(`https://wa.me/91${p}?text=${encodeURIComponent("Welcome to " + BUS_NAME + "!")}`, '_blank');
-        }
-
-        function confirmPayment() {
-            const amt = parseFloat(document.getElementById('pay-amt').value);
-            const u = users.find(x => x.id === activeUserId);
-            if (amt > 0) {
-                u.balance -= amt;
-                u.logs.push({ type: 'payment', date: new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }), amount: amt, ts: Date.now() });
-                save(); render(); closePayModal();
-                window.open(`https://wa.me/91${u.phone}?text=${encodeURIComponent("*RECEIPT*\nAmount: ₹" + amt + "\nDue: ₹" + u.balance + "\n\nRegards,\n" + BUS_NAME)}`, '_blank');
-            }
-        }
-
-        function render() {
-            const list = document.getElementById('user-list');
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const istDate = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+            const total = (meals + extras) * config.pM + (water * config.pW);
             
-            list.innerHTML = users.filter(u => u.name.toLowerCase().includes(search)).map(u => {
-                const ate = u.logs.some(l => l.date === istDate && l.session === currentMode);
-                return `
-                <div class="card-pro p-4 ${u.balance >= 1500 ? 'debt-alert' : ''} ${ate ? 'marked-ate' : ''}">
-                    <img src="${u.photo}" class="student-photo mb-3 shadow-inner" onclick="toggleMeal(${u.id})">
-                    <h4 class="text-[12px] font-900 text-gray-800 truncate text-center uppercase tracking-tighter">${u.name}</h4>
-                    <p class="text-[11px] font-black text-center ${u.balance > 0 ? 'text-red-500' : 'text-green-600'} mb-4">₹${u.balance}</p>
-                    <div class="flex gap-1.5">
-                        <button onclick="toggleMeal(${u.id})" class="flex-1 py-3 rounded-xl text-[9px] font-black ${ate ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-400'} uppercase">${ate ? 'ATE' : 'MARK'}</button>
-                        <button onclick="openHistory(${u.id})" class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100 active:scale-90"><i class="fa-solid fa-receipt text-[10px]"></i></button>
-                        <button onclick="openPay(${u.id})" class="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center border border-green-100 active:scale-90"><i class="fa-solid fa-plus text-[10px]"></i></button>
-                    </div>
-                    <button onclick="deleteMember(${u.id})" class="absolute top-1 right-2 text-gray-200 text-xl font-bold">&times;</button>
-                </div>`;
-            }).join('');
+            let archives = JSON.parse(localStorage.getItem('m-archives')) || [];
+            archives.push({ date: lastKey.replace('m-', ''), bill: total, meals: meals + extras });
+            localStorage.setItem('m-archives', JSON.stringify(archives));
         }
+        localStorage.setItem('last-key', currentKey);
+    }
 
-        function previewFile() {
-            const file = document.getElementById('camera-input').files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image(); img.src = e.target.result;
-                img.onload = () => {
-                    const c = document.getElementById('resize-canvas');
-                    c.width = 400; c.height = 400;
-                    c.getContext('2d').drawImage(img, 0, 0, 400, 400);
-                    tempPhotoData = c.toDataURL('image/jpeg', 0.6);
-                    document.getElementById('photo-status').innerText = "Verified ✅";
-                };
-            };
-            reader.readAsDataURL(file);
+    function applyUI() {
+        document.getElementById('displayDate').innerText = viewDate.toDateString();
+        document.getElementById('setNameA').value = config.nA;
+        document.getElementById('setNameB').value = config.nB;
+        document.getElementById('setPriceM').value = config.pM;
+        document.getElementById('setPriceW').value = config.pW;
+        
+        document.getElementById('labelLA').innerText = config.nA;
+        document.getElementById('labelDA').innerText = config.nA;
+        document.getElementById('labelLB').innerText = config.nB;
+        document.getElementById('labelDB').innerText = config.nB;
+        
+        const d = data[viewDate.getDate()] || {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
+        document.getElementById('btnLA').classList.toggle('active', !!d.LA);
+        document.getElementById('btnLB').classList.toggle('active', !!d.LB);
+        document.getElementById('btnDA').classList.toggle('active', !!d.DA);
+        document.getElementById('btnDB').classList.toggle('active', !!d.DB);
+        document.getElementById('btnW').classList.toggle('active', !!d.W);
+        document.getElementById('extraInput').value = d.EX;
+
+        renderStats();
+        renderTable();
+        renderArchives();
+    }
+
+    function toggleField(field) {
+        const d = viewDate.getDate();
+        if(!data[d]) data[d] = {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
+        if(field === 'LA') { data[d].LA = !data[d].LA; data[d].LB = 0; }
+        if(field === 'LB') { data[d].LB = !data[d].LB; data[d].LA = 0; }
+        if(field === 'DA') { data[d].DA = !data[d].DA; data[d].DB = 0; }
+        if(field === 'DB') { data[d].DB = !data[d].DB; data[d].DA = 0; }
+        if(field === 'W')  { data[d].W = !data[d].W; }
+        save();
+    }
+
+    function updateExtra(v) {
+        const d = viewDate.getDate();
+        if(!data[d]) data[d] = {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
+        data[d].EX = parseInt(v) || 0;
+        save();
+    }
+
+    function save() {
+        localStorage.setItem(currentKey, JSON.stringify(data));
+        const s = document.getElementById('saveIndicator');
+        s.style.opacity = 1; setTimeout(() => s.style.opacity = 0, 1000);
+        applyUI();
+    }
+
+    function renderStats() {
+        let meals = 0, water = 0, extras = 0;
+        Object.values(data).forEach(v => {
+            if(v.LA || v.LB) meals++; if(v.DA || v.DB) meals++;
+            if(v.W) water++; extras += (v.EX || 0);
+        });
+        const cost = (meals + extras) * config.pM + (water * config.pW);
+        document.getElementById('statTotal').innerText = `₹${cost}`;
+        document.getElementById('statMeals').innerText = meals + extras;
+        const pct = Math.min((cost / config.bud) * 100, 100);
+        document.getElementById('progressBar').style.width = pct + '%';
+        document.getElementById('budgetPct').innerText = Math.round(pct) + '%';
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tbody'); tbody.innerHTML = '';
+        const days = new Date(viewDate.getFullYear(), viewDate.getMonth()+1, 0).getDate();
+        for(let i=1; i<=days; i++) {
+            const r = data[i] || {LA:0, LB:0, DA:0, DB:0, W:0};
+            const tr = document.createElement('tr');
+            if(i === viewDate.getDate()) tr.style.background = 'rgba(37,99,235,0.1)';
+            tr.onclick = () => { viewDate.setDate(i); applyUI(); window.scrollTo(0,0); };
+            tr.innerHTML = `<td>${i}</td><td>${r.LA?'A':(r.LB?'B':'-')}</td><td>${r.DA?'A':(r.DB?'B':'-')}</td><td>${r.W?'💧':'-'}</td>`;
+            tbody.appendChild(tr);
         }
+    }
 
-        function toggleMenu() { document.getElementById('sidebar').classList.toggle('sidebar-open'); document.getElementById('overlay').classList.toggle('hidden'); }
-        function setMode(m) { currentMode = m; document.getElementById('mode-glider').style.left = (m === 'Lunch') ? '4px' : '51%'; render(); }
-        function deleteMember(id) { if (prompt("PIN:") === MASTER_PIN) { users = users.filter(u => u.id !== id); save(); render(); } }
-        function openHistory(id) { activeUserId = id; const u = users.find(x => x.id === id); document.getElementById('hist-name').innerText = u.name; const list = document.getElementById('history-list'); list.innerHTML = u.logs.slice().reverse().map(l => `<div class="p-5 bg-gray-50 rounded-2xl flex justify-between items-center border border-gray-100"><span>${l.date} ${l.session || 'PAID'}</span><b class="${l.type === 'meal'?'text-red-500':'text-green-600'}">₹${l.amount}</b></div>`).join(''); document.getElementById('pdf-btn').onclick = () => generatePDF(u); document.getElementById('history-modal').classList.remove('hidden'); }
-        function openPay(id) { activeUserId = id; const u = users.find(x => x.id === id); document.getElementById('pay-name').innerText = u.name; document.getElementById('pay-modal').classList.remove('hidden'); }
-        function closeHistory() { document.getElementById('history-modal').classList.add('hidden'); }
-        function closePayModal() { document.getElementById('pay-modal').classList.add('hidden'); document.getElementById('pay-amt').value = ""; }
-        function exportData() { const b = new Blob([JSON.stringify(users)],{type:'application/json'}); const a = document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Backup.json'; a.click(); }
-        function importData(e) { const r = new FileReader(); r.onload=(x)=>{ try { users=JSON.parse(x.target.result); save(); render(); } catch(e){ alert("Invalid File"); } }; r.readAsText(e.target.files[0]); }
+    function renderArchives() {
+        const box = document.getElementById('archiveBox');
+        const archives = JSON.parse(localStorage.getItem('m-archives')) || [];
+        box.innerHTML = archives.map(a => `<div class="archive-item">
+            <div class="archive-info"><b>Month: ${a.date}</b><small>${a.meals} Meals logged</small></div>
+            <b style="color:var(--primary)">₹${a.bill}</b>
+        </div>`).join('') || '<p style="text-align:center; color:var(--muted)">No archives yet</p>';
+    }
 
-        load(); render(); 
-        setInterval(() => { 
-            const now = new Date();
-            const tOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' };
-            const dOptions = { weekday: 'long', day: '2-digit', month: 'short', timeZone: 'Asia/Kolkata' };
-            document.getElementById('live-clock').innerText = now.toLocaleTimeString('en-IN', tOptions).toUpperCase(); 
-            document.getElementById('live-date').innerText = now.toLocaleDateString('en-IN', dOptions).toUpperCase();
-        }, 1000);
-    </script>
+    function updateSet() {
+        config.nA = document.getElementById('setNameA').value;
+        config.nB = document.getElementById('setNameB').value;
+        config.pM = parseInt(document.getElementById('setPriceM').value) || 0;
+        config.pW = parseInt(document.getElementById('setPriceW').value) || 0;
+        localStorage.setItem('m-conf', JSON.stringify(config));
+        applyUI();
+    }
+
+    function toggleEl(id) { 
+        const e = document.getElementById(id); 
+        e.style.display = e.style.display === 'block' ? 'none' : 'block'; 
+    }
+
+    function toggleTheme() { document.body.classList.toggle('dark'); }
+    
+    runArchive();
+    applyUI();
+</script>
 </body>
 </html>
