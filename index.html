@@ -1,325 +1,327 @@
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Nexus Mess Tracker Pro</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VetTrack Luxe | Omni</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #f8fafc; --card: #ffffff; --text: #1e293b;
-            --muted: #64748b; --primary: #2563eb; --border: #e2e8f0;
-            --green: #10b981; --orange: #f59e0b; --red: #ef4444;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        :root { 
+            --p: #E67E22; --p-dark: #D35400; --bg: #FFFDFB; --card: #ffffff; 
+            --text: #3E2723; --sub: #8D6E63; --radius: 35px;
         }
-        .dark {
-            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9;
-            --muted: #94a3b8; --border: #334155;
-        }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 40px; transition: background 0.3s; }
-        
-        .container { max-width: 500px; margin: 0 auto; padding: 16px; }
-        
-        /* Header */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .header h1 { font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -1px; color: var(--primary); }
-        .header-btns { display: flex; gap: 10px; }
-        .icon-btn { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 10px; cursor: pointer; font-size: 18px; box-shadow: var(--shadow); }
 
-        /* Status Bar */
-        .status-bar { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
-        #saveIndicator { color: var(--green); opacity: 0; transition: 0.3s; }
-
-        /* Action Card */
-        .action-card { 
-            background: var(--card); padding: 20px; border-radius: 20px; 
-            box-shadow: var(--shadow); margin-bottom: 20px;
-            border: 1px solid var(--border);
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 60px;
+            overflow-x: hidden; touch-action: pan-y;
+            -webkit-user-select: none; user-select: none;
         }
-        .section-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .grid-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .toggle-btn { 
-            padding: 16px 10px; border-radius: 14px; border: 1px solid var(--border);
-            background: var(--card); color: var(--text); cursor: pointer;
-            font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 6px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .container { max-width: 500px; margin: 0 auto; padding: 24px; }
+
+        /* Header & Nav */
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .month-chip { display: flex; align-items: center; background: var(--card); padding: 8px 16px; border-radius: 100px; border: 1px solid rgba(230, 126, 34, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .month-chip span { font-weight: 800; font-size: 14px; min-width: 120px; text-align: center; }
+
+        /* Main Bill Card */
+        .stat-card {
+            position: relative; overflow: hidden; color: white; padding: 30px; border-radius: 40px; 
+            margin-bottom: 30px; background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+            box-shadow: 0 20px 40px rgba(211, 84, 0, 0.25);
         }
-        .toggle-btn:active { transform: scale(0.95); }
-        .toggle-btn.active { border-color: var(--primary); background: rgba(37, 99, 235, 0.1); color: var(--primary); border-width: 2px; }
-        .toggle-btn span { font-size: 11px; opacity: 0.7; font-weight: 500; }
+        .stat-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .val { font-family: 'Outfit', sans-serif; font-size: 54px; font-weight: 900; line-height: 1; margin: 8px 0; letter-spacing: -2px; }
+        
+        /* Smart Auto-Log Button */
+        .smart-log-btn {
+            background: rgba(255, 255, 255, 0.15); border: 1.5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 22px; padding: 12px; display: flex; flex-direction: column;
+            align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; min-width: 75px;
+        }
+        .smart-log-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.3); }
+        .smart-log-btn svg { width: 22px; height: 22px; fill: white; }
+        .smart-log-btn span { font-size: 8px; font-weight: 800; text-transform: uppercase; color: white; }
 
-        /* Smart Pulse Nudge */
-        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
-        .nudge { animation: pulse-blue 2s infinite; border-color: var(--primary); }
+        .wa-btn { 
+            background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2); 
+            color: white; padding: 14px; border-radius: 18px; font-size: 11px; font-weight: 800; 
+            width: 100%; margin-top: 20px; backdrop-filter: blur(10px); cursor: pointer;
+        }
 
-        /* Stats & Progress */
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-        .stat-item { background: var(--card); padding: 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .stat-val { font-size: 20px; font-weight: 800; display: block; margin-top: 4px; }
-        .stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+        /* Log Rows */
+        .log-section { border-radius: var(--radius); border: 1px solid rgba(230, 126, 34, 0.08); background: var(--card); overflow: hidden; }
+        .log-row { 
+            display: grid; grid-template-columns: 55px 1fr 1fr 1fr; align-items: center; 
+            padding: 14px 8px; border-bottom: 1px solid #FAF3E0; transition: background 0.2s;
+        }
+        .day-num { font-weight: 800; font-size: 19px; color: #5D4037; }
+        .day-name { font-size: 10px; font-weight: 700; color: #A1887F; text-transform: uppercase; }
 
-        .progress-box { background: var(--card); padding: 16px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .progress-container { height: 10px; background: var(--border); border-radius: 20px; overflow: hidden; margin-top: 10px; }
-        .progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* Interactive Pills */
+        .pill { 
+            height: 54px; border-radius: 18px; border: 1.5px solid #FDF2E9; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            margin: 0 4px; background: #fff; transition: all 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
+            cursor: pointer; gap: 3px; position: relative;
+        }
+        .pill svg { width: 18px; height: 18px; fill: #A1887F; }
+        .pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #A1887F; }
+        .pill.on { background: var(--p); border-color: var(--p); transform: scale(1.05); }
+        .pill.on svg { fill: white; }
+        .pill.on span { color: white; }
+        .pill.locked { opacity: 0.4; cursor: not-allowed; }
 
-        /* History Table */
-        .history-toggle { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 700; cursor: pointer; box-shadow: var(--shadow); }
-        .table-wrap { display: none; margin-top: 15px; background: var(--card); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { background: rgba(0,0,0,0.02); padding: 12px; color: var(--muted); font-size: 11px; text-transform: uppercase; }
-        td { padding: 14px 10px; text-align: center; border-bottom: 1px solid var(--border); cursor: pointer; }
-        tr:hover td { background: rgba(37, 99, 235, 0.05); }
+        .note-dot { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; background: #FFC107; border-radius: 50%; border: 1px solid white; }
 
-        /* Settings Modal */
-        #settingsModal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); display: none; z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-content { background: var(--card); padding: 24px; border-radius: 24px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
-        .input-group { margin-bottom: 16px; }
-        .input-group label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; color: var(--muted); text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-weight: 600; }
+        /* Modals */
+        .overlay { position: fixed; inset: 0; background: rgba(62, 39, 35, 0.6); display: none; z-index: 2000; backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 24px; }
+        .dialog { background: var(--bg); width: 100%; max-width: 400px; border-radius: 35px; padding: 30px; }
+        .input { width: 100%; padding: 16px; border-radius: 18px; border: 2px solid #FAD7A0; margin: 10px 0; font-family: inherit; font-size: 16px; -webkit-user-select: auto; }
+        .btn-p { background: var(--p); color: white; width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; }
+
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 14px 28px; border-radius: 100px; font-weight: 700; display: none; z-index: 3000; font-size: 13px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
+<div id="toast">Saved!</div>
+
 <div class="container">
-    <div class="header">
-        <h1>Nexus</h1>
-        <div class="header-btns">
-            <button class="icon-btn" onclick="exportData()" title="Backup Data">💾</button>
-            <button class="icon-btn" onclick="document.getElementById('settingsModal').style.display='flex'">⚙️</button>
-            <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    <div class="nav-header">
+        <div class="month-chip">
+            <button onclick="moveMon(-1)" style="border:none; background:none; color:var(--p); font-size:20px;">‹</button>
+            <span id="monLab"></span>
+            <button onclick="moveMon(1)" style="border:none; background:none; color:var(--p); font-size:20px;">›</button>
         </div>
+        <button onclick="toggleAcc()" style="background:#fff; border:1px solid #eee; width:44px; height:44px; border-radius:15px;">⚙️</button>
     </div>
 
-    <div class="status-bar">
-        <span>Managing Day: <b id="displayDate"></b></span>
-        <span id="saveIndicator">✓ Saved</span>
+    <div class="welcome-section">
+        <h2 id="greet" style="margin:0; font-size:36px; font-family:Outfit;">Hello!</h2>
+        <p id="subGreet" style="color:var(--sub); margin:5px 0 25px 0; font-weight:600; font-size: 14px;">Hold any row to add extra meals/notes.</p>
     </div>
 
-    <div class="action-card">
-        <div class="section-title">Quick Log</div>
-        <div class="grid-buttons">
-            <button class="toggle-btn" id="btnLA" onclick="toggleField('LA')">🍱 <span id="labelLA">Lunch A</span></button>
-            <button class="toggle-btn" id="btnLB" onclick="toggleField('LB')">🍲 <span id="labelLB">Lunch B</span></button>
-            <button class="toggle-btn" id="btnDA" onclick="toggleField('DA')">🍛 <span id="labelDA">Dinner A</span></button>
-            <button class="toggle-btn" id="btnDB" onclick="toggleField('DB')">🥘 <span id="labelDB">Dinner B</span></button>
-        </div>
-        <div style="display: flex; gap: 12px; margin-top: 12px;">
-            <button class="toggle-btn" id="btnW" style="flex: 1;" onclick="toggleField('W')">💧 <span>Water</span></button>
-            <div class="toggle-btn" style="flex: 1; cursor: default;">
-                <span>Extra Meals</span>
-                <input type="number" id="extraInput" value="0" min="0" style="width: 60px; text-align: center; border:none; background:transparent; font-size:18px; font-weight:800; color:var(--primary)" onchange="updateExtra(this.value)">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div style="font-size:11px; font-weight:800; opacity:0.85; letter-spacing: 1px;">TOTAL LEDGER</div>
+                <div class="val" id="totalVal">₹0</div>
+            </div>
+            <div class="smart-log-btn" onclick="autoLog()" id="smartLogBtn">
+                <svg id="smartIcon"><use href="#icon-lunch"/></svg>
+                <span id="smartLabel">Log</span>
             </div>
         </div>
+        <div id="summary" style="font-size:13px; font-weight:700; opacity:0.9;">0 Meals • 0 Water</div>
+        <button id="waBtn" class="wa-btn" onclick="share()">SEND WHATSAPP REPORT ↗</button>
     </div>
 
-    <div class="progress-box">
-        <div style="display:flex; justify-content: space-between; align-items: flex-end;">
-            <span class="stat-label">Budget Usage</span>
-            <b id="budgetPct" style="font-size: 18px;">0%</b>
-        </div>
-        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-    </div>
+    <div class="log-section" id="logList"></div>
+</div>
 
-    <div class="stats">
-        <div class="stat-item">
-            <span class="stat-label">This Month</span>
-            <span class="stat-val" id="statTotal">₹0</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">Total Meals</span>
-            <span class="stat-val" id="statMeals">0</span>
-        </div>
-    </div>
-
-    <button class="history-toggle" onclick="toggleHistory()">📅 View Detailed History</button>
-    
-    <div class="table-wrap" id="historyTable">
-        <table>
-            <thead><tr><th>Day</th><th>L</th><th>D</th><th>W</th><th>Ex</th></tr></thead>
-            <tbody id="tbody"></tbody>
-        </table>
+<div id="noteOverlay" class="overlay" onclick="closeNote()">
+    <div class="dialog" onclick="event.stopPropagation()">
+        <h2 id="noteTitle" style="margin:0; font-family:Outfit;">Day Detail</h2>
+        <p style="font-size:14px; color:var(--sub); margin:8px 0 20px 0;">Add one-off meals or spending notes.</p>
+        <label style="font-size:11px; font-weight:800; color:var(--p);">ADD EXTRA MEAL COUNT</label>
+        <input type="number" id="nExtra" class="input" placeholder="0">
+        <label style="font-size:11px; font-weight:800; color:var(--p);">NOTE</label>
+        <input type="text" id="nText" class="input" placeholder="e.g. Guest Breakfast">
+        <button class="btn-p" onclick="saveNote()">Update Day</button>
     </div>
 </div>
 
-<div id="settingsModal" onclick="if(event.target==this) this.style.display='none'">
-    <div class="modal-content">
-        <h3 style="margin-top:0; letter-spacing:-1px">Ledger Settings</h3>
-        <div class="input-group">
-            <label>Tracking Mode</label>
-            <select id="setMode" onchange="updateSet()">
-                <option value="1">Single Mess</option>
-                <option value="2">Dual Mess (A/B)</option>
-            </select>
+<div id="accOverlay" class="overlay" onclick="toggleAcc()">
+    <div class="dialog" onclick="event.stopPropagation()">
+        <h2 style="font-family:Outfit; margin:0 0 20px 0;">Settings</h2>
+        <input type="text" id="uName" class="input" placeholder="Your Name">
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="uMeal" class="input" placeholder="Meal ₹">
+            <input type="number" id="uWat" class="input" placeholder="Water ₹">
         </div>
-        <div class="input-group"><label>Mess A Name</label><input type="text" id="setNameA" onchange="updateSet()"></div>
-        <div id="groupB" class="input-group"><label>Mess B Name</label><input type="text" id="setNameB" onchange="updateSet()"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="input-group"><label>Meal (₹)</label><input type="number" id="setPriceM" onchange="updateSet()"></div>
-            <div class="input-group"><label>Water (₹)</label><input type="number" id="setPriceW" onchange="updateSet()"></div>
-        </div>
-        <div class="input-group"><label>Monthly Budget (₹)</label><input type="number" id="setBudget" onchange="updateSet()"></div>
-        <button class="history-toggle" onclick="document.getElementById('settingsModal').style.display='none'">Save & Close</button>
+        <button class="btn-p" onclick="savePr()">Save Preferences</button>
     </div>
 </div>
+
+<svg style="display:none">
+    <symbol id="icon-lunch" viewBox="0 0 24 24"><path d="M22 9h-4.2c-.4-2.3-2.1-4.2-4.4-4.8l1.3-1.3c.4-.4.4-1 0-1.4s-1-.4-1.4 0l-2.7 2.7c-.2.2-.3.4-.3.7s.1.5.3.7l2.7 2.7c.4.4 1 .4 1.4 0s.4-1 0-1.4l-1.3-1.3c1.3.4 2.3 1.5 2.7 2.8H2v2h20V9zM2 13v1c0 3.9 3.1 7 7 7h6c3.9 0 7-3.1 7-7v-1H2z"/></symbol>
+    <symbol id="icon-dinner" viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.1 1.6 3.9 3.7 4l-1.7 8h2.1l1.4-6.5L10 21h2l1-9h1c1.1 0 2-.9 2-2V2h-2v7h-1zm9 4c-1.7 0-3-1.3-3-3V2h-2v8c0 2.8 2.2 5 5 5v6h2v-6c0-1.7-1.3-3-3-3z"/></symbol>
+    <symbol id="icon-water" viewBox="0 0 24 24"><path d="M12 21.5c-3.6 0-6.5-2.9-6.5-6.5 0-3.3 4.2-9.6 5.8-11.8.4-.5 1.1-.5 1.5 0 1.6 2.2 5.8 8.5 5.8 11.8 0 3.6-2.9 6.5-6.5 6.5z"/></symbol>
+</svg>
 
 <script>
-    let config = JSON.parse(localStorage.getItem('m-conf')) || { mode: 2, nA: "Mess A", nB: "Mess B", pM: 60, pW: 20, bud: 5000 };
-    let viewDate = new Date(); // Date being viewed/edited
-    const realToday = new Date().getDate();
-    const currentKey = `m-${viewDate.getFullYear()}-${viewDate.getMonth()}`;
-    let data = JSON.parse(localStorage.getItem(currentKey)) || {};
+    let vDate = new Date(), tDate = new Date(), pressTimer, activeDay;
+    const PREFIX = "VET_V5_";
+    let prefs = JSON.parse(localStorage.getItem('VET_PREF')) || { n: "", m: 50, w: 30 };
 
-    function updateSet() {
-        config = {
-            mode: parseInt(document.getElementById('setMode').value),
-            nA: document.getElementById('setNameA').value,
-            nB: document.getElementById('setNameB').value,
-            pM: parseInt(document.getElementById('setPriceM').value),
-            pW: parseInt(document.getElementById('setPriceW').value),
-            bud: parseInt(document.getElementById('setBudget').value)
-        };
-        localStorage.setItem('m-conf', JSON.stringify(config));
-        applyUI();
-    }
+    function refresh() {
+        document.getElementById('monLab').innerText = vDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+        
+        const currentYM = tDate.getFullYear() * 12 + tDate.getMonth();
+        const viewedYM = vDate.getFullYear() * 12 + vDate.getMonth();
+        const isPast = viewedYM < currentYM;
+        const isFuture = viewedYM > currentYM;
 
-    function applyUI() {
-        document.getElementById('displayDate').innerText = viewDate.toDateString();
-        document.getElementById('setMode').value = config.mode;
-        document.getElementById('setNameA').value = config.nA;
-        document.getElementById('setNameB').value = config.nB;
-        document.getElementById('setPriceM').value = config.pM;
-        document.getElementById('setPriceW').value = config.pW;
-        document.getElementById('setBudget').value = config.bud;
+        document.getElementById('waBtn').style.display = isPast ? 'block' : 'none';
         
-        document.getElementById('labelLA').innerText = config.nA;
-        document.getElementById('labelDA').innerText = config.nA;
-        
-        const isDual = config.mode === 2;
-        document.getElementById('groupB').style.display = isDual ? 'block' : 'none';
-        document.getElementById('btnLB').style.display = isDual ? 'flex' : 'none';
-        document.getElementById('btnDB').style.display = isDual ? 'flex' : 'none';
-        
-        renderActiveDay();
-        renderTable();
+        const hr = tDate.getHours();
+        const greets = hr < 12 ? "Good Morning" : hr < 17 ? "Good Afternoon" : "Good Evening";
+        document.getElementById('greet').innerText = `${greets}${prefs.n ? ', ' + prefs.n : ''}!`;
+
+        updateSmartButton();
+        draw(isPast || isFuture); 
         calc();
-        smartNudge();
     }
 
-    function smartNudge() {
-        // Only nudge if we are looking at the actual current day
-        if (viewDate.getDate() !== realToday) {
-            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('nudge'));
+    function updateSmartButton() {
+        const hr = new Date().getHours();
+        const btn = document.getElementById('smartLogBtn');
+        const icon = document.getElementById('smartIcon');
+        const label = document.getElementById('smartLabel');
+        
+        if (hr >= 5 && hr < 16) {
+            icon.innerHTML = '<use href="#icon-lunch"/>';
+            label.innerText = "Log Lunch";
+            btn.dataset.type = 'l';
+        } else {
+            icon.innerHTML = '<use href="#icon-dinner"/>';
+            label.innerText = "Log Dinner";
+            btn.dataset.type = 'd';
+        }
+    }
+
+    function autoLog() {
+        const btn = document.getElementById('smartLogBtn');
+        const type = btn.dataset.type;
+        const today = new Date().getDate();
+        const currentYM = tDate.getFullYear() * 12 + tDate.getMonth();
+        const viewedYM = vDate.getFullYear() * 12 + vDate.getMonth();
+        
+        if (currentYM !== viewedYM) {
+            toast("Switch to today's month to log!");
             return;
         }
-        const hour = new Date().getHours();
-        document.getElementById('btnLA').classList.toggle('nudge', hour >= 11 && hour <= 15);
-        document.getElementById('btnDA').classList.toggle('nudge', hour >= 19 && hour <= 22);
+        toggle(today, type);
+        toast((type === 'l' ? "Lunch" : "Dinner") + " Logged! 🥘");
     }
 
-    function toggleField(field) {
-        const d = viewDate.getDate();
-        if(!data[d]) data[d] = {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
-        
-        if(field === 'LA') { data[d].LA = data[d].LA ? 0 : 1; data[d].LB = 0; }
-        if(field === 'LB') { data[d].LB = data[d].LB ? 0 : 1; data[d].LA = 0; }
-        if(field === 'DA') { data[d].DA = data[d].DA ? 0 : 1; data[d].DB = 0; }
-        if(field === 'DB') { data[d].DB = data[d].DB ? 0 : 1; data[d].DA = 0; }
-        if(field === 'W')  { data[d].W = data[d].W ? 0 : 1; }
-        
-        save();
+    function draw(locked) {
+        const k = PREFIX + vDate.getFullYear() + "_" + vDate.getMonth();
+        let db = JSON.parse(localStorage.getItem(k)) || {};
+        const days = new Date(vDate.getFullYear(), vDate.getMonth() + 1, 0).getDate();
+        const list = document.getElementById('logList');
+        list.innerHTML = '';
+
+        for(let i=1; i<=days; i++) {
+            const data = db[i] || {l:0, d:0, w:0, x:0, n:""};
+            const row = document.createElement('div');
+            row.className = 'log-row';
+            if(i === tDate.getDate() && vDate.getMonth() === tDate.getMonth() && vDate.getFullYear() === tDate.getFullYear()) {
+                row.style.background = "#FFF8F0";
+            }
+
+            row.addEventListener('touchstart', (e) => {
+                if (locked) return;
+                pressTimer = setTimeout(() => {
+                    if (window.navigator.vibrate) window.navigator.vibrate(60);
+                    openNote(i);
+                }, 600);
+            });
+            row.addEventListener('touchend', () => clearTimeout(pressTimer));
+            row.addEventListener('touchmove', () => clearTimeout(pressTimer));
+
+            row.innerHTML = `
+                <div class="day-box">
+                    <div class="day-num">${i}</div>
+                    <div class="day-name">${new Date(vDate.getFullYear(), vDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</div>
+                </div>
+                <div class="pill ${data.l?'on':''} ${locked?'locked':''}" onclick="${locked?'':'toggle('+i+',\'l\')'}"><svg><use href="#icon-lunch"/></svg><span>Lunch</span></div>
+                <div class="pill ${data.d?'on':''} ${locked?'locked':''}" onclick="${locked?'':'toggle('+i+',\'d\')'}"><svg><use href="#icon-dinner"/></svg><span>Dinner</span></div>
+                <div class="pill ${data.w?'on':''} ${locked?'locked':''}" onclick="${locked?'':'toggle('+i+',\'w\')'}">
+                    <svg><use href="#icon-water"/></svg><span>Water</span>
+                    ${(data.x > 0 || data.n) ? '<div class="note-dot"></div>' : ''}
+                </div>
+            `;
+            list.appendChild(row);
+        }
     }
 
-    function updateExtra(val) {
-        const d = viewDate.getDate();
-        if(!data[d]) data[d] = {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
-        data[d].EX = parseInt(val) || 0;
-        save();
+    function toggle(d, t) {
+        const k = PREFIX + vDate.getFullYear() + "_" + vDate.getMonth();
+        let db = JSON.parse(localStorage.getItem(k)) || {};
+        if(!db[d]) db[d] = {l:0, d:0, w:0, x:0, n:""};
+        db[d][t] = db[d][t] ? 0 : 1;
+        localStorage.setItem(k, JSON.stringify(db));
+        draw(false); calc();
     }
 
-    function save() {
-        localStorage.setItem(currentKey, JSON.stringify(data));
-        showSaved();
-        applyUI();
+    function openNote(d) {
+        activeDay = d;
+        const k = PREFIX + vDate.getFullYear() + "_" + vDate.getMonth();
+        let db = JSON.parse(localStorage.getItem(k)) || {};
+        const data = db[d] || {x:0, n:""};
+        document.getElementById('noteTitle').innerText = "Day " + d;
+        document.getElementById('nExtra').value = data.x || "";
+        document.getElementById('nText').value = data.n || "";
+        document.getElementById('noteOverlay').style.display = 'flex';
     }
 
-    function showSaved() {
-        const s = document.getElementById('saveIndicator');
-        s.style.opacity = 1;
-        setTimeout(() => s.style.opacity = 0, 1500);
-    }
-
-    function renderActiveDay() {
-        const d = data[viewDate.getDate()] || {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
-        document.getElementById('btnLA').classList.toggle('active', !!d.LA);
-        document.getElementById('btnLB').classList.toggle('active', !!d.LB);
-        document.getElementById('btnDA').classList.toggle('active', !!d.DA);
-        document.getElementById('btnDB').classList.toggle('active', !!d.DB);
-        document.getElementById('btnW').classList.toggle('active', !!d.W);
-        document.getElementById('extraInput').value = d.EX;
+    function saveNote() {
+        const k = PREFIX + vDate.getFullYear() + "_" + vDate.getMonth();
+        let db = JSON.parse(localStorage.getItem(k)) || {};
+        if(!db[activeDay]) db[activeDay] = {l:0, d:0, w:0};
+        db[activeDay].x = parseInt(document.getElementById('nExtra').value) || 0;
+        db[activeDay].n = document.getElementById('nText').value;
+        localStorage.setItem(k, JSON.stringify(db));
+        closeNote(); refresh();
     }
 
     function calc() {
-        let meals = 0, water = 0, extras = 0;
-        Object.values(data).forEach(v => {
-            if(v.LA || v.LB) meals++;
-            if(v.DA || v.DB) meals++;
-            if(v.W) water++;
-            extras += (v.EX || 0);
-        });
-        const cost = (meals + extras) * config.pM + (water * config.pW);
-        document.getElementById('statTotal').innerText = `₹${cost}`;
-        document.getElementById('statMeals').innerText = meals + extras;
-        
-        const pct = Math.min((cost / config.bud) * 100, 100);
-        document.getElementById('progressBar').style.width = pct + '%';
-        document.getElementById('budgetPct').innerText = Math.round(pct) + '%';
-        document.getElementById('progressBar').style.background = pct > 90 ? 'var(--red)' : pct > 75 ? 'var(--orange)' : 'var(--primary)';
+        const db = JSON.parse(localStorage.getItem(PREFIX + vDate.getFullYear() + "_" + vDate.getMonth())) || {};
+        let m=0, w=0, x=0;
+        Object.values(db).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; if(v.x) x += v.x; });
+        const total = ((m + x) * prefs.m) + (w * prefs.w);
+        document.getElementById('totalVal').innerText = `₹${total}`;
+        document.getElementById('summary').innerText = `${m + x} Meals • ${w} Water`;
     }
 
-    function renderTable() {
-        const tbody = document.getElementById('tbody');
-        tbody.innerHTML = '';
-        const days = new Date(viewDate.getFullYear(), viewDate.getMonth()+1, 0).getDate();
-        for(let i=1; i<=days; i++) {
-            const r = data[i] || {LA:0, LB:0, DA:0, DB:0, W:0, EX:0};
-            const tr = document.createElement('tr');
-            if(i === viewDate.getDate()) tr.style.background = 'rgba(37,99,235,0.1)';
-            tr.onclick = () => { viewDate.setDate(i); applyUI(); window.scrollTo({top:0, behavior:'smooth'}); };
-            tr.innerHTML = `<td><b>${i}</b></td>
-                <td>${r.LA?'A':(r.LB?'B':'-')}</td>
-                <td>${r.DA?'A':(r.DB?'B':'-')}</td>
-                <td>${r.W?'💧':'-'}</td>
-                <td>${r.EX || '-'}</td>`;
-            tbody.appendChild(tr);
-        }
+    function moveMon(d) { vDate.setMonth(vDate.getMonth() + d); refresh(); }
+    function closeNote() { document.getElementById('noteOverlay').style.display = 'none'; }
+    function toggleAcc() { 
+        document.getElementById('uName').value = prefs.n;
+        document.getElementById('uMeal').value = prefs.m;
+        document.getElementById('uWat').value = prefs.w;
+        const s = document.getElementById('accOverlay'); 
+        s.style.display = s.style.display === 'flex' ? 'none' : 'flex'; 
+    }
+    function savePr() {
+        prefs = { n: document.getElementById('uName').value, m: parseInt(document.getElementById('uMeal').value) || 50, w: parseInt(document.getElementById('uWat').value) || 30 };
+        localStorage.setItem('VET_PREF', JSON.stringify(prefs));
+        toggleAcc(); refresh();
+    }
+    function toast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display='none', 2000);
+    }
+    function share() {
+        const db = JSON.parse(localStorage.getItem(PREFIX + vDate.getFullYear() + "_" + vDate.getMonth())) || {};
+        let m=0, w=0, x=0; Object.values(db).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; if(v.x) x += v.x; });
+        const msg = `*VETTRACK LEDGER: ${document.getElementById('monLab').innerText}*\n👤 *Diner:* ${prefs.n}\n🍱 *Meals:* ${m+x}\n💧 *Water:* ${w}\n💰 *Final Bill: ₹${((m+x)*prefs.m)+(w*prefs.w)}*`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
     }
 
-    function toggleHistory() {
-        const t = document.getElementById('historyTable');
-        t.style.display = t.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function toggleTheme() {
-        document.body.classList.toggle('dark');
-        localStorage.setItem('dark-mode', document.body.classList.contains('dark'));
-    }
-
-    function exportData() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "mess_tracker_backup.json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-    }
-
-    // Auto-load theme
-    if(localStorage.getItem('dark-mode') === 'true') document.body.classList.add('dark');
-
-    applyUI();
+    refresh();
 </script>
-
 </body>
 </html>
+
