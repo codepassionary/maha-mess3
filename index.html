@@ -12,7 +12,7 @@
             --text: #F8FAFC; --sub: #94A3B8;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; scroll-behavior: smooth; }
         
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
@@ -35,35 +35,47 @@
         /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .greet-p { margin: 0; font-size: 13px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; }
-        .user-h1 { font-family: 'Outfit'; font-size: 32px; margin: 0; font-weight: 800; letter-spacing: -1px; display: flex; align-items: center; gap: 12px; }
-        .pfp { width: 50px; height: 50px; border-radius: 16px; border: 2px solid var(--surface); box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
+        .user-h1 { font-family: 'Outfit'; font-size: 32px; margin: 0; font-weight: 800; letter-spacing: -1px; }
+        .pfp { width: 50px; height: 50px; border-radius: 16px; border: 2px solid var(--surface); cursor: pointer; object-fit: cover; }
+
+        /* STAT CARD + QUICK LOG */
+        .stat-card {
+            background: linear-gradient(160deg, #FF8C00 0%, #F39C12 100%);
+            padding: 25px; border-radius: 35px; margin-bottom: 35px;
+            box-shadow: 0 25px 50px -12px var(--p-glow);
+            position: relative; overflow: hidden;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .stat-left { z-index: 2; }
+        .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.8); }
+        .total-val { font-family: 'Outfit'; font-size: 44px; font-weight: 900; margin: 2px 0; color: white; letter-spacing: -2px; }
+        
+        .quick-log-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white; padding: 12px; border-radius: 22px;
+            display: flex; flex-direction: column; align-items: center;
+            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
+            z-index: 2; min-width: 105px; text-align: center;
+        }
+        .quick-log-btn.done { background: white; color: var(--p); border-color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .quick-log-btn:active { transform: scale(0.9); }
+        .quick-log-btn i { font-style: normal; font-size: 20px; margin-bottom: 2px; }
 
         /* NAV PILL */
         .nav-pill { 
             display: flex; align-items: center; background: var(--card); padding: 6px; 
             border-radius: 20px; border: 1px solid var(--surface); margin-bottom: 25px;
         }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 40px; height: 40px; border-radius: 15px; cursor: pointer; transition: 0.2s; }
+        .nav-pill button { border: none; background: var(--surface); color: white; width: 40px; height: 40px; border-radius: 15px; cursor: pointer; }
         .nav-pill span { flex: 1; text-align: center; font-weight: 700; font-size: 14px; color: var(--text); }
-
-        /* STAT CARD */
-        .stat-card {
-            background: linear-gradient(160deg, #FF8C00 0%, #F39C12 100%);
-            padding: 30px; border-radius: 35px; margin-bottom: 35px;
-            box-shadow: 0 25px 50px -12px var(--p-glow);
-            position: relative; overflow: hidden;
-        }
-        .stat-card::before { content: ""; position: absolute; width: 120px; height: 120px; background: white; opacity: 0.1; border-radius: 50%; top: -40px; right: -40px; }
-        .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.8); }
-        .total-val { font-family: 'Outfit'; font-size: 56px; font-weight: 900; margin: 5px 0; color: white; letter-spacing: -2px; }
-        .mini-badge { display: inline-block; padding: 6px 14px; background: rgba(0,0,0,0.15); border-radius: 12px; font-size: 12px; font-weight: 700; color: white; }
 
         /* GRID */
         .day-item { 
             display: grid; grid-template-columns: 65px 1fr 1fr 1fr; gap: 10px; align-items: center; 
             padding: 16px; background: var(--card); border-radius: 28px; margin-bottom: 14px;
             border: 1px solid var(--surface); transition: all 0.3s ease;
-            user-select: none; -webkit-user-select: none;
         }
         .day-item.is-today { border-color: var(--p); background: #1E293B; }
         .date-circ .n { font-family: 'Outfit'; font-size: 24px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
@@ -77,18 +89,16 @@
         .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 8px 15px -5px var(--p-glow); }
         .item-pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; margin-top: 2px; }
 
-        /* SHEETS (Settings & Notes) */
+        /* SHEETS */
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: flex-end; }
-        .sheet { background: var(--card); width: 100%; border-radius: 40px 40px 0 0; padding: 35px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.4s cubic-bezier(0.32, 0.72, 0, 1); max-height: 90vh; overflow-y: auto; }
+        .sheet { background: var(--card); width: 100%; border-radius: 40px 40px 0 0; padding: 35px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
         .sheet.up { transform: translateY(0); }
-        .sheet h2 { font-family: 'Outfit'; font-size: 28px; margin: 0 0 20px 0; color: white; }
         
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; letter-spacing: 1px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; }
         .form-group input, .form-group textarea { width: 100%; padding: 16px; background: var(--bg); border: 1px solid var(--surface); border-radius: 18px; color: white; font-size: 16px; }
         
-        .btn-prime { background: var(--p); color: white; padding: 20px; border-radius: 24px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        .btn-prime:active { transform: scale(0.98); }
+        .btn-prime { background: var(--p); color: white; padding: 20px; border-radius: 24px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 16px; }
         .note-tag { grid-column: 1 / -1; font-size: 12px; color: var(--p); background: rgba(255,140,0,0.1); padding: 8px 15px; border-radius: 12px; margin-top: 10px; font-weight: 600; }
     </style>
 </head>
@@ -96,44 +106,50 @@
 
 <div id="welcomeScreen">
     <div class="logo-wrap"><div class="glow-orb"></div><h1 class="logo-main">VetTrack<span style="color:var(--p)">.</span></h1></div>
-    <button class="btn-prime" onclick="login()" style="width: 280px; border-radius: 50px;">Sign In with Google</button>
+    <button class="btn-prime" onclick="login()" style="width: 280px; border-radius: 50px;">Sign In</button>
 </div>
 
 <div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
     <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2>App Settings</h2>
+        <h2 style="margin-top:0">Settings</h2>
         <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="form-group"><label>Meal Price (₹)</label><input type="number" id="setMealPrice"></div>
-            <div class="form-group"><label>Water Price (₹)</label><input type="number" id="setWaterPrice"></div>
+            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
+            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
         </div>
-        <button class="btn-prime" onclick="saveSettings()">Save & Update</button>
+        <button class="btn-prime" onclick="saveSettings()">Save Changes</button>
         <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:700;">Sign Out</button>
     </div>
 </div>
 
 <div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
     <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle">Day Details</h2>
-        <div class="form-group"><label>Notes / Guest Meals</label><textarea id="noteInput" placeholder="Add guest meals or notes..."></textarea></div>
-        <button class="btn-prime" onclick="saveNote()">Confirm Note</button>
+        <h2 id="noteTitle" style="margin-top:0">Notes</h2>
+        <div class="form-group"><textarea id="noteInput" placeholder="Add guest meals or notes..."></textarea></div>
+        <button class="btn-prime" onclick="saveNote()">Save Note</button>
     </div>
 </div>
 
 <div class="container">
     <div class="header">
         <div class="greeting-text"><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
-        <img id="userPfp" class="pfp" src="" onclick="openSettings()" onerror="this.src='https://ui-avatars.com/api/?background=334155&color=fff&name=User'">
+        <img id="userPfp" class="pfp" src="" onclick="openSettings()">
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-left">
+            <div class="label">Total Dues</div>
+            <div class="total-val" id="totalValue">₹0</div>
+            <div id="statsSub" style="font-size:11px; font-weight:700; opacity:0.8">0 Units</div>
+        </div>
+        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
+            <i id="quickIcon">⚡</i>
+            <span id="quickText">Check Status</span>
+        </div>
     </div>
 
     <div class="nav-pill">
         <button onclick="changeMonth(-1)">‹</button><span id="monthLabel">Month</span><button onclick="changeMonth(1)">›</button>
-    </div>
-
-    <div class="stat-card">
-        <div class="label">Total Investment</div>
-        <div class="total-val" id="totalValue">₹0</div>
-        <div class="mini-badge" id="statsSub">0 Units</div>
     </div>
 
     <div id="logsGrid"></div>
@@ -162,15 +178,9 @@
             user = u; 
             document.getElementById('welcomeScreen').style.display = 'none'; 
             document.getElementById('userPfp').src = u.photoURL;
-            
             const userDoc = await getDoc(doc(db, "users", u.uid));
-            if (userDoc.exists()) {
-                config = { ...config, ...userDoc.data() };
-            } else {
-                config.name = u.displayName;
-                await setDoc(doc(db, "users", u.uid), config);
-            }
-            
+            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
+            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
             document.getElementById('userLabel').innerText = config.name;
             updateGreet(); syncData(); 
         } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
@@ -181,11 +191,53 @@
         document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : h < 21 ? "Good Evening 🌇" : "Good Night 🌙";
     }
 
+    function updateQuickBtn() {
+        const day = todayDate.getDate();
+        const hour = todayDate.getHours();
+        const type = hour < 16 ? 'l' : 'd';
+        const typeLabel = type === 'l' ? 'Lunch' : 'Dinner';
+        const isMarked = logs[day] && logs[day][type] === 1;
+
+        const btn = document.getElementById('quickBtn');
+        const icon = document.getElementById('quickIcon');
+        const text = document.getElementById('quickText');
+
+        if (isMarked) {
+            btn.classList.add('done');
+            icon.innerText = '✅';
+            text.innerText = `${typeLabel} Marked`;
+        } else {
+            btn.classList.remove('done');
+            icon.innerText = '⚡';
+            text.innerText = `Mark ${typeLabel}`;
+        }
+    }
+
     function syncData() {
         onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
-            logs = d.data() || {}; renderGrid();
+            logs = d.data() || {}; 
+            renderGrid();
+            updateQuickBtn();
+            if(viewDate.getMonth() === todayDate.getMonth()) {
+                setTimeout(() => {
+                    const todayEl = document.querySelector('.is-today');
+                    if(todayEl) todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 500);
+            }
         });
     }
+
+    window.quickLog = async () => {
+        const day = todayDate.getDate();
+        const hour = todayDate.getHours();
+        const type = hour < 16 ? 'l' : 'd';
+        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
+        
+        if(obj[type] === 1) return; // Already marked
+        
+        obj[type] = 1;
+        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
+    };
 
     function renderGrid() {
         const isCurrent = viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
@@ -205,7 +257,7 @@
             };
             card.onmousemove = card.ontouchmove = (e) => {
                 const cy = e.touches ? e.touches[0].clientY : e.clientY;
-                if (Math.abs(cy - touchStartY) > 10) clearTimeout(timer);
+                if (Math.abs(cy - touchStartY) > 15) clearTimeout(timer);
             };
             card.onmouseup = card.ontouchend = () => clearTimeout(timer);
 
@@ -243,7 +295,6 @@
         closeNote();
     };
 
-    // SETTINGS LOGIC
     window.openSettings = () => {
         document.getElementById('setUserName').value = config.name;
         document.getElementById('setMealPrice').value = config.mealPrice;
@@ -266,7 +317,7 @@
         let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
         const total = (m * config.mealPrice) + (w * config.waterPrice);
         document.getElementById('totalValue').innerText = `₹${total.toLocaleString('en-IN')}`;
-        document.getElementById('statsSub').innerText = `${m} Meals (${config.mealPrice}/ea) • ${w} Water (${config.waterPrice}/ea)`;
+        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
     }
 
     window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
