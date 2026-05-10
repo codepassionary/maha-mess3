@@ -3,186 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Premier</title>
+    <title>VetTrack | Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --p: #E67E22; --p-dark: #D35400; --bg: #FFFDFB; --card: #ffffff; 
-            --text: #1A1A1A; --sub: #8D6E63; --radius: 28px;
+            --p: #FF8C00; /* Vibrant Deep Orange */
+            --p-soft: #FFF4E6; 
+            --bg: #F8F9FA; 
+            --card: #ffffff; 
+            --text: #2D3436; 
+            --sub: #636E72;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 40px; padding-top: env(safe-area-inset-top); }
+        
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
+        }
+
         .container { max-width: 480px; margin: 0 auto; padding: 20px; }
 
-        /* HEADER & ICONS */
-        .welcome-box { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .greeting { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 800; color: var(--text); }
-        
+        /* HEADER & GREETING */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .greeting-text h1 { font-family: 'Outfit'; font-size: 28px; margin: 0; color: var(--text); }
+        .greeting-text p { margin: 0; font-size: 14px; color: var(--sub); font-weight: 600; }
+
+        /* ICON BUTTONS */
         .icon-btn { 
-            border: none; background: white; width: 42px; height: 42px; border-radius: 12px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06); cursor: pointer; display: flex; 
+            border: none; background: var(--card); width: 44px; height: 44px; border-radius: 14px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; display: flex; 
             align-items: center; justify-content: center; transition: 0.2s;
         }
-        .icon-btn:active { transform: scale(0.9); background: #fdfdfd; }
-        .icon-btn svg { width: 20px; height: 20px; stroke: var(--text); stroke-width: 2; fill: none; }
+        .icon-btn:active { transform: scale(0.9); }
+        .icon-btn svg { width: 22px; height: 22px; stroke: var(--p); stroke-width: 2.5; fill: none; }
 
-        /* BILLING LOGIC UI */
+        /* REFINED STAT CARD (NO LONGER PURE BLACK) */
         .stat-card {
-            background: linear-gradient(165deg, #1e1e1e 0%, #000 100%);
-            color: white; padding: 30px; border-radius: 32px; margin-bottom: 25px;
+            background: linear-gradient(135deg, var(--p) 0%, #E67E22 100%);
+            color: white; padding: 28px; border-radius: 30px; margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(255, 140, 0, 0.25);
             position: relative; overflow: hidden;
         }
-        .stat-card::after { content: ''; position: absolute; bottom: -20px; right: -20px; width: 120px; height: 120px; background: var(--p); filter: blur(70px); opacity: 0.3; }
-        .val { font-family: 'Outfit', sans-serif; font-size: 52px; font-weight: 900; margin: 5px 0; }
-        
-        .bill-status { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #aaa; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
-        .bill-btn { 
-            width: 100%; padding: 16px; border-radius: 18px; border: none; 
-            background: var(--p); color: white; font-weight: 800; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s;
+        .stat-card::before {
+            content: ""; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px;
+            background: rgba(255,255,255,0.1); border-radius: 50%;
         }
-        .bill-btn:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); cursor: not-allowed; border: 1px dashed rgba(255,255,255,0.2); }
+        .val { font-family: 'Outfit'; font-size: 50px; font-weight: 900; margin: 5px 0; }
+        .card-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.9; }
 
-        /* DATA LIST */
-        .month-nav { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; background: #fff; padding: 8px; border-radius: 50px; border: 1px solid #eee; }
-        .month-nav span { font-weight: 800; font-size: 14px; min-width: 140px; text-align: center; }
-        
-        .day-row { display: grid; grid-template-columns: 50px 1fr 1fr 1fr; align-items: center; padding: 12px; border-bottom: 1px solid #f8f8f8; }
-        .day-row.locked { opacity: 0.4; pointer-events: none; }
-        .day-row.today { border-left: 5px solid var(--p); background: linear-gradient(90deg, #fff9f5 0%, #fff 100%); }
+        /* LOG LIST */
+        .month-label { text-align: center; font-weight: 800; font-size: 16px; margin-bottom: 15px; color: var(--p); }
+        .day-row { 
+            display: grid; grid-template-columns: 50px 1fr 1fr 1fr; align-items: center; 
+            padding: 12px; background: var(--card); border-radius: 20px; margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .day-row.today { border: 2px solid var(--p-soft); background: #FFFBF5; }
+        .day-row.locked { opacity: 0.5; pointer-events: none; }
 
-        .pill { height: 50px; border-radius: 15px; border: 1.5px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 4px; background: #fff; cursor: pointer; }
-        .pill.on { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 4px 10px rgba(230,126,34,0.2); }
+        .date-box { text-align: center; font-weight: 800; font-size: 18px; color: var(--p); }
+
+        .pill { 
+            height: 48px; border-radius: 14px; border: 1px solid #f0f0f0; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            margin: 0 4px; background: #fff; cursor: pointer; transition: 0.2s;
+        }
+        .pill.on { background: var(--p); border-color: var(--p); color: white; }
         .pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; }
 
-        /* SETTINGS OVERLAY */
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: flex-end; }
-        .panel { background: white; width: 100%; border-radius: 30px 30px 0 0; padding: 30px; transform: translateY(100%); transition: 0.4s cubic-bezier(0.17, 0.84, 0.44, 1); }
-        .panel.open { transform: translateY(0); }
-        input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #eee; margin-top: 6px; font-size: 16px; font-weight: 600; margin-bottom: 15px; }
-
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: white; padding: 12px 24px; border-radius: 50px; font-size: 13px; font-weight: 700; display: none; z-index: 200; }
+        /* LOGOUT FIX OVERLAY */
+        #loadingOverlay {
+            position: fixed; inset: 0; background: white; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
     </style>
 </head>
 <body>
 
-<div id="toast"></div>
-
-<div id="setOverlay" class="overlay" onclick="toggleSet(false)">
-    <div class="panel" id="setPanel" onclick="event.stopPropagation()">
-        <h2 style="font-family:Outfit; margin:0 0 20px 0;">Preferences</h2>
-        <label style="font-size:11px; font-weight:800; color:var(--sub);">NAME</label>
-        <input type="text" id="prefName">
-        <div style="display:flex; gap:15px;">
-            <div style="flex:1;"><label style="font-size:11px; font-weight:800; color:var(--sub);">MEAL RATE</label><input type="number" id="prefMeal"></div>
-            <div style="flex:1;"><label style="font-size:11px; font-weight:800; color:var(--sub);">WATER RATE</label><input type="number" id="prefWater"></div>
-        </div>
-        <button onclick="savePrefs()" class="bill-btn">Save Changes</button>
-    </div>
+<div id="loadingOverlay">
+    <h1 style="font-family:Outfit; color:var(--p)">VetTrack</h1>
+    <p>Securing session...</p>
 </div>
 
 <div class="container">
-    <div class="welcome-box">
-        <div class="greeting" id="greet">Hi!</div>
+    <div class="header">
+        <div class="greeting-text">
+            <p id="timeGreet">Good Day</p>
+            <h1 id="userName">User</h1>
+        </div>
         <div style="display:flex; gap:10px;">
-            <button class="icon-btn" onclick="toggleSet(true)">
-                <svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
             <button class="icon-btn" onclick="logout()">
                 <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             </button>
         </div>
     </div>
 
-    <div class="month-nav">
-        <button onclick="chgMon(-1)" style="border:none; background:none; font-size:18px; cursor:pointer;">‹</button>
-        <span id="monLab">Loading...</span>
-        <button onclick="chgMon(1)" style="border:none; background:none; font-size:18px; cursor:pointer;">›</button>
-    </div>
-
     <div class="stat-card">
-        <div class="bill-status" id="billStatus">Checking Cycle...</div>
+        <div class="card-label">Monthly Balance</div>
         <div class="val" id="totalVal">₹0</div>
-        <div id="summary" style="font-size:13px; opacity:0.7; margin-bottom:20px;">0 Units Logged</div>
-        <button class="bill-btn" id="billBtn" onclick="share()" disabled>
-            <svg style="width:18px; stroke:#fff;" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            <span>Generate Bill</span>
+        <button onclick="shareBill()" style="width:100%; padding:12px; border-radius:12px; border:none; background:rgba(255,255,255,0.2); color:white; font-weight:800; cursor:pointer;">
+            WhatsApp Report ↗
         </button>
     </div>
 
-    <div class="list-container" id="logList"></div>
+    <div class="month-label" id="monLabel">Loading...</div>
+    <div id="logList"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" };
-    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
-
-    let vD = new Date(), tD = new Date(), user = null, logs = {}, unsub = null;
-    let prefs = { name: "User", meal: 50, water: 30 };
-
-    onAuthStateChanged(auth, async (u) => {
-        if (u) { user = u; await loadPrefs(); sync(); } 
-        else { setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider)); }
-    });
-
-    async function loadPrefs() {
-        const d = await getDoc(doc(db, "users", user.uid, "config", "settings"));
-        if(d.exists()) prefs = d.data();
-        document.getElementById('prefName').value = prefs.name;
-        document.getElementById('prefMeal').value = prefs.meal;
-        document.getElementById('prefWater').value = prefs.water;
-        const hr = new Date().getHours();
-        document.getElementById('greet').innerText = `${hr<12?'Good Morning':hr<17?'Good Afternoon':'Good Evening'}, ${prefs.name}!`;
-    }
-
-    window.savePrefs = async () => {
-        prefs = { name: document.getElementById('prefName').value, meal: parseInt(document.getElementById('prefMeal').value), water: parseInt(document.getElementById('prefWater').value) };
-        await setDoc(doc(db, "users", user.uid, "config", "settings"), prefs);
-        location.reload();
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", 
+        authDomain: "vettrack-1c65e.firebaseapp.com", 
+        projectId: "vettrack-1c65e", 
+        storageBucket: "vettrack-1c65e.firebasestorage.app", 
+        messagingSenderId: "591343582241", 
+        appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
     };
 
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let user = null, logs = {}, vD = new Date(), tD = new Date();
+
+    // --- LOGOUT FIX: CLEAR PERSISTENCE ---
+    window.logout = async () => {
+        if(confirm("Confirm Logout?")) {
+            try {
+                await signOut(auth);
+                // Explicitly clear local storage to ensure no ghost sessions
+                window.localStorage.clear();
+                window.location.reload();
+            } catch (e) { alert("Error logging out"); }
+        }
+    };
+
+    // --- AUTH WITH PERSISTENCE ---
+    onAuthStateChanged(auth, async (u) => {
+        if (u) {
+            user = u;
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('userName').innerText = u.displayName.split(' ')[0];
+            sync();
+        } else {
+            // If no user, trigger login immediately
+            await setPersistence(auth, browserLocalPersistence);
+            signInWithPopup(auth, provider);
+        }
+    });
+
     function sync() {
-        if(unsub) unsub();
         const key = `${vD.getFullYear()}_${vD.getMonth()}`;
-        unsub = onSnapshot(doc(db, "users", user.uid, "logs", key), (d) => { logs = d.data() || {}; render(); });
+        onSnapshot(doc(db, "users", user.uid, "logs", key), (d) => {
+            logs = d.data() || {};
+            render();
+        });
     }
 
     function render() {
-        const isCur = vD.getMonth() === tD.getMonth() && vD.getFullYear() === tD.getFullYear();
-        const lastDay = new Date(vD.getFullYear(), vD.getMonth() + 1, 0).getDate();
-        document.getElementById('monLab').innerText = vD.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-        
-        // --- HEAVY BILLING LOGIC ---
-        const btn = document.getElementById('billBtn');
-        const status = document.getElementById('billStatus');
-        
-        if (!isCur && vD < tD) { // Past Month
-            btn.disabled = false;
-            status.innerHTML = "✅ CYCLE COMPLETE (PAST)";
-            btn.querySelector('span').innerText = "Download Past Bill";
-        } else if (isCur && tD.getDate() >= lastDay) { // Last day of current month
-            btn.disabled = false;
-            status.innerHTML = "🏁 END OF CYCLE REACHED";
-            btn.querySelector('span').innerText = "Generate Monthly Bill";
-        } else { // In progress
-            btn.disabled = true;
-            status.innerHTML = `⏳ ${lastDay - tD.getDate()} DAYS REMAINING`;
-            btn.querySelector('span').innerText = "Bill Locked 🔒";
-        }
-
+        const isCur = vD.getMonth() === tD.getMonth();
+        document.getElementById('monLabel').innerText = vD.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
         const list = document.getElementById('logList');
         list.innerHTML = '';
-        for (let i = 1; i <= lastDay; i++) {
+
+        for (let i = 1; i <= new Date(vD.getFullYear(), vD.getMonth() + 1, 0).getDate(); i++) {
             const d = logs[i] || { l: 0, d: 0, w: 0 };
             const row = document.createElement('div');
             row.className = `day-row ${!isCur ? 'locked' : ''} ${isCur && i === tD.getDate() ? 'today' : ''}`;
             row.innerHTML = `
-                <div style="font-weight:800; text-align:center;">${i}</div>
+                <div class="date-box">${i}</div>
                 <div class="pill ${d.l?'on':''}" onclick="upd(${i},'l')"><span>Lunch</span></div>
                 <div class="pill ${d.d?'on':''}" onclick="upd(${i},'d')"><span>Dinner</span></div>
                 <div class="pill ${d.w?'on':''}" onclick="upd(${i},'w')"><span>Water</span></div>
@@ -200,24 +195,8 @@
 
     function calc() {
         let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        document.getElementById('totalVal').innerText = `₹${((m*prefs.meal)+(w*prefs.water)).toLocaleString('en-IN')}`;
-        document.getElementById('summary').innerText = `${m} Meals • ${w} Water Units`;
+        document.getElementById('totalVal').innerText = `₹${((m*50)+(w*30)).toLocaleString('en-IN')}`;
     }
-
-    window.toggleSet = (s) => {
-        const o = document.getElementById('setOverlay'), p = document.getElementById('setPanel');
-        if(s) { o.style.display = 'flex'; setTimeout(()=>p.classList.add('open'),10); }
-        else { p.classList.remove('open'); setTimeout(()=>o.style.display='none',400); }
-    };
-
-    window.chgMon = (v) => { vD.setMonth(vD.getMonth()+v); sync(); };
-    window.logout = () => signOut(auth).then(()=>location.reload());
-    
-    window.share = () => {
-        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        const msg = `*VETTRACK OFFICIAL BILL*\n👤 Diner: ${prefs.name}\n🗓 Month: ${document.getElementById('monLab').innerText}\n🍱 Meals: ${m}\n💧 Water: ${w}\n💰 Total: ₹${(m*prefs.meal)+(w*prefs.water)}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
-    };
 </script>
 </body>
 </html>
