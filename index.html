@@ -3,57 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Admin</title>
+    <title>VetTrack Luxe</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #FF8C00; --bg: #F8F9FA; --text: #1A1A1A; --card: #ffffff; }
+        :root { 
+            --p: #FF8C00; --p-dark: #E67E22; --p-soft: #FFF4E6; 
+            --bg: #F8F9FA; --card: #ffffff; --text: #1A1A1A; --sub: #718093; 
+        }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 80px; }
-        .container { padding: 20px; max-width: 500px; margin: 0 auto; }
-        .admin-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .user-card { background: var(--card); padding: 20px; border-radius: 24px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .user-info h3 { margin: 0; font-size: 16px; }
-        .btn-action { background: var(--p); color: white; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 800; }
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 100; display: none; align-items: flex-end; }
-        .sheet { background: white; width: 100%; border-radius: 30px 30px 0 0; padding: 30px; max-height: 80vh; overflow-y: auto; transform: translateY(100%); transition: 0.3s ease; }
-        .sheet.open { transform: translateY(0); }
-        .log-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #F5F5F5; }
+        
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
+        }
+
+        .container { max-width: 480px; margin: 0 auto; padding: 20px; }
+
+        /* AUTH SCREEN */
+        #welcomeScreen { 
+            position: fixed; inset: 0; background: white; z-index: 10000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px;
+        }
+        .logo-text { font-family: 'Outfit'; font-size: 50px; margin: 0; letter-spacing: -1px; }
+        .logo-dot { color: var(--p); }
+
+        /* HEADER & GREETING */
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; }
+        .greeting-text p { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .greeting-text h1 { font-family: 'Outfit'; font-size: 32px; margin: 0; line-height: 1; }
+
+        .btn-icon { 
+            border: none; background: white; width: 48px; height: 48px; border-radius: 16px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; font-size: 20px;
+        }
+
+        /* NAVIGATION */
+        .mon-nav { 
+            display: flex; align-items: center; background: white; padding: 8px; 
+            border-radius: 50px; border: 1px solid #EEE; margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+        .mon-nav button { border: none; background: var(--p-soft); color: var(--p); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-weight: 900; }
+        .mon-nav span { font-weight: 800; font-size: 15px; flex: 1; text-align: center; color: var(--text); }
+
+        /* STAT CARD */
+        .stat-card {
+            background: linear-gradient(135deg, var(--p) 0%, var(--p-dark) 100%);
+            color: white; padding: 30px; border-radius: 32px; margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(255, 140, 0, 0.25); position: relative; overflow: hidden;
+        }
+        .stat-card::after { content: ""; position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+        .card-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; }
+        .val { font-family: 'Outfit'; font-size: 54px; font-weight: 900; margin: 5px 0; }
+        .summary-text { font-size: 13px; font-weight: 600; background: rgba(0,0,0,0.1); padding: 6px 12px; border-radius: 10px; display: inline-block; }
+
+        /* LOG ROWS */
+        .day-row { 
+            display: grid; grid-template-columns: 60px 1fr 1fr 1fr; align-items: center; 
+            padding: 14px; background: var(--card); border-radius: 24px; margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid transparent; transition: 0.2s;
+        }
+        .day-row.today { border-color: var(--p-soft); background: #FFFBF5; box-shadow: 0 4px 20px rgba(255,140,0,0.08); }
+        .day-row.locked { opacity: 0.5; pointer-events: none; filter: grayscale(0.8); }
+
+        .date-box { text-align: center; }
+        .date-box .num { font-weight: 900; font-size: 20px; color: var(--p); line-height: 1; }
+        .date-box .day { font-size: 10px; font-weight: 800; color: var(--sub); text-transform: uppercase; }
+
+        .pill { 
+            height: 52px; border-radius: 16px; border: 1px solid #F0F0F0; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            margin: 0 4px; background: #fff; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .pill.on { background: var(--p); border-color: var(--p); color: white; transform: scale(1.05); box-shadow: 0 5px 15px rgba(255,140,0,0.3); }
+        .pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* DETAIL PANEL */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: flex-end; }
+        .panel { background: white; width: 100%; border-radius: 40px 40px 0 0; padding: 40px; transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); }
+        .panel.open { transform: translateY(0); }
+        .panel h2 { font-family: 'Outfit'; font-size: 28px; margin: 0 0 10px 0; }
+        textarea { width: 100%; height: 120px; border-radius: 20px; border: 2px solid #F5F5F5; padding: 20px; font-size: 16px; margin: 15px 0; outline: none; background: #FAFAFA; resize: none; }
+        .btn-main { background: var(--p); color: white; padding: 20px; border-radius: 22px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 16px; box-shadow: 0 10px 20px rgba(255,140,0,0.2); }
+
+        .note-indicator { grid-column: 1 / -1; font-size: 11px; color: var(--p); font-weight: 700; margin-top: 8px; padding-left: 5px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="admin-head"><h1>Master Center</h1><button onclick="fetchUsers()" style="border:none; background:none; font-size:20px;">🔄</button></div>
-        <div id="masterList"></div>
+
+<div id="welcomeScreen">
+    <h1 class="logo-text">VetTrack<span class="logo-dot">.</span></h1>
+    <p style="color:var(--sub); margin-bottom:40px; font-weight: 600;">Your Premier Mess Assistant</p>
+    <button class="btn-main" onclick="login()" style="width: 260px;">Login with Google</button>
+</div>
+
+<div class="overlay" id="detailOverlay" onclick="closeDetail()">
+    <div class="panel" id="detailPanel" onclick="event.stopPropagation()">
+        <h2 id="detailTitle">Day Details</h2>
+        <p style="color:var(--sub); font-size: 14px; margin:0;">Add guest meals or special notes below.</p>
+        <textarea id="detailNote" placeholder="e.g. Guest lunch added..."></textarea>
+        <button class="btn-main" onclick="saveDetail()">Save Changes</button>
     </div>
-    <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"><div class="sheet" id="sheet" onclick="event.stopPropagation()"><h2 id="sheetTitle">History Sync</h2><div id="history"></div></div></div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div class="greeting-text">
+            <p id="timeGreet">Welcome</p>
+            <h1 id="userName">User</h1>
+        </div>
+        <button class="btn-icon" onclick="logout()">🚪</button>
+    </div>
+
+    <div class="mon-nav">
+        <button onclick="changeMon(-1)">‹</button>
+        <span id="monLabel">Loading...</span>
+        <button onclick="changeMon(1)">›</button>
+    </div>
+
+    <div class="stat-card">
+        <div class="card-label">Current Balance</div>
+        <div class="val" id="totalVal">₹0</div>
+        <div class="summary-text" id="summary">0 Units Recoreded</div>
+    </div>
+
+    <div id="logList"></div>
+    <p style="text-align:center; font-size:11px; color: #BBB; margin-top: 30px; font-weight: 600;">LONG PRESS ON A DAY FOR NOTES</p>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    const firebaseConfig = { apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" };
-    const app = initializeApp(firebaseConfig), db = getFirestore(app);
+    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    window.fetchUsers = async () => {
-        const snap = await getDocs(collection(db, "users"));
-        const list = document.getElementById('masterList'); list.innerHTML = "";
-        snap.forEach(u => {
-            const div = document.createElement('div'); div.className = "user-card";
-            div.innerHTML = `<div class="user-info"><h3>${u.data().name || 'New User'}</h3><small>${u.id.slice(0,8)}</small></div><button class="btn-action" onclick="syncFull('${u.id}')">Sync</button>`;
-            list.appendChild(div);
-        });
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", 
+        authDomain: "vettrack-1c65e.firebaseapp.com", 
+        projectId: "vettrack-1c65e", 
+        storageBucket: "vettrack-1c65e.firebasestorage.app", 
+        messagingSenderId: "591343582241", 
+        appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
     };
 
-    window.syncFull = async (uid) => {
-        document.getElementById('sheetOverlay').style.display='flex'; setTimeout(()=>document.getElementById('sheet').classList.add('open'),10);
-        const logSnap = await getDocs(collection(db, `users/${uid}/logs`));
-        const hist = document.getElementById('history'); hist.innerHTML = "";
-        logSnap.forEach(d => {
-            let m=0, w=0; Object.values(d.data()).forEach(v=>{if(v.l)m++;if(v.d)m++;if(v.w)w++;});
-            hist.innerHTML += `<div class="log-item"><b>${d.id}</b> <span>${m} Meals • ₹${m*50+w*30}</span></div>`;
-        });
+    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
+    let user = null, logs = {}, vD = new Date(), tD = new Date(), activeDay = null;
+
+    // --- AUTHENTICATION ---
+    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
+    window.logout = () => { if(confirm("Are you sure you want to logout?")) signOut(auth).then(() => { localStorage.clear(); location.reload(); }); };
+
+    onAuthStateChanged(auth, async (u) => {
+        if (u) { 
+            user = u; 
+            document.getElementById('welcomeScreen').style.display = 'none'; 
+            document.getElementById('userName').innerText = u.displayName.split(' ')[0];
+            updateGreeting();
+            // Sync user profile to the root for Admin visibility
+            await setDoc(doc(db, "users", u.uid), { name: u.displayName, email: u.email, lastActive: new Date() }, { merge: true });
+            sync(); 
+        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
+    });
+
+    function updateGreeting() {
+        const hr = new Date().getHours();
+        const greet = hr < 12 ? "Good Morning 🌅" : hr < 17 ? "Good Afternoon ☀️" : hr < 21 ? "Good Evening 🌇" : "Good Night 🌙";
+        document.getElementById('timeGreet').innerText = greet;
+    }
+
+    // --- DATA SYNC & RENDER ---
+    function sync() {
+        const key = `${vD.getFullYear()}_${vD.getMonth()}`;
+        onSnapshot(doc(db, "users", user.uid, "logs", key), (d) => { logs = d.data() || {}; render(); });
+    }
+
+    function render() {
+        const isCur = vD.getMonth() === tD.getMonth() && vD.getFullYear() === tD.getFullYear();
+        document.getElementById('monLabel').innerText = vD.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+        const list = document.getElementById('logList'); list.innerHTML = '';
+        const totalDays = new Date(vD.getFullYear(), vD.getMonth() + 1, 0).getDate();
+
+        for (let i = 1; i <= totalDays; i++) {
+            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
+            const dayName = new Date(vD.getFullYear(), vD.getMonth(), i).toLocaleDateString('en-IN', { weekday: 'short' });
+            
+            const row = document.createElement('div');
+            row.className = `day-row ${!isCur ? 'locked' : ''} ${isCur && i === tD.getDate() ? 'today' : ''}`;
+            
+            // Interaction logic
+            let timer;
+            const start = () => timer = setTimeout(() => openDetail(i), 600);
+            const stop = () => clearTimeout(timer);
+            row.onmousedown = start; row.onmouseup = stop; row.ontouchstart = start; row.ontouchend = stop;
+
+            row.innerHTML = `
+                <div class="date-box"><div class="num">${i}</div><div class="day">${dayName}</div></div>
+                <div class="pill ${d.l?'on':''}" onclick="upd(${i},'l')"><span>Lunch</span></div>
+                <div class="pill ${d.d?'on':''}" onclick="upd(${i},'d')"><span>Dinner</span></div>
+                <div class="pill ${d.w?'on':''}" onclick="upd(${i},'w')"><span>Water</span></div>
+                ${d.n ? `<div class="note-indicator">📝 ${d.n}</div>` : ''}
+            `;
+            list.appendChild(row);
+        }
+        calc();
+    }
+
+    // --- CORE ACTIONS ---
+    window.upd = async (day, type) => {
+        if (vD.getMonth() !== tD.getMonth()) return;
+        const dObj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
+        dObj[type] = dObj[type] ? 0 : 1;
+        await setDoc(doc(db, "users", user.uid, "logs", `${vD.getFullYear()}_${vD.getMonth()}`), { [day]: dObj }, { merge: true });
     };
-    window.closeSheet = () => { document.getElementById('sheet').classList.remove('open'); setTimeout(()=>document.getElementById('sheetOverlay').style.display='none',300); };
-    fetchUsers();
+
+    window.openDetail = (day) => {
+        activeDay = day;
+        document.getElementById('detailTitle').innerText = `Day ${day} Notes`;
+        document.getElementById('detailNote').value = logs[day]?.n || "";
+        const ov = document.getElementById('detailOverlay');
+        ov.style.display = 'flex';
+        setTimeout(() => document.getElementById('detailPanel').classList.add('open'), 10);
+    };
+
+    window.closeDetail = () => {
+        document.getElementById('detailPanel').classList.remove('open');
+        setTimeout(() => document.getElementById('detailOverlay').style.display = 'none', 300);
+    };
+
+    window.saveDetail = async () => {
+        const note = document.getElementById('detailNote').value;
+        const dObj = logs[activeDay] || { l: 0, d: 0, w: 0, n: "" };
+        dObj.n = note;
+        await setDoc(doc(db, "users", user.uid, "logs", `${vD.getFullYear()}_${vD.getMonth()}`), { [activeDay]: dObj }, { merge: true });
+        closeDetail();
+    };
+
+    function calc() {
+        let m=0, w=0; 
+        Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
+        const total = (m * 50) + (w * 30);
+        document.getElementById('totalVal').innerText = `₹${total.toLocaleString('en-IN')}`;
+        document.getElementById('summary').innerText = `${m} Meals • ${w} Water Units`;
+    }
+
+    window.changeMon = (dir) => {
+        vD.setMonth(vD.getMonth() + dir);
+        sync();
+    };
 </script>
 </body>
 </html>
