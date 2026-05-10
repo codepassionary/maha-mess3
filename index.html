@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Premier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <title>VetTrack | Zen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
-            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
-            --text: #FFFFFF; --sub: #94A3B8;
+            --p: #FFB800; --p-soft: rgba(255, 184, 0, 0.1);
+            --bg: #0A0C10; --card: rgba(25, 28, 35, 0.7); --border: rgba(255, 255, 255, 0.08);
+            --text: #FFFFFF; --sub: #8E9196;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -17,143 +17,121 @@
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
             font-family: 'Plus Jakarta Sans', sans-serif;
-            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
-            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
-                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
-            background-attachment: fixed;
+            padding-bottom: 60px; padding-top: env(safe-area-inset-top);
         }
 
-        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
+        .container { max-width: 440px; margin: 0 auto; padding: 20px; }
 
-        /* HEADER & AVATAR */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
-        .greet-p { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        .user-h1 { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
-        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
-        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
+        /* HEADER */
+        .header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 35px 0; }
+        #greetLabel { font-size: 11px; color: var(--sub); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+        #userLabel { font-family: 'Outfit'; font-size: 30px; margin: 0; font-weight: 800; letter-spacing: -0.5px; }
+        .pfp-wrap { width: 52px; height: 52px; border-radius: 50%; padding: 2px; background: linear-gradient(180deg, var(--border), transparent); border: 1px solid var(--border); }
+        .pfp { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer; }
 
-        /* STAT CARD - REDESIGNED */
+        /* STAT CARD (The Main View) */
         .stat-card {
-            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
-            padding: 30px; border-radius: 35px; margin-bottom: 30px;
-            box-shadow: 0 20px 40px -10px var(--p-glow);
-            position: relative; overflow: hidden;
+            background: linear-gradient(145deg, #1A1D23 0%, #111419 100%);
+            padding: 28px; border-radius: 32px; margin-bottom: 30px;
+            border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
         }
-        .stat-card::after { content: ""; position: absolute; width: 150px; height: 150px; background: white; filter: blur(50px); opacity: 0.15; top: -50px; right: -50px; border-radius: 50%; }
-        
-        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
-        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
+        .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--sub); }
+        .total-val { font-family: 'Outfit'; font-size: 42px; font-weight: 800; margin: 4px 0; color: var(--p); letter-spacing: -1px; }
         
         .quick-log-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 14px; border-radius: 24px;
+            background: var(--p-soft); border: 1px solid rgba(255,184,0,0.2);
+            color: var(--p); padding: 12px 18px; border-radius: 20px;
             display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 2; min-width: 110px;
+            font-weight: 700; font-size: 10px; cursor: pointer; transition: 0.3s;
         }
-        .quick-log-btn.done { background: white; color: var(--p); border-color: white; transform: scale(1.05); }
-        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
+        .quick-log-btn.done { background: var(--p); color: #000; border-color: var(--p); }
+        .quick-log-btn i { font-style: normal; font-size: 18px; margin-bottom: 2px; }
 
         /* NAV PILL */
         .nav-pill { 
-            display: flex; align-items: center; background: var(--card); padding: 8px; 
-            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
-            backdrop-filter: blur(10px);
+            display: flex; align-items: center; background: var(--card); padding: 6px; 
+            border-radius: 50px; border: 1px solid var(--border); margin-bottom: 25px;
         }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; transition: 0.2s; }
-        .nav-pill button:active { transform: scale(0.9); }
-        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); letter-spacing: 0.5px; }
+        .nav-pill button { border: none; background: transparent; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; }
+        .nav-pill span { flex: 1; text-align: center; font-weight: 700; font-size: 14px; color: var(--text); }
 
-        /* GRID LOGS */
+        /* DAY ITEMS */
         .day-item { 
-            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
-            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
-            border: 1px solid var(--surface); backdrop-filter: blur(10px);
-            transition: 0.3s;
+            display: grid; grid-template-columns: 55px 1fr 1fr 1fr; gap: 12px; align-items: center; 
+            padding: 16px; background: var(--card); border-radius: 24px; margin-bottom: 12px;
+            border: 1px solid var(--border); transition: 0.2s;
         }
-        .day-item.is-today { border-color: rgba(255,140,0,0.5); background: rgba(255,140,0,0.05); border-width: 1.5px; }
+        .day-item.is-today { border-color: rgba(255,184,0,0.3); background: rgba(255,184,0,0.02); }
         
-        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; margin-bottom: 2px; }
-        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; }
+        .date-circ { text-align: center; border-right: 1px solid var(--border); }
+        .date-circ .n { font-family: 'Outfit'; font-size: 22px; font-weight: 700; color: white; display: block; }
+        .date-circ .d { font-size: 9px; font-weight: 600; color: var(--sub); text-transform: uppercase; }
 
         .item-pill { 
-            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
+            height: 52px; border-radius: 18px; border: 1px solid var(--border); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s ease;
+            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.2s;
         }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
-        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
+        .item-pill.active { background: white; border-color: white; color: black; font-weight: 800; }
+        .item-pill span { font-size: 9px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
 
-        /* SHEETS & FORMS */
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
-        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
+        /* MODALS / SHEETS */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: flex-end; }
+        .sheet { background: #121418; width: 100%; border-radius: 32px 32px 0 0; padding: 35px; border-top: 1px solid var(--border); transform: translateY(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .sheet.up { transform: translateY(0); }
-        .sheet h2 { font-family: 'Outfit'; font-size: 32px; margin: 0 0 25px 0; letter-spacing: -1px; }
+        .sheet h2 { font-family: 'Outfit'; font-size: 26px; margin: 0 0 25px 0; }
         
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.5px; }
-        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
+        .form-group label { display: block; font-size: 10px; font-weight: 800; color: var(--sub); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input, textarea { width: 100%; padding: 16px; background: #1A1D23; border: 1px solid var(--border); border-radius: 16px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
         
-        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 16px; box-shadow: 0 10px 25px -5px var(--p-glow); }
-        .note-tag { grid-column: 1 / -1; font-size: 13px; color: var(--p); background: rgba(255,140,0,0.1); padding: 10px 18px; border-radius: 15px; margin-top: 12px; font-weight: 600; border: 1px dashed rgba(255,140,0,0.3); }
+        .btn-prime { background: var(--p); color: black; padding: 18px; border-radius: 20px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 15px; }
+        .note-tag { grid-column: 1 / -1; font-size: 12px; color: var(--sub); background: rgba(255,255,255,0.03); padding: 8px 14px; border-radius: 12px; margin-top: 8px; border: 1px solid var(--border); }
 
-        /* WELCOME */
         #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="welcomeScreen">
-    <div class="logo-wrap"><div class="glow-orb"></div><h1 class="logo-main" style="font-family: 'Outfit'; font-size: 60px; font-weight: 900;">VetTrack<span style="color:var(--p)">.</span></h1></div>
-    <button class="btn-prime" onclick="login()" style="width: 260px; border-radius: 50px;">Get Started</button>
+    <h1 style="font-family:'Outfit'; font-size:42px; font-weight:900; letter-spacing:-2px;">VetTrack<span style="color:var(--p)">.</span></h1>
+    <button class="btn-prime" onclick="login()" style="width: 200px; margin-top: 20px;">Enter</button>
 </div>
 
 <div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
     <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2>Account</h2>
+        <h2>Preferences</h2>
         <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
-            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group"><label>Meal Rate</label><input type="number" id="setMealPrice"></div>
+            <div class="form-group"><label>Water Rate</label><input type="number" id="setWaterPrice"></div>
         </div>
-        <button class="btn-prime" onclick="saveSettings()">Apply Changes</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:25px; font-weight:800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Sign Out</button>
+        <button class="btn-prime" onclick="saveSettings()">Update Profile</button>
+        <button onclick="logout()" style="background:none; border:none; color:var(--sub); width:100%; margin-top:20px; font-size:12px; font-weight:700;">LOGOUT</button>
     </div>
 </div>
 
 <div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
     <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle">Day Note</h2>
-        <textarea id="noteInput" rows="4" placeholder="Mention guests or special items..."></textarea>
-        <button class="btn-prime" onclick="saveNote()">Save to Log</button>
+        <h2 id="noteTitle">Notes</h2>
+        <textarea id="noteInput" rows="3" placeholder="Extra guests, details..."></textarea>
+        <button class="btn-prime" onclick="saveNote()">Confirm Note</button>
     </div>
 </div>
 
 <div class="container">
     <div class="header">
-        <div class="greeting-text"><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
-        <div class="pfp-wrap"><img id="userPfp" class="pfp" src="" onclick="openSettings()"></div>
+        <div><p id="greetLabel">...</p><h1 id="userLabel">Diner</h1></div>
+        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
     </div>
 
     <div class="stat-card">
-        <div class="stat-left">
-            <div class="label">Balance Due</div>
-            <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
-        </div>
-        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
-            <i id="quickIcon">⚡</i>
-            <span id="quickText">Loading...</span>
-        </div>
+        <div><div class="label">Balance Due</div><div class="total-val" id="totalValue">₹0</div><div id="statsSub" style="font-size:11px; color:var(--sub); font-weight:600;">...</div></div>
+        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()"><i id="quickIcon">⚡</i><span id="quickText">Mark</span></div>
     </div>
 
     <div class="nav-pill">
-        <button onclick="changeMonth(-1)">‹</button>
-        <span id="monthLabel">Current Month</span>
-        <button onclick="changeMonth(1)">›</button>
+        <button onclick="changeMonth(-1)">‹</button><span id="monthLabel">...</span><button onclick="changeMonth(1)">›</button>
     </div>
 
     <div id="logsGrid"></div>
@@ -171,16 +149,15 @@
     };
 
     const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
-    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null, touchStartY = 0;
+    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
     let config = { name: "", mealPrice: 50, waterPrice: 30 };
 
     window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
-    window.logout = () => { if(confirm("Sign out?")) signOut(auth).then(() => { localStorage.clear(); location.reload(); }); };
+    window.logout = () => signOut(auth).then(() => location.reload());
 
     onAuthStateChanged(auth, async (u) => {
         if (u) { 
-            user = u; 
-            document.getElementById('welcomeScreen').style.display = 'none'; 
+            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
             document.getElementById('userPfp').src = u.photoURL;
             const userDoc = await getDoc(doc(db, "users", u.uid));
             if (userDoc.exists()) config = { ...config, ...userDoc.data() };
@@ -192,22 +169,16 @@
 
     function updateGreet() {
         const h = new Date().getHours();
-        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : h < 21 ? "Good Evening 🌇" : "Good Night 🌙";
+        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning" : h < 17 ? "Good Afternoon" : "Good Evening";
     }
 
     function updateQuickBtn() {
         const day = todayDate.getDate();
-        const hour = todayDate.getHours();
-        const type = hour < 16 ? 'l' : 'd';
-        const typeLabel = type === 'l' ? 'Lunch' : 'Dinner';
+        const type = todayDate.getHours() < 16 ? 'l' : 'd';
         const isMarked = logs[day] && logs[day][type] === 1;
-
-        const btn = document.getElementById('quickBtn');
-        const icon = document.getElementById('quickIcon');
-        const text = document.getElementById('quickText');
-
-        if (isMarked) { btn.classList.add('done'); icon.innerText = '✅'; text.innerText = `${typeLabel} Done`; } 
-        else { btn.classList.remove('done'); icon.innerText = '⚡'; text.innerText = `Mark ${typeLabel}`; }
+        const btn = document.getElementById('quickBtn'), icon = document.getElementById('quickIcon'), text = document.getElementById('quickText');
+        if (isMarked) { btn.classList.add('done'); icon.innerText = '✓'; text.innerText = 'Marked'; } 
+        else { btn.classList.remove('done'); icon.innerText = '⚡'; text.innerText = `Log ${type==='l'?'Lunch':'Dinner'}`; }
     }
 
     function syncData() {
@@ -217,9 +188,7 @@
     }
 
     window.quickLog = async () => {
-        const day = todayDate.getDate();
-        const hour = todayDate.getHours();
-        const type = hour < 16 ? 'l' : 'd';
+        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
         const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
         if(obj[type] === 1) return;
         obj[type] = 1;
@@ -236,16 +205,8 @@
             const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
             const card = document.createElement('div');
             card.className = `day-item ${isCurrent && i === todayDate.getDate() ? 'is-today' : ''}`;
-            
             let timer;
-            card.onmousedown = card.ontouchstart = (e) => {
-                touchStartY = e.touches ? e.touches[0].clientY : e.clientY;
-                timer = setTimeout(() => openNote(i), 600);
-            };
-            card.onmousemove = card.ontouchmove = (e) => {
-                const cy = e.touches ? e.touches[0].clientY : e.clientY;
-                if (Math.abs(cy - touchStartY) > 15) clearTimeout(timer);
-            };
+            card.onmousedown = card.ontouchstart = () => timer = setTimeout(() => openNote(i), 600);
             card.onmouseup = card.ontouchend = () => clearTimeout(timer);
 
             card.innerHTML = `
@@ -253,7 +214,7 @@
                 <div class="item-pill ${d.l?'active':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
                 <div class="item-pill ${d.d?'active':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
                 <div class="item-pill ${d.w?'active':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
-                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
+                ${d.n ? `<div class="note-tag">${d.n}</div>` : ''}
             `;
             grid.appendChild(card);
         }
@@ -267,14 +228,12 @@
     };
 
     window.openNote = (day) => {
-        activeDayId = day;
-        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
+        activeDayId = day; document.getElementById('noteTitle').innerText = `Day ${day} Detail`;
         document.getElementById('noteInput').value = logs[day]?.n || "";
         document.getElementById('noteOverlay').style.display = 'flex';
         setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
     };
     window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
-    
     window.saveNote = async () => {
         const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
         obj.n = document.getElementById('noteInput').value;
@@ -290,7 +249,6 @@
         setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
     };
     window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
-    
     window.saveSettings = async () => {
         config.name = document.getElementById('setUserName').value;
         config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
@@ -302,9 +260,8 @@
 
     function calculate() {
         let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        const total = (m * config.mealPrice) + (w * config.waterPrice);
-        document.getElementById('totalValue').innerText = `₹${total.toLocaleString('en-IN')}`;
-        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
+        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
+        document.getElementById('statsSub').innerText = `${m} Meals · ${w} Water Units`;
     }
 
     window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
