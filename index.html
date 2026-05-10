@@ -1,69 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VetTrack | Admin Luxe</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Outfit:wght@800&display=swap" rel="stylesheet">
-    <style>
-        :root { --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --text: #FFFFFF; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
-        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,140,0,0.3); margin-bottom: 20px; }
-        .student-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .amt { color: var(--p); font-weight: 800; font-family: 'Outfit'; }
-        #loginBtn { background: var(--p); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-weight: 800; cursor: pointer; display: none; }
-    </style>
-</head>
-<body>
+<style>
+    .edit-sheet {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+        display: none; flex-direction: column; padding: 30px; z-index: 10000;
+        overflow-y: auto;
+    }
+    .edit-sheet.active { display: flex; }
+    .day-row {
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(255,255,255,0.05); padding: 10px 15px;
+        border-radius: 12px; margin-bottom: 8px; font-size: 13px;
+    }
+    .toggle-btn {
+        padding: 5px 10px; border-radius: 8px; border: 1px solid var(--p);
+        background: transparent; color: white; cursor: pointer; font-size: 10px;
+    }
+    .toggle-btn.on { background: var(--p); }
+    .close-edit { margin-bottom: 20px; color: var(--p); font-weight: 800; cursor: pointer; }
+</style>
 
-    <div id="adminUI" style="display:none;">
-        <h1 style="font-family:'Outfit'">Admin Dashboard</h1>
-        <div class="stat-card">
-            <small>TOTAL COLLECTION</small>
-            <div id="totalCollection" style="font-size:32px; color:var(--p)">₹0</div>
-        </div>
-        <div id="studentList"></div>
-    </div>
-
-    <div id="authUI" style="text-align:center; padding-top:100px;">
-        <h2 style="font-family:'Outfit'">Admin Authorization</h2>
-        <button id="loginBtn" onclick="adminLogin()">Sign In as Admin</button>
-        <p id="status">Checking credentials...</p>
-    </div>
+<div id="editSheet" class="edit-sheet">
+    <div class="close-edit" onclick="closeEdit()">← Back to Dashboard</div>
+    <h2 id="editStudentName" style="font-family:'Outfit'; margin-bottom:5px;">Student Name</h2>
+    <p style="color:var(--sub); font-size:12px; margin-bottom:20px;">Modify logs for current month</p>
+    <div id="daysList"></div>
+</div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // ... (Keep existing imports and config)
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", 
-        authDomain: "vettrack-1c65e.firebaseapp.com", 
-        projectId: "vettrack-1c65e", 
-        storageBucket: "vettrack-1c65e.firebasestorage.app", 
-        messagingSenderId: "591343582241", 
-        appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    window.adminLogin = () => {
-        signInWithPopup(auth, provider).catch(e => alert("Login Error: " + e.message));
-    };
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('authUI').style.display = 'none';
-            document.getElementById('adminUI').style.display = 'block';
-            fetchAllData();
-        } else {
-            document.getElementById('loginBtn').style.display = 'inline-block';
-            document.getElementById('status').innerText = "Please sign in to access Admin data.";
-        }
-    });
+    let currentEditingUid = null;
+    let currentEditingLogs = {};
 
     async function fetchAllData() {
         const list = document.getElementById('studentList');
@@ -84,18 +50,62 @@
                 const bill = (m * (u.mealPrice || 50)) + (w * (u.waterPrice || 30));
                 grandTotal += bill;
 
-                list.innerHTML += `
-                    <div class="student-card">
-                        <span><strong>${u.name || 'User'}</strong><br><small>${m} Meals</small></span>
-                        <span class="amt">₹${bill}</span>
-                    </div>`;
+                const card = document.createElement('div');
+                card.className = "student-card";
+                card.onclick = () => openEdit(userDoc.id, u.name, logs);
+                card.innerHTML = `
+                    <span><strong>${u.name || 'User'}</strong><br><small>${m} Meals | ${w} Water</small></span>
+                    <span class="amt">₹${bill}</span>
+                `;
+                list.appendChild(card);
             }
-            document.getElementById('totalCollection').innerText = "₹" + grandTotal;
+            document.getElementById('totalCollection').innerText = "₹" + grandTotal.toLocaleString('en-IN');
         } catch (e) {
-            alert("Permission Denied: You are not recognized as an Admin in Firestore Rules.");
             console.error(e);
         }
     }
+
+    window.openEdit = (uid, name, logs) => {
+        currentEditingUid = uid;
+        currentEditingLogs = logs;
+        document.getElementById('editStudentName').innerText = name;
+        document.getElementById('editSheet').classList.add('active');
+        renderDays();
+    };
+
+    window.closeEdit = () => {
+        document.getElementById('editSheet').classList.remove('active');
+        fetchAllData(); // Refresh main list
+    };
+
+    function renderDays() {
+        const container = document.getElementById('daysList');
+        container.innerHTML = "";
+        const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            const d = currentEditingLogs[i] || { l: 0, d: 0, w: 0 };
+            const row = document.createElement('div');
+            row.className = "day-row";
+            row.innerHTML = `
+                <span style="font-weight:800; width:30px;">${i}</span>
+                <button class="toggle-btn ${d.l?'on':''}" onclick="toggleCell(${i},'l')">Lunch</button>
+                <button class="toggle-btn ${d.d?'on':''}" onclick="toggleCell(${i},'d')">Dinner</button>
+                <button class="toggle-btn ${d.w?'on':''}" onclick="toggleCell(${i},'w')">Water</button>
+            `;
+            container.appendChild(row);
+        }
+    }
+
+    window.toggleCell = async (day, type) => {
+        if (!currentEditingLogs[day]) currentEditingLogs[day] = { l: 0, d: 0, w: 0, n: "" };
+        currentEditingLogs[day][type] = currentEditingLogs[day][type] ? 0 : 1;
+        
+        const monthKey = `${new Date().getFullYear()}_${new Date().getMonth()}`;
+        await setDoc(doc(db, "users", currentEditingUid, "logs", monthKey), {
+            [day]: currentEditingLogs[day]
+        }, { merge: true });
+        
+        renderDays(); // Update UI
+    };
 </script>
-</body>
-</html>
