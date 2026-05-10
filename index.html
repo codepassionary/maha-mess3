@@ -7,149 +7,154 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.3);
-            --bg: #05070A; --card: rgba(17, 24, 39, 0.8); --surface: rgba(31, 41, 55, 0.5);
-            --text: #F9FAFB; --sub: #9CA3AF; --success: #10B981;
+            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
+            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
+            --text: #FFFFFF; --sub: #94A3B8;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
         body { 
-            margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif;
-            padding-bottom: 120px; padding-top: env(safe-area-inset-top);
-            background-image: radial-gradient(circle at 0% 0%, #1e1b4b 0%, transparent 30%);
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
+            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
+                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
+            background-attachment: fixed;
         }
 
-        .container { max-width: 480px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
 
-        /* --- LUXE HEADER --- */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .user-meta h1 { font-family: 'Outfit'; font-size: 32px; margin: 0; letter-spacing: -1px; }
-        .user-meta p { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .pfp-circle { width: 50px; height: 50px; border-radius: 18px; border: 2px solid var(--surface); padding: 2px; }
-        .pfp-circle img { width: 100%; height: 100%; border-radius: 14px; object-fit: cover; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+        #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
+        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
+        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
 
-        /* --- CONTEXTUAL HUB (THE MAGIC CARD) --- */
-        .context-hub {
-            background: linear-gradient(165deg, #1e1b4b 0%, #05070A 100%);
-            border-radius: 35px; padding: 25px; border: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 30px; position: relative; overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        .stat-card {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
+            padding: 30px; border-radius: 35px; margin-bottom: 30px;
+            box-shadow: 0 20px 40px -10px var(--p-glow);
+            position: relative; overflow: hidden;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .hub-glow { position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; background: var(--p); filter: blur(60px); opacity: 0.3; }
         
-        .bill-main { display: flex; justify-content: space-between; align-items: flex-end; }
-        .bill-main .amt { font-family: 'Outfit'; font-size: 48px; font-weight: 900; line-height: 1; }
-        .bill-main .label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; }
-
-        /* --- NUTRITION PULSE (NEW FEATURE) --- */
-        .pulse-track { display: flex; gap: 4px; margin-top: 20px; height: 4px; background: var(--surface); border-radius: 10px; overflow: hidden; }
-        .pulse-fill { height: 100%; background: var(--p); border-radius: 10px; transition: 1s cubic-bezier(0.23, 1, 0.32, 1); }
-
-        /* --- QUICK ACTION FLOAT --- */
-        .action-strip { 
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 25px;
-        }
-        .action-chip {
-            background: var(--surface); padding: 12px; border-radius: 20px; text-align: center;
-            border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.2s;
-        }
-        .action-chip.active { background: var(--p); border-color: var(--p); }
-        .action-chip i { display: block; font-style: normal; font-size: 18px; margin-bottom: 2px; }
-        .action-chip span { font-size: 10px; font-weight: 800; text-transform: uppercase; }
-
-        /* --- ELEGANT LOG LIST --- */
-        .day-row {
-            display: flex; align-items: center; background: var(--card); 
-            padding: 15px 20px; border-radius: 28px; margin-bottom: 12px;
-            border: 1px solid rgba(255,255,255,0.03); backdrop-filter: blur(10px);
-        }
-        .day-row.today { border: 1px solid var(--p); background: rgba(255,140,0,0.03); }
+        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
+        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
         
-        .day-info { flex: 1; }
-        .day-info b { font-family: 'Outfit'; font-size: 20px; display: block; }
-        .day-info span { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-
-        .toggle-group { display: flex; gap: 8px; }
-        .t-btn { 
-            width: 44px; height: 44px; border-radius: 15px; 
-            background: var(--surface); border: none; color: white;
-            font-weight: 800; font-size: 12px; cursor: pointer; transition: 0.2s;
+        .quick-log-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 14px; border-radius: 24px;
+            display: flex; flex-direction: column; align-items: center;
+            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
+            z-index: 2; min-width: 110px;
         }
-        .t-btn.on { background: var(--p); box-shadow: 0 4px 12px var(--p-glow); }
-        .t-btn.water.on { background: #3B82F6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
+        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
-        /* --- BOTTOM NAV BAR --- */
-        .bottom-nav {
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; height: 70px;
-            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px);
-            border-radius: 25px; border: 1px solid rgba(255,255,255,0.1);
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+        .nav-pill { 
+            display: flex; align-items: center; background: var(--card); padding: 8px; 
+            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
+            backdrop-filter: blur(10px);
         }
-        .nav-link { color: var(--sub); font-size: 24px; cursor: pointer; transition: 0.3s; }
-        .nav-link.active { color: var(--p); transform: translateY(-5px); }
+        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
+        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
+
+        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
+
+        .day-item { 
+            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
+            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
+            border: 1px solid var(--surface); backdrop-filter: blur(10px);
+            user-select: none;
+        }
+        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
+        
+        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
+        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
+
+        .item-pill { 
+            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
+        }
+        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
+        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
+        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
+
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
+        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
+        .sheet.up { transform: translateY(0); }
+        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
+        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
+        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
+        
+        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
+<div id="welcomeScreen">
+    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
+    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
+</div>
+
+<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
+    <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
+        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
+        <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
+            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
+        </div>
+        <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
+        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
+    </div>
+</div>
+
+<div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
+    <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
+        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
+        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
+        <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
+    </div>
+</div>
+
 <div class="container">
-    <header class="header">
-        <div class="user-meta">
-            <p id="time-greet">Good Morning</p>
-            <h1 id="user-name">Diner</h1>
-        </div>
-        <div class="pfp-circle" onclick="openSettings()">
-            <img id="user-pfp" src="https://ui-avatars.com/api/?name=User&background=random">
-        </div>
-    </header>
+    <div class="header">
+        <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
+        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
+    </div>
 
-    <div class="context-hub">
-        <div class="hub-glow"></div>
-        <div class="bill-main">
-            <div>
-                <div class="label">Monthly Investment</div>
-                <div class="amt" id="total-val">₹0</div>
-            </div>
-            <div style="text-align: right;">
-                <div class="label">Status</div>
-                <div id="pay-badge" style="color: var(--success); font-weight: 900; font-size: 12px;">● ACTIVE</div>
-            </div>
+    <div class="stat-card">
+        <div class="stat-left">
+            <div class="label">Total Bill</div>
+            <div class="total-val" id="totalValue">₹0</div>
+            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
         </div>
-        
-        <div class="pulse-track">
-            <div id="pulse-bar" class="pulse-fill" style="width: 0%"></div>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-            <small style="font-size: 9px; font-weight: 800; color: var(--sub);" id="meal-count">0 MEALS THIS MONTH</small>
-            <small style="font-size: 9px; font-weight: 800; color: var(--p);">GOAL: 60 MEALS</small>
-        </div>
-
-        <div class="action-strip">
-            <div class="action-chip" onclick="quickLog('l')" id="quick-l">
-                <i>🍱</i><span>Lunch</span>
-            </div>
-            <div class="action-chip" onclick="quickLog('d')" id="quick-d">
-                <i>🌙</i><span>Dinner</span>
-            </div>
-            <div class="action-chip" onclick="quickLog('w')" id="quick-w">
-                <i>💧</i><span>Water</span>
-            </div>
+        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
+            <i id="quickIcon">⚡</i>
+            <span id="quickText">Loading...</span>
         </div>
     </div>
 
-    <div id="logs-container">
-        </div>
-</div>
+    <div class="nav-pill">
+        <button onclick="changeMonth(-1)">‹</button>
+        <span id="monthLabel">Current</span>
+        <button onclick="changeMonth(1)">›</button>
+    </div>
+    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
 
-<nav class="bottom-nav">
-    <div class="nav-link active" onclick="changeMonth(0)">🏠</div>
-    <div class="nav-link" onclick="changeMonth(-1)">📅</div>
-    <div class="nav-link" onclick="openSettings()">⚙️</div>
-</nav>
+    <div id="logsGrid"></div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { 
@@ -158,100 +163,164 @@
         messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
     };
 
-    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
-    let user = null, logs = {}, config = { mealPrice: 50, waterPrice: 30 };
-    let viewDate = new Date();
+    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
+    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
+    let config = { name: "", mealPrice: 50, waterPrice: 30 };
+    
+    // SCROLL GUARD VARIABLES
+    let longPressTimer;
+    let startY = 0;
+    let isScrolling = false;
+
+    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
+    window.logout = () => signOut(auth).then(() => location.reload());
 
     onAuthStateChanged(auth, async (u) => {
-        if (u) {
-            user = u;
-            document.getElementById('user-name').innerText = u.displayName.split(' ')[0];
-            document.getElementById('user-pfp').src = u.photoURL;
-            syncData();
-        } else {
-            signInWithPopup(auth, new GoogleAuthProvider());
-        }
+        if (u) { 
+            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
+            document.getElementById('userPfp').src = u.photoURL;
+            const userDoc = await getDoc(doc(db, "users", u.uid));
+            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
+            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
+            document.getElementById('userLabel').innerText = config.name;
+            updateGreet(); syncData(); 
+        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
     });
 
+    function isCurrentMonth() {
+        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
+    }
+
+    function updateGreet() {
+        const h = new Date().getHours();
+        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : "Good Evening 🌇";
+    }
+
     function syncData() {
-        const monthKey = `${viewDate.getFullYear()}_${viewDate.getMonth()}`;
-        onSnapshot(doc(db, "users", user.uid, "logs", monthKey), (d) => {
-            logs = d.data() || {};
-            render();
+        onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
+            logs = d.data() || {}; renderGrid();
         });
     }
 
-    window.quickLog = async (type) => {
-        const day = new Date().getDate();
-        const monthKey = `${new Date().getFullYear()}_${new Date().getMonth()}`;
-        const obj = logs[day] || { l: 0, d: 0, w: 0 };
-        obj[type] = obj[type] ? 0 : 1;
-        await setDoc(doc(db, "users", user.uid, "logs", monthKey), { [day]: obj }, { merge: true });
+    window.quickLog = async () => {
+        if (!isCurrentMonth()) return;
+        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
+        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
+        if(obj[type] === 1) return;
+        obj[type] = 1;
+        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
     };
 
-    function render() {
-        const container = document.getElementById('logs-container');
-        container.innerHTML = '';
-        let totalMeals = 0, totalWater = 0;
+    function renderGrid() {
+        const current = isCurrentMonth();
+        document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
+        document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
+        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
         
-        const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+        const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
+        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
 
-        // Render from Today backwards for better UX
-        for (let i = daysInMonth; i >= 1; i--) {
-            const data = logs[i] || { l: 0, d: 0, w: 0 };
-            if(data.l) totalMeals++; if(data.d) totalMeals++; if(data.w) totalWater++;
-
-            const row = document.createElement('div');
-            const isToday = i === new Date().getDate() && viewDate.getMonth() === new Date().getMonth();
-            row.className = `day-row ${isToday ? 'today' : ''}`;
-            
-            row.innerHTML = `
-                <div class="day-info">
-                    <b>${i}</b>
-                    <span>${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en', {weekday:'short'})}</span>
-                </div>
-                <div class="toggle-group">
-                    <button class="t-btn ${data.l?'on':''}" onclick="toggle(${i},'l')">L</button>
-                    <button class="t-btn ${data.d?'on':''}" onclick="toggle(${i},'d')">D</button>
-                    <button class="t-btn water ${data.w?'on':''}" onclick="toggle(${i},'w')">W</button>
-                </div>
-            `;
-            container.appendChild(row);
+        const type = todayDate.getHours() < 16 ? 'l' : 'd';
+        const isMarked = logs[todayDate.getDate()] && logs[todayDate.getDate()][type] === 1;
+        
+        if (current) {
+            document.getElementById('quickIcon').innerText = isMarked ? '✅' : '⚡';
+            document.getElementById('quickText').innerText = isMarked ? 'Marked' : `Mark ${type==='l'?'Lunch':'Dinner'}`;
+            if(isMarked) document.getElementById('quickBtn').classList.add('done');
+            else document.getElementById('quickBtn').classList.remove('done');
+        } else {
+            document.getElementById('quickIcon').innerText = '🔒';
+            document.getElementById('quickText').innerText = 'Locked';
         }
 
-        // Update Hub
-        const bill = (totalMeals * config.mealPrice) + (totalWater * config.waterPrice);
-        document.getElementById('total-val').innerText = `₹${bill}`;
-        document.getElementById('meal-count').innerText = `${totalMeals} MEALS CONSUMED`;
-        
-        // Progress bar logic (Target 60 meals/month)
-        const progress = Math.min((totalMeals / 60) * 100, 100);
-        document.getElementById('pulse-bar').style.width = `${progress}%`;
+        for (let i = 1; i <= daysCount; i++) {
+            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
+            const card = document.createElement('div');
+            card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
+            
+            if (current) {
+                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
+                card.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                    isScrolling = false;
+                    longPressTimer = setTimeout(() => {
+                        if (!isScrolling) openNote(i);
+                    }, 650);
+                }, { passive: true });
 
-        // Update Quick Action Chips visually
-        const today = new Date().getDate();
-        const tLog = logs[today] || {};
-        document.getElementById('quick-l').className = tLog.l ? 'action-chip active' : 'action-chip';
-        document.getElementById('quick-d').className = tLog.d ? 'action-chip active' : 'action-chip';
-        document.getElementById('quick-w').className = tLog.w ? 'action-chip active' : 'action-chip';
+                card.addEventListener('touchmove', (e) => {
+                    let moveY = e.touches[0].clientY;
+                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
+                        isScrolling = true;
+                        clearTimeout(longPressTimer);
+                    }
+                }, { passive: true });
+
+                card.addEventListener('touchend', () => {
+                    clearTimeout(longPressTimer);
+                });
+            }
+
+            card.innerHTML = `
+                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
+                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
+                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
+                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
+                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
+            `;
+            grid.appendChild(card);
+        }
+        calculate();
     }
 
     window.toggle = async (day, type) => {
-        const monthKey = `${viewDate.getFullYear()}_${viewDate.getMonth()}`;
-        const obj = logs[day] || { l: 0, d: 0, w: 0 };
+        if (!isCurrentMonth()) return;
+        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
         obj[type] = obj[type] ? 0 : 1;
-        await setDoc(doc(db, "users", user.uid, "logs", monthKey), { [day]: obj }, { merge: true });
+        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
     };
 
-    window.changeMonth = (dir) => {
-        if(dir === 0) viewDate = new Date();
-        else viewDate.setMonth(viewDate.getMonth() + dir);
-        syncData();
+    window.openNote = (day) => {
+        activeDayId = day;
+        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
+        document.getElementById('noteInput').value = logs[day]?.n || "";
+        document.getElementById('noteOverlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
+    };
+    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
+    window.saveNote = async () => {
+        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
+        obj.n = document.getElementById('noteInput').value;
+        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
+        closeNote();
     };
 
-    // Auto-greeting
-    const hours = new Date().getHours();
-    document.getElementById('time-greet').innerText = hours < 12 ? "Good Morning" : hours < 17 ? "Good Afternoon" : "Good Evening";
+    window.openSettings = () => {
+        document.getElementById('setUserName').value = config.name;
+        document.getElementById('setMealPrice').value = config.mealPrice;
+        document.getElementById('setWaterPrice').value = config.waterPrice;
+        document.getElementById('settingsOverlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
+    };
+    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
+    window.saveSettings = async () => {
+        config.name = document.getElementById('setUserName').value;
+        config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
+        config.waterPrice = parseInt(document.getElementById('setWaterPrice').value);
+        await setDoc(doc(db, "users", user.uid), config, { merge: true });
+        document.getElementById('userLabel').innerText = config.name;
+        calculate(); closeSettings();
+    };
+
+    function calculate() {
+        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
+        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
+        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
+    }
+
+    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
 </script>
 </body>
 </html>
+
+
