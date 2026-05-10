@@ -3,105 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Master Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <title>VetTrack Pro | Elite Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); 
-            --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8; --danger: #ff4444; --success: #22c55e;
+            --p: #FF8C00; --bg: #05070A; --card: rgba(17, 24, 39, 0.8); 
+            --surface: rgba(31, 41, 55, 0.5); --text: #F9FAFB; --sub: #9CA3AF;
+            --danger: #EF4444; --success: #10B981; --accent: #6366F1;
         }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; padding-bottom: 80px; }
-        .container { max-width: 650px; margin: 0 auto; }
-
-        /* Maintenance Panel */
-        .dev-panel { 
-            background: rgba(255, 68, 68, 0.1); border: 1px dashed var(--danger); 
-            padding: 15px; border-radius: 20px; margin-bottom: 25px; display: flex; 
-            justify-content: space-between; align-items: center; 
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: 'Plus Jakarta Sans', sans-serif; padding: env(safe-area-inset-top) 20px 80px 20px;
+            background-image: radial-gradient(circle at 0% 0%, #1e1b4b 0%, transparent 25%), radial-gradient(circle at 100% 100%, #1e1b4b 0%, transparent 25%);
         }
 
-        /* Stats */
-        .master-stats { display: flex; gap: 12px; margin-bottom: 25px; }
-        .stat-box { flex: 1; background: var(--card); padding: 18px; border-radius: 22px; border: 1px solid var(--surface); }
-        .stat-box small { font-size: 10px; color: var(--sub); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .stat-box div { font-family: 'Outfit'; font-size: 24px; color: var(--p); font-weight: 800; }
+        .container { max-width: 800px; margin: 0 auto; }
 
-        /* Search & Rows */
-        .search-box { width: 100%; padding: 15px 20px; background: var(--card); border: 1px solid var(--surface); border-radius: 18px; color: white; margin: 15px 0; outline: none; }
-        .student-row { background: var(--card); padding: 15px; border-radius: 22px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--surface); cursor: pointer; }
-        .student-icon { width: 45px; height: 45px; border-radius: 14px; object-fit: cover; }
-        .badge { font-size: 9px; padding: 3px 8px; border-radius: 6px; font-weight: 800; text-transform: uppercase; }
-        .bg-paid { background: var(--success); } .bg-unpaid { background: var(--danger); }
+        /* Navigation Tabs */
+        .tab-bar { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .tab { padding: 10px 20px; border-radius: 12px; background: var(--surface); color: var(--sub); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; border: 1px solid transparent; }
+        .tab.active { background: var(--p); color: white; border-color: var(--p); }
 
-        /* Modal */
-        .modal { position: fixed; inset: 0; background: var(--bg); z-index: 20000; display: none; flex-direction: column; padding: 25px; overflow-y: auto; }
-        .modal.active { display: flex; }
-        .field-group { margin-bottom: 15px; background: var(--card); padding: 15px; border-radius: 18px; border: 1px solid var(--surface); }
-        .field-group label { display: block; font-size: 10px; font-weight: 800; color: var(--p); text-transform: uppercase; margin-bottom: 5px; }
-        .read-only { color: var(--sub); font-weight: 600; }
+        /* Dashboard Cards */
+        .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--surface); backdrop-filter: blur(10px); }
+        .stat-card small { font-size: 10px; color: var(--sub); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card .val { font-family: 'Outfit'; font-size: 28px; font-weight: 900; margin-top: 5px; }
+        .stat-card .trend { font-size: 10px; margin-top: 5px; color: var(--success); }
+
+        /* Kitchen Insight Section */
+        .kitchen-panel { background: linear-gradient(135deg, #1e1b4b, #05070A); border-radius: 24px; padding: 20px; border: 1px solid var(--accent); margin-bottom: 25px; }
         
-        /* Table */
-        .detail-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 15px; }
-        .detail-table th { text-align: left; color: var(--sub); padding: 8px; font-size: 9px; }
-        .detail-table td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .in-table { background: #000; border: 1px solid var(--surface); color: white; width: 40px; text-align: center; border-radius: 5px; padding: 4px; }
+        /* Search and Filter */
+        .search-area { position: sticky; top: 10px; z-index: 100; margin-bottom: 20px; }
+        .search-box { width: 100%; padding: 16px 20px; background: rgba(0,0,0,0.6); border: 1px solid var(--surface); border-radius: 18px; color: white; backdrop-filter: blur(20px); font-size: 15px; outline: none; transition: 0.3s; }
+        .search-box:focus { border-color: var(--p); box-shadow: 0 0 20px rgba(255,140,0,0.2); }
 
-        .btn-p { background: var(--p); color: white; border: none; padding: 12px 20px; border-radius: 14px; font-weight: 800; cursor: pointer; }
-        .btn-status { border: none; padding: 8px 15px; border-radius: 10px; font-weight: 800; cursor: pointer; width: 100%; color: white; }
+        /* Student Rows */
+        .student-item { 
+            background: var(--card); padding: 16px; border-radius: 20px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid var(--surface); transition: 0.3s; cursor: pointer;
+        }
+        .student-item:hover { transform: translateY(-3px); border-color: var(--p); }
+        .avatar-group { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 50px; height: 50px; border-radius: 15px; object-fit: cover; border: 2px solid var(--surface); }
+        .name-stack { display: flex; flex-direction: column; }
+        .name-stack b { font-size: 16px; letter-spacing: -0.5px; }
+        .name-stack span { font-size: 11px; color: var(--sub); font-weight: 600; }
+
+        /* Full-Screen Editor */
+        .editor-modal { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .editor-modal.active { display: flex; }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+
+        .bill-summary { background: var(--surface); padding: 20px; border-radius: 20px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .bill-item label { display: block; font-size: 10px; color: var(--p); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+        .bill-item span { font-family: 'Outfit'; font-size: 20px; font-weight: 800; }
+
+        /* Control Table */
+        .data-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        .data-table th { text-align: left; padding: 10px; color: var(--sub); border-bottom: 1px solid var(--surface); }
+        .data-table td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+
+        .toggle-cell { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .toggle-cell.active { background: var(--p); border-color: var(--p); color: white; }
+        
+        .btn-action { padding: 12px 24px; border-radius: 14px; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-p { background: var(--p); color: white; }
+        .btn-ghost { background: var(--surface); color: white; }
+
+        .maintenance-ribbon { background: var(--danger); color: white; font-size: 10px; font-weight: 900; text-align: center; padding: 4px; position: fixed; top: 0; left: 0; right: 0; z-index: 1001; display: none; text-transform: uppercase; }
+
+        @media print { .no-print { display: none; } .editor-modal { position: static; display: block; background: white; color: black; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header class="admin-header">
-        <h1 style="font-family:'Outfit'">Master Control</h1>
+<div id="maintLabel" class="maintenance-ribbon">System Offline - Maintenance Active</div>
+
+<div class="container no-print">
+    <header style="margin-bottom: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="font-family:'Outfit'; font-size: 32px; margin:0;">Command Center</h1>
+            <button class="btn-action btn-ghost" onclick="toggleMaintenance()" id="maintBtn">Global Kill-Switch</button>
+        </div>
     </header>
 
-    <div class="dev-panel">
-        <div>
-            <div style="font-weight: 800; font-size: 14px;">Maintenance Mode</div>
-            <small id="maintStatus" style="color: var(--sub)">Checking system status...</small>
+    <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('all')">All Students</div>
+        <div class="tab" onclick="switchTab('unpaid')">Unpaid Only</div>
+        <div class="tab" onclick="switchTab('kitchen')">Kitchen View</div>
+    </div>
+
+    <div class="grid-stats">
+        <div class="stat-card">
+            <small>Estimated Rev</small>
+            <div class="val" id="totalRev">₹0</div>
+            <div class="trend">Current Month</div>
         </div>
-        <button id="maintBtn" class="btn-p" onclick="toggleMaintenance()" style="background: var(--danger)">Disable App</button>
+        <div class="stat-card">
+            <small>Active Users</small>
+            <div class="val" id="userCount">0</div>
+            <div class="trend" id="kitchenCount">0 marked for lunch</div>
+        </div>
     </div>
 
-    <div class="master-stats">
-        <div class="stat-box"><small>Revenue</small><div id="totalRev">₹0</div></div>
-        <div class="stat-box"><small>Students</small><div id="totalStuds">0</div></div>
+    <div class="search-area">
+        <input type="text" id="mainSearch" class="search-box" placeholder="Search by name, email or status..." oninput="filterList()">
     </div>
 
-    <input type="text" id="search" class="search-box" placeholder="Search students..." oninput="filterList()">
     <div id="studentList"></div>
 </div>
 
-<div id="editModal" class="modal">
-    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <button onclick="closeModal()" style="background:none; border:none; color:var(--p); font-weight:800;">← SAVE & EXIT</button>
-        <button class="btn-p" onclick="window.print()">PRINT BILL</button>
+<div id="editorModal" class="editor-modal">
+    <div class="editor-header no-print">
+        <button class="btn-action btn-ghost" onclick="closeEditor()">← Close & Sync</button>
+        <button class="btn-action btn-p" onclick="window.print()">Print Statement</button>
     </div>
 
-    <div style="display:flex; align-items:center; gap:15px; margin-bottom:20px;">
-        <img id="m-icon" class="student-icon" style="width:60px; height:60px;">
-        <div>
-            <h2 id="m-name" style="margin:0; font-family:'Outfit'">Student Name</h2>
-            <div id="m-email" class="read-only" style="font-size:12px;">email@student.com</div>
+    <div style="display:flex; align-items:center; gap:20px; margin-bottom:30px;">
+        <img id="m-avatar" class="avatar" style="width:80px; height:80px; border-radius: 25px;">
+        <div class="name-stack">
+            <b id="m-name" style="font-size:32px; font-family:'Outfit';">Student Name</b>
+            <span id="m-email" style="font-size:14px;">email@student.com</span>
         </div>
     </div>
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-        <div class="field-group">
-            <label>Meal Price (₹)</label>
-            <input type="number" id="m-price" class="in-table" style="width:100%; height:35px;" onchange="updatePrice(this.value)">
+    <div class="bill-summary no-print">
+        <div class="bill-item">
+            <label>Meal Price</label>
+            <input type="number" id="m-price" class="search-box" style="padding:10px; font-size:18px;" onchange="updateUserMeta('mealPrice', this.value)">
         </div>
-        <div class="field-group">
-            <label>Payment</label>
-            <button id="m-pay" class="btn-status" onclick="togglePay()">Unpaid</button>
+        <div class="bill-item">
+            <label>Status</label>
+            <button id="m-status" class="btn-action" style="width:100%" onclick="togglePaidStatus()">UNPAID</button>
         </div>
     </div>
 
-    <table class="detail-table">
-        <thead><tr><th>Day</th><th>L</th><th>D</th><th>Guests</th><th>W</th></tr></thead>
+    <div style="margin-bottom: 10px; font-weight: 800; font-size: 12px; color: var(--sub);">ATTENDANCE LOGS</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Lunch</th>
+                <th>Dinner</th>
+                <th>Gst L</th>
+                <th>Gst D</th>
+                <th>Water</th>
+            </tr>
+        </thead>
         <tbody id="m-table"></tbody>
     </table>
 </div>
@@ -118,68 +171,90 @@
     };
 
     const app = initializeApp(firebaseConfig), db = getFirestore(app), auth = getAuth(app), provider = new GoogleAuthProvider();
-    let students = [], currentS, currentUid, currentLogs, isMaintActive = false;
+    let students = [], currentS, currentUid, currentLogs, isMaint = false;
 
-    // 1. Auth & Maintenance Sync
     onAuthStateChanged(auth, u => { 
         if(u) {
-            fetchAll();
-            onSnapshot(doc(db, "app_settings", "global"), s => {
-                isMaintActive = s.exists() ? s.data().maintenance : false;
-                document.getElementById('maintStatus').innerText = isMaintActive ? "System Offline" : "System Live";
-                document.getElementById('maintBtn').innerText = isMaintActive ? "Enable App" : "Disable App";
-                document.getElementById('maintBtn').style.background = isMaintActive ? "var(--success)" : "var(--danger)";
-            });
+            initApp();
+            syncMaint();
         } else signInWithPopup(auth, provider);
     });
 
-    window.toggleMaintenance = async () => {
-        await setDoc(doc(db, "app_settings", "global"), { maintenance: !isMaintActive, updatedAt: Date.now() }, { merge: true });
-    };
-
-    async function fetchAll() {
-        const snap = await getDocs(collection(db, "users")), monthKey = `${new Date().getFullYear()}_${new Date().getMonth()}`;
+    async function initApp() {
+        const snap = await getDocs(collection(db, "users"));
+        const monthKey = `${new Date().getFullYear()}_${new Date().getMonth()}`;
         students = [];
         for(const d of snap.docs) {
-            const u = d.data(), lSnap = await getDoc(doc(db, "users", d.id, "logs", monthKey));
+            const u = d.data();
+            const lSnap = await getDoc(doc(db, "users", d.id, "logs", monthKey));
             students.push({ uid: d.id, ...u, logs: lSnap.exists() ? lSnap.data() : {} });
         }
-        render(students);
+        render();
     }
 
-    function render(data) {
+    function syncMaint() {
+        onSnapshot(doc(db, "app_settings", "global"), s => {
+            isMaint = s.exists() ? s.data().maintenance : false;
+            document.getElementById('maintLabel').style.display = isMaint ? 'block' : 'none';
+            document.getElementById('maintBtn').innerText = isMaint ? "Go Live" : "Go Maintenance";
+            document.getElementById('maintBtn').style.borderColor = isMaint ? 'var(--success)' : 'var(--danger)';
+        });
+    }
+
+    window.toggleMaintenance = async () => {
+        await setDoc(doc(db, "app_settings", "global"), { maintenance: !isMaint, updatedAt: Date.now() }, { merge: true });
+    };
+
+    function render(filter = 'all') {
         const list = document.getElementById('studentList'); list.innerHTML = "";
-        let rev = 0;
-        data.forEach(s => {
+        let rev = 0, kLunch = 0, today = new Date().getDate();
+
+        const filtered = students.filter(s => {
+            if(filter === 'unpaid') return !s.isPaid;
+            return true;
+        });
+
+        filtered.forEach(s => {
             let m=0, g=0;
-            Object.values(s.logs).forEach(v => { m+=(v.l?1:0)+(v.d?1:0); g+=(parseInt(v.lg)||0)+(parseInt(v.dg)||0); });
-            const bill = (m+g) * (s.mealPrice || 50); rev += bill;
+            Object.values(s.logs).forEach(v => { 
+                m += (v.l?1:0) + (v.d?1:0); 
+                g += (parseInt(v.lg)||0) + (parseInt(v.dg)||0);
+            });
+            const bill = (m+g) * (s.mealPrice || 50);
+            rev += bill;
+            if(s.logs[today]?.l) kLunch++;
+
             list.innerHTML += `
-                <div class="student-row" onclick="openEdit('${s.uid}')">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <img src="${s.photo||'https://ui-avatars.com/api/?name='+s.name}" class="student-icon">
-                        <div>
-                            <div style="font-weight:700">${s.name} <span class="badge ${s.isPaid?'bg-paid':'bg-unpaid'}">${s.isPaid?'Paid':'Unpaid'}</span></div>
-                            <small style="color:var(--sub)">${m+g} total plates</small>
+                <div class="student-item" onclick="openEditor('${s.uid}')">
+                    <div class="avatar-group">
+                        <img src="${s.photo || 'https://ui-avatars.com/api/?name='+s.name}" class="avatar">
+                        <div class="name-stack">
+                            <b>${s.name}</b>
+                            <span>${s.email || 'No Email'} • ${s.isPaid ? '✅ Paid' : '❌ Unpaid'}</span>
                         </div>
                     </div>
-                    <div style="font-weight:800; color:var(--p)">₹${bill}</div>
+                    <div style="text-align:right">
+                        <div style="font-family:'Outfit'; font-weight:900; font-size:18px;">₹${bill}</div>
+                        <div style="font-size:10px; color:var(--sub)">${m+g} PLATES</div>
+                    </div>
                 </div>`;
         });
-        document.getElementById('totalRev').innerText = "₹" + rev;
-        document.getElementById('totalStuds').innerText = data.length;
+
+        document.getElementById('totalRev').innerText = "₹" + rev.toLocaleString();
+        document.getElementById('userCount').innerText = students.length;
+        document.getElementById('kitchenCount').innerText = kLunch + " marked for lunch";
     }
 
-    window.openEdit = (uid) => {
+    window.openEditor = (uid) => {
         currentS = students.find(x => x.uid === uid);
         currentUid = uid; currentLogs = currentS.logs;
         document.getElementById('m-name').innerText = currentS.name;
-        document.getElementById('m-email').innerText = currentS.email || "No Email";
+        document.getElementById('m-email').innerText = currentS.email || 'No email';
+        document.getElementById('m-avatar').src = currentS.photo || 'https://ui-avatars.com/api/?name='+currentS.name;
         document.getElementById('m-price').value = currentS.mealPrice || 50;
-        document.getElementById('m-icon').src = currentS.photo || 'https://ui-avatars.com/api/?name='+currentS.name;
-        updatePayUI(currentS.isPaid);
-        document.getElementById('editModal').classList.add('active');
+        updatePaidUI(currentS.isPaid);
         renderTable();
+        document.getElementById('editorModal').classList.add('active');
     }
 
     function renderTable() {
@@ -190,47 +265,69 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${i}</td>
-                <td><input type="checkbox" ${d.l?'checked':''} onchange="logChange(${i},'l',this.checked?1:0)"></td>
-                <td><input type="checkbox" ${d.d?'checked':''} onchange="logChange(${i},'d',this.checked?1:0)"></td>
-                <td><input type="number" class="in-table" value="${(parseInt(d.lg)||0)+(parseInt(d.dg)||0)}" onchange="logChange(${i},'lg',this.value)"></td>
-                <td><input type="number" class="in-table" value="${d.w||0}" onchange="logChange(${i},'w',this.value)"></td>
+                <td><div class="toggle-cell ${d.l?'active':''}" onclick="updateLog(${i},'l',${d.l?0:1})">${d.l?'L':''}</div></td>
+                <td><div class="toggle-cell ${d.d?'active':''}" onclick="updateLog(${i},'d',${d.d?0:1})">${d.d?'D':''}</div></td>
+                <td><input type="number" class="toggle-cell" style="width:40px; background:transparent; color:white;" value="${d.lg||0}" onchange="updateLog(${i},'lg',this.value)"></td>
+                <td><input type="number" class="toggle-cell" style="width:40px; background:transparent; color:white;" value="${d.dg||0}" onchange="updateLog(${i},'dg',this.value)"></td>
+                <td><input type="number" class="toggle-cell" style="width:40px; background:transparent; color:white;" value="${d.w||0}" onchange="updateLog(${i},'w',this.value)"></td>
             `;
             body.appendChild(tr);
         }
     }
 
-    window.logChange = async (day, field, val) => {
+    window.updateLog = async (day, field, val) => {
         if(!currentLogs[day]) currentLogs[day] = { l:0, d:0, lg:0, dg:0, w:0 };
         currentLogs[day][field] = val;
         const mk = `${new Date().getFullYear()}_${new Date().getMonth()}`;
         await setDoc(doc(db,"users",currentUid,"logs",mk), { [day]: currentLogs[day] }, { merge: true });
-        // Push notification to student
-        await addDoc(collection(db,"users",currentUid,"activity"), { msg:`Admin updated Day ${day} ${field.toUpperCase()}`, time:Date.now() });
+        await notify(currentUid, `Admin manually adjusted logs for Day ${day}`);
+        renderTable();
     }
 
-    window.updatePrice = async (v) => { 
-        await updateDoc(doc(db,"users",currentUid), { mealPrice: parseInt(v) });
-        await addDoc(collection(db,"users",currentUid,"activity"), { msg:`Meal price set to ₹${v} by Admin`, time:Date.now() });
-    };
-    
-    window.togglePay = async () => {
-        const s = !currentS.isPaid;
-        await updateDoc(doc(db,"users",currentUid), { isPaid: s });
-        currentS.isPaid = s; updatePayUI(s);
-    };
+    window.updateUserMeta = async (field, val) => {
+        await updateDoc(doc(db, "users", currentUid), { [field]: parseInt(val) });
+        await notify(currentUid, `Admin updated your profile settings: ${field}`);
+    }
 
-    function updatePayUI(s) {
-        const b = document.getElementById('m-pay');
-        b.innerText = s ? "PAID" : "UNPAID";
-        b.style.background = s ? "var(--success)" : "var(--danger)";
+    window.togglePaidStatus = async () => {
+        const newState = !currentS.isPaid;
+        await updateDoc(doc(db, "users", currentUid), { isPaid: newState });
+        currentS.isPaid = newState;
+        updatePaidUI(newState);
+        await notify(currentUid, newState ? "Payment marked as RECEIVED by Admin" : "Payment status marked as UNPAID");
+    }
+
+    function updatePaidUI(paid) {
+        const b = document.getElementById('m-status');
+        b.innerText = paid ? "PAID" : "UNPAID";
+        b.className = paid ? 'btn-action btn-p' : 'btn-action btn-ghost';
+        b.style.background = paid ? 'var(--success)' : 'var(--danger)';
+    }
+
+    async function notify(uid, msg) {
+        await addDoc(collection(db, "users", uid, "activity"), { msg, time: Date.now() });
     }
 
     window.filterList = () => {
-        const q = document.getElementById('search').value.toLowerCase();
-        render(students.filter(s => s.name.toLowerCase().includes(q)));
+        const q = document.getElementById('mainSearch').value.toLowerCase();
+        renderSearch(q);
     }
 
-    window.closeModal = () => { document.getElementById('editModal').classList.remove('active'); fetchAll(); }
+    function renderSearch(q) {
+        const list = document.getElementById('studentList');
+        const items = list.getElementsByClassName('student-item');
+        for(let item of items) {
+            item.style.display = item.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+        }
+    }
+
+    window.switchTab = (t) => {
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+        render(t);
+    }
+
+    window.closeEditor = () => { document.getElementById('editorModal').classList.remove('active'); initApp(); }
 </script>
 </body>
 </html>
