@@ -1,111 +1,228 @@
-<style>
-    .edit-sheet {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-        display: none; flex-direction: column; padding: 30px; z-index: 10000;
-        overflow-y: auto;
-    }
-    .edit-sheet.active { display: flex; }
-    .day-row {
-        display: flex; justify-content: space-between; align-items: center;
-        background: rgba(255,255,255,0.05); padding: 10px 15px;
-        border-radius: 12px; margin-bottom: 8px; font-size: 13px;
-    }
-    .toggle-btn {
-        padding: 5px 10px; border-radius: 8px; border: 1px solid var(--p);
-        background: transparent; color: white; cursor: pointer; font-size: 10px;
-    }
-    .toggle-btn.on { background: var(--p); }
-    .close-edit { margin-bottom: 20px; color: var(--p); font-weight: 800; cursor: pointer; }
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VetTrack Luxe | Admin Ultimate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); 
+            --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8;
+        }
 
-<div id="editSheet" class="edit-sheet">
-    <div class="close-edit" onclick="closeEdit()">← Back to Dashboard</div>
-    <h2 id="editStudentName" style="font-family:'Outfit'; margin-bottom:5px;">Student Name</h2>
-    <p style="color:var(--sub); font-size:12px; margin-bottom:20px;">Modify logs for current month</p>
-    <div id="daysList"></div>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
+        
+        .container { max-width: 650px; margin: 0 auto; }
+        .admin-header h1 { font-family: 'Outfit'; font-size: 32px; margin: 0; }
+        
+        /* Stats & Search */
+        .master-stats { display: flex; gap: 15px; margin: 20px 0; }
+        .stat-box { flex: 1; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--surface); }
+        .stat-box small { font-size: 10px; color: var(--sub); font-weight: 800; text-transform: uppercase; }
+        .stat-box div { font-family: 'Outfit'; font-size: 24px; color: var(--p); }
+
+        /* Student List */
+        .student-row {
+            background: var(--card); padding: 15px 20px; border-radius: 18px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--surface);
+            cursor: pointer; transition: 0.2s;
+        }
+        .student-row:hover { border-color: var(--p); }
+
+        /* Full Edit Modal */
+        .modal {
+            position: fixed; inset: 0; background: var(--bg); z-index: 20000;
+            display: none; flex-direction: column; padding: 25px; overflow-y: auto;
+        }
+        .modal.active { display: flex; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        /* Detailed Day Table */
+        .detail-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .detail-table th { text-align: left; font-size: 11px; color: var(--sub); padding: 10px; border-bottom: 1px solid var(--surface); }
+        .detail-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        
+        .input-mini {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--surface); color: white;
+            padding: 5px; border-radius: 5px; width: 45px; text-align: center;
+        }
+        .input-note { width: 100%; background: transparent; border: none; color: var(--sub); font-size: 12px; }
+        
+        .btn { padding: 10px 20px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; }
+        .btn-p { background: var(--p); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--surface); color: white; }
+        
+        .invoice-box {
+            background: white; color: black; padding: 40px; border-radius: 5px;
+            margin-top: 20px; display: none; font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="mainDashboard">
+    <div class="admin-header">
+        <h1>Control Tower</h1>
+        <p style="color:var(--sub)">Manage every student, plate, and rupee.</p>
+    </div>
+
+    <div class="master-stats">
+        <div class="stat-box"><small>Revenue</small><div id="totalRev">₹0</div></div>
+        <div class="stat-box"><small>Total Plates</small><div id="totalPlates">0</div></div>
+    </div>
+
+    <div id="studentList"></div>
 </div>
 
+<div id="editModal" class="modal">
+    <div class="modal-header">
+        <button class="btn btn-outline" onclick="closeModal()">← Close</button>
+        <button class="btn btn-p" onclick="generateInvoice()">Download Bill</button>
+    </div>
+    
+    <h2 id="editName" style="font-family:'Outfit'; margin:0">Student Name</h2>
+    <div style="display:flex; gap:10px; margin:15px 0;">
+        <div class="stat-box" style="padding:10px">
+            <small>Personal Meal Price</small>
+            <input type="number" id="overridePrice" class="input-mini" style="width:80px; font-size:16px;">
+        </div>
+    </div>
+
+    <table class="detail-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>L</th>
+                <th>D</th>
+                <th>Guests (L/D)</th>
+                <th>Water</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody id="detailBody"></tbody>
+    </table>
+</div>
+
+<div id="invoiceContainer" class="invoice-box"></div>
+
 <script type="module">
-    // ... (Keep existing imports and config)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    let currentEditingUid = null;
-    let currentEditingLogs = {};
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
+        projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
+        messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
+    };
 
-    async function fetchAllData() {
+    const app = initializeApp(firebaseConfig), db = getFirestore(app), auth = getAuth(app), provider = new GoogleAuthProvider();
+    let currentUid, currentLogs, currentConfig;
+
+    onAuthStateChanged(auth, u => { if(u) fetchAll(); else signInWithPopup(auth, provider); });
+
+    async function fetchAll() {
+        const snap = await getDocs(collection(db, "users"));
         const list = document.getElementById('studentList');
         const monthKey = `${new Date().getFullYear()}_${new Date().getMonth()}`;
-        let grandTotal = 0;
+        list.innerHTML = "";
+        let rev = 0, plates = 0;
 
-        try {
-            const usersSnap = await getDocs(collection(db, "users"));
-            list.innerHTML = "";
+        for(const d of snap.docs) {
+            const u = d.data();
+            const lSnap = await getDoc(doc(db, "users", d.id, "logs", monthKey));
+            const logs = lSnap.exists() ? lSnap.data() : {};
             
-            for (const userDoc of usersSnap.docs) {
-                const u = userDoc.data();
-                const logSnap = await getDoc(doc(db, "users", userDoc.id, "logs", monthKey));
-                const logs = logSnap.exists() ? logSnap.data() : {};
-                
-                let m=0, w=0;
-                Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-                const bill = (m * (u.mealPrice || 50)) + (w * (u.waterPrice || 30));
-                grandTotal += bill;
+            let m=0, g=0;
+            Object.values(logs).forEach(v => { 
+                if(v.l) m++; if(v.d) m++; 
+                g += (parseInt(v.lg)||0) + (parseInt(v.dg)||0);
+            });
+            
+            const totalBill = (m + g) * (u.mealPrice || 50);
+            rev += totalBill; plates += (m + g);
 
-                const card = document.createElement('div');
-                card.className = "student-card";
-                card.onclick = () => openEdit(userDoc.id, u.name, logs);
-                card.innerHTML = `
-                    <span><strong>${u.name || 'User'}</strong><br><small>${m} Meals | ${w} Water</small></span>
-                    <span class="amt">₹${bill}</span>
-                `;
-                list.appendChild(card);
-            }
-            document.getElementById('totalCollection').innerText = "₹" + grandTotal.toLocaleString('en-IN');
-        } catch (e) {
-            console.error(e);
+            list.innerHTML += `
+                <div class="student-row" onclick='openDetail("${d.id}", ${JSON.stringify(u)}, ${JSON.stringify(logs)})'>
+                    <div><strong>${u.name}</strong><br><small style="color:var(--sub)">${m+g} total plates</small></div>
+                    <div style="font-family:'Outfit'; color:var(--p)">₹${totalBill}</div>
+                </div>`;
         }
+        document.getElementById('totalRev').innerText = "₹" + rev;
+        document.getElementById('totalPlates').innerText = plates;
     }
 
-    window.openEdit = (uid, name, logs) => {
-        currentEditingUid = uid;
-        currentEditingLogs = logs;
-        document.getElementById('editStudentName').innerText = name;
-        document.getElementById('editSheet').classList.add('active');
-        renderDays();
-    };
+    window.openDetail = (uid, config, logs) => {
+        currentUid = uid; currentLogs = logs; currentConfig = config;
+        document.getElementById('editName').innerText = config.name;
+        document.getElementById('overridePrice').value = config.mealPrice || 50;
+        document.getElementById('editModal').classList.add('active');
+        renderTable();
+    }
 
-    window.closeEdit = () => {
-        document.getElementById('editSheet').classList.remove('active');
-        fetchAllData(); // Refresh main list
-    };
+    window.closeModal = () => { document.getElementById('editModal').classList.remove('active'); fetchAll(); }
 
-    function renderDays() {
-        const container = document.getElementById('daysList');
-        container.innerHTML = "";
-        const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    function renderTable() {
+        const body = document.getElementById('detailBody');
+        body.innerHTML = "";
+        const days = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
 
-        for (let i = 1; i <= daysInMonth; i++) {
-            const d = currentEditingLogs[i] || { l: 0, d: 0, w: 0 };
-            const row = document.createElement('div');
-            row.className = "day-row";
-            row.innerHTML = `
-                <span style="font-weight:800; width:30px;">${i}</span>
-                <button class="toggle-btn ${d.l?'on':''}" onclick="toggleCell(${i},'l')">Lunch</button>
-                <button class="toggle-btn ${d.d?'on':''}" onclick="toggleCell(${i},'d')">Dinner</button>
-                <button class="toggle-btn ${d.w?'on':''}" onclick="toggleCell(${i},'w')">Water</button>
+        for(let i=1; i<=days; i++) {
+            const d = currentLogs[i] || { l:0, d:0, lg:0, dg:0, w:0, n:"" };
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${i}</td>
+                <td><input type="checkbox" ${d.l?'checked':''} onchange="update(${i}, 'l', this.checked?1:0)"></td>
+                <td><input type="checkbox" ${d.d?'checked':''} onchange="update(${i}, 'd', this.checked?1:0)"></td>
+                <td>
+                    <input type="number" class="input-mini" value="${d.lg||0}" onchange="update(${i}, 'lg', this.value)">
+                    <input type="number" class="input-mini" value="${d.dg||0}" onchange="update(${i}, 'dg', this.value)">
+                </td>
+                <td><input type="number" class="input-mini" value="${d.w||0}" onchange="update(${i}, 'w', this.value)"></td>
+                <td><input type="text" class="input-note" value="${d.n||''}" placeholder="..." onchange="update(${i}, 'n', this.value)"></td>
             `;
-            container.appendChild(row);
+            body.appendChild(tr);
         }
     }
 
-    window.toggleCell = async (day, type) => {
-        if (!currentEditingLogs[day]) currentEditingLogs[day] = { l: 0, d: 0, w: 0, n: "" };
-        currentEditingLogs[day][type] = currentEditingLogs[day][type] ? 0 : 1;
-        
+    window.update = async (day, field, val) => {
+        if(!currentLogs[day]) currentLogs[day] = { l:0, d:0, lg:0, dg:0, w:0, n:"" };
+        currentLogs[day][field] = val;
         const monthKey = `${new Date().getFullYear()}_${new Date().getMonth()}`;
-        await setDoc(doc(db, "users", currentEditingUid, "logs", monthKey), {
-            [day]: currentEditingLogs[day]
-        }, { merge: true });
+        await setDoc(doc(db, "users", currentUid, "logs", monthKey), { [day]: currentLogs[day] }, { merge: true });
+    }
+
+    window.generateInvoice = () => {
+        const inv = document.getElementById('invoiceContainer');
+        inv.style.display = 'block';
+        let m=0, g=0, w=0;
+        Object.values(currentLogs).forEach(v => { 
+            if(v.l) m++; if(v.d) m++; 
+            g += (parseInt(v.lg)||0) + (parseInt(v.dg)||0);
+            w += (parseInt(v.w)||0);
+        });
         
-        renderDays(); // Update UI
-    };
+        const price = document.getElementById('overridePrice').value;
+        const total = (m + g) * price;
+
+        inv.innerHTML = `
+            <h2>VETTRACK LUXE STATEMENT</h2>
+            <hr>
+            NAME: ${currentConfig.name}<br>
+            MONTH: ${new Date().toLocaleString('default', { month: 'long' })} ${new Date().getFullYear()}<br>
+            -----------------------------------<br>
+            PERSONAL MEALS:   ${m} x ₹${price}<br>
+            GUEST MEALS:      ${g} x ₹${price}<br>
+            WATER UNITS:      ${w}<br>
+            -----------------------------------<br>
+            TOTAL PAYABLE:    ₹${total}<br>
+            -----------------------------------<br>
+            Generated by Admin Command Center
+        `;
+        window.print();
+    }
 </script>
+</body>
+</html>
