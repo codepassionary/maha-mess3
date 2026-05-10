@@ -13,15 +13,17 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; }
 
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); padding-bottom: 40px;
-            line-height: 1.6;
-        }
+        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 40px; }
 
         .container { max-width: 480px; margin: 0 auto; padding: 20px; }
 
+        /* GREETING SECTION */
+        .welcome-box { margin-bottom: 25px; margin-top: 10px; }
+        .greeting { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 800; color: var(--text); line-height: 1; }
+        .sub-greeting { font-size: 14px; color: var(--sub); font-weight: 600; margin-top: 5px; }
+
         /* HEADER & NAVIGATION */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; margin-top: 10px; }
+        .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .month-selector { 
             display: flex; align-items: center; background: white; padding: 6px; 
             border-radius: 50px; border: 1px solid #EEE; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
@@ -29,101 +31,107 @@
         .month-selector button { border: none; background: var(--p-light); color: var(--p); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-weight: 800; }
         .month-selector span { font-weight: 800; font-size: 14px; padding: 0 15px; min-width: 120px; text-align: center; }
 
-        /* PREMIER STAT CARD */
+        /* STAT CARD */
         .stat-card {
             background: linear-gradient(160deg, #2D1B14 0%, #1A1A1A 100%);
             color: white; padding: 30px; border-radius: 32px; margin-bottom: 25px;
             position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
         .stat-card::after { content: ''; position: absolute; top: -20%; right: -10%; width: 150px; height: 150px; background: var(--p); filter: blur(80px); opacity: 0.3; }
-        
-        .label { font-size: 11px; font-weight: 700; opacity: 0.6; letter-spacing: 1.2px; text-transform: uppercase; }
         .val { font-family: 'Outfit', sans-serif; font-size: 52px; font-weight: 900; line-height: 1.1; margin: 5px 0; }
-        .summary-pill { display: inline-flex; background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 50px; font-size: 12px; font-weight: 600; margin-top: 10px; }
-
-        /* THE LOG LIST */
-        .list-container { background: white; border-radius: 32px; border: 1px solid #F0F0F0; overflow: hidden; }
-        .day-row { 
-            display: grid; grid-template-columns: 50px 1fr 1fr 1fr; align-items: center; 
-            padding: 12px; border-bottom: 1px solid #F9F9F9; transition: 0.2s;
+        
+        /* SETTINGS OVERLAY */
+        .overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(8px); z-index: 10002; display: none; 
+            align-items: flex-end; justify-content: center;
         }
-        .day-row.today { background: #FFF9F3; }
-        .day-row.locked { opacity: 0.4; filter: grayscale(0.8); }
+        .settings-panel { 
+            background: white; width: 100%; max-width: 480px; 
+            border-radius: 32px 32px 0 0; padding: 30px;
+            transform: translateY(100%); transition: transform 0.3s ease;
+        }
+        .settings-panel.open { transform: translateY(0); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 11px; font-weight: 800; color: var(--sub); margin-bottom: 5px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #EEE; font-size: 16px; font-weight: 600; }
 
-        .date-col { text-align: center; }
-        .date-col .num { font-weight: 800; font-size: 18px; color: #333; }
-        .date-col .day { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-
-        /* MODERN PILLS */
+        /* PILLS & ROWS */
+        .list-container { background: white; border-radius: 32px; border: 1px solid #F0F0F0; overflow: hidden; }
+        .day-row { display: grid; grid-template-columns: 50px 1fr 1fr 1fr; align-items: center; padding: 12px; border-bottom: 1px solid #F9F9F9; }
+        .day-row.locked { opacity: 0.4; pointer-events: none; }
+        .day-row.today { background: #FFF9F3; border-left: 4px solid var(--p); }
         .pill { 
             height: 52px; border-radius: 18px; border: 1px solid #F0F0F0; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            margin: 0 4px; background: #FAFAFA; cursor: pointer; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 4px; background: #FAFAFA; cursor: pointer;
         }
-        .pill:active { transform: scale(0.9); }
-        .pill.on { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 8px 15px rgba(230, 126, 34, 0.2); }
-        .pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; margin-top: 2px; }
+        .pill.on { background: var(--p); border-color: var(--p); color: white; }
+        .pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; }
 
-        /* BUTTONS */
-        .btn-main { 
-            width: 100%; padding: 18px; border-radius: 20px; border: none; 
-            background: var(--p); color: white; font-weight: 800; font-size: 15px;
-            cursor: pointer; margin-top: 20px; transition: 0.3s;
-        }
-        .btn-main:disabled { background: #CCC; cursor: not-allowed; }
-
-        #authOverlay { 
-            position: fixed; inset: 0; background: var(--bg); z-index: 10000; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px;
-        }
-
-        #syncToast { 
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
-            background: #1A1A1A; color: white; padding: 8px 20px; border-radius: 50px; 
-            font-size: 11px; font-weight: 700; display: none; z-index: 10001;
-        }
+        .btn-main { width: 100%; padding: 18px; border-radius: 20px; border: none; background: var(--p); color: white; font-weight: 800; cursor: pointer; margin-top: 15px; }
+        #authOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div id="syncToast">☁️ Syncing to Cloud...</div>
-
 <div id="authOverlay" style="display:none;">
-    <div style="text-align: center;">
-        <h1 style="font-family:Outfit; font-size:48px; margin:0;">VetTrack<span style="color:var(--p)">.</span></h1>
-        <p style="color:var(--sub); font-weight:600; margin-bottom:40px;">The Elite Mess Ledger</p>
-        <button onclick="login()" class="btn-main" style="width: 250px;">Sign in with Google</button>
+    <h1 style="font-family:Outfit; font-size:48px;">VetTrack<span style="color:var(--p)">.</span></h1>
+    <button onclick="login()" class="btn-main" style="width: 250px;">Sign in with Google</button>
+</div>
+
+<div class="overlay" id="settingsOverlay" onclick="toggleSettings(false)">
+    <div class="settings-panel" id="settingsPanel" onclick="event.stopPropagation()">
+        <h2 style="font-family:Outfit; margin-top:0;">Settings</h2>
+        <div class="input-group">
+            <label>Your Display Name</label>
+            <input type="text" id="setName" placeholder="Enter name">
+        </div>
+        <div style="display:flex; gap:10px;">
+            <div class="input-group" style="flex:1;">
+                <label>Meal Price (₹)</label>
+                <input type="number" id="setMeal" placeholder="50">
+            </div>
+            <div class="input-group" style="flex:1;">
+                <label>Water Price (₹)</label>
+                <input type="number" id="setWater" placeholder="30">
+            </div>
+        </div>
+        <button class="btn-main" onclick="saveSettings()">Save & Update</button>
     </div>
 </div>
 
 <div class="container">
-    <div class="header">
+    <div class="welcome-box">
+        <div class="greeting" id="greetText">Good Day, User!</div>
+        <div class="sub-greeting">Your meal records are safe in the cloud.</div>
+    </div>
+
+    <div class="header-nav">
         <div class="month-selector">
             <button onclick="changeMonth(-1)">‹</button>
             <span id="monLabel">Loading...</span>
             <button onclick="changeMonth(1)">›</button>
         </div>
-        <button onclick="logout()" style="border:none; background:none; font-size:22px; cursor:pointer;">🚪</button>
+        <div style="display:flex; gap:10px;">
+            <button onclick="toggleSettings(true)" style="border:none; background:none; font-size:22px; cursor:pointer;">⚙️</button>
+            <button onclick="logout()" style="border:none; background:none; font-size:22px; cursor:pointer;">🚪</button>
+        </div>
     </div>
 
     <div class="stat-card">
-        <div class="label">Balance Due</div>
         <div class="val" id="totalVal">₹0</div>
-        <div class="summary-pill" id="summary">0 Meals this month</div>
-        <button class="btn-main" id="billBtn" onclick="shareReport()">Generate Report</button>
+        <div id="summary" style="font-size:13px; font-weight:600; opacity:0.8;">0 Meals this month</div>
+        <button class="btn-main" id="billBtn" onclick="shareReport()">Share WhatsApp Bill</button>
     </div>
 
     <div class="list-container" id="logList"></div>
-    
-    <p style="text-align:center; font-size:10px; color:#AAA; margin-top:20px; font-weight:600; text-transform:uppercase; letter-spacing:1px;">
-        Hard-locked: Prior months are read-only
-    </p>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g",
@@ -139,118 +147,118 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    let viewDate = new Date();
-    let today = new Date();
-    let currentUser = null;
-    let logs = {};
-    let unsub = null;
-    const rates = { meal: 50, water: 30 };
+    let viewDate = new Date(), today = new Date(), currentUser = null, logs = {}, unsub = null;
+    let userPrefs = { name: "User", meal: 50, water: 30 };
 
-    // --- AUTHENTICATION ---
-    window.login = () => {
-        setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
-    };
-    window.logout = () => { if(confirm("Logout from VetTrack?")) signOut(auth).then(() => location.reload()); };
+    // --- AUTH & PERSISTENCE ---
+    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
+    window.logout = () => signOut(auth).then(() => location.reload());
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = user;
             document.getElementById('authOverlay').style.display = 'none';
+            await loadSettings();
+            updateGreeting();
             sync();
         } else {
             document.getElementById('authOverlay').style.display = 'flex';
         }
     });
 
-    // --- CLOUD SYNC ---
+    // --- SETTINGS LOGIC ---
+    async function loadSettings() {
+        const ref = doc(db, "users", currentUser.uid, "config", "settings");
+        const snap = await getDoc(ref);
+        if (snap.exists()) userPrefs = snap.data();
+        else userPrefs.name = currentUser.displayName.split(' ')[0];
+        
+        // Fill inputs
+        document.getElementById('setName').value = userPrefs.name;
+        document.getElementById('setMeal').value = userPrefs.meal;
+        document.getElementById('setWater').value = userPrefs.water;
+    }
+
+    window.toggleSettings = (show) => {
+        const ov = document.getElementById('settingsOverlay');
+        const pa = document.getElementById('settingsPanel');
+        if(show) { ov.style.display = 'flex'; setTimeout(() => pa.classList.add('open'), 10); }
+        else { pa.classList.remove('open'); setTimeout(() => ov.style.display = 'none', 300); }
+    };
+
+    window.saveSettings = async () => {
+        userPrefs = {
+            name: document.getElementById('setName').value,
+            meal: parseInt(document.getElementById('setMeal').value),
+            water: parseInt(document.getElementById('setWater').value)
+        };
+        await setDoc(doc(db, "users", currentUser.uid, "config", "settings"), userPrefs);
+        updateGreeting();
+        calculate();
+        toggleSettings(false);
+    };
+
+    function updateGreeting() {
+        const hr = new Date().getHours();
+        let greet = "Good Night";
+        if (hr < 12) greet = "Good Morning";
+        else if (hr < 17) greet = "Good Afternoon";
+        else if (hr < 21) greet = "Good Evening";
+        document.getElementById('greetText').innerText = `${greet}, ${userPrefs.name}!`;
+    }
+
+    // --- LOGIC ENGINE ---
     function sync() {
         if (unsub) unsub();
         const mKey = `${viewDate.getFullYear()}_${viewDate.getMonth()}`;
-        const ref = doc(db, "users", currentUser.uid, "logs", mKey);
-        
-        document.getElementById('syncToast').style.display = 'block';
-        unsub = onSnapshot(ref, (d) => {
+        unsub = onSnapshot(doc(db, "users", currentUser.uid, "logs", mKey), (d) => {
             logs = d.data() || {};
             render();
-            document.getElementById('syncToast').style.display = 'none';
         });
     }
 
-    // --- CORE RENDERING ---
     function render() {
-        const isCurrentMonth = viewDate.getMonth() === today.getMonth() && viewDate.getFullYear() === today.getFullYear();
-        const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-        
+        const isCurrent = viewDate.getMonth() === today.getMonth() && viewDate.getFullYear() === today.getFullYear();
         document.getElementById('monLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-        
         const list = document.getElementById('logList');
         list.innerHTML = '';
 
-        for (let i = 1; i <= daysInMonth; i++) {
-            const data = logs[i] || { l: 0, d: 0, w: 0 };
-            const isToday = isCurrentMonth && i === today.getDate();
-            const rowDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), i);
-            
+        for (let i = 1; i <= new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate(); i++) {
+            const d = logs[i] || { l: 0, d: 0, w: 0 };
             const row = document.createElement('div');
-            row.className = `day-row ${!isCurrentMonth ? 'locked' : ''} ${isToday ? 'today' : ''}`;
-            
+            row.className = `day-row ${!isCurrent ? 'locked' : ''} ${isCurrent && i === today.getDate() ? 'today' : ''}`;
             row.innerHTML = `
-                <div class="date-col">
-                    <div class="num">${i}</div>
-                    <div class="day">${rowDate.toLocaleDateString('en-IN', { weekday: 'short' })}</div>
-                </div>
-                <div class="pill ${data.l ? 'on' : ''}" onclick="update(${i}, 'l')"><span>Lunch</span></div>
-                <div class="pill ${data.d ? 'on' : ''}" onclick="update(${i}, 'd')"><span>Dinner</span></div>
-                <div class="pill ${data.w ? 'on' : ''}" onclick="update(${i}, 'w')"><span>Water</span></div>
+                <div style="text-align:center;"><div style="font-weight:800;">${i}</div></div>
+                <div class="pill ${d.l ? 'on' : ''}" onclick="update(${i}, 'l')"><span>Lunch</span></div>
+                <div class="pill ${d.d ? 'on' : ''}" onclick="update(${i}, 'd')"><span>Dinner</span></div>
+                <div class="pill ${d.w ? 'on' : ''}" onclick="update(${i}, 'w')"><span>Water</span></div>
             `;
             list.appendChild(row);
         }
-        
-        // Disable Report if it's a future month
-        const isFuture = viewDate > today;
-        document.getElementById('billBtn').disabled = isFuture;
-
         calculate();
     }
 
     window.update = async (day, type) => {
-        // Prevent editing if not current month
-        const isCurrentMonth = viewDate.getMonth() === today.getMonth() && viewDate.getFullYear() === today.getFullYear();
-        if (!isCurrentMonth) return;
-
+        if (viewDate.getMonth() !== today.getMonth()) return;
         const dObj = logs[day] || { l: 0, d: 0, w: 0 };
         dObj[type] = dObj[type] ? 0 : 1;
-        
-        const mKey = `${viewDate.getFullYear()}_${viewDate.getMonth()}`;
-        await setDoc(doc(db, "users", currentUser.uid, "logs", mKey), { [day]: dObj }, { merge: true });
+        await setDoc(doc(db, "users", currentUser.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: dObj }, { merge: true });
     };
 
     function calculate() {
         let m = 0, w = 0;
         Object.values(logs).forEach(d => { if(d.l) m++; if(d.d) m++; if(d.w) w++; });
-        const total = (m * rates.meal) + (w * rates.water);
-        
-        document.getElementById('totalVal').innerText = `₹${total.toLocaleString('en-IN')}`;
+        document.getElementById('totalVal').innerText = `₹${((m * userPrefs.meal) + (w * userPrefs.water)).toLocaleString('en-IN')}`;
         document.getElementById('summary').innerText = `${m} Meals • ${w} Water Units`;
     }
 
-    window.changeMonth = (val) => {
-        viewDate.setMonth(viewDate.getMonth() + val);
-        sync();
-    };
+    window.changeMonth = (v) => { viewDate.setMonth(viewDate.getMonth() + v); sync(); };
 
     window.shareReport = () => {
-        let m = 0, w = 0;
-        Object.values(logs).forEach(d => { if(d.l) m++; if(d.d) m++; if(d.w) w++; });
-        const monthStr = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-        const isPast = viewDate < new Date(today.getFullYear(), today.getMonth(), 1);
-        
-        const header = isPast ? `📜 FINAL BILL: ${monthStr}` : `⏳ DRAFT BILL: ${monthStr}`;
-        const msg = `${header}\n------------------\n👤 Diner: ${currentUser.displayName}\n🍱 Meals: ${m}\n💧 Water: ${w}\n💰 Total: ₹${(m*rates.meal)+(w*rates.water)}\n------------------\n_Generated via VetTrack Luxe_`;
-        
+        let m = 0, w = 0; Object.values(logs).forEach(d => { if(d.l) m++; if(d.d) m++; if(d.w) w++; });
+        const msg = `*VETTRACK LUXE BILL*\n👤 Diner: ${userPrefs.name}\n🗓 Month: ${document.getElementById('monLabel').innerText}\n🍱 Meals: ${m}\n💧 Water: ${w}\n💰 Total: ₹${(m * userPrefs.meal) + (w * userPrefs.water)}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
     };
 </script>
-
 </body>
 </html>
