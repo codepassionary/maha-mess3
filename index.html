@@ -7,149 +7,153 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.3);
-            --bg: #0F172A; --card: #1E293B; --surface: #334155;
-            --text: #F8FAFC; --sub: #94A3B8;
+            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
+            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
+            --text: #FFFFFF; --sub: #94A3B8;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; scroll-behavior: smooth; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
             font-family: 'Plus Jakarta Sans', sans-serif;
             padding-bottom: 40px; padding-top: env(safe-area-inset-top);
-            overflow-x: hidden;
+            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
+                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
+            background-attachment: fixed;
         }
 
         .container { max-width: 480px; margin: 0 auto; padding: 25px; }
 
-        /* WELCOME SCREEN */
-        #welcomeScreen { 
-            position: fixed; inset: 0; background: var(--bg); z-index: 10000; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-        }
-        .logo-wrap { position: relative; margin-bottom: 30px; }
-        .logo-main { font-family: 'Outfit'; font-size: 56px; font-weight: 900; letter-spacing: -2px; margin: 0; }
-        .glow-orb { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; background: var(--p); filter: blur(60px); opacity: 0.4; z-index: -1; }
+        /* HEADER & AVATAR */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+        .greet-p { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        .user-h1 { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
+        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
+        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
 
-        /* HEADER */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .greet-p { margin: 0; font-size: 13px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; }
-        .user-h1 { font-family: 'Outfit'; font-size: 32px; margin: 0; font-weight: 800; letter-spacing: -1px; }
-        .pfp { width: 50px; height: 50px; border-radius: 16px; border: 2px solid var(--surface); cursor: pointer; object-fit: cover; }
-
-        /* STAT CARD + QUICK LOG */
+        /* STAT CARD - REDESIGNED */
         .stat-card {
-            background: linear-gradient(160deg, #FF8C00 0%, #F39C12 100%);
-            padding: 25px; border-radius: 35px; margin-bottom: 35px;
-            box-shadow: 0 25px 50px -12px var(--p-glow);
+            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
+            padding: 30px; border-radius: 35px; margin-bottom: 30px;
+            box-shadow: 0 20px 40px -10px var(--p-glow);
             position: relative; overflow: hidden;
             display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .stat-left { z-index: 2; }
-        .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.8); }
-        .total-val { font-family: 'Outfit'; font-size: 44px; font-weight: 900; margin: 2px 0; color: white; letter-spacing: -2px; }
+        .stat-card::after { content: ""; position: absolute; width: 150px; height: 150px; background: white; filter: blur(50px); opacity: 0.15; top: -50px; right: -50px; border-radius: 50%; }
+        
+        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
+        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
         
         .quick-log-btn {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.25);
-            color: white; padding: 12px; border-radius: 22px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 14px; border-radius: 24px;
             display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
-            z-index: 2; min-width: 105px; text-align: center;
+            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2; min-width: 110px;
         }
-        .quick-log-btn.done { background: white; color: var(--p); border-color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .quick-log-btn:active { transform: scale(0.9); }
-        .quick-log-btn i { font-style: normal; font-size: 20px; margin-bottom: 2px; }
+        .quick-log-btn.done { background: white; color: var(--p); border-color: white; transform: scale(1.05); }
+        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
         /* NAV PILL */
         .nav-pill { 
-            display: flex; align-items: center; background: var(--card); padding: 6px; 
-            border-radius: 20px; border: 1px solid var(--surface); margin-bottom: 25px;
+            display: flex; align-items: center; background: var(--card); padding: 8px; 
+            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
+            backdrop-filter: blur(10px);
         }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 40px; height: 40px; border-radius: 15px; cursor: pointer; }
-        .nav-pill span { flex: 1; text-align: center; font-weight: 700; font-size: 14px; color: var(--text); }
+        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; transition: 0.2s; }
+        .nav-pill button:active { transform: scale(0.9); }
+        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); letter-spacing: 0.5px; }
 
-        /* GRID */
+        /* GRID LOGS */
         .day-item { 
-            display: grid; grid-template-columns: 65px 1fr 1fr 1fr; gap: 10px; align-items: center; 
-            padding: 16px; background: var(--card); border-radius: 28px; margin-bottom: 14px;
-            border: 1px solid var(--surface); transition: all 0.3s ease;
+            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
+            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
+            border: 1px solid var(--surface); backdrop-filter: blur(10px);
+            transition: 0.3s;
         }
-        .day-item.is-today { border-color: var(--p); background: #1E293B; }
-        .date-circ .n { font-family: 'Outfit'; font-size: 24px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
-        .date-circ .d { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
+        .day-item.is-today { border-color: rgba(255,140,0,0.5); background: rgba(255,140,0,0.05); border-width: 1.5px; }
+        
+        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; margin-bottom: 2px; }
+        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; }
 
         .item-pill { 
-            height: 55px; border-radius: 20px; border: 1px solid var(--surface); 
+            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.2s;
+            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s ease;
         }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 8px 15px -5px var(--p-glow); }
-        .item-pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; margin-top: 2px; }
+        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
+        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
 
-        /* SHEETS */
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: flex-end; }
-        .sheet { background: var(--card); width: 100%; border-radius: 40px 40px 0 0; padding: 35px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+        /* SHEETS & FORMS */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
+        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
         .sheet.up { transform: translateY(0); }
+        .sheet h2 { font-family: 'Outfit'; font-size: 32px; margin: 0 0 25px 0; letter-spacing: -1px; }
         
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 16px; background: var(--bg); border: 1px solid var(--surface); border-radius: 18px; color: white; font-size: 16px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.5px; }
+        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
         
-        .btn-prime { background: var(--p); color: white; padding: 20px; border-radius: 24px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 16px; }
-        .note-tag { grid-column: 1 / -1; font-size: 12px; color: var(--p); background: rgba(255,140,0,0.1); padding: 8px 15px; border-radius: 12px; margin-top: 10px; font-weight: 600; }
+        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; font-size: 16px; box-shadow: 0 10px 25px -5px var(--p-glow); }
+        .note-tag { grid-column: 1 / -1; font-size: 13px; color: var(--p); background: rgba(255,140,0,0.1); padding: 10px 18px; border-radius: 15px; margin-top: 12px; font-weight: 600; border: 1px dashed rgba(255,140,0,0.3); }
+
+        /* WELCOME */
+        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="welcomeScreen">
-    <div class="logo-wrap"><div class="glow-orb"></div><h1 class="logo-main">VetTrack<span style="color:var(--p)">.</span></h1></div>
-    <button class="btn-prime" onclick="login()" style="width: 280px; border-radius: 50px;">Sign In</button>
+    <div class="logo-wrap"><div class="glow-orb"></div><h1 class="logo-main" style="font-family: 'Outfit'; font-size: 60px; font-weight: 900;">VetTrack<span style="color:var(--p)">.</span></h1></div>
+    <button class="btn-prime" onclick="login()" style="width: 260px; border-radius: 50px;">Get Started</button>
 </div>
 
 <div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
     <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2 style="margin-top:0">Settings</h2>
+        <h2>Account</h2>
         <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
             <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
         </div>
-        <button class="btn-prime" onclick="saveSettings()">Save Changes</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:700;">Sign Out</button>
+        <button class="btn-prime" onclick="saveSettings()">Apply Changes</button>
+        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:25px; font-weight:800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Sign Out</button>
     </div>
 </div>
 
 <div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
     <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle" style="margin-top:0">Notes</h2>
-        <div class="form-group"><textarea id="noteInput" placeholder="Add guest meals or notes..."></textarea></div>
-        <button class="btn-prime" onclick="saveNote()">Save Note</button>
+        <h2 id="noteTitle">Day Note</h2>
+        <textarea id="noteInput" rows="4" placeholder="Mention guests or special items..."></textarea>
+        <button class="btn-prime" onclick="saveNote()">Save to Log</button>
     </div>
 </div>
 
 <div class="container">
     <div class="header">
         <div class="greeting-text"><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
-        <img id="userPfp" class="pfp" src="" onclick="openSettings()">
+        <div class="pfp-wrap"><img id="userPfp" class="pfp" src="" onclick="openSettings()"></div>
     </div>
 
     <div class="stat-card">
         <div class="stat-left">
-            <div class="label">Total Dues</div>
+            <div class="label">Balance Due</div>
             <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:11px; font-weight:700; opacity:0.8">0 Units</div>
+            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
         </div>
         <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
             <i id="quickIcon">⚡</i>
-            <span id="quickText">Check Status</span>
+            <span id="quickText">Loading...</span>
         </div>
     </div>
 
     <div class="nav-pill">
-        <button onclick="changeMonth(-1)">‹</button><span id="monthLabel">Month</span><button onclick="changeMonth(1)">›</button>
+        <button onclick="changeMonth(-1)">‹</button>
+        <span id="monthLabel">Current Month</span>
+        <button onclick="changeMonth(1)">›</button>
     </div>
 
     <div id="logsGrid"></div>
@@ -202,28 +206,13 @@
         const icon = document.getElementById('quickIcon');
         const text = document.getElementById('quickText');
 
-        if (isMarked) {
-            btn.classList.add('done');
-            icon.innerText = '✅';
-            text.innerText = `${typeLabel} Marked`;
-        } else {
-            btn.classList.remove('done');
-            icon.innerText = '⚡';
-            text.innerText = `Mark ${typeLabel}`;
-        }
+        if (isMarked) { btn.classList.add('done'); icon.innerText = '✅'; text.innerText = `${typeLabel} Done`; } 
+        else { btn.classList.remove('done'); icon.innerText = '⚡'; text.innerText = `Mark ${typeLabel}`; }
     }
 
     function syncData() {
         onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
-            logs = d.data() || {}; 
-            renderGrid();
-            updateQuickBtn();
-            if(viewDate.getMonth() === todayDate.getMonth()) {
-                setTimeout(() => {
-                    const todayEl = document.querySelector('.is-today');
-                    if(todayEl) todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 500);
-            }
+            logs = d.data() || {}; renderGrid(); updateQuickBtn();
         });
     }
 
@@ -232,9 +221,7 @@
         const hour = todayDate.getHours();
         const type = hour < 16 ? 'l' : 'd';
         const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        
-        if(obj[type] === 1) return; // Already marked
-        
+        if(obj[type] === 1) return;
         obj[type] = 1;
         await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
     };
