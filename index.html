@@ -11,53 +11,57 @@
             --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
         
         .container { max-width: 650px; margin: 0 auto; }
-        .admin-header h1 { font-family: 'Outfit'; font-size: 32px; margin: 0; }
         
-        /* Stats & Search */
-        .master-stats { display: flex; gap: 15px; margin: 20px 0; }
-        .stat-box { flex: 1; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--surface); }
-        .stat-box small { font-size: 10px; color: var(--sub); font-weight: 800; text-transform: uppercase; }
-        .stat-box div { font-family: 'Outfit'; font-size: 24px; color: var(--p); }
-
-        /* Student List */
-        .student-row {
-            background: var(--card); padding: 15px 20px; border-radius: 18px; margin-bottom: 10px;
-            display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--surface);
-            cursor: pointer; transition: 0.2s;
+        /* Header & Search */
+        .admin-header { margin-bottom: 25px; }
+        .admin-header h1 { font-family: 'Outfit'; font-size: 32px; margin: 0; letter-spacing: -1px; }
+        .search-box {
+            width: 100%; padding: 15px 20px; background: var(--card); border: 1px solid var(--surface);
+            border-radius: 15px; color: white; margin-top: 15px; font-family: inherit;
         }
-        .student-row:hover { border-color: var(--p); }
 
-        /* Full Edit Modal */
+        /* Stats Bar */
+        .master-stats { display: flex; gap: 12px; margin-bottom: 25px; }
+        .stat-box { flex: 1; background: var(--card); padding: 18px; border-radius: 22px; border: 1px solid var(--surface); }
+        .stat-box small { font-size: 10px; color: var(--sub); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .stat-box div { font-family: 'Outfit'; font-size: 26px; color: var(--p); font-weight: 800; }
+
+        /* Student Row with Icons */
+        .student-row {
+            background: var(--card); padding: 12px 18px; border-radius: 22px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--surface);
+            cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .student-row:hover { border-color: var(--p); background: rgba(255,140,0,0.05); transform: translateY(-2px); }
+        
+        .student-meta { display: flex; align-items: center; gap: 15px; }
+        .student-icon { 
+            width: 48px; height: 48px; border-radius: 16px; 
+            object-fit: cover; border: 2px solid var(--surface);
+            background: var(--bg);
+        }
+        .student-name { font-weight: 700; font-size: 16px; display: block; }
+        .student-sub { font-size: 11px; color: var(--sub); font-weight: 600; }
+
+        /* Detail Modal */
         .modal {
             position: fixed; inset: 0; background: var(--bg); z-index: 20000;
             display: none; flex-direction: column; padding: 25px; overflow-y: auto;
         }
         .modal.active { display: flex; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
-        /* Detailed Day Table */
-        .detail-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .detail-table th { text-align: left; font-size: 11px; color: var(--sub); padding: 10px; border-bottom: 1px solid var(--surface); }
-        .detail-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .detail-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        .detail-table th { text-align: left; color: var(--sub); padding: 10px; text-transform: uppercase; font-size: 10px; }
+        .detail-table td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .input-mini { background: #000; border: 1px solid var(--surface); color: white; padding: 6px; border-radius: 8px; width: 45px; text-align: center; }
+        .btn-p { background: var(--p); color: white; border: none; padding: 12px 25px; border-radius: 15px; font-weight: 800; cursor: pointer; }
         
-        .input-mini {
-            background: rgba(0,0,0,0.3); border: 1px solid var(--surface); color: white;
-            padding: 5px; border-radius: 5px; width: 45px; text-align: center;
-        }
-        .input-note { width: 100%; background: transparent; border: none; color: var(--sub); font-size: 12px; }
-        
-        .btn { padding: 10px 20px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; }
-        .btn-p { background: var(--p); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--surface); color: white; }
-        
-        .invoice-box {
-            background: white; color: black; padding: 40px; border-radius: 5px;
-            margin-top: 20px; display: none; font-family: 'Courier New', Courier, monospace;
-        }
+        #loader { text-align: center; padding: 50px; color: var(--p); font-weight: 800; }
     </style>
 </head>
 <body>
@@ -65,47 +69,39 @@
 <div class="container" id="mainDashboard">
     <div class="admin-header">
         <h1>Control Tower</h1>
-        <p style="color:var(--sub)">Manage every student, plate, and rupee.</p>
+        <input type="text" id="studentSearch" class="search-box" placeholder="Search by student name..." oninput="filterData()">
     </div>
 
     <div class="master-stats">
-        <div class="stat-box"><small>Revenue</small><div id="totalRev">₹0</div></div>
-        <div class="stat-box"><small>Total Plates</small><div id="totalPlates">0</div></div>
+        <div class="stat-box"><small>Total Rev</small><div id="totalRev">₹0</div></div>
+        <div class="stat-box"><small>Plates</small><div id="totalPlates">0</div></div>
     </div>
 
+    <div id="loader">Syncing Students...</div>
     <div id="studentList"></div>
 </div>
 
 <div id="editModal" class="modal">
-    <div class="modal-header">
-        <button class="btn btn-outline" onclick="closeModal()">← Close</button>
-        <button class="btn btn-p" onclick="generateInvoice()">Download Bill</button>
+    <div style="display:flex; justify-content: space-between; align-items: center;">
+        <button onclick="closeModal()" style="background:none; border:none; color:var(--sub); font-weight:800; cursor:pointer;">← BACK</button>
+        <button class="btn-p" onclick="window.print()">PRINT BILL</button>
     </div>
     
-    <h2 id="editName" style="font-family:'Outfit'; margin:0">Student Name</h2>
-    <div style="display:flex; gap:10px; margin:15px 0;">
-        <div class="stat-box" style="padding:10px">
-            <small>Personal Meal Price</small>
-            <input type="number" id="overridePrice" class="input-mini" style="width:80px; font-size:16px;">
+    <div style="display:flex; align-items:center; gap:15px; margin-top:30px;">
+        <img id="editIcon" class="student-icon" src="" style="width:60px; height:60px;">
+        <div>
+            <h2 id="editName" style="font-family:'Outfit'; margin:0">Name</h2>
+            <p id="editEmail" style="font-size:12px; color:var(--sub); margin:0">email@student.com</p>
         </div>
     </div>
 
     <table class="detail-table">
         <thead>
-            <tr>
-                <th>Date</th>
-                <th>L</th>
-                <th>D</th>
-                <th>Guests (L/D)</th>
-                <th>Water</th>
-                <th>Notes</th>
-            </tr>
+            <tr><th>Day</th><th>L</th><th>D</th><th>Guests</th><th>W</th></tr>
         </thead>
         <tbody id="detailBody"></tbody>
     </table>
 </div>
-
-<div id="invoiceContainer" class="invoice-box"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -119,47 +115,71 @@
     };
 
     const app = initializeApp(firebaseConfig), db = getFirestore(app), auth = getAuth(app), provider = new GoogleAuthProvider();
-    let currentUid, currentLogs, currentConfig;
+    let allStudents = [], currentUid, currentLogs;
 
     onAuthStateChanged(auth, u => { if(u) fetchAll(); else signInWithPopup(auth, provider); });
 
     async function fetchAll() {
         const snap = await getDocs(collection(db, "users"));
-        const list = document.getElementById('studentList');
         const monthKey = `${new Date().getFullYear()}_${new Date().getMonth()}`;
-        list.innerHTML = "";
-        let rev = 0, plates = 0;
-
+        allStudents = [];
+        
         for(const d of snap.docs) {
             const u = d.data();
             const lSnap = await getDoc(doc(db, "users", d.id, "logs", monthKey));
             const logs = lSnap.exists() ? lSnap.data() : {};
-            
+            allStudents.push({ uid: d.id, ...u, logs });
+        }
+        renderList(allStudents);
+    }
+
+    function renderList(data) {
+        document.getElementById('loader').style.display = 'none';
+        const list = document.getElementById('studentList');
+        list.innerHTML = "";
+        let rev = 0, plates = 0;
+
+        data.forEach(s => {
             let m=0, g=0;
-            Object.values(logs).forEach(v => { 
+            Object.values(s.logs).forEach(v => { 
                 if(v.l) m++; if(v.d) m++; 
                 g += (parseInt(v.lg)||0) + (parseInt(v.dg)||0);
             });
-            
-            const totalBill = (m + g) * (u.mealPrice || 50);
-            rev += totalBill; plates += (m + g);
+            const bill = (m + g) * (s.mealPrice || 50);
+            rev += bill; plates += (m + g);
+
+            // Generate initial-based icon if no photo exists
+            const photo = s.photo || `https://ui-avatars.com/api/?name=${s.name}&background=random&color=fff`;
 
             list.innerHTML += `
-                <div class="student-row" onclick='openDetail("${d.id}", ${JSON.stringify(u)}, ${JSON.stringify(logs)})'>
-                    <div><strong>${u.name}</strong><br><small style="color:var(--sub)">${m+g} total plates</small></div>
-                    <div style="font-family:'Outfit'; color:var(--p)">₹${totalBill}</div>
+                <div class="student-row" onclick='openDetail("${s.uid}")'>
+                    <div class="student-meta">
+                        <img class="student-icon" src="${photo}">
+                        <div>
+                            <span class="student-name">${s.name}</span>
+                            <span class="student-sub">${m+g} Plates logged</span>
+                        </div>
+                    </div>
+                    <div class="student-amt">₹${bill}</div>
                 </div>`;
-        }
+        });
         document.getElementById('totalRev').innerText = "₹" + rev;
         document.getElementById('totalPlates').innerText = plates;
     }
 
-    window.openDetail = (uid, config, logs) => {
-        currentUid = uid; currentLogs = logs; currentConfig = config;
-        document.getElementById('editName').innerText = config.name;
-        document.getElementById('overridePrice').value = config.mealPrice || 50;
+    window.openDetail = (uid) => {
+        const s = allStudents.find(x => x.uid === uid);
+        currentUid = uid; currentLogs = s.logs;
+        document.getElementById('editName').innerText = s.name;
+        document.getElementById('editIcon').src = s.photo || `https://ui-avatars.com/api/?name=${s.name}&background=random&color=fff`;
         document.getElementById('editModal').classList.add('active');
         renderTable();
+    }
+
+    window.filterData = () => {
+        const query = document.getElementById('studentSearch').value.toLowerCase();
+        const filtered = allStudents.filter(s => s.name.toLowerCase().includes(query));
+        renderList(filtered);
     }
 
     window.closeModal = () => { document.getElementById('editModal').classList.remove('active'); fetchAll(); }
@@ -168,60 +188,25 @@
         const body = document.getElementById('detailBody');
         body.innerHTML = "";
         const days = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-
         for(let i=1; i<=days; i++) {
-            const d = currentLogs[i] || { l:0, d:0, lg:0, dg:0, w:0, n:"" };
+            const d = currentLogs[i] || { l:0, d:0, lg:0, dg:0, w:0 };
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${i}</td>
                 <td><input type="checkbox" ${d.l?'checked':''} onchange="update(${i}, 'l', this.checked?1:0)"></td>
                 <td><input type="checkbox" ${d.d?'checked':''} onchange="update(${i}, 'd', this.checked?1:0)"></td>
-                <td>
-                    <input type="number" class="input-mini" value="${d.lg||0}" onchange="update(${i}, 'lg', this.value)">
-                    <input type="number" class="input-mini" value="${d.dg||0}" onchange="update(${i}, 'dg', this.value)">
-                </td>
+                <td><input type="number" class="input-mini" value="${(parseInt(d.lg)||0) + (parseInt(d.dg)||0)}" onchange="update(${i}, 'lg', this.value)"></td>
                 <td><input type="number" class="input-mini" value="${d.w||0}" onchange="update(${i}, 'w', this.value)"></td>
-                <td><input type="text" class="input-note" value="${d.n||''}" placeholder="..." onchange="update(${i}, 'n', this.value)"></td>
             `;
             body.appendChild(tr);
         }
     }
 
     window.update = async (day, field, val) => {
-        if(!currentLogs[day]) currentLogs[day] = { l:0, d:0, lg:0, dg:0, w:0, n:"" };
+        if(!currentLogs[day]) currentLogs[day] = { l:0, d:0, lg:0, dg:0, w:0 };
         currentLogs[day][field] = val;
         const monthKey = `${new Date().getFullYear()}_${new Date().getMonth()}`;
         await setDoc(doc(db, "users", currentUid, "logs", monthKey), { [day]: currentLogs[day] }, { merge: true });
-    }
-
-    window.generateInvoice = () => {
-        const inv = document.getElementById('invoiceContainer');
-        inv.style.display = 'block';
-        let m=0, g=0, w=0;
-        Object.values(currentLogs).forEach(v => { 
-            if(v.l) m++; if(v.d) m++; 
-            g += (parseInt(v.lg)||0) + (parseInt(v.dg)||0);
-            w += (parseInt(v.w)||0);
-        });
-        
-        const price = document.getElementById('overridePrice').value;
-        const total = (m + g) * price;
-
-        inv.innerHTML = `
-            <h2>VETTRACK LUXE STATEMENT</h2>
-            <hr>
-            NAME: ${currentConfig.name}<br>
-            MONTH: ${new Date().toLocaleString('default', { month: 'long' })} ${new Date().getFullYear()}<br>
-            -----------------------------------<br>
-            PERSONAL MEALS:   ${m} x ₹${price}<br>
-            GUEST MEALS:      ${g} x ₹${price}<br>
-            WATER UNITS:      ${w}<br>
-            -----------------------------------<br>
-            TOTAL PAYABLE:    ₹${total}<br>
-            -----------------------------------<br>
-            Generated by Admin Command Center
-        `;
-        window.print();
     }
 </script>
 </body>
