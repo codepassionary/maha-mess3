@@ -1,15 +1,9 @@
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Omni</title>
+    <title>VetTrack Luxe | Cloud</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -23,78 +17,82 @@
             margin: 0; background: var(--bg); color: var(--text); 
             font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 60px;
             overflow-x: hidden; touch-action: pan-y;
-            -webkit-user-select: none; user-select: none;
         }
 
         .container { max-width: 500px; margin: 0 auto; padding: 24px; }
 
-        /* Header & Nav */
+        /* Auth Overlay */
+        #authOverlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 5000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 40px; text-align: center;
+        }
+
+        /* UI Elements */
         .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .month-chip { display: flex; align-items: center; background: var(--card); padding: 8px 16px; border-radius: 100px; border: 1px solid rgba(230, 126, 34, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         .month-chip span { font-weight: 800; font-size: 14px; min-width: 120px; text-align: center; }
 
-        /* Main Bill Card */
         .stat-card {
             position: relative; overflow: hidden; color: white; padding: 30px; border-radius: 40px; 
             margin-bottom: 30px; background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
             box-shadow: 0 20px 40px rgba(211, 84, 0, 0.25);
         }
-        .stat-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .val { font-family: 'Outfit', sans-serif; font-size: 54px; font-weight: 900; line-height: 1; margin: 8px 0; letter-spacing: -2px; }
         
-        /* Smart Auto-Log Button */
         .smart-log-btn {
             background: rgba(255, 255, 255, 0.15); border: 1.5px solid rgba(255, 255, 255, 0.3);
             border-radius: 22px; padding: 12px; display: flex; flex-direction: column;
             align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; min-width: 75px;
         }
-        .smart-log-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.3); }
+        .smart-log-btn:active { transform: scale(0.9); }
         .smart-log-btn svg { width: 22px; height: 22px; fill: white; }
         .smart-log-btn span { font-size: 8px; font-weight: 800; text-transform: uppercase; color: white; }
 
         .wa-btn { 
             background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2); 
             color: white; padding: 14px; border-radius: 18px; font-size: 11px; font-weight: 800; 
-            width: 100%; margin-top: 20px; backdrop-filter: blur(10px); cursor: pointer;
+            width: 100%; margin-top: 20px; cursor: pointer;
         }
 
-        /* Log Rows */
         .log-section { border-radius: var(--radius); border: 1px solid rgba(230, 126, 34, 0.08); background: var(--card); overflow: hidden; }
         .log-row { 
             display: grid; grid-template-columns: 55px 1fr 1fr 1fr; align-items: center; 
-            padding: 14px 8px; border-bottom: 1px solid #FAF3E0; transition: background 0.2s;
+            padding: 14px 8px; border-bottom: 1px solid #FAF3E0;
         }
         .day-num { font-weight: 800; font-size: 19px; color: #5D4037; }
         .day-name { font-size: 10px; font-weight: 700; color: #A1887F; text-transform: uppercase; }
 
-        /* Interactive Pills */
         .pill { 
             height: 54px; border-radius: 18px; border: 1.5px solid #FDF2E9; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            margin: 0 4px; background: #fff; transition: all 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
-            cursor: pointer; gap: 3px; position: relative;
+            margin: 0 4px; background: #fff; cursor: pointer; position: relative;
         }
         .pill svg { width: 18px; height: 18px; fill: #A1887F; }
         .pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #A1887F; }
-        .pill.on { background: var(--p); border-color: var(--p); transform: scale(1.05); }
-        .pill.on svg { fill: white; }
-        .pill.on span { color: white; }
+        .pill.on { background: var(--p); border-color: var(--p); }
+        .pill.on svg, .pill.on span { fill: white; color: white; }
         .pill.locked { opacity: 0.4; cursor: not-allowed; }
 
         .note-dot { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; background: #FFC107; border-radius: 50%; border: 1px solid white; }
 
-        /* Modals */
         .overlay { position: fixed; inset: 0; background: rgba(62, 39, 35, 0.6); display: none; z-index: 2000; backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 24px; }
         .dialog { background: var(--bg); width: 100%; max-width: 400px; border-radius: 35px; padding: 30px; }
-        .input { width: 100%; padding: 16px; border-radius: 18px; border: 2px solid #FAD7A0; margin: 10px 0; font-family: inherit; font-size: 16px; -webkit-user-select: auto; }
+        .input { width: 100%; padding: 16px; border-radius: 18px; border: 2px solid #FAD7A0; margin: 10px 0; font-size: 16px; }
         .btn-p { background: var(--p); color: white; width: 100%; padding: 18px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; }
 
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 14px 28px; border-radius: 100px; font-weight: 700; display: none; z-index: 3000; font-size: 13px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 14px 28px; border-radius: 100px; font-weight: 700; display: none; z-index: 6000; font-size: 13px; }
     </style>
 </head>
 <body>
 
 <div id="toast">Saved!</div>
+
+<div id="authOverlay">
+    <h1 style="font-family:Outfit; font-size:42px; margin:0;">VetTrack <span style="color:var(--p)">Luxe</span></h1>
+    <p style="color:var(--sub); margin-bottom:30px; font-weight:600;">Cloud-synced meal ledger.</p>
+    <button onclick="login()" class="btn-p" style="max-width:280px;">Continue with Google</button>
+</div>
 
 <div class="container">
     <div class="nav-header">
@@ -103,6 +101,244 @@
             <span id="monLab"></span>
             <button onclick="moveMon(1)" style="border:none; background:none; color:var(--p); font-size:20px;">›</button>
         </div>
+        <div style="display:flex; gap:8px;">
+            <button onclick="toggleAcc()" style="background:#fff; border:1px solid #eee; width:44px; height:44px; border-radius:15px;">⚙️</button>
+            <button onclick="logout()" style="background:#fff; border:1px solid #eee; width:44px; height:44px; border-radius:15px;">🚪</button>
+        </div>
+    </div>
+
+    <div class="welcome-section">
+        <h2 id="greet" style="margin:0; font-size:36px; font-family:Outfit;">Hello!</h2>
+        <p id="subGreet" style="color:var(--sub); margin:5px 0 25px 0; font-weight:600; font-size: 14px;">Hold any row for notes & extras.</p>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header" style="display:flex; justify-content:space-between;">
+            <div>
+                <div style="font-size:11px; font-weight:800; opacity:0.85;">TOTAL LEDGER</div>
+                <div class="val" id="totalVal">₹0</div>
+            </div>
+            <div class="smart-log-btn" onclick="autoLog()" id="smartLogBtn">
+                <svg id="smartIcon"><use href="#icon-lunch"/></svg>
+                <span id="smartLabel">Log</span>
+            </div>
+        </div>
+        <div id="summary" style="font-size:13px; font-weight:700; opacity:0.9;">0 Meals • 0 Water</div>
+        <button id="waBtn" class="wa-btn" onclick="share()">SEND WHATSAPP REPORT ↗</button>
+    </div>
+
+    <div class="log-section" id="logList"></div>
+</div>
+
+<div id="accOverlay" class="overlay" onclick="toggleAcc()">
+    <div class="dialog" onclick="event.stopPropagation()">
+        <h2 style="font-family:Outfit; margin:0 0 20px 0;">Settings</h2>
+        <input type="text" id="uName" class="input" placeholder="Your Name">
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="uMeal" class="input" placeholder="Meal ₹">
+            <input type="number" id="uWat" class="input" placeholder="Water ₹">
+        </div>
+        <button class="btn-p" onclick="savePrefs()">Save Preferences</button>
+    </div>
+</div>
+
+<div id="noteOverlay" class="overlay" onclick="closeNote()">
+    <div class="dialog" onclick="event.stopPropagation()">
+        <h2 id="noteTitle" style="margin:0; font-family:Outfit;">Day Detail</h2>
+        <input type="number" id="nExtra" class="input" placeholder="Extra Meals (e.g. 1)">
+        <input type="text" id="nText" class="input" placeholder="Notes (e.g. Guest)">
+        <button class="btn-p" onclick="saveNote()">Update Day</button>
+    </div>
+</div>
+
+<svg style="display:none">
+    <symbol id="icon-lunch" viewBox="0 0 24 24"><path d="M22 9h-4.2c-.4-2.3-2.1-4.2-4.4-4.8l1.3-1.3c.4-.4.4-1 0-1.4s-1-.4-1.4 0l-2.7 2.7c-.2.2-.3.4-.3.7s.1.5.3.7l2.7 2.7c.4.4 1 .4 1.4 0s.4-1 0-1.4l-1.3-1.3c1.3.4 2.3 1.5 2.7 2.8H2v2h20V9zM2 13v1c0 3.9 3.1 7 7 7h6c3.9 0 7-3.1 7-7v-1H2z"/></symbol>
+    <symbol id="icon-dinner" viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.1 1.6 3.9 3.7 4l-1.7 8h2.1l1.4-6.5L10 21h2l1-9h1c1.1 0 2-.9 2-2V2h-2v7h-1zm9 4c-1.7 0-3-1.3-3-3V2h-2v8c0 2.8 2.2 5 5 5v6h2v-6c0-1.7-1.3-3-3-3z"/></symbol>
+    <symbol id="icon-water" viewBox="0 0 24 24"><path d="M12 21.5c-3.6 0-6.5-2.9-6.5-6.5 0-3.3 4.2-9.6 5.8-11.8.4-.5 1.1-.5 1.5 0 1.6 2.2 5.8 8.5 5.8 11.8 0 3.6-2.9 6.5-6.5 6.5z"/></symbol>
+</svg>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 1. CONFIGURATION (Replace this with yours)
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT.firebaseapp.com",
+        projectId: "YOUR_PROJECT",
+        storageBucket: "YOUR_PROJECT.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let vDate = new Date(), tDate = new Date(), currentUser = null, activeDay = null, pressTimer;
+    let prefs = { n: "User", m: 50, w: 30 };
+    let logs = {};
+
+    // --- AUTH FUNCTIONS ---
+    window.login = () => signInWithPopup(auth, provider);
+    window.logout = () => signOut(auth);
+
+    onAuthStateChanged(auth, async (user) => {
+        const overlay = document.getElementById('authOverlay');
+        if (user) {
+            currentUser = user;
+            overlay.style.display = 'none';
+            await syncPrefs();
+            startDataListener();
+            updateSmartIcon();
+        } else {
+            currentUser = null;
+            overlay.style.display = 'flex';
+        }
+    });
+
+    // --- DATA SYNC ---
+    async function syncPrefs() {
+        const pDoc = await getDoc(doc(db, "users", currentUser.uid, "settings", "prefs"));
+        if (pDoc.exists()) prefs = pDoc.data();
+        else prefs.n = currentUser.displayName.split(' ')[0];
+        document.getElementById('greet').innerText = `Hello, ${prefs.n}!`;
+    }
+
+    function startDataListener() {
+        const key = `${vDate.getFullYear()}_${vDate.getMonth()}`;
+        const docRef = doc(db, "users", currentUser.uid, "logs", key);
+        
+        onSnapshot(docRef, (doc) => {
+            logs = doc.data() || {};
+            refreshUI();
+        });
+    }
+
+    async function pushDay(day, data) {
+        const key = `${vDate.getFullYear()}_${vDate.getMonth()}`;
+        await setDoc(doc(db, "users", currentUser.uid, "logs", key), { [day]: data }, { merge: true });
+    }
+
+    // --- UI LOGIC ---
+    function refreshUI() {
+        document.getElementById('monLab').innerText = vDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+        const isPast = (vDate.getFullYear() * 12 + vDate.getMonth()) < (tDate.getFullYear() * 12 + tDate.getMonth());
+        draw(isPast);
+        calc();
+    }
+
+    function draw(locked) {
+        const days = new Date(vDate.getFullYear(), vDate.getMonth() + 1, 0).getDate();
+        const list = document.getElementById('logList');
+        list.innerHTML = '';
+
+        for(let i=1; i<=days; i++) {
+            const d = logs[i] || {l:0, d:0, w:0, x:0, n:""};
+            const row = document.createElement('div');
+            row.className = 'log-row';
+            
+            row.addEventListener('touchstart', () => { if(!locked) pressTimer = setTimeout(() => openNote(i), 600); });
+            row.addEventListener('touchend', () => clearTimeout(pressTimer));
+
+            row.innerHTML = `
+                <div><div class="day-num">${i}</div><div class="day-name">${new Date(vDate.getFullYear(), vDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</div></div>
+                <div class="pill ${d.l?'on':''} ${locked?'locked':''}" onclick="toggleCloud(${i},'l')"><svg><use href="#icon-lunch"/></svg><span>Lunch</span></div>
+                <div class="pill ${d.d?'on':''} ${locked?'locked':''}" onclick="toggleCloud(${i},'d')"><svg><use href="#icon-dinner"/></svg><span>Dinner</span></div>
+                <div class="pill ${d.w?'on':''} ${locked?'locked':''}" onclick="toggleCloud(${i},'w')"><svg><use href="#icon-water"/></svg><span>Water</span>${(d.x>0||d.n)?'<div class="note-dot"></div>':''}</div>
+            `;
+            list.appendChild(row);
+        }
+    }
+
+    window.toggleCloud = (day, type) => {
+        const d = logs[day] || {l:0, d:0, w:0, x:0, n:""};
+        d[type] = d[type] ? 0 : 1;
+        pushDay(day, d);
+    };
+
+    function calc() {
+        let m=0, w=0, x=0;
+        Object.values(logs).forEach(v => { if(v.l)m++; if(v.d)m++; if(v.w)w++; if(v.x)x+=v.x; });
+        const total = ((m + x) * prefs.m) + (w * prefs.w);
+        document.getElementById('totalVal').innerText = `₹${total}`;
+        document.getElementById('summary').innerText = `${m + x} Meals • ${w} Water`;
+    }
+
+    window.autoLog = () => {
+        const hr = new Date().getHours();
+        const type = (hr >= 5 && hr < 16) ? 'l' : 'd';
+        const day = new Date().getDate();
+        window.toggleCloud(day, type);
+        toast("Logged! 🥘");
+    };
+
+    function updateSmartIcon() {
+        const hr = new Date().getHours();
+        const btn = document.getElementById('smartLogBtn');
+        if (hr >= 5 && hr < 16) {
+            document.getElementById('smartIcon').innerHTML = '<use href="#icon-lunch"/>';
+            document.getElementById('smartLabel').innerText = "Log Lunch";
+        } else {
+            document.getElementById('smartIcon').innerHTML = '<use href="#icon-dinner"/>';
+            document.getElementById('smartLabel').innerText = "Log Dinner";
+        }
+    }
+
+    window.moveMon = (d) => { vDate.setMonth(vDate.getMonth() + d); startDataListener(); };
+    window.toggleAcc = () => { 
+        const s = document.getElementById('accOverlay'); 
+        if(s.style.display === 'flex') s.style.display = 'none';
+        else {
+            document.getElementById('uName').value = prefs.n;
+            document.getElementById('uMeal').value = prefs.m;
+            document.getElementById('uWat').value = prefs.w;
+            s.style.display = 'flex';
+        }
+    };
+
+    window.savePrefs = async () => {
+        prefs = { n: document.getElementById('uName').value, m: parseInt(document.getElementById('uMeal').value), w: parseInt(document.getElementById('uWat').value) };
+        await setDoc(doc(db, "users", currentUser.uid, "settings", "prefs"), prefs);
+        window.toggleAcc();
+        toast("Settings Saved");
+    };
+
+    function openNote(d) {
+        activeDay = d;
+        const data = logs[d] || {x:0, n:""};
+        document.getElementById('noteTitle').innerText = "Day " + d;
+        document.getElementById('nExtra').value = data.x || "";
+        document.getElementById('nText').value = data.n || "";
+        document.getElementById('noteOverlay').style.display = 'flex';
+    }
+
+    window.saveNote = async () => {
+        const d = logs[activeDay] || {l:0, d:0, w:0};
+        d.x = parseInt(document.getElementById('nExtra').value) || 0;
+        d.n = document.getElementById('nText').value;
+        await pushDay(activeDay, d);
+        window.closeNote();
+    };
+
+    window.closeNote = () => document.getElementById('noteOverlay').style.display = 'none';
+    
+    function toast(m) { 
+        const t = document.getElementById('toast'); 
+        t.innerText = m; t.style.display = 'block'; 
+        setTimeout(() => t.style.display='none', 2000); 
+    }
+
+    window.share = () => {
+        let m=0, w=0, x=0; Object.values(logs).forEach(v=>{if(v.l)m++; if(v.d)m++; if(v.w)w++; if(v.x)x+=v.x;});
+        const msg = `*VETTRACK REPORT: ${document.getElementById('monLab').innerText}*\n👤 Diner: ${prefs.n}\n🍱 Meals: ${m+x}\n💧 Water: ${w}\n💰 Total: ₹${((m+x)*prefs.m)+(w*prefs.w)}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
+    };
+</script>
+</body>
+</html>
         <button onclick="toggleAcc()" style="background:#fff; border:1px solid #eee; width:44px; height:44px; border-radius:15px;">⚙️</button>
     </div>
 
