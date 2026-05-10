@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Pay & Play</title>
+    <title>VetTrack Luxe | Smart Mess</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         :root { 
             --p: #FF8C00; --bg: #05070A; --card: rgba(17, 24, 39, 0.8); 
@@ -16,77 +15,95 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px 20px 100px 20px; }
 
-        /* Unified Bill Section */
-        .bill-widget {
-            background: linear-gradient(145deg, #1e1b4b 0%, #05070A 100%);
-            border: 1px solid var(--surface); padding: 25px; border-radius: 32px;
-            margin-bottom: 25px; position: relative; overflow: hidden;
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .profile-btn { width: 45px; height: 45px; border-radius: 15px; border: 2px solid var(--surface); object-fit: cover; }
+
+        /* Waste Prevention Banner */
+        .waste-banner {
+            background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 15px; border-radius: 20px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center;
         }
-        .bill-widget::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,140,0,0.1) 0%, transparent 70%); pointer-events: none; }
+        .waste-banner i { font-size: 20px; }
+        .waste-banner small { font-size: 11px; color: var(--success); font-weight: 700; line-height: 1.3; }
+
+        .bill-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #05070A 100%);
+            padding: 25px; border-radius: 32px; margin-bottom: 25px; border: 1px solid var(--surface);
+        }
+        .bill-amt { font-family: 'Outfit'; font-size: 42px; font-weight: 900; margin: 5px 0; color: var(--p); }
+
+        /* Attendance Toggles */
+        .toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .toggle-card { 
+            background: var(--card); border: 1px solid var(--surface); 
+            padding: 20px; border-radius: 24px; text-align: center; cursor: pointer; transition: 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .toggle-card.active { border-color: var(--p); background: rgba(255,140,0,0.05); }
         
-        .amt-big { font-family: 'Outfit'; font-size: 48px; font-weight: 900; color: white; margin: 10px 0; }
-        .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 800; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.1); }
-        .paid { background: rgba(16, 185, 129, 0.2); color: var(--success); border-color: var(--success); }
-        .unpaid { background: rgba(239, 68, 68, 0.2); color: var(--danger); border-color: var(--danger); }
+        /* Deadline Locked Style */
+        .toggle-card.locked { opacity: 0.5; cursor: not-allowed; grayscale: 1; }
+        .lock-icon { font-size: 10px; color: var(--sub); display: block; margin-top: 5px; font-weight: 800; }
 
-        /* Payment Button */
-        .pay-btn {
-            width: 100%; background: var(--p); color: white; border: none; padding: 18px;
-            border-radius: 20px; font-size: 16px; font-weight: 800; cursor: pointer;
-            box-shadow: 0 10px 25px -5px rgba(255, 140, 0, 0.4); margin-top: 15px;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .icon-circle { 
+            width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--surface); 
+            margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-weight: 800;
         }
-        .pay-btn:active { transform: scale(0.96); }
-        .pay-btn:disabled { background: var(--surface); color: var(--sub); box-shadow: none; cursor: not-allowed; }
+        .active .icon-circle { background: var(--p); border-color: var(--p); color: white; }
 
-        /* Log Section */
-        .log-section { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
-        .log-tile { background: var(--card); border: 1px solid var(--surface); padding: 20px; border-radius: 24px; text-align: center; }
-        .log-tile.active { border-color: var(--p); background: rgba(255,140,0,0.05); }
-        .circle-toggle { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--surface); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .active .circle-toggle { background: var(--p); border-color: var(--p); color: white; }
+        .activity-box { background: var(--card); border-radius: 24px; border: 1px solid var(--surface); margin-top: 20px; }
+        .activity-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
 
-        #maintenance { position: fixed; inset: 0; background: var(--bg); z-index: 999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+        #authUI { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 90vh; text-align: center; }
+        .btn-action { background: var(--p); color: white; border: none; padding: 16px 32px; border-radius: 20px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="maintenance">
-    <h1 style="font-family:'Outfit'; font-size: 42px;">System Update</h1>
-    <p style="color:var(--sub)">We're making things better. Hang tight!</p>
+<div id="authUI">
+    <h1 style="font-family:'Outfit'; font-size: 48px; margin: 0;">VetTrack<span style="color:var(--p)">.</span></h1>
+    <button class="btn-action" onclick="login()">Login to Dashboard</button>
 </div>
 
-<div class="container">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="font-family:'Outfit'; margin:0">VetTrack<span style="color:var(--p)">.</span></h2>
-        <img id="u-icon" style="width:40px; height:40px; border-radius:12px; border:1px solid var(--surface);">
+<div id="appUI" style="display:none;">
+    <header class="header">
+        <h2 id="userName" style="font-family:'Outfit'; margin: 0;">Student</h2>
+        <img id="userIcon" class="profile-btn" src="">
+    </header>
+
+    <div class="waste-banner">
+        <i>♻️</i>
+        <small>HELP REDUCE WASTE:<br>Decide Lunch before 10 AM & Dinner before 4 PM.</small>
     </div>
 
-    <div class="bill-widget">
-        <div class="status-pill" id="u-status">Loading...</div>
-        <div class="amt-big" id="u-bill">₹0</div>
-        <small id="u-meta" style="color:var(--sub); font-weight:700;">0 Meals Total</small>
-        
-        <button id="pay-button" class="pay-btn" onclick="initiatePayment()">Pay Monthly Dues</button>
+    <div class="bill-card">
+        <div style="font-size:11px; font-weight:800; color:var(--sub); text-transform:uppercase;">Monthly Bill</div>
+        <div class="bill-amt" id="totalBill">₹0</div>
+        <div id="payStatus" style="font-size:10px; font-weight:800;">SYNCING...</div>
     </div>
 
-    <h3 style="font-family:'Outfit'; font-size:18px;">Today's Attendance</h3>
-    <div class="log-section">
-        <div id="l-tile" class="log-tile" onclick="toggleMeal('l')">
-            <div class="circle-toggle">L</div>
-            <b style="font-size:14px;">LUNCH</b>
+    <h3 style="font-family:'Outfit'; font-size:18px; margin-bottom:15px;">Today's Meals</h3>
+    <div class="toggle-grid">
+        <div id="card-l" class="toggle-card" onclick="handleMealToggle('l')">
+            <div class="icon-circle">L</div>
+            <b style="font-size: 12px;">LUNCH</b>
+            <span id="lock-l" class="lock-icon">Deadline: 10:00 AM</span>
         </div>
-        <div id="d-tile" class="log-tile" onclick="toggleMeal('d')">
-            <div class="circle-toggle">D</div>
-            <b style="font-size:14px;">DINNER</b>
+        <div id="card-d" class="toggle-card" onclick="handleMealToggle('d')">
+            <div class="icon-circle">D</div>
+            <b style="font-size: 12px;">DINNER</b>
+            <span id="lock-d" class="lock-icon">Deadline: 04:00 PM</span>
         </div>
     </div>
+
+    <h3 style="font-family:'Outfit'; font-size:18px; margin: 30px 0 15px;">Recent History</h3>
+    <div class="activity-box" id="activityFeed"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, updateDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, setDoc, collection, query, orderBy, limit, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
@@ -95,99 +112,111 @@
     };
 
     const app = initializeApp(firebaseConfig), db = getFirestore(app), auth = getAuth(app), provider = new GoogleAuthProvider();
-    let user, userData, logs = {}, currentAmount = 0;
+    let user, userData, logs = {};
 
-    onAuthStateChanged(auth, u => {
+    window.login = () => signInWithPopup(auth, provider);
+
+    onAuthStateChanged(auth, async u => {
         if(u) {
             user = u;
-            document.getElementById('u-icon').src = u.photoURL;
-            syncData();
-        } else signInWithPopup(auth, provider);
+            document.getElementById('authUI').style.display = 'none';
+            document.getElementById('appUI').style.display = 'block';
+            document.getElementById('userName').innerText = u.displayName;
+            document.getElementById('userIcon').src = u.photoURL;
+            
+            // Sync Profile & Pricing
+            onSnapshot(doc(db, "users", u.uid), s => {
+                userData = s.data() || { mealPrice: 50, isPaid: false };
+                updateUI();
+            });
+
+            // Sync Current Month Logs
+            const mk = `${new Date().getFullYear()}_${new Date().getMonth()}`;
+            onSnapshot(doc(db, "users", u.uid, "logs", mk), s => {
+                logs = s.exists() ? s.data() : {};
+                updateUI();
+            });
+
+            // Sync Activity
+            const q = query(collection(db, "users", u.uid, "activity"), orderBy("time", "desc"), limit(5));
+            onSnapshot(q, snap => {
+                const feed = document.getElementById('activityFeed'); feed.innerHTML = "";
+                snap.forEach(d => {
+                    const a = d.data();
+                    feed.innerHTML += `<div class="activity-item">${a.msg}<br><small style="color:var(--sub)">${new Date(a.time).toLocaleTimeString()}</small></div>`;
+                });
+            });
+        }
     });
-
-    // 1. Live Sync Global Maintenance
-    onSnapshot(doc(db, "app_settings", "global"), s => {
-        document.getElementById('maintenance').style.display = (s.exists() && s.data().maintenance) ? 'flex' : 'none';
-    });
-
-    function syncData() {
-        const mk = `${new Date().getFullYear()}_${new Date().getMonth()}`;
-        
-        // Sync Profile (Price/Status)
-        onSnapshot(doc(db, "users", user.uid), s => {
-            userData = s.data() || { mealPrice: 50, isPaid: false };
-            updateUI();
-        });
-
-        // Sync Logs
-        onSnapshot(doc(db, "users", user.uid, "logs", mk), s => {
-            logs = s.exists() ? s.data() : {};
-            updateUI();
-        });
-    }
 
     function updateUI() {
-        let m=0, g=0, today = new Date().getDate();
+        const now = new Date();
+        const hour = now.getHours();
+        const today = now.getDate();
+
+        // 1. Check Deadlines
+        const isLunchLocked = hour >= 10;
+        const isDinnerLocked = hour >= 16;
+
+        const d = logs[today] || { l:0, d:0 };
+        
+        // Update Lunch Card
+        const cl = document.getElementById('card-l');
+        cl.className = d.l ? 'toggle-card active' : 'toggle-card';
+        if(isLunchLocked) {
+            cl.classList.add('locked');
+            document.getElementById('lock-l').innerText = "Locked at 10 AM";
+        }
+
+        // Update Dinner Card
+        const cd = document.getElementById('card-d');
+        cd.className = d.d ? 'toggle-card active' : 'toggle-card';
+        if(isDinnerLocked) {
+            cd.classList.add('locked');
+            document.getElementById('lock-d').innerText = "Locked at 4 PM";
+        }
+
+        // 2. Calculate Bill
+        let m=0, g=0;
         Object.values(logs).forEach(v => { 
             m += (v.l?1:0) + (v.d?1:0); 
             g += (parseInt(v.lg)||0) + (parseInt(v.dg)||0);
         });
-        
-        currentAmount = (m+g) * (userData.mealPrice || 50);
-        document.getElementById('u-bill').innerText = "₹" + currentAmount;
-        document.getElementById('u-meta').innerText = `${m+g} Plates Registered`;
+        document.getElementById('totalBill').innerText = "₹" + (m+g) * (userData.mealPrice || 50);
+        document.getElementById('payStatus').innerText = userData.isPaid ? "✅ VERIFIED PAID" : "⚠️ PAYMENT DUE";
+        document.getElementById('payStatus').style.color = userData.isPaid ? "var(--success)" : "var(--danger)";
+    }
 
-        const stat = document.getElementById('u-status');
-        const payBtn = document.getElementById('pay-button');
+    window.handleMealToggle = async (type) => {
+        const now = new Date();
+        const hour = now.getHours();
 
-        if(userData.isPaid) {
-            stat.innerText = "● Verified Paid"; stat.className = "status-pill paid";
-            payBtn.disabled = true; payBtn.innerText = "Payment Cleared";
-        } else {
-            stat.innerText = "● Due Pending"; stat.className = "status-pill unpaid";
-            payBtn.disabled = currentAmount === 0;
-            payBtn.innerText = "Pay Now";
+        // Enforcement Logic
+        if(type === 'l' && hour >= 10) {
+            alert("Lunch deadline (10:00 AM) has passed. Changes cannot be made.");
+            return;
+        }
+        if(type === 'd' && hour >= 16) {
+            alert("Dinner deadline (04:00 PM) has passed. Changes cannot be made.");
+            return;
         }
 
-        const d = logs[today] || { l:0, d:0 };
-        document.getElementById('l-tile').className = d.l ? 'log-tile active' : 'log-tile';
-        document.getElementById('d-tile').className = d.d ? 'log-tile active' : 'log-tile';
-    }
-
-    window.toggleMeal = async (t) => {
-        const today = new Date().getDate();
+        const today = now.getDate();
         if(!logs[today]) logs[today] = { l:0, d:0, lg:0, dg:0, w:0 };
-        logs[today][t] = logs[today][t] ? 0 : 1;
-        const mk = `${new Date().getFullYear()}_${new Date().getMonth()}`;
+        
+        const newState = logs[today][type] ? 0 : 1;
+        logs[today][type] = newState;
+        
+        const mk = `${now.getFullYear()}_${now.getMonth()}`;
         await setDoc(doc(db, "users", user.uid, "logs", mk), { [today]: logs[today] }, { merge: true });
-        // Ensure user entry exists
-        await setDoc(doc(db, "users", user.uid), { name: user.displayName, email: user.email, photo: user.photoURL }, { merge: true });
-    }
-
-    // RAZORPAY INTEGRATION
-    window.initiatePayment = () => {
-        if(currentAmount <= 0) return;
-
-        const options = {
-            "key": "rzp_test_YOUR_KEY_HERE", // Replace with your Key ID from Razorpay Dashboard
-            "amount": currentAmount * 100, // In paise
-            "currency": "INR",
-            "name": "VetTrack Luxe",
-            "description": "Monthly Mess Dues",
-            "handler": async function (response) {
-                // UPDATE DB ON SUCCESS
-                await updateDoc(doc(db, "users", user.uid), { isPaid: true });
-                await addDoc(collection(db, "users", user.uid, "activity"), {
-                    msg: `Successfully paid ₹${currentAmount} (Ref: ${response.razorpay_payment_id})`,
-                    time: Date.now()
-                });
-                alert("Payment Successful! Status Updated.");
-            },
-            "prefill": { "name": user.displayName, "email": user.email },
-            "theme": { "color": "#FF8C00" }
-        };
-        const rzp = new Razorpay(options);
-        rzp.open();
+        
+        // Log Activity
+        const mealName = type === 'l' ? 'Lunch' : 'Dinner';
+        const action = newState ? 'Marked' : 'Cancelled';
+        await addDoc(collection(db, "users", user.uid, "activity"), {
+            msg: `${action} ${mealName} for today.`,
+            time: Date.now()
+        });
     };
 </script>
 </body>
