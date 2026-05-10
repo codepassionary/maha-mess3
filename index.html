@@ -3,187 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Admin | Mobile</title>
+    <title>VetTrack Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
         :root { --p: #FF8C00; --bg: #F8F9FA; --text: #1A1A1A; --card: #ffffff; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; }
-        
         body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 80px; }
         .container { padding: 20px; max-width: 500px; margin: 0 auto; }
-
-        /* HEADER */
-        .admin-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px; }
-        .admin-head h1 { font-family: 'Outfit'; font-size: 24px; margin: 0; }
-        .sync-indicator { font-size: 10px; font-weight: 800; color: #4CAF50; display: flex; align-items: center; gap: 5px; }
-
-        /* USER CARDS */
-        .user-card { 
-            background: var(--card); padding: 20px; border-radius: 24px; margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #EEE;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .user-info h3 { margin: 0; font-size: 16px; font-weight: 800; }
-        .user-info p { margin: 0; font-size: 12px; color: #888; }
-
-        /* BOTTOM NAV */
-        .bottom-nav { 
-            position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: white; 
-            display: flex; justify-content: space-around; align-items: center;
-            border-top: 1px solid #EEE; padding-bottom: env(safe-area-inset-bottom);
-        }
-        .nav-item { border: none; background: none; font-size: 11px; font-weight: 800; color: #AAA; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .nav-item.active { color: var(--p); }
-        .nav-item svg { width: 22px; height: 22px; }
-
-        /* MODAL / SHEET */
+        .admin-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .user-card { background: var(--card); padding: 20px; border-radius: 24px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .user-info h3 { margin: 0; font-size: 16px; }
+        .btn-action { background: var(--p); color: white; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 800; }
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 100; display: none; align-items: flex-end; }
-        .sheet { background: white; width: 100%; border-radius: 30px 30px 0 0; padding: 30px; max-height: 85vh; overflow-y: auto; transform: translateY(100%); transition: 0.3s cubic-bezier(0.1, 0.9, 0.2, 1); }
+        .sheet { background: white; width: 100%; border-radius: 30px 30px 0 0; padding: 30px; max-height: 80vh; overflow-y: auto; transform: translateY(100%); transition: 0.3s ease; }
         .sheet.open { transform: translateY(0); }
-
-        .log-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #F5F5F5; font-size: 14px; }
-        .btn-action { background: var(--p); color: white; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer; }
-        
-        input { width: 100%; padding: 15px; border-radius: 15px; border: 1.5px solid #EEE; margin-bottom: 15px; font-size: 16px; }
-        .badge { background: var(--p-soft); color: var(--p); padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+        .log-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #F5F5F5; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div id="view-users" class="section">
-        <div class="admin-head">
-            <h1>Master Center</h1>
-            <div class="sync-indicator">🟢 Fully Synced</div>
-        </div>
-        <div id="masterUserList">
-            <p style="color:#888; font-size: 14px; text-align: center; margin-top: 50px;">Scanning Database...</p>
-        </div>
+    <div class="container">
+        <div class="admin-head"><h1>Master Center</h1><button onclick="fetchUsers()" style="border:none; background:none; font-size:20px;">🔄</button></div>
+        <div id="masterList"></div>
     </div>
-
-    <div id="view-settings" class="section" style="display:none;">
-        <div class="admin-head"><h1>Global Config</h1></div>
-        <div style="background:white; padding:25px; border-radius:24px; border:1px solid #EEE;">
-            <label style="font-size:11px; font-weight:800; color:#888;">GLOBAL MEAL RATE (₹)</label>
-            <input type="number" id="gMeal" value="50">
-            <label style="font-size:11px; font-weight:800; color:#888;">GLOBAL WATER RATE (₹)</label>
-            <input type="number" id="gWater" value="30">
-            <button class="btn-action" style="width:100%; height:55px;" onclick="saveGlobalConfig()">Apply to All Users</button>
-        </div>
-    </div>
-</div>
-
-<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()">
-    <div class="sheet" id="sheet" onclick="event.stopPropagation()">
-        <h2 id="sheetTitle" style="font-family:Outfit; margin-top:0;">Inspect User</h2>
-        <div id="fullDataSync">
-            </div>
-    </div>
-</div>
-
-<nav class="bottom-nav">
-    <button class="nav-item active" onclick="nav('view-users', this)">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        Users
-    </button>
-    <button class="nav-item" onclick="nav('view-settings', this)">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-        Config
-    </button>
-</nav>
+    <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"><div class="sheet" id="sheet" onclick="event.stopPropagation()"><h2 id="sheetTitle">History Sync</h2><div id="history"></div></div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", projectId: "vettrack-1c65e", 
-        storageBucket: "vettrack-1c65e.firebasestorage.app", messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
-    };
-
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    const firebaseConfig = { apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" };
     const app = initializeApp(firebaseConfig), db = getFirestore(app);
 
-    // NAVIGATION
-    window.nav = (id, el) => {
-        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).style.display = 'block';
-        el.classList.add('active');
-    };
-
-    // FULL SYNC - FETCH ALL USERS
-    window.fetchMasterUsers = async () => {
+    window.fetchUsers = async () => {
         const snap = await getDocs(collection(db, "users"));
-        const list = document.getElementById('masterUserList');
-        list.innerHTML = "";
-
-        snap.forEach(userDoc => {
-            const uid = userDoc.id;
-            const div = document.createElement('div');
-            div.className = "user-card";
-            div.innerHTML = `
-                <div class="user-info">
-                    <h3>Diner: ${uid.substring(0,6)}</h3>
-                    <p>Verified Account</p>
-                </div>
-                <button class="btn-action" onclick="syncUserFullHistory('${uid}')">Sync Logs</button>
-            `;
+        const list = document.getElementById('masterList'); list.innerHTML = "";
+        snap.forEach(u => {
+            const div = document.createElement('div'); div.className = "user-card";
+            div.innerHTML = `<div class="user-info"><h3>${u.data().name || 'New User'}</h3><small>${u.id.slice(0,8)}</small></div><button class="btn-action" onclick="syncFull('${u.id}')">Sync</button>`;
             list.appendChild(div);
         });
     };
 
-    // FULL DATA SYNC - DRILL DOWN INTO ALL COLLECTIONS
-    window.syncUserFullHistory = async (uid) => {
-        document.getElementById('sheetTitle').innerText = "Syncing History...";
-        document.getElementById('fullDataSync').innerHTML = "Fetching every log from cloud...";
-        openSheet();
-
+    window.syncFull = async (uid) => {
+        document.getElementById('sheetOverlay').style.display='flex'; setTimeout(()=>document.getElementById('sheet').classList.add('open'),10);
         const logSnap = await getDocs(collection(db, `users/${uid}/logs`));
-        const history = document.getElementById('fullDataSync');
-        history.innerHTML = "";
-
-        if(logSnap.empty) {
-            history.innerHTML = "<p style='text-align:center;'>No historical data found.</p>";
-            return;
-        }
-
+        const hist = document.getElementById('history'); hist.innerHTML = "";
         logSnap.forEach(d => {
-            const data = d.data();
-            let meals = 0, water = 0;
-            Object.values(data).forEach(v => { if(v.l) meals++; if(v.d) meals++; if(v.w) water++; });
-
-            const row = document.createElement('div');
-            row.className = "log-item";
-            row.innerHTML = `
-                <div>
-                    <b>Month: ${d.id.replace('_', '/')}</b><br>
-                    <small>${meals} Meals • ${water} Water</small>
-                </div>
-                <span class="badge">₹${(meals*50 + water*30)}</span>
-            `;
-            history.appendChild(row);
+            let m=0, w=0; Object.values(d.data()).forEach(v=>{if(v.l)m++;if(v.d)m++;if(v.w)w++;});
+            hist.innerHTML += `<div class="log-item"><b>${d.id}</b> <span>${m} Meals • ₹${m*50+w*30}</span></div>`;
         });
-        document.getElementById('sheetTitle').innerText = "Full History Sync";
     };
-
-    window.openSheet = () => {
-        document.getElementById('sheetOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('sheet').classList.add('open'), 10);
-    };
-
-    window.closeSheet = () => {
-        document.getElementById('sheet').classList.remove('open');
-        setTimeout(() => document.getElementById('sheetOverlay').style.display = 'none', 300);
-    };
-
-    window.saveGlobalConfig = async () => {
-        const meal = document.getElementById('gMeal').value;
-        const water = document.getElementById('gWater').value;
-        await setDoc(doc(db, "admin", "global_config"), { meal: parseInt(meal), water: parseInt(water), updated: new Date() });
-        alert("Global rates updated!");
-    };
-
-    fetchMasterUsers();
+    window.closeSheet = () => { document.getElementById('sheet').classList.remove('open'); setTimeout(()=>document.getElementById('sheetOverlay').style.display='none',300); };
+    fetchUsers();
 </script>
 </body>
 </html>
