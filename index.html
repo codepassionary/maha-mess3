@@ -2,129 +2,185 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VetTrack | Pulse Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>VetTrack Luxe | Resilient Pulse</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #FF8C00; --bg: #0B0F1A; --card: #1E293B; --success: #2ed573; --danger: #ff4757; }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
+        :root { 
+            --p: #FF8C00; --bg: #0B0F1A; --card: #1E293B; 
+            --success: #2ed573; --danger: #ff4757; --warn: #f1c40f;
+        }
+        body { 
+            margin: 0; background: var(--bg); color: white; 
+            font-family: 'Plus Jakarta Sans', sans-serif; padding: 25px; 
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
         
-        /* Pulse UI */
-        .status-card { background: var(--card); border-radius: 30px; padding: 30px; text-align: center; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-        .pulse-ring { width: 100px; height: 100px; border: 4px solid var(--p); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; position: relative; }
-        .pulse-ring.active { animation: ripple 2s infinite; }
-        
-        @keyframes ripple { 0% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(255, 140, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0); } }
+        .status-card { 
+            background: var(--card); border-radius: 35px; padding: 40px 20px; 
+            text-align: center; border: 1px solid rgba(255,255,255,0.1); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative;
+        }
 
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .stat-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; text-align: center; }
-        .btn { width: 100%; padding: 20px; border-radius: 20px; border: none; background: var(--p); color: white; font-weight: 800; font-size: 16px; cursor: pointer; margin-top: 20px; }
-        #log { margin-top: 20px; font-size: 12px; color: #94A3B8; height: 100px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; }
+        /* Pulse Ring Logic */
+        .pulse-ring { 
+            width: 120px; height: 120px; border: 4px solid var(--p); 
+            border-radius: 50%; margin: 0 auto 25px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .pulse-ring.active { animation: ripple 2s infinite; }
+        .pulse-ring.offline { border-color: var(--warn); filter: grayscale(0.5); animation: none; }
+
+        @keyframes ripple { 
+            0% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.4); } 
+            70% { box-shadow: 0 0 0 20px rgba(255, 140, 0, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0); } 
+        }
+
+        .network-badge {
+            position: absolute; top: 20px; right: 20px;
+            padding: 5px 12px; border-radius: 10px; font-size: 10px; font-weight: 800;
+        }
+
+        .btn-prime { 
+            width: 100%; padding: 22px; border-radius: 25px; border: none; 
+            background: var(--p); color: white; font-weight: 800; 
+            font-size: 16px; cursor: pointer; transition: 0.3s;
+            margin-top: auto;
+        }
+        .btn-prime:active { transform: scale(0.98); opacity: 0.9; }
+
+        #log { 
+            margin-top: 25px; font-size: 11px; color: #94A3B8; 
+            height: 120px; overflow-y: auto; background: rgba(0,0,0,0.2); 
+            padding: 15px; border-radius: 20px; line-height: 1.6;
+        }
     </style>
 </head>
 <body>
 
-    <h1 style="font-family:'Outfit';">Attendance<span style="color:var(--p)">Pulse.</span></h1>
+    <header style="margin-bottom: 30px;">
+        <h1 style="font-family:'Outfit'; margin:0; font-size:32px;">Pulse<span style="color:var(--p)">Guard.</span></h1>
+        <p style="color:#94A3B8; font-size:14px; margin-top:5px;">Resilient Attendance System</p>
+    </header>
 
     <div class="status-card">
+        <div id="netBadge" class="network-badge" style="background:var(--success)">ONLINE</div>
         <div id="ring" class="pulse-ring">
-            <span id="score">0%</span>
+            <span id="score" style="font-family:'Outfit'; font-size:32px;">0%</span>
+            <small style="font-size:9px; font-weight:800; opacity:0.6;">STAY SCORE</small>
         </div>
-        <div id="statusLabel" style="font-weight:700; color:var(--p)">READY TO START</div>
-        <div id="timer" style="font-size: 14px; opacity: 0.6; margin-top: 5px;">Lecture Duration: 60m</div>
+        <div id="statusLabel" style="font-weight:800; letter-spacing:1px; color:var(--p)">SYSTEM IDLE</div>
     </div>
 
-    <div class="stat-grid">
-        <div class="stat-item">
-            <small>VALID PULSES</small>
-            <div id="pulses" style="font-size:24px; font-weight:800;">0/12</div>
-        </div>
-        <div class="stat-item">
-            <small>GRACE TIME</small>
-            <div id="grace" style="font-size:24px; font-weight:800;">10m</div>
-        </div>
-    </div>
+    <div id="log">Device ready. Internet connection verified.</div>
 
-    <button id="startBtn" class="btn" onclick="engagePulse()">Start Tracking</button>
-
-    <div id="log">System initialized. Waiting for GPS trigger...</div>
+    <button id="startBtn" class="btn-prime" onclick="initiatePulse()">START SESSION</button>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, updateDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = { /* YOUR CONFIG */ };
+    const firebaseConfig = { /* PASTE YOUR CONFIG HERE */ };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // CONFIG
-    const TARGET_LOC = { lat: 22.7196, lng: 75.8577 }; // Classroom Coords
-    const CLASS_ID = "LECTURE_101";
-    const USER_ID = "STUDENT_XYZ"; // In real app, get from Auth
+    const CLASS_ID = "LECTURE_ROOM_A"; 
+    const USER_ID = "STUDENT_DEVICE_01"; 
+    const TARGET_LOC = { lat: 22.7196, lng: 75.8577 };
 
-    let pulsesCaught = 0;
-    let totalChecks = 0;
     let isMonitoring = false;
+    let pendingSyncCount = 0;
 
-    window.engagePulse = async () => {
-        if(isMonitoring) return;
+    // --- NETWORK RESILIENCE LOGIC ---
+    window.addEventListener('online', syncOfflineData);
+    window.addEventListener('offline', () => {
+        document.getElementById('netBadge').innerText = "OFFLINE (CACHING)";
+        document.getElementById('netBadge').style.background = "var(--warn)";
+        document.getElementById('ring').classList.add('offline');
+        addLog("Network Lost. Switching to Local Buffer.", "warn");
+    });
+
+    async function syncOfflineData() {
+        document.getElementById('netBadge').innerText = "ONLINE";
+        document.getElementById('netBadge').style.background = "var(--success)";
+        document.getElementById('ring').classList.remove('offline');
+        
+        if (pendingSyncCount > 0) {
+            addLog(`Restored! Syncing ${pendingSyncCount} pulses to cloud...`);
+            try {
+                await updateDoc(doc(db, `attendance/${CLASS_ID}/students`, USER_ID), {
+                    pulses: increment(pendingSyncCount),
+                    lastSync: serverTimestamp()
+                });
+                pendingSyncCount = 0;
+                addLog("Cloud Sync Complete.", "success");
+            } catch (e) {
+                addLog("Sync failed. Retrying next pulse.");
+            }
+        }
+    }
+
+    // --- PULSE ENGINE ---
+    window.initiatePulse = () => {
         isMonitoring = true;
         document.getElementById('startBtn').style.display = 'none';
         document.getElementById('ring').classList.add('active');
-        addLog("Pulse started. Continuous monitoring active.");
-
-        // Create Initial Doc in Firestore
-        await setDoc(doc(db, `attendance/${CLASS_ID}/students`, USER_ID), {
-            name: "John Doe",
-            status: "In Progress",
-            startTime: serverTimestamp(),
-            pulses: 0
-        });
-
-        // Run the pulse check every 5 minutes (300000ms)
-        // For testing, change this to 10000 (10 seconds)
-        runCheck(); 
-        setInterval(runCheck, 300000); 
+        document.getElementById('statusLabel').innerText = "MONITORING ACTIVE";
+        
+        addLog("Session Started. Pulse interval: 5m");
+        executePulse(); 
+        setInterval(executePulse, 300000); // 5 Minute Interval
     };
 
-    async function runCheck() {
-        totalChecks++;
+    function executePulse() {
+        if (!navigator.geolocation) return addLog("GPS Not Supported", "error");
+
         navigator.geolocation.getCurrentPosition(async (pos) => {
-            const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, TARGET_LOC.lat, TARGET_LOC.lng);
-            
-            const inClass = dist < 0.05; // 50-meter radius
-            if(inClass) pulsesCaught++;
+            const dist = getDistance(pos.coords.latitude, pos.coords.longitude, TARGET_LOC.lat, TARGET_LOC.lng);
+            const inClass = dist < 0.05; // 50 meters
 
-            // Update UI
-            document.getElementById('pulses').innerText = `${pulsesCaught}/12`;
-            document.getElementById('score').innerText = `${Math.round((pulsesCaught/12)*100)}%`;
-            document.getElementById('statusLabel').innerText = inClass ? "VERIFIED IN CLASS" : "OUTSIDE ROOM";
-            document.getElementById('statusLabel').style.color = inClass ? "var(--success)" : "var(--danger)";
-            
-            addLog(`Pulse ${totalChecks}: ${inClass ? "Verified" : "Failed"}`);
-
-            // Update Firebase Real-time
-            await updateDoc(doc(db, `attendance/${CLASS_ID}/students`, USER_ID), {
-                pulses: pulsesCaught,
-                lastSeen: serverTimestamp(),
-                finalStatus: pulsesCaught >= 10 ? "PRESENT" : "INCOMPLETE"
-            });
+            if (inClass) {
+                if (navigator.onLine) {
+                    // Online: Update Firebase Immediately
+                    try {
+                        await updateDoc(doc(db, `attendance/${CLASS_ID}/students`, USER_ID), {
+                            pulses: increment(1),
+                            lastVerified: serverTimestamp()
+                        });
+                        addLog("Pulse Verified & Synced.");
+                    } catch (e) {
+                        cachePulse();
+                    }
+                } else {
+                    // Offline: Save to Local Buffer
+                    cachePulse();
+                }
+            } else {
+                addLog("Outside Geofence. Pulse Rejected.", "error");
+            }
         });
     }
 
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // km
-        const dLat = (lat2-lat1) * Math.PI / 180;
-        const dLon = (lon2-lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    function cachePulse() {
+        pendingSyncCount++;
+        addLog(`Pulse Cached Locally (Offline count: ${pendingSyncCount})`);
     }
 
-    function addLog(msg) {
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const p = 0.017453292519943295;    
+        const c = Math.cos;
+        const a = 0.5 - c((lat2 - lat1) * p)/2 + 
+                c(lat1 * p) * c(lat2 * p) * 
+                (1 - c((lon2 - lon1) * p))/2;
+        return 12742 * Math.asin(Math.sqrt(a)); 
+    }
+
+    function addLog(msg, type = "info") {
         const log = document.getElementById('log');
-        log.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+        const color = type === "error" ? "var(--danger)" : (type === "warn" ? "var(--warn)" : "#94A3B8");
+        log.innerHTML += `<div style="color:${color}">[${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}] ${msg}</div>`;
         log.scrollTop = log.scrollHeight;
     }
 </script>
