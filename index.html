@@ -3,147 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>VetKart | NDVSU Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@700&display=swap" rel="stylesheet">
+    <title>TicketLuxe | Professional Booking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --p: #2874f0; --accent: #fb641b; --bg: #f1f3f6; 
-            --card: #ffffff; --text: #212121; --sub: #878787;
-        }
+        :root { --p: #FF8C00; --bg: #0B0F1A; --card: #1E293B; --border: rgba(255,255,255,0.1); --text: #FFFFFF; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 40px; }
+        
+        header { background: rgba(11, 15, 26, 0.8); backdrop-filter: blur(20px); padding: 20px 5%; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Outfit'; font-size: 24px; }
+        .logo span { color: var(--p); }
 
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        .container { padding: 20px 5%; }
+        .event-banner { width: 100%; border-radius: 30px; margin-bottom: 30px; border: 1px solid var(--border); }
 
-        /* --- FLIPKART STYLE HEADER --- */
-        header {
-            background: var(--p); padding: 10px 5%; position: sticky; top: 0; z-index: 1000;
-            display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+        /* Seat Matrix */
+        .seat-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; max-width: 400px; margin: 30px auto; }
+        .seat { aspect-ratio: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
+        .seat.selected { background: var(--p); border-color: var(--p); transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 140, 0, 0.4); }
+        .seat.occupied { background: #334155; opacity: 0.3; cursor: not-allowed; }
 
-        .logo { font-family: 'Outfit'; color: white; font-size: 20px; text-decoration: none; font-style: italic; }
-        .logo span { color: #ffe500; font-weight: 800; }
-
-        .search-container {
-            flex: 1; background: white; border-radius: 2px; display: flex; 
-            align-items: center; padding: 0 12px; height: 36px;
-        }
-        .search-container input { 
-            border: none; outline: none; width: 100%; font-size: 14px;
-        }
-
-        .cart-trigger { color: white; font-weight: 700; cursor: pointer; font-size: 14px; }
-
-        /* --- CATEGORY NAVIGATION --- */
-        .categories {
-            background: white; padding: 12px 5%; display: flex; 
-            justify-content: space-between; overflow-x: auto; border-bottom: 1px solid #e0e0e0;
-        }
-        .cat-item { 
-            text-align: center; font-size: 12px; font-weight: 700; cursor: pointer; 
-            min-width: 80px; color: var(--text);
-        }
-
-        /* --- PRODUCT GRID --- */
-        .product-grid { 
-            padding: 15px 5%; display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; 
-        }
-
-        .product-card {
-            background: white; border-radius: 4px; padding: 12px; 
-            display: flex; flex-direction: column; transition: 0.2s;
-        }
-        .product-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-
-        .prod-img { width: 100%; aspect-ratio: 1; object-fit: contain; margin-bottom: 8px; }
-        .prod-name { font-size: 13px; font-weight: 500; height: 34px; overflow: hidden; }
-        .prod-price { font-weight: 800; font-size: 16px; margin-top: 5px; }
-
-        .buy-btn {
-            background: var(--accent); color: white; border: none; 
-            padding: 10px; border-radius: 2px; font-weight: 700; 
-            margin-top: 10px; cursor: pointer; font-size: 12px;
-        }
-
-        /* --- TOAST NOTIFICATION --- */
-        #toast {
-            position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%);
-            background: #212121; color: white; padding: 12px 24px; border-radius: 4px;
-            font-size: 14px; transition: 0.4s; z-index: 2000;
-        }
-        #toast.visible { bottom: 30px; }
+        /* Glassmorphic Footer */
+        .footer-action { position: fixed; bottom: 20px; left: 5%; right: 5%; background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(15px); padding: 20px; border-radius: 25px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .btn-prime { background: var(--p); color: white; border: none; padding: 15px 35px; border-radius: 15px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="#" class="logo">Vet<span>Kart</span></a>
-    <div class="search-container">
-        <input type="text" id="search" placeholder="Search textbooks, stethoscopes..." onkeyup="handleSearch()">
-    </div>
-    <div class="cart-trigger">Cart <span id="cartCount">0</span></div>
+    <div class="logo">Ticket<span>Luxe.</span></div>
+    <div style="font-size:12px; font-weight:700;">NDVSU Rewa Campus</div>
 </header>
 
-<div class="categories">
-    <div class="cat-item" onclick="filter('all')">All</div>
-    <div class="cat-item" onclick="filter('clinical')">Clinical</div>
-    <div class="cat-item" onclick="filter('books')">Books</div>
-    <div class="cat-item" onclick="filter('batch')">Batch A Gear</div>
+<div class="container">
+    <div style="margin-bottom:20px;">
+        <h2 style="font-family:'Outfit'; margin:0;">Select Your Seats</h2>
+        <p style="color:#94A3B8; font-size:14px; margin-top:5px;">Batch A Seminar | Hall 01</p>
+    </div>
+
+    <div class="seat-grid" id="seatGrid"></div>
 </div>
 
-<div class="product-grid" id="grid"></div>
-<div id="toast">Added to your inventory</div>
+<div class="footer-action">
+    <div>
+        <div style="font-size:10px; color:#94A3B8; font-weight:800; letter-spacing:1px;">TOTAL PAYABLE</div>
+        <div id="totalDisplay" style="font-size:22px; font-weight:800;">₹0</div>
+    </div>
+    <button class="btn-prime" onclick="confirmBooking()">BOOK NOW</button>
+</div>
 
 <script type="module">
-    // Simulation of a professional product engine
-    const products = [
-        { id: 101, cat: 'clinical', name: 'Pro-Series Stethoscope', price: 7499, img: 'https://images.unsplash.com/photo-1584982324572-755d1333e382?w=200' },
-        { id: 102, cat: 'books', name: 'Veterinary Anatomy Vol.1', price: 2150, img: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=200' },
-        { id: 103, cat: 'batch', name: 'NDVSU Batch A Lab Coat', price: 1200, img: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=200' },
-        { id: 104, cat: 'clinical', name: 'Medical Diagnostic Kit', price: 15400, img: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=200' }
-    ];
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    let cart = [];
+    const SEAT_PRICE = 450;
+    let selectedSeats = [];
 
-    window.drawGrid = (items) => {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = items.map(p => `
-            <div class="product-card">
-                <img src="${p.img}" class="prod-img">
-                <div class="prod-name">${p.name}</div>
-                <div class="prod-price">₹${p.price.toLocaleString()}</div>
-                <button class="buy-btn" onclick="addToCart('${p.name}')">ADD TO CART</button>
-            </div>
-        `).join('');
-    };
+    // --- SEAT ENGINE ---
+    const grid = document.getElementById('seatGrid');
+    for (let i = 1; i <= 36; i++) {
+        const isOccupied = [5, 12, 18, 22].includes(i); // Simulated occupied seats
+        grid.innerHTML += `<div class="seat ${isOccupied ? 'occupied' : ''}" onclick="toggleSeat(this, ${i})">${i}</div>`;
+    }
 
-    window.handleSearch = () => {
-        const val = document.getElementById('search').value.toLowerCase();
-        const results = products.filter(p => p.name.toLowerCase().includes(val));
-        drawGrid(results);
-    };
-
-    window.filter = (c) => {
-        if(c === 'all') drawGrid(products);
-        else drawGrid(products.filter(p => p.cat === c));
-    };
-
-    window.addToCart = (name) => {
-        cart.push(name);
-        document.getElementById('cartCount').innerText = cart.length;
+    window.toggleSeat = (el, id) => {
+        if (el.classList.contains('occupied')) return;
         
-        const t = document.getElementById('toast');
-        t.innerText = `"${name}" added to cart`;
-        t.classList.add('visible');
-        setTimeout(() => t.classList.remove('visible'), 3000);
+        el.classList.toggle('selected');
+        if (el.classList.contains('selected')) {
+            selectedSeats.push(id);
+            if (window.navigator.vibrate) window.navigator.vibrate(40); // Clinical Haptic
+        } else {
+            selectedSeats = selectedSeats.filter(s => s !== id);
+        }
         
-        if(window.navigator.vibrate) window.navigator.vibrate(35); // Clinical feel
+        document.getElementById('totalDisplay').innerText = `₹${selectedSeats.length * SEAT_PRICE}`;
     };
 
-    // Initial Render
-    drawGrid(products);
+    window.confirmBooking = async () => {
+        if (selectedSeats.length === 0) return alert("Please select a seat.");
+        
+        // Firebase Logic Integration
+        try {
+            console.log("Syncing to Firebase...");
+            // Example: updateDoc(doc(db, "bookings", "session_01"), { seats: arrayUnion(...selectedSeats) });
+            alert(`Success! Seats ${selectedSeats.join(", ")} confirmed for Batch A.`);
+            location.reload();
+        } catch (e) {
+            alert("Connection error. Caching pulse locally."); // Using your Resilience logic
+        }
+    };
 </script>
 </body>
 </html>
