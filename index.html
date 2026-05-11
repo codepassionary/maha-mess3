@@ -2,61 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VetAuth | Multi-User Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>VetPulse Pro | NDVSU Batch A</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@800&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --text: #FFFFFF; }
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif; height: 100vh;
+        :root { --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --border: rgba(255,255,255,0.1); --text: #FFFFFF; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Glassmorphic Header */
+        header {
+            position: sticky; top: 0; z-index: 1000; padding: 15px 5%;
+            background: rgba(11, 15, 26, 0.8); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo { font-family: 'Outfit'; font-size: 24px; font-weight: 800; }
+        .logo span { color: var(--p); }
+
+        .container { max-width: 550px; margin: 20px auto; padding: 0 15px; }
+
+        /* Auth Overlay */
+        #authOverlay {
+            position: fixed; inset: 0; background: var(--bg); z-index: 2000;
             display: flex; align-items: center; justify-content: center;
         }
-
-        .auth-card {
-            background: var(--card); backdrop-filter: blur(20px);
-            padding: 40px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.1);
-            text-align: center; width: 320px;
+        .login-card { 
+            background: var(--card); padding: 40px; border-radius: 30px; 
+            border: 1px solid var(--border); text-align: center; width: 300px;
         }
 
-        .google-btn {
-            background: white; color: #1E293B; border: none; padding: 15px 25px;
-            border-radius: 15px; font-weight: 700; cursor: pointer; width: 100%;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* Post Cards */
+        .post-card {
+            background: var(--card); border-radius: 25px; padding: 20px;
+            border: 1px solid var(--border); margin-bottom: 20px;
+            animation: slideUp 0.5s ease;
         }
-        .google-btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .btn-main {
+            background: var(--p); color: white; border: none; padding: 12px 25px;
+            border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="auth-card">
-    <h2 style="font-weight: 800; margin-bottom: 30px;">NDVSU <span>Portal</span></h2>
-    <button class="google-btn" onclick="signInWithGoogle()">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="18">
-        Sign in with Google
-    </button>
-    <div id="status" style="margin-top: 20px; font-size: 12px; color: #94A3B8;"></div>
+<!-- Login Screen -->
+<div id="authOverlay">
+    <div class="login-card">
+        <div class="logo" style="margin-bottom: 20px;">Vet<span>Pulse.</span></div>
+        <p style="font-size: 13px; color: #94A3B8; margin-bottom: 30px;">NDVSU Rewa | Professional Portal</p>
+        <button class="btn-main" onclick="login()">SIGN IN WITH GOOGLE</button>
+    </div>
+</div>
+
+<!-- Main App Content -->
+<header>
+    <div class="logo">Vet<span>Pulse.</span></div>
+    <div id="userDisplay" style="font-size: 11px; font-weight: 800;">AUTHENTICATING...</div>
+</header>
+
+<div class="container">
+    <div class="post-card">
+        <textarea id="postInput" placeholder="Share a clinical insight..." style="width:100%; background:transparent; border:none; color:white; outline:none; font-family:inherit;" rows="3"></textarea>
+        <button class="btn-main" onclick="createPost()" style="margin-top:10px;">PUBLISH TO BATCH A</button>
+    </div>
+    <div id="feed"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = { /* Paste your config here */ };
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = { /* PASTE YOUR CONFIG FROM FIREBASE CONSOLE HERE */ };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // --- GOOGLE SIGN-IN LOGIC ---
-    window.signInWithGoogle = async () => {
+    // --- 1. HANDLE LOGIN & PROFILE CREATION ---
+    window.login = async () => {
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-            
-            // Check if user exists in Firestore, if not, create profile
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
 
@@ -64,28 +93,48 @@
                 await setDoc(userRef, {
                     name: user.displayName,
                     email: user.email,
-                    photo: user.photoURL,
-                    batch: "Batch A", // Defaulting to your batch
-                    role: "student",
-                    createdAt: new Date()
+                    degree: "B.V.Sc. & A.H.", // Automated profile setup
+                    batch: "A",
+                    createdAt: serverTimestamp()
                 });
             }
-            
-            if (window.navigator.vibrate) window.navigator.vibrate(50); // Haptic feedback
-            document.getElementById('status').innerText = `Welcome, ${user.displayName}`;
-        } catch (error) {
-            console.error("Auth Error:", error);
-        }
+            document.getElementById('authOverlay').style.display = 'none';
+        } catch (e) { console.error(e); }
     };
 
-    // --- TRACK MULTIPLE USERS ---
+    // --- 2. AUTH STATE LISTENER ---
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            console.log("Logged in:", user.uid);
-            // Redirect to home/dashboard
-        } else {
-            console.log("No user signed in.");
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('userDisplay').innerText = user.displayName.toUpperCase();
         }
+    });
+
+    // --- 3. CREATE & STREAM POSTS ---
+    window.createPost = async () => {
+        const content = document.getElementById('postInput').value;
+        if (!content.trim()) return;
+        await addDoc(collection(db, "posts"), {
+            content,
+            author: auth.currentUser.displayName,
+            timestamp: serverTimestamp()
+        });
+        document.getElementById('postInput').value = '';
+        if (window.navigator.vibrate) window.navigator.vibrate(40); // Haptic feedback
+    };
+
+    const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+    onSnapshot(q, (snapshot) => {
+        const feed = document.getElementById('feed');
+        feed.innerHTML = '';
+        snapshot.forEach(d => {
+            const data = d.data();
+            feed.innerHTML += `
+                <div class="post-card">
+                    <div style="font-weight:800; font-size:12px; color:var(--p); margin-bottom:5px;">${data.author}</div>
+                    <div style="font-size:15px; line-height:1.6;">${data.content}</div>
+                </div>`;
+        });
     });
 </script>
 </body>
