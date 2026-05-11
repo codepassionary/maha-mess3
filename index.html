@@ -2,268 +2,130 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Pulse Attendance</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetTrack | Pulse Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); 
-            --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8;
-            --success: #2ed573; --danger: #ff4757; --warn: #ffa502;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif; padding: 25px;
-            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%);
-            min-height: 100vh;
-        }
-
-        .container { max-width: 480px; margin: 0 auto; }
-
-        /* Pulse UI */
-        .pulse-box {
-            background: var(--card); border-radius: 35px; padding: 30px;
-            text-align: center; border: 1px solid var(--surface);
-            margin-bottom: 25px; backdrop-filter: blur(10px);
-            position: relative; overflow: hidden;
-        }
-
-        .pulse-ring {
-            width: 140px; height: 140px; border-radius: 50%;
-            border: 4px solid var(--surface); margin: 0 auto 20px;
-            display: flex; align-items: center; justify-content: center;
-            position: relative; transition: 0.5s;
-        }
-
-        .pulse-ring.active { border-color: var(--p); box-shadow: 0 0 30px var(--p-glow); animation: pulse-glow 2s infinite; }
-        .pulse-ring.paused { border-color: var(--warn); border-style: dashed; animation: none; }
-
-        @keyframes pulse-glow {
-            0% { transform: scale(1); box-shadow: 0 0 0px var(--p); }
-            50% { transform: scale(1.05); box-shadow: 0 0 20px var(--p); }
-            100% { transform: scale(1); box-shadow: 0 0 0px var(--p); }
-        }
-
-        .status-badge {
-            display: inline-block; padding: 8px 20px; border-radius: 15px;
-            font-size: 11px; font-weight: 800; text-transform: uppercase;
-            margin-top: 10px; letter-spacing: 1px; transition: 0.3s;
-        }
-
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .mini-card { background: var(--card); padding: 20px; border-radius: 25px; border: 1px solid var(--surface); }
-
-        .btn-prime {
-            background: var(--p); color: white; border: none; padding: 22px;
-            border-radius: 25px; width: 100%; font-weight: 800; cursor: pointer;
-            font-size: 16px; margin-bottom: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
+        :root { --p: #FF8C00; --bg: #0B0F1A; --card: #1E293B; --success: #2ed573; --danger: #ff4757; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
         
-        .btn-sec {
-            background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--surface);
-            padding: 15px; border-radius: 20px; width: 100%; font-weight: 600; cursor: pointer;
-        }
+        /* Pulse UI */
+        .status-card { background: var(--card); border-radius: 30px; padding: 30px; text-align: center; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .pulse-ring { width: 100px; height: 100px; border: 4px solid var(--p); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .pulse-ring.active { animation: ripple 2s infinite; }
+        
+        @keyframes ripple { 0% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(255, 140, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0); } }
 
-        .btn-prime:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        #logArea { 
-            margin-top: 25px; max-height: 150px; overflow-y: auto; 
-            font-size: 12px; color: var(--sub); padding: 15px;
-            background: rgba(0,0,0,0.2); border-radius: 15px;
-        }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stat-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; text-align: center; }
+        .btn { width: 100%; padding: 20px; border-radius: 20px; border: none; background: var(--p); color: white; font-weight: 800; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        #log { margin-top: 20px; font-size: 12px; color: #94A3B8; height: 100px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <h1 style="font-family:'Outfit'; font-size:32px; margin:0;">Pulse<span style="color:var(--p)">Luxe.</span></h1>
-            <p id="userStatus" style="color:var(--sub); font-size:13px;">Continuous Classroom Guard</p>
-        </div>
-        <div id="sessionIndicator" style="width:12px; height:12px; background:var(--surface); border-radius:50%;"></div>
-    </header>
+    <h1 style="font-family:'Outfit';">Attendance<span style="color:var(--p)">Pulse.</span></h1>
 
-    <div class="pulse-box">
+    <div class="status-card">
         <div id="ring" class="pulse-ring">
-            <div style="display:flex; flex-direction:column;">
-                <span id="percent" style="font-family:'Outfit'; font-size:32px; line-height:1;">0%</span>
-                <small style="font-size:10px; color:var(--sub); font-weight:700;">STAY SCORE</small>
-            </div>
+            <span id="score">0%</span>
         </div>
-        <div id="liveStatus" class="status-badge" style="background:var(--surface)">SYSTEM IDLE</div>
-        <h3 id="timerLabel" style="margin: 20px 0 5px 0; font-family:'Outfit';">60:00</h3>
+        <div id="statusLabel" style="font-weight:700; color:var(--p)">READY TO START</div>
+        <div id="timer" style="font-size: 14px; opacity: 0.6; margin-top: 5px;">Lecture Duration: 60m</div>
     </div>
 
     <div class="stat-grid">
-        <div class="mini-card">
-            <small style="color:var(--p); font-weight:800; font-size:10px; letter-spacing:1px;">PULSES</small>
-            <div id="validPulses" style="font-size:24px; font-weight:800;">0/12</div>
+        <div class="stat-item">
+            <small>VALID PULSES</small>
+            <div id="pulses" style="font-size:24px; font-weight:800;">0/12</div>
         </div>
-        <div class="mini-card">
-            <small style="color:var(--p); font-weight:800; font-size:10px; letter-spacing:1px;">RELAXATION</small>
-            <div id="bufferUsed" style="font-size:24px; font-weight:800;">0m</div>
+        <div class="stat-item">
+            <small>GRACE TIME</small>
+            <div id="grace" style="font-size:24px; font-weight:800;">10m</div>
         </div>
     </div>
 
-    <button id="actionBtn" class="btn-prime" onclick="startSession()">Begin Lecture Track</button>
-    <button id="pauseBtn" class="btn-sec" onclick="togglePause()" style="display:none;">Take Washroom Break</button>
+    <button id="startBtn" class="btn" onclick="engagePulse()">Start Tracking</button>
 
-    <div id="logArea">
-        <div style="text-align:center; opacity:0.5;">Logs will appear here once session starts...</div>
-    </div>
-</div>
+    <div id="log">System initialized. Waiting for GPS trigger...</div>
 
-<script>
-    // --- CONFIGURATION ---
-    const CLASS_COORDS = { lat: 23.277269, lng: 77.432435 }; // UPDATE THIS WITH GOOGLE MAPS
-    const LECTURE_MINS = 60;
-    const PULSE_INTERVAL_MS = 5 * 60 * 1000; // Check every 5 mins
-    const TOTAL_CHECKS = LECTURE_MINS / 5;   // 12 Checks
-    const MIN_REQUIRED_PULSES = 10;          // Student can miss 2 pulses (10 mins)
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    let sessionActive = false;
-    let isPaused = false;
+    const firebaseConfig = { /* YOUR CONFIG */ };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // CONFIG
+    const TARGET_LOC = { lat: 22.7196, lng: 75.8577 }; // Classroom Coords
+    const CLASS_ID = "LECTURE_101";
+    const USER_ID = "STUDENT_XYZ"; // In real app, get from Auth
+
     let pulsesCaught = 0;
-    let totalChecksDone = 0;
-    let timerInterval, pulseInterval;
+    let totalChecks = 0;
+    let isMonitoring = false;
 
-    const haptic = (pattern) => { if(window.navigator.vibrate) window.navigator.vibrate(pattern); };
-
-    function addLog(msg, type='info') {
-        const log = document.getElementById('logArea');
-        const color = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success)' : 'var(--sub)');
-        const entry = document.createElement('div');
-        entry.style.marginBottom = "5px";
-        entry.innerHTML = `<span style="color:var(--p)">[${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}]</span> <span style="color:${color}">${msg}</span>`;
-        log.prepend(entry);
-    }
-
-    const checkLocation = () => new Promise(res => {
-        if (!navigator.geolocation) return res(false);
-        navigator.geolocation.getCurrentPosition(p => {
-            const dist = Math.sqrt(
-                Math.pow(p.coords.latitude - CLASS_COORDS.lat, 2) + 
-                Math.pow(p.coords.longitude - CLASS_COORDS.lng, 2)
-            );
-            // 0.0006 is roughly a 60-meter radius
-            res(dist < 0.0006); 
-        }, () => res(false), { enableHighAccuracy: true });
-    });
-
-    async function performPulse() {
-        if (!sessionActive) return;
-        
-        // If student explicitly paused for washroom, we don't increment pulseCount
-        if (isPaused) {
-            addLog("Pulse Skipped: Student on break", "info");
-            totalChecksDone++;
-            updateUI();
-            return;
-        }
-
-        totalChecksDone++;
-        document.getElementById('liveStatus').innerText = "SCANNING...";
-        document.getElementById('liveStatus').style.background = "var(--surface)";
-        
-        const inClass = await checkLocation();
-
-        if (inClass) {
-            pulsesCaught++;
-            document.getElementById('liveStatus').innerText = "VERIFIED IN CLASS";
-            document.getElementById('liveStatus').style.background = "var(--success)";
-            addLog("Pulse Verified: Classroom presence confirmed", "success");
-            haptic(40);
-        } else {
-            document.getElementById('liveStatus').innerText = "LOCATION ALERT";
-            document.getElementById('liveStatus').style.background = "var(--danger)";
-            addLog("Pulse Failed: Outside classroom bounds", "error");
-            haptic([100, 50, 100]);
-        }
-
-        updateUI();
-    }
-
-    function updateUI() {
-        const percentage = Math.round((pulsesCaught / TOTAL_CHECKS) * 100);
-        document.getElementById('percent').innerText = `${percentage}%`;
-        document.getElementById('validPulses').innerText = `${pulsesCaught}/${TOTAL_CHECKS}`;
-        
-        const bufferMinutes = (totalChecksDone - pulsesCaught) * 5;
-        document.getElementById('bufferUsed').innerText = `${bufferMinutes}m`;
-        
-        if (bufferMinutes > 10) {
-            document.getElementById('bufferUsed').style.color = "var(--danger)";
-        }
-    }
-
-    function togglePause() {
-        isPaused = !isPaused;
-        const btn = document.getElementById('pauseBtn');
-        const ring = document.getElementById('ring');
-        
-        if (isPaused) {
-            btn.innerText = "Return to Class";
-            btn.style.borderColor = "var(--p)";
-            ring.classList.add('paused');
-            document.getElementById('liveStatus').innerText = "ON BREAK";
-            document.getElementById('liveStatus').style.background = "var(--warn)";
-            addLog("Break started: 10m buffer clocking...", "info");
-        } else {
-            btn.innerText = "Take Washroom Break";
-            btn.style.borderColor = "var(--surface)";
-            ring.classList.remove('paused');
-            addLog("Returned from break. Resuming track.");
-            performPulse(); // Immediate check on return
-        }
-        haptic(60);
-    }
-
-    function startSession() {
-        sessionActive = true;
-        document.getElementById('actionBtn').style.display = 'none';
-        document.getElementById('pauseBtn').style.display = 'block';
+    window.engagePulse = async () => {
+        if(isMonitoring) return;
+        isMonitoring = true;
+        document.getElementById('startBtn').style.display = 'none';
         document.getElementById('ring').classList.add('active');
-        document.getElementById('sessionIndicator').style.background = "var(--p)";
-        document.getElementById('logArea').innerHTML = '';
-        
-        addLog("Attendance Tracking Engaged.");
-        performPulse(); // Check 1
+        addLog("Pulse started. Continuous monitoring active.");
 
-        pulseInterval = setInterval(performPulse, PULSE_INTERVAL_MS);
+        // Create Initial Doc in Firestore
+        await setDoc(doc(db, `attendance/${CLASS_ID}/students`, USER_ID), {
+            name: "John Doe",
+            status: "In Progress",
+            startTime: serverTimestamp(),
+            pulses: 0
+        });
 
-        let timeLeft = LECTURE_MINS * 60;
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            let m = Math.floor(timeLeft / 60);
-            let s = timeLeft % 60;
-            document.getElementById('timerLabel').innerText = `${m}:${s < 10 ? '0' + s : s}`;
+        // Run the pulse check every 5 minutes (300000ms)
+        // For testing, change this to 10000 (10 seconds)
+        runCheck(); 
+        setInterval(runCheck, 300000); 
+    };
 
-            if (timeLeft <= 0) endSession();
-        }, 1000);
+    async function runCheck() {
+        totalChecks++;
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, TARGET_LOC.lat, TARGET_LOC.lng);
+            
+            const inClass = dist < 0.05; // 50-meter radius
+            if(inClass) pulsesCaught++;
+
+            // Update UI
+            document.getElementById('pulses').innerText = `${pulsesCaught}/12`;
+            document.getElementById('score').innerText = `${Math.round((pulsesCaught/12)*100)}%`;
+            document.getElementById('statusLabel').innerText = inClass ? "VERIFIED IN CLASS" : "OUTSIDE ROOM";
+            document.getElementById('statusLabel').style.color = inClass ? "var(--success)" : "var(--danger)";
+            
+            addLog(`Pulse ${totalChecks}: ${inClass ? "Verified" : "Failed"}`);
+
+            // Update Firebase Real-time
+            await updateDoc(doc(db, `attendance/${CLASS_ID}/students`, USER_ID), {
+                pulses: pulsesCaught,
+                lastSeen: serverTimestamp(),
+                finalStatus: pulsesCaught >= 10 ? "PRESENT" : "INCOMPLETE"
+            });
+        });
     }
 
-    function endSession() {
-        sessionActive = false;
-        clearInterval(timerInterval);
-        clearInterval(pulseInterval);
-        document.getElementById('ring').classList.remove('active');
-        document.getElementById('pauseBtn').style.display = 'none';
-        
-        const wasPresent = pulsesCaught >= MIN_REQUIRED_PULSES;
-        
-        if (wasPresent) {
-            document.getElementById('liveStatus').innerText = "PRESENT";
-            document.getElementById('liveStatus').style.background = "var(--success)";
-            haptic([100, 50, 100, 50, 100]);
-            alert("Attendance Success! You stayed for " + (pulsesCaught*5) + " minutes.");
-        } else {
-            document.getElementById('liveStatus').innerText = "ABSENT";
-            document.getElementById('liveStatus').style.background = "var(--danger)";
-            alert("Attendance Failed. You were outside the room for more than 10 minutes.");
-        }
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // km
+        const dLat = (lat2-lat1) * Math.PI / 180;
+        const dLon = (lon2-lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function addLog(msg) {
+        const log = document.getElementById('log');
+        log.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+        log.scrollTop = log.scrollHeight;
     }
 </script>
 </body>
