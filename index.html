@@ -3,324 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Premier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <title>VetTrack Luxe | Pulse Attendance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@800;900&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
-            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
-            --text: #FFFFFF; --sub: #94A3B8;
+            --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); 
+            --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8;
+            --success: #2ed573; --danger: #ff4757; --warn: #ffa502;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
-            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
-                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
-            background-attachment: fixed;
+            font-family: 'Plus Jakarta Sans', sans-serif; padding: 25px;
+            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%);
+            min-height: 100vh;
         }
 
-        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
+        .container { max-width: 480px; margin: 0 auto; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
-        #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
-        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
-        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
-
-        .stat-card {
-            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
-            padding: 30px; border-radius: 35px; margin-bottom: 30px;
-            box-shadow: 0 20px 40px -10px var(--p-glow);
+        /* Pulse UI */
+        .pulse-box {
+            background: var(--card); border-radius: 35px; padding: 30px;
+            text-align: center; border: 1px solid var(--surface);
+            margin-bottom: 25px; backdrop-filter: blur(10px);
             position: relative; overflow: hidden;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .pulse-ring {
+            width: 140px; height: 140px; border-radius: 50%;
+            border: 4px solid var(--surface); margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; transition: 0.5s;
+        }
+
+        .pulse-ring.active { border-color: var(--p); box-shadow: 0 0 30px var(--p-glow); animation: pulse-glow 2s infinite; }
+        .pulse-ring.paused { border-color: var(--warn); border-style: dashed; animation: none; }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1); box-shadow: 0 0 0px var(--p); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px var(--p); }
+            100% { transform: scale(1); box-shadow: 0 0 0px var(--p); }
+        }
+
+        .status-badge {
+            display: inline-block; padding: 8px 20px; border-radius: 15px;
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
+            margin-top: 10px; letter-spacing: 1px; transition: 0.3s;
+        }
+
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .mini-card { background: var(--card); padding: 20px; border-radius: 25px; border: 1px solid var(--surface); }
+
+        .btn-prime {
+            background: var(--p); color: white; border: none; padding: 22px;
+            border-radius: 25px; width: 100%; font-weight: 800; cursor: pointer;
+            font-size: 16px; margin-bottom: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
         
-        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
-        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
-        
-        .quick-log-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 14px; border-radius: 24px;
-            display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
-            z-index: 2; min-width: 110px;
+        .btn-sec {
+            background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--surface);
+            padding: 15px; border-radius: 20px; width: 100%; font-weight: 600; cursor: pointer;
         }
-        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
-        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
-        .nav-pill { 
-            display: flex; align-items: center; background: var(--card); padding: 8px; 
-            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
-            backdrop-filter: blur(10px);
+        .btn-prime:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #logArea { 
+            margin-top: 25px; max-height: 150px; overflow-y: auto; 
+            font-size: 12px; color: var(--sub); padding: 15px;
+            background: rgba(0,0,0,0.2); border-radius: 15px;
         }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
-        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
-
-        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
-
-        .day-item { 
-            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
-            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
-            border: 1px solid var(--surface); backdrop-filter: blur(10px);
-            user-select: none;
-        }
-        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
-        
-        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
-        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-
-        .item-pill { 
-            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
-        }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
-        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
-        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
-
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
-        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
-        .sheet.up { transform: translateY(0); }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
-        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
-        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
-        
-        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div id="welcomeScreen">
-    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
-    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
-</div>
-
-<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
-    <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
-        <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
-            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
-        </div>
-        <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
-    </div>
-</div>
-
-<div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
-    <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
-        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
-        <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
-    </div>
-</div>
-
 <div class="container">
-    <div class="header">
-        <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
-        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-left">
-            <div class="label">Total Bill</div>
-            <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
+    <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 style="font-family:'Outfit'; font-size:32px; margin:0;">Pulse<span style="color:var(--p)">Luxe.</span></h1>
+            <p id="userStatus" style="color:var(--sub); font-size:13px;">Continuous Classroom Guard</p>
         </div>
-        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
-            <i id="quickIcon">⚡</i>
-            <span id="quickText">Loading...</span>
+        <div id="sessionIndicator" style="width:12px; height:12px; background:var(--surface); border-radius:50%;"></div>
+    </header>
+
+    <div class="pulse-box">
+        <div id="ring" class="pulse-ring">
+            <div style="display:flex; flex-direction:column;">
+                <span id="percent" style="font-family:'Outfit'; font-size:32px; line-height:1;">0%</span>
+                <small style="font-size:10px; color:var(--sub); font-weight:700;">STAY SCORE</small>
+            </div>
+        </div>
+        <div id="liveStatus" class="status-badge" style="background:var(--surface)">SYSTEM IDLE</div>
+        <h3 id="timerLabel" style="margin: 20px 0 5px 0; font-family:'Outfit';">60:00</h3>
+    </div>
+
+    <div class="stat-grid">
+        <div class="mini-card">
+            <small style="color:var(--p); font-weight:800; font-size:10px; letter-spacing:1px;">PULSES</small>
+            <div id="validPulses" style="font-size:24px; font-weight:800;">0/12</div>
+        </div>
+        <div class="mini-card">
+            <small style="color:var(--p); font-weight:800; font-size:10px; letter-spacing:1px;">RELAXATION</small>
+            <div id="bufferUsed" style="font-size:24px; font-weight:800;">0m</div>
         </div>
     </div>
 
-    <div class="nav-pill">
-        <button onclick="changeMonth(-1)">‹</button>
-        <span id="monthLabel">Current</span>
-        <button onclick="changeMonth(1)">›</button>
-    </div>
-    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
+    <button id="actionBtn" class="btn-prime" onclick="startSession()">Begin Lecture Track</button>
+    <button id="pauseBtn" class="btn-sec" onclick="togglePause()" style="display:none;">Take Washroom Break</button>
 
-    <div id="logsGrid"></div>
+    <div id="logArea">
+        <div style="text-align:center; opacity:0.5;">Logs will appear here once session starts...</div>
+    </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script>
+    // --- CONFIGURATION ---
+    const CLASS_COORDS = { lat: 23.277269, lng: 77.432435 }; // UPDATE THIS WITH GOOGLE MAPS
+    const LECTURE_MINS = 60;
+    const PULSE_INTERVAL_MS = 5 * 60 * 1000; // Check every 5 mins
+    const TOTAL_CHECKS = LECTURE_MINS / 5;   // 12 Checks
+    const MIN_REQUIRED_PULSES = 10;          // Student can miss 2 pulses (10 mins)
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
-        projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
-        messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
-    };
+    let sessionActive = false;
+    let isPaused = false;
+    let pulsesCaught = 0;
+    let totalChecksDone = 0;
+    let timerInterval, pulseInterval;
 
-    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
-    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
-    let config = { name: "", mealPrice: 50, waterPrice: 30 };
-    
-    // SCROLL GUARD VARIABLES
-    let longPressTimer;
-    let startY = 0;
-    let isScrolling = false;
+    const haptic = (pattern) => { if(window.navigator.vibrate) window.navigator.vibrate(pattern); };
 
-    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
-    window.logout = () => signOut(auth).then(() => location.reload());
+    function addLog(msg, type='info') {
+        const log = document.getElementById('logArea');
+        const color = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--success)' : 'var(--sub)');
+        const entry = document.createElement('div');
+        entry.style.marginBottom = "5px";
+        entry.innerHTML = `<span style="color:var(--p)">[${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}]</span> <span style="color:${color}">${msg}</span>`;
+        log.prepend(entry);
+    }
 
-    onAuthStateChanged(auth, async (u) => {
-        if (u) { 
-            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
-            document.getElementById('userPfp').src = u.photoURL;
-            const userDoc = await getDoc(doc(db, "users", u.uid));
-            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
-            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
-            document.getElementById('userLabel').innerText = config.name;
-            updateGreet(); syncData(); 
-        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
+    const checkLocation = () => new Promise(res => {
+        if (!navigator.geolocation) return res(false);
+        navigator.geolocation.getCurrentPosition(p => {
+            const dist = Math.sqrt(
+                Math.pow(p.coords.latitude - CLASS_COORDS.lat, 2) + 
+                Math.pow(p.coords.longitude - CLASS_COORDS.lng, 2)
+            );
+            // 0.0006 is roughly a 60-meter radius
+            res(dist < 0.0006); 
+        }, () => res(false), { enableHighAccuracy: true });
     });
 
-    function isCurrentMonth() {
-        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
-    }
-
-    function updateGreet() {
-        const h = new Date().getHours();
-        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : "Good Evening 🌇";
-    }
-
-    function syncData() {
-        onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
-            logs = d.data() || {}; renderGrid();
-        });
-    }
-
-    window.quickLog = async () => {
-        if (!isCurrentMonth()) return;
-        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        if(obj[type] === 1) return;
-        obj[type] = 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
-
-    function renderGrid() {
-        const current = isCurrentMonth();
-        document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
-        document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
-        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    async function performPulse() {
+        if (!sessionActive) return;
         
-        const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
-        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+        // If student explicitly paused for washroom, we don't increment pulseCount
+        if (isPaused) {
+            addLog("Pulse Skipped: Student on break", "info");
+            totalChecksDone++;
+            updateUI();
+            return;
+        }
 
-        const type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const isMarked = logs[todayDate.getDate()] && logs[todayDate.getDate()][type] === 1;
+        totalChecksDone++;
+        document.getElementById('liveStatus').innerText = "SCANNING...";
+        document.getElementById('liveStatus').style.background = "var(--surface)";
         
-        if (current) {
-            document.getElementById('quickIcon').innerText = isMarked ? '✅' : '⚡';
-            document.getElementById('quickText').innerText = isMarked ? 'Marked' : `Mark ${type==='l'?'Lunch':'Dinner'}`;
-            if(isMarked) document.getElementById('quickBtn').classList.add('done');
-            else document.getElementById('quickBtn').classList.remove('done');
+        const inClass = await checkLocation();
+
+        if (inClass) {
+            pulsesCaught++;
+            document.getElementById('liveStatus').innerText = "VERIFIED IN CLASS";
+            document.getElementById('liveStatus').style.background = "var(--success)";
+            addLog("Pulse Verified: Classroom presence confirmed", "success");
+            haptic(40);
         } else {
-            document.getElementById('quickIcon').innerText = '🔒';
-            document.getElementById('quickText').innerText = 'Locked';
+            document.getElementById('liveStatus').innerText = "LOCATION ALERT";
+            document.getElementById('liveStatus').style.background = "var(--danger)";
+            addLog("Pulse Failed: Outside classroom bounds", "error");
+            haptic([100, 50, 100]);
         }
 
-        for (let i = 1; i <= daysCount; i++) {
-            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
-            const card = document.createElement('div');
-            card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
-            
-            if (current) {
-                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
-                card.addEventListener('touchstart', (e) => {
-                    startY = e.touches[0].clientY;
-                    isScrolling = false;
-                    longPressTimer = setTimeout(() => {
-                        if (!isScrolling) openNote(i);
-                    }, 650);
-                }, { passive: true });
+        updateUI();
+    }
 
-                card.addEventListener('touchmove', (e) => {
-                    let moveY = e.touches[0].clientY;
-                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
-                        isScrolling = true;
-                        clearTimeout(longPressTimer);
-                    }
-                }, { passive: true });
-
-                card.addEventListener('touchend', () => {
-                    clearTimeout(longPressTimer);
-                });
-            }
-
-            card.innerHTML = `
-                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
-                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
-                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
-                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
-                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
-            `;
-            grid.appendChild(card);
+    function updateUI() {
+        const percentage = Math.round((pulsesCaught / TOTAL_CHECKS) * 100);
+        document.getElementById('percent').innerText = `${percentage}%`;
+        document.getElementById('validPulses').innerText = `${pulsesCaught}/${TOTAL_CHECKS}`;
+        
+        const bufferMinutes = (totalChecksDone - pulsesCaught) * 5;
+        document.getElementById('bufferUsed').innerText = `${bufferMinutes}m`;
+        
+        if (bufferMinutes > 10) {
+            document.getElementById('bufferUsed').style.color = "var(--danger)";
         }
-        calculate();
     }
 
-    window.toggle = async (day, type) => {
-        if (!isCurrentMonth()) return;
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        obj[type] = obj[type] ? 0 : 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
-
-    window.openNote = (day) => {
-        activeDayId = day;
-        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
-        document.getElementById('noteInput').value = logs[day]?.n || "";
-        document.getElementById('noteOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
-    };
-    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
-    window.saveNote = async () => {
-        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
-        obj.n = document.getElementById('noteInput').value;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
-        closeNote();
-    };
-
-    window.openSettings = () => {
-        document.getElementById('setUserName').value = config.name;
-        document.getElementById('setMealPrice').value = config.mealPrice;
-        document.getElementById('setWaterPrice').value = config.waterPrice;
-        document.getElementById('settingsOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
-    };
-    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
-    window.saveSettings = async () => {
-        config.name = document.getElementById('setUserName').value;
-        config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
-        config.waterPrice = parseInt(document.getElementById('setWaterPrice').value);
-        await setDoc(doc(db, "users", user.uid), config, { merge: true });
-        document.getElementById('userLabel').innerText = config.name;
-        calculate(); closeSettings();
-    };
-
-    function calculate() {
-        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
-        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
+    function togglePause() {
+        isPaused = !isPaused;
+        const btn = document.getElementById('pauseBtn');
+        const ring = document.getElementById('ring');
+        
+        if (isPaused) {
+            btn.innerText = "Return to Class";
+            btn.style.borderColor = "var(--p)";
+            ring.classList.add('paused');
+            document.getElementById('liveStatus').innerText = "ON BREAK";
+            document.getElementById('liveStatus').style.background = "var(--warn)";
+            addLog("Break started: 10m buffer clocking...", "info");
+        } else {
+            btn.innerText = "Take Washroom Break";
+            btn.style.borderColor = "var(--surface)";
+            ring.classList.remove('paused');
+            addLog("Returned from break. Resuming track.");
+            performPulse(); // Immediate check on return
+        }
+        haptic(60);
     }
 
-    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
+    function startSession() {
+        sessionActive = true;
+        document.getElementById('actionBtn').style.display = 'none';
+        document.getElementById('pauseBtn').style.display = 'block';
+        document.getElementById('ring').classList.add('active');
+        document.getElementById('sessionIndicator').style.background = "var(--p)";
+        document.getElementById('logArea').innerHTML = '';
+        
+        addLog("Attendance Tracking Engaged.");
+        performPulse(); // Check 1
+
+        pulseInterval = setInterval(performPulse, PULSE_INTERVAL_MS);
+
+        let timeLeft = LECTURE_MINS * 60;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timerLabel').innerText = `${m}:${s < 10 ? '0' + s : s}`;
+
+            if (timeLeft <= 0) endSession();
+        }, 1000);
+    }
+
+    function endSession() {
+        sessionActive = false;
+        clearInterval(timerInterval);
+        clearInterval(pulseInterval);
+        document.getElementById('ring').classList.remove('active');
+        document.getElementById('pauseBtn').style.display = 'none';
+        
+        const wasPresent = pulsesCaught >= MIN_REQUIRED_PULSES;
+        
+        if (wasPresent) {
+            document.getElementById('liveStatus').innerText = "PRESENT";
+            document.getElementById('liveStatus').style.background = "var(--success)";
+            haptic([100, 50, 100, 50, 100]);
+            alert("Attendance Success! You stayed for " + (pulsesCaught*5) + " minutes.");
+        } else {
+            document.getElementById('liveStatus').innerText = "ABSENT";
+            document.getElementById('liveStatus').style.background = "var(--danger)";
+            alert("Attendance Failed. You were outside the room for more than 10 minutes.");
+        }
+    }
 </script>
 </body>
 </html>
-
-
