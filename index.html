@@ -3,217 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>VetLuxe | Professional Store</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Outfit:wght@800&display=swap" rel="stylesheet">
+    <title>VetKart | NDVSU Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --p: #FF8C00; --bg: #0B0F1A; --card: #1E293B; --border: rgba(255,255,255,0.1);
-            --success: #2ed573; --text: #FFFFFF; --sub: #94A3B8;
+            --p: #2874f0; --accent: #fb641b; --bg: #f1f3f6; 
+            --card: #ffffff; --text: #212121; --sub: #878787;
         }
 
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        /* --- LUXE HEADER --- */
+        /* --- FLIPKART STYLE HEADER --- */
         header {
-            background: rgba(11, 15, 26, 0.8); backdrop-filter: blur(25px);
-            padding: 18px 5%; position: sticky; top: 0; z-index: 1000;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border);
-        }
-        .logo { font-family: 'Outfit'; font-size: 24px; font-weight: 800; }
-        .logo span { color: var(--p); }
-
-        /* --- CATEGORY PILLS --- */
-        .category-scroller {
-            padding: 15px 5%; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none;
-        }
-        .pill {
-            padding: 10px 22px; background: var(--card); border: 1px solid var(--border);
-            border-radius: 50px; font-size: 13px; font-weight: 700; white-space: nowrap;
-            cursor: pointer; transition: 0.3s;
-        }
-        .pill.active { background: var(--p); border-color: var(--p); }
-
-        /* --- PROFESSIONAL GRID --- */
-        .grid { padding: 0 5% 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; }
-        .card {
-            background: var(--card); border-radius: 28px; padding: 15px;
-            border: 1px solid var(--border); transition: 0.3s; position: relative;
-        }
-        .card:hover { transform: translateY(-8px); border-color: var(--p); }
-        .card img { width: 100%; aspect-ratio: 1; border-radius: 20px; object-fit: cover; margin-bottom: 12px; }
-        .card-tag { position: absolute; top: 20px; right: 20px; background: var(--p); font-size: 9px; padding: 4px 8px; border-radius: 8px; font-weight: 800; }
-
-        /* --- SIDEBAR CART --- */
-        #cartSide {
-            position: fixed; right: -100%; top: 0; width: 380px; height: 100%;
-            background: #0F172A; z-index: 2000; transition: 0.5s cubic-bezier(0.85, 0, 0.15, 1);
-            padding: 40px 30px; box-shadow: -20px 0 50px rgba(0,0,0,0.5); display: flex; flex-direction: column;
-        }
-        #cartSide.active { right: 0; }
-        .cart-item { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; }
-        .cart-item img { width: 50px; height: 50px; border-radius: 12px; }
-
-        /* --- MODAL SYSTEM --- */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-            display: none; justify-content: center; align-items: center; z-index: 3000;
-        }
-        .modal-content {
-            background: var(--card); width: 90%; max-width: 450px; border-radius: 35px;
-            padding: 35px; position: relative; animation: slideUp 0.4s ease;
+            background: var(--p); padding: 10px 5%; position: sticky; top: 0; z-index: 1000;
+            display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        /* --- BUTTONS & ANIMATIONS --- */
-        .btn-buy { width: 100%; padding: 16px; border-radius: 18px; border: none; background: var(--p); color: white; font-weight: 800; cursor: pointer; }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .logo { font-family: 'Outfit'; color: white; font-size: 20px; text-decoration: none; font-style: italic; }
+        .logo span { color: #ffe500; font-weight: 800; }
 
-        /* Notifications */
-        .snack { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--success); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 800; font-size: 14px; opacity: 0; transition: 0.4s; z-index: 4000; }
-        .snack.active { opacity: 1; bottom: 50px; }
+        .search-container {
+            flex: 1; background: white; border-radius: 2px; display: flex; 
+            align-items: center; padding: 0 12px; height: 36px;
+        }
+        .search-container input { 
+            border: none; outline: none; width: 100%; font-size: 14px;
+        }
+
+        .cart-trigger { color: white; font-weight: 700; cursor: pointer; font-size: 14px; }
+
+        /* --- CATEGORY NAVIGATION --- */
+        .categories {
+            background: white; padding: 12px 5%; display: flex; 
+            justify-content: space-between; overflow-x: auto; border-bottom: 1px solid #e0e0e0;
+        }
+        .cat-item { 
+            text-align: center; font-size: 12px; font-weight: 700; cursor: pointer; 
+            min-width: 80px; color: var(--text);
+        }
+
+        /* --- PRODUCT GRID --- */
+        .product-grid { 
+            padding: 15px 5%; display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; 
+        }
+
+        .product-card {
+            background: white; border-radius: 4px; padding: 12px; 
+            display: flex; flex-direction: column; transition: 0.2s;
+        }
+        .product-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        .prod-img { width: 100%; aspect-ratio: 1; object-fit: contain; margin-bottom: 8px; }
+        .prod-name { font-size: 13px; font-weight: 500; height: 34px; overflow: hidden; }
+        .prod-price { font-weight: 800; font-size: 16px; margin-top: 5px; }
+
+        .buy-btn {
+            background: var(--accent); color: white; border: none; 
+            padding: 10px; border-radius: 2px; font-weight: 700; 
+            margin-top: 10px; cursor: pointer; font-size: 12px;
+        }
+
+        /* --- TOAST NOTIFICATION --- */
+        #toast {
+            position: fixed; bottom: -50px; left: 50%; transform: translateX(-50%);
+            background: #212121; color: white; padding: 12px 24px; border-radius: 4px;
+            font-size: 14px; transition: 0.4s; z-index: 2000;
+        }
+        #toast.visible { bottom: 30px; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">Luxe<span>Kart.</span></div>
-    <div onclick="toggleCart()" style="cursor:pointer; background:rgba(255,255,255,0.05); padding:10px 18px; border-radius:15px; font-weight:700;">
-        Cart <span id="cartCount" style="color:var(--p)">0</span>
+    <a href="#" class="logo">Vet<span>Kart</span></a>
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Search textbooks, stethoscopes..." onkeyup="handleSearch()">
     </div>
+    <div class="cart-trigger">Cart <span id="cartCount">0</span></div>
 </header>
 
-<div class="category-scroller">
-    <div class="pill active" onclick="filterBy('All')">All Inventory</div>
-    <div class="pill" onclick="filterBy('Clinical')">Clinical Gear</div>
-    <div class="pill" onclick="filterBy('Academic')">Academic Texts</div>
-    <div class="pill" onclick="filterBy('Tech')">Tech Tools</div>
+<div class="categories">
+    <div class="cat-item" onclick="filter('all')">All</div>
+    <div class="cat-item" onclick="filter('clinical')">Clinical</div>
+    <div class="cat-item" onclick="filter('books')">Books</div>
+    <div class="cat-item" onclick="filter('batch')">Batch A Gear</div>
 </div>
 
-<div class="grid" id="mainGrid"></div>
-
-<!-- Modal -->
-<div class="modal-overlay" id="modal">
-    <div class="modal-content" id="modalContent"></div>
-</div>
-
-<!-- Cart Sidebar -->
-<div id="cartSide">
-    <div style="display:flex; justify-content:space-between; margin-bottom:40px;">
-        <h2 style="font-family:'Outfit'; font-size:28px;">Checkout</h2>
-        <button onclick="toggleCart()" style="background:none; border:none; color:white; font-size:30px;">×</button>
-    </div>
-    <div id="cartItems" style="flex:1; overflow-y:auto;"></div>
-    <div style="border-top:1px solid var(--border); padding-top:20px;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <span>Subtotal</span>
-            <span id="totalPrice" style="font-weight:800; font-size:22px;">₹0</span>
-        </div>
-        <button class="btn-buy" onclick="simulateCheckout()">CONFIRM ORDER</button>
-    </div>
-</div>
-
-<div id="snackbar" class="snack">Successfully Added</div>
+<div class="product-grid" id="grid"></div>
+<div id="toast">Added to your inventory</div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+    // Simulation of a professional product engine
     const products = [
-        { id: 1, cat: 'Clinical', name: 'Pro Stethoscope', price: 9500, desc: 'Dual-frequency membrane for high-precision heart monitoring.', img: 'https://images.unsplash.com/photo-1584982324572-755d1333e382?w=300' },
-        { id: 2, cat: 'Academic', name: 'Vet Anatomy Atlas', price: 3200, desc: 'Full-color skeletal maps and organ system diagrams.', img: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=300' },
-        { id: 3, cat: 'Tech', name: 'Simulation Kit', price: 1500, desc: 'Web-based fuel and logistics management licenses.', img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=300' },
-        { id: 4, cat: 'Clinical', name: 'Material UI Scrubs', price: 1800, desc: 'High-quality cotton, clinical-grade material for NDVSU students.', img: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=300' }
+        { id: 101, cat: 'clinical', name: 'Pro-Series Stethoscope', price: 7499, img: 'https://images.unsplash.com/photo-1584982324572-755d1333e382?w=200' },
+        { id: 102, cat: 'books', name: 'Veterinary Anatomy Vol.1', price: 2150, img: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=200' },
+        { id: 103, cat: 'batch', name: 'NDVSU Batch A Lab Coat', price: 1200, img: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=200' },
+        { id: 104, cat: 'clinical', name: 'Medical Diagnostic Kit', price: 15400, img: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=200' }
     ];
 
     let cart = [];
 
-    // --- RENDER ENGINE ---
-    window.render = (items) => {
-        const grid = document.getElementById('mainGrid');
+    window.drawGrid = (items) => {
+        const grid = document.getElementById('grid');
         grid.innerHTML = items.map(p => `
-            <div class="card" onclick="openProduct(${p.id})">
-                <span class="card-tag">${p.cat}</span>
-                <img src="${p.img}">
-                <div style="font-weight:700; font-size:14px; margin-bottom:5px;">${p.name}</div>
-                <div style="color:var(--p); font-weight:800;">₹${p.price}</div>
+            <div class="product-card">
+                <img src="${p.img}" class="prod-img">
+                <div class="prod-name">${p.name}</div>
+                <div class="prod-price">₹${p.price.toLocaleString()}</div>
+                <button class="buy-btn" onclick="addToCart('${p.name}')">ADD TO CART</button>
             </div>
         `).join('');
     };
 
-    // --- FUNCTIONALITIES ---
-    window.openProduct = (id) => {
-        const p = products.find(x => x.id === id);
-        const modal = document.getElementById('modal');
-        const content = document.getElementById('modalContent');
-        content.innerHTML = `
-            <img src="${p.img}" style="width:100%; border-radius:25px; margin-bottom:20px;">
-            <h2 style="font-family:'Outfit'; margin:0 0 10px 0;">${p.name}</h2>
-            <p style="color:var(--sub); line-height:1.6; font-size:14px;">${p.desc}</p>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px;">
-                <span style="font-size:24px; font-weight:800; color:var(--p)">₹${p.price}</span>
-                <button class="btn-buy" onclick="addToCart(${p.id})" style="width:auto; padding:15px 35px;">Add to Cart</button>
-            </div>
-            <button onclick="closeModal()" style="position:absolute; top:25px; right:25px; background:none; border:none; color:white; font-size:24px;">×</button>
-        `;
-        modal.style.display = 'flex';
+    window.handleSearch = () => {
+        const val = document.getElementById('search').value.toLowerCase();
+        const results = products.filter(p => p.name.toLowerCase().includes(val));
+        drawGrid(results);
     };
 
-    window.addToCart = (id) => {
-        const p = products.find(x => x.id === id);
-        cart.push(p);
-        updateUI();
-        closeModal();
-        showSnack(`"${p.name}" added to inventory`);
-        if(window.navigator.vibrate) window.navigator.vibrate(50);
+    window.filter = (c) => {
+        if(c === 'all') drawGrid(products);
+        else drawGrid(products.filter(p => p.cat === c));
     };
 
-    function updateUI() {
+    window.addToCart = (name) => {
+        cart.push(name);
         document.getElementById('cartCount').innerText = cart.length;
-        const list = document.getElementById('cartItems');
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        document.getElementById('totalPrice').innerText = `₹${total}`;
         
-        list.innerHTML = cart.map(i => `
-            <div class="cart-item">
-                <img src="${i.img}">
-                <div>
-                    <div style="font-weight:700; font-size:14px;">${i.name}</div>
-                    <div style="color:var(--p); font-size:13px; font-weight:700;">₹${i.price}</div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    window.simulateCheckout = () => {
-        if(cart.length === 0) return alert("Cart is empty");
-        showSnack("Order Placed Successfully!");
-        cart = [];
-        updateUI();
-        toggleCart();
+        const t = document.getElementById('toast');
+        t.innerText = `"${name}" added to cart`;
+        t.classList.add('visible');
+        setTimeout(() => t.classList.remove('visible'), 3000);
+        
+        if(window.navigator.vibrate) window.navigator.vibrate(35); // Clinical feel
     };
 
-    window.filterBy = (cat) => {
-        document.querySelectorAll('.pill').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        if(cat === 'All') render(products);
-        else render(products.filter(p => p.cat === cat));
-    };
-
-    window.toggleCart = () => document.getElementById('cartSide').classList.toggle('active');
-    window.closeModal = () => document.getElementById('modal').style.display = 'none';
-    
-    function showSnack(msg) {
-        const s = document.getElementById('snackbar');
-        s.innerText = msg;
-        s.classList.add('active');
-        setTimeout(() => s.classList.remove('active'), 3000);
-    }
-
-    // Initial Load
-    render(products);
+    // Initial Render
+    drawGrid(products);
 </script>
 </body>
 </html>
