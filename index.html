@@ -3,63 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luxe | Master Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;800&family=Outfit:wght@800;900&display=swap" rel="stylesheet">
+    <title>VetTrack Luxe | Master Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@800;900&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --text: #FFFFFF; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 25px; }
-        .control-card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 25px; margin-bottom: 20px; }
-        .btn { background: var(--p); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 10px; }
-        .status-tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; margin-bottom: 10px; }
-        input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 10px; color: white; box-sizing: border-box; }
+        :root { 
+            --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); 
+            --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8;
+        }
+
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px;
+            background-image: radial-gradient(circle at 100% 0%, #1e293b 0%, transparent 40%);
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .header h1 { font-family: 'Outfit'; font-size: 28px; margin: 0; }
+
+        /* System Control Section */
+        .section-label { font-size: 10px; font-weight: 800; color: var(--p); text-transform: uppercase; letter-spacing: 2px; margin: 20px 0 10px; }
+        
+        .sys-card { 
+            background: var(--card); border: 1px solid var(--surface); padding: 20px; 
+            border-radius: 25px; margin-bottom: 25px; 
+        }
+
+        .status-pill { 
+            display: inline-block; padding: 6px 12px; border-radius: 10px; 
+            font-size: 11px; font-weight: 800; margin-bottom: 15px;
+        }
+        .live { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .maint { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .stat-box { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid var(--surface); }
+        .stat-box label { font-size: 9px; color: var(--sub); text-transform: uppercase; display: block; }
+        .stat-box b { font-family: 'Outfit'; font-size: 22px; color: var(--p); }
+
+        /* UI Elements */
+        input { width: 100%; padding: 14px; background: #000; border: 1px solid #333; border-radius: 12px; color: white; box-sizing: border-box; font-family: inherit; margin-bottom: 10px; }
+        .btn { background: var(--p); color: white; border: none; padding: 14px; border-radius: 15px; font-weight: 800; width: 100%; cursor: pointer; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-alt { background: #334155; }
+
+        /* User List */
+        .user-card { 
+            background: var(--card); padding: 18px; border-radius: 22px; 
+            border: 1px solid var(--surface); margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .u-info h4 { margin: 0; font-size: 16px; }
+        .u-info small { color: var(--sub); font-size: 11px; }
+
+        #loading { text-align: center; color: var(--p); font-weight: 800; padding: 40px; display: none; }
     </style>
 </head>
 <body>
 
-    <h1 style="font-family:'Outfit';">Master Control</h1>
-
-    <div class="control-card">
-        <div id="mBadge" class="status-tag">Checking...</div>
-        <button class="btn" onclick="toggleM()">Toggle Maintenance</button>
+    <div class="header">
+        <h1>Master<span>Control</span></h1>
+        <button onclick="syncAll()" style="background:none; border:none; color:var(--p); font-weight:800;">REFRESH</button>
     </div>
 
-    <div class="control-card">
-        <label style="font-size:10px; color:var(--p); font-weight:800;">ADMIN UIDS</label>
-        <input type="text" id="adminInput" placeholder="UID1, UID2...">
-        <button class="btn" onclick="saveAdmins()" style="background:#334155;">Update Admins</button>
+    <!-- 1. System Config -->
+    <div class="section-label">System Command</div>
+    <div class="sys-card">
+        <div id="mStatus" class="status-pill">CHECKING...</div>
+        <button class="btn" onclick="toggleMaintenance()" id="mBtn">Toggle Mode</button>
+        
+        <div style="margin-top: 20px;">
+            <label style="font-size: 10px; color: var(--sub);">ADMIN UIDS (Comma Separated)</label>
+            <input type="text" id="adminUIDs" placeholder="UID1, UID2...">
+            <button class="btn btn-alt" onclick="saveAdmins()">Update Admin List</button>
+        </div>
     </div>
 
+    <!-- 2. Global Analytics -->
+    <div class="section-label">Global Analytics</div>
+    <div class="stats-grid">
+        <div class="stat-box"><label>Total Revenue</label><b id="totalRev">₹0</b></div>
+        <div class="stat-box"><label>Users Found</label><b id="totalUsers">0</b></div>
+    </div>
+
+    <!-- 3. Member List -->
+    <div class="section-label">Member Directory</div>
+    <div id="loading">SYNCING REAL-TIME DATA...</div>
     <div id="userList"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", projectId: "vettrack-1c65e" };
-    const app = initializeApp(firebaseConfig), db = getFirestore(app);
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", 
+        authDomain: "vettrack-1c65e.firebaseapp.com", 
+        projectId: "vettrack-1c65e" 
+    };
 
-    // Sync System Settings
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --- SYSTEM STATUS LISTENER ---
     onSnapshot(doc(db, "system", "config"), (snap) => {
-        const data = snap.data() || { maintenanceMode: false, adminUIDs: [] };
-        const isM = data.maintenanceMode;
-        const badge = document.getElementById('mBadge');
-        badge.innerText = isM ? "MAINTENANCE ON" : "SYSTEM LIVE";
-        badge.style.background = isM ? "#ef4444" : "#10B981";
-        document.getElementById('adminInput').value = data.adminUIDs.join(", ");
+        if (snap.exists()) {
+            const data = snap.data();
+            const isM = data.maintenanceMode;
+            const badge = document.getElementById('mStatus');
+            
+            badge.innerText = isM ? "MAINTENANCE ACTIVE" : "SYSTEM LIVE";
+            badge.className = `status-pill ${isM ? 'maint' : 'live'}`;
+            document.getElementById('mBtn').innerText = isM ? "Go Live" : "Start Maintenance";
+            document.getElementById('adminUIDs').value = (data.adminUIDs || []).join(", ");
+        }
     });
 
-    window.toggleM = async () => {
+    window.toggleMaintenance = async () => {
         const ref = doc(db, "system", "config");
         const snap = await getDoc(ref);
-        const cur = snap.data().maintenanceMode;
-        await setDoc(ref, { maintenanceMode: !cur }, { merge: true });
+        const current = snap.exists() ? snap.data().maintenanceMode : false;
+        await setDoc(ref, { maintenanceMode: !current }, { merge: true });
     };
 
     window.saveAdmins = async () => {
-        const list = document.getElementById('adminInput').value.split(",").map(s => s.trim());
-        await setDoc(doc(db, "system", "config"), { adminUIDs: list }, { merge: true });
-        alert("Admins Updated");
+        const uids = document.getElementById('adminUIDs').value.split(",").map(id => id.trim()).filter(id => id.length > 0);
+        await setDoc(doc(db, "system", "config"), { adminUIDs: uids }, { merge: true });
+        alert("Admin Permissions Synchronized");
     };
+
+    // --- DATA AGGREGATION ---
+    window.syncAll = async () => {
+        const loader = document.getElementById('loading');
+        const list = document.getElementById('userList');
+        loader.style.display = 'block';
+        list.innerHTML = '';
+
+        try {
+            const usersSnap = await getDocs(collection(db, "users"));
+            let globalRev = 0;
+            let userCount = 0;
+
+            for (const userDoc of usersSnap.docs) {
+                userCount++;
+                const u = userDoc.data();
+                const uid = userDoc.id;
+                let userBill = 0;
+
+                // Deep scan user logs
+                const logsSnap = await getDocs(collection(db, "users", uid, "logs"));
+                logsSnap.forEach(lDoc => {
+                    const monthData = lDoc.data();
+                    Object.values(monthData).forEach(day => {
+                        if (day.l) userBill += (u.mealPrice || 50);
+                        if (day.d) userBill += (u.mealPrice || 50);
+                        if (day.w) userBill += (u.waterPrice || 30);
+                    });
+                });
+
+                globalRev += userBill;
+
+                // Render User Card
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.innerHTML = `
+                    <div class="u-info">
+                        <h4>${u.name || 'Anonymous'}</h4>
+                        <small>Bill: ₹${userBill} | UID: ${uid.substring(0,8)}</small>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="editUser('${uid}','${u.name}')" style="background:var(--surface); border:none; color:white; padding:8px; border-radius:10px; cursor:pointer;">✎</button>
+                        <button onclick="deleteUser('${uid}')" style="background:rgba(239,68,68,0.1); border:none; color:#ef4444; padding:8px; border-radius:10px; cursor:pointer;">✕</button>
+                    </div>
+                `;
+                list.appendChild(card);
+            }
+
+            document.getElementById('totalRev').innerText = `₹${globalRev.toLocaleString()}`;
+            document.getElementById('totalUsers').innerText = userCount;
+        } catch (e) {
+            console.error(e);
+        } finally {
+            loader.style.display = 'none';
+        }
+    };
+
+    window.editUser = async (id, current) => {
+        const n = prompt("New Display Name:", current);
+        if (n) {
+            await updateDoc(doc(db, "users", id), { name: n });
+            syncAll();
+        }
+    };
+
+    window.deleteUser = async (id) => {
+        if(confirm("Permanently delete this member?")) {
+            await deleteDoc(doc(db, "users", id));
+            syncAll();
+        }
+    };
+
+    // Initial Load
+    syncAll();
 </script>
 </body>
 </html>
