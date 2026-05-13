@@ -3,44 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VetTrack Luxe | Master Admin</title>
+    <title>VetTrack Luxe | Master Admin v2</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@800;900&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8; }
+        :root { --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .stat-box { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--surface); }
-        .stat-box label { font-size: 10px; text-transform: uppercase; color: var(--p); font-weight: 800; }
-        .stat-box div { font-family: 'Outfit'; font-size: 28px; }
-        .user-card { background: var(--card); padding: 15px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--surface); }
-        .u-info h4 { margin: 0; font-size: 16px; }
-        .u-info p { margin: 0; font-size: 11px; color: var(--sub); }
-        .btn-group { display: flex; gap: 8px; }
-        button { cursor: pointer; border: none; font-weight: 700; border-radius: 10px; }
-        .btn-edit { background: var(--surface); color: white; padding: 8px 12px; }
-        .btn-del { background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 8px 12px; }
-        #loader { text-align: center; color: var(--p); font-weight: 800; padding: 20px; display: none; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .stat-box { background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid var(--surface); margin-bottom: 10px; }
+        .user-card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid var(--surface); display: flex; justify-content: space-between; }
+        
+        /* Debug Console Style */
+        #debugLog { 
+            background: #000; color: #0f0; font-family: monospace; font-size: 11px; 
+            padding: 10px; border-radius: 10px; height: 100px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #333;
+        }
+        .btn-sync { background: var(--p); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1 style="font-family:'Outfit'; margin:0;">Admin<span style="color:var(--p)">.</span></h1>
-    <button onclick="fetchAllData()" style="background:var(--p); color:white; padding:8px 15px;">Sync Data</button>
+    <h1 style="font-family:'Outfit'; margin:0;">Admin Console</h1>
+    <button class="btn-sync" onclick="startGlobalSync()">Force Sync</button>
 </div>
 
-<div class="stat-grid">
-    <div class="stat-box"><label>Total Members</label><div id="count">0</div></div>
-    <div class="stat-box"><label>Est. Revenue</label><div id="rev">₹0</div></div>
+<div id="debugLog">System Ready. Click Sync to fetch...</div>
+
+<div class="stat-box">
+    <div style="font-size: 12px; color: var(--p); font-weight: 800;">TOTAL REVENUE</div>
+    <div id="revDisplay" style="font-size: 32px; font-family: 'Outfit';">₹0</div>
 </div>
 
-<div id="loader">Fetching Real-time Logs...</div>
-<div id="userList"></div>
+<div id="userList">
+    <p style="color: #94A3B8; text-align: center;">No users loaded yet.</p>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", 
@@ -48,74 +48,75 @@
         projectId: "vettrack-1c65e" 
     };
 
-    const app = initializeApp(firebaseConfig), db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    async function fetchAllData() {
-        document.getElementById('loader').style.display = 'block';
-        const usersSnap = await getDocs(collection(db, "users"));
-        let totalRev = 0;
-        let userCount = 0;
-        const list = document.getElementById('userList');
-        list.innerHTML = '';
-
-        for (const userDoc of usersSnap.docs) {
-            userCount++;
-            const userData = userDoc.data();
-            const userId = userDoc.id;
-            let userSpend = 0;
-
-            // Fetch this specific user's logs
-            const logsSnap = await getDocs(collection(db, "users", userId, "logs"));
-            logsSnap.forEach(lDoc => {
-                const dayData = lDoc.data();
-                Object.values(dayData).forEach(day => {
-                    if (day.l) userSpend += (userData.mealPrice || 50);
-                    if (day.d) userSpend += (userData.mealPrice || 50);
-                    if (day.w) userSpend += (userData.waterPrice || 30);
-                });
-            });
-
-            totalRev += userSpend;
-
-            // Render Card
-            const card = document.createElement('div');
-            card.className = 'user-card';
-            card.innerHTML = `
-                <div class="u-info">
-                    <h4>${userData.name || 'New User'}</h4>
-                    <p>Bill: ₹${userSpend} | Meals: ${userData.mealPrice} | Water: ${userData.waterPrice}</p>
-                </div>
-                <div class="btn-group">
-                    <button class="btn-edit" onclick="editUser('${userId}', '${userData.name}', ${userData.mealPrice})">Edit</button>
-                    <button class="btn-del" onclick="deleteProfile('${userId}')">Delete</button>
-                </div>
-            `;
-            list.appendChild(card);
-        }
-
-        document.getElementById('count').innerText = userCount;
-        document.getElementById('rev').innerText = `₹${totalRev}`;
-        document.getElementById('loader').style.display = 'none';
+    function log(msg) {
+        const d = document.getElementById('debugLog');
+        d.innerHTML += `> ${msg}<br>`;
+        d.scrollTop = d.scrollHeight;
     }
 
-    window.editUser = async (id, oldName, oldPrice) => {
-        const newName = prompt("New Name:", oldName);
-        const newPrice = prompt("New Meal Price:", oldPrice);
-        if (newName && newPrice) {
-            await updateDoc(doc(db, "users", id), { name: newName, mealPrice: parseInt(newPrice) });
-            fetchAllData();
+    window.startGlobalSync = async () => {
+        try {
+            log("Attempting to connect to 'users' collection...");
+            const usersSnap = await getDocs(collection(db, "users"));
+            
+            if (usersSnap.empty) {
+                log("WARN: 'users' collection is EMPTY in Firestore.");
+                return;
+            }
+
+            log(`SUCCESS: Found ${usersSnap.size} users.`);
+            let grandTotal = 0;
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+
+            for (const userDoc of usersSnap.docs) {
+                const u = userDoc.data();
+                const uid = userDoc.id;
+                log(`Fetching logs for: ${u.name || uid}...`);
+
+                let userBill = 0;
+                // Important: Using the exact path to sub-collection
+                const logsSnap = await getDocs(collection(db, "users", uid, "logs"));
+                
+                logsSnap.forEach(lDoc => {
+                    const monthData = lDoc.data();
+                    Object.values(monthData).forEach(day => {
+                        if (day.l) userBill += (u.mealPrice || 50);
+                        if (day.d) userBill += (u.mealPrice || 50);
+                        if (day.w) userBill += (u.waterPrice || 30);
+                    });
+                });
+
+                grandTotal += userBill;
+
+                const div = document.createElement('div');
+                div.className = 'user-card';
+                div.innerHTML = `
+                    <div>
+                        <strong style="display:block;">${u.name || 'Unknown'}</strong>
+                        <small style="color:#94A3B8;">${uid.substring(0,10)}...</small>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="color:var(--p); font-weight:800;">₹${userBill}</div>
+                    </div>
+                `;
+                list.appendChild(div);
+            }
+
+            document.getElementById('revDisplay').innerText = `₹${grandTotal.toLocaleString()}`;
+            log("Sync Complete.");
+
+        } catch (err) {
+            log(`ERROR: ${err.message}`);
+            console.error(err);
         }
     };
 
-    window.deleteProfile = async (id) => {
-        if(confirm("Permanently delete this user?")) {
-            await deleteDoc(doc(db, "users", id));
-            fetchAllData();
-        }
-    };
-
-    // Initial Load
-    fetchAllData();
+    // Auto-start on load
+    startGlobalSync();
 </script>
 </body>
 </html>
