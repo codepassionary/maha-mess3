@@ -2,323 +2,175 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Premier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VetTrack Luxe | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@800;900&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
-            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
-            --text: #FFFFFF; --sub: #94A3B8;
+            --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); 
+            --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8;
+            --danger: #ff4757;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
-            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
-                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
-            background-attachment: fixed;
+            font-family: 'Plus Jakarta Sans', sans-serif; padding: 25px;
+            background-image: radial-gradient(circle at 100% 0%, #1e293b 0%, transparent 40%);
         }
 
-        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-family: 'Outfit'; font-size: 28px; margin: 0; }
+        .admin-badge { background: var(--p); font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 800; vertical-align: middle; margin-left: 10px; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
-        #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
-        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
-        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
+        .summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .sum-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--surface); }
+        .sum-card label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--sub); }
+        .sum-card .val { font-family: 'Outfit'; font-size: 24px; color: var(--p); display: block; }
 
-        .stat-card {
-            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
-            padding: 30px; border-radius: 35px; margin-bottom: 30px;
-            box-shadow: 0 20px 40px -10px var(--p-glow);
-            position: relative; overflow: hidden;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
+        .user-list { display: flex; flex-direction: column; gap: 15px; }
+        .user-item { 
+            background: var(--card); padding: 20px; border-radius: 28px; 
+            border: 1px solid var(--surface); display: flex; align-items: center; justify-content: space-between;
         }
-        
-        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
-        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
-        
-        .quick-log-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 14px; border-radius: 24px;
-            display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
-            z-index: 2; min-width: 110px;
-        }
-        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
-        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-info img { width: 45px; height: 45px; border-radius: 14px; background: #222; }
+        .user-details h3 { margin: 0; font-size: 16px; letter-spacing: -0.5px; }
+        .user-details p { margin: 0; font-size: 12px; color: var(--sub); }
 
-        .nav-pill { 
-            display: flex; align-items: center; background: var(--card); padding: 8px; 
-            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
-            backdrop-filter: blur(10px);
-        }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
-        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
+        .actions { display: flex; gap: 10px; }
+        .btn-icon { width: 40px; height: 40px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-edit { background: var(--surface); color: white; }
+        .btn-del { background: rgba(255, 71, 87, 0.1); color: var(--danger); }
+        .btn-icon:hover { transform: scale(1.1); }
 
-        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
-
-        .day-item { 
-            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
-            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
-            border: 1px solid var(--surface); backdrop-filter: blur(10px);
-            user-select: none;
-        }
-        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
-        
-        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
-        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-
-        .item-pill { 
-            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
-        }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
-        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
-        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
-
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
-        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
-        .sheet.up { transform: translateY(0); }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
-        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
-        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
-        
-        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* Modal Styles */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+        .modal-content { background: #161B29; width: 100%; max-width: 400px; padding: 30px; border-radius: 35px; border: 1px solid var(--surface); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 8px; text-transform: uppercase; }
+        .form-group input { width: 100%; padding: 15px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 15px; color: white; box-sizing: border-box; }
+        .btn-save { background: var(--p); color: white; width: 100%; padding: 18px; border: none; border-radius: 18px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="welcomeScreen">
-    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
-    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
+<div class="header">
+    <h1>VetTrack Admin<span class="admin-badge">LUXE</span></h1>
+    <button onclick="location.reload()" style="background:none; border:none; color:var(--p); font-weight:800; cursor:pointer;">Refresh</button>
 </div>
 
-<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
-    <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
-        <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
-            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
-        </div>
-        <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
-    </div>
+<div class="summary-row">
+    <div class="sum-card"><label>Total Users</label><span class="val" id="totalUsers">0</span></div>
+    <div class="sum-card"><label>Global Revenue</label><span class="val" id="totalRev">₹0</span></div>
 </div>
 
-<div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
-    <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
-        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
-        <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
-    </div>
+<div class="user-list" id="userList">
+    <!-- Users will be injected here -->
 </div>
 
-<div class="container">
-    <div class="header">
-        <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
-        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-left">
-            <div class="label">Total Bill</div>
-            <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h2 style="margin-top:0; font-family:'Outfit';">Edit Profile</h2>
+        <div class="form-group"><label>Display Name</label><input type="text" id="editName"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+            <div class="form-group"><label>Meal (₹)</label><input type="number" id="editMeal"></div>
+            <div class="form-group"><label>Water (₹)</label><input type="number" id="editWater"></div>
         </div>
-        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
-            <i id="quickIcon">⚡</i>
-            <span id="quickText">Loading...</span>
-        </div>
+        <button class="btn-save" onclick="updateUser()">Update Member</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:var(--sub); width:100%; margin-top:15px; font-weight:700;">Cancel</button>
     </div>
-
-    <div class="nav-pill">
-        <button onclick="changeMonth(-1)">‹</button>
-        <span id="monthLabel">Current</span>
-        <button onclick="changeMonth(1)">›</button>
-    </div>
-    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
-
-    <div id="logsGrid"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { 
-        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
-        projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
-        messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
+        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", 
+        authDomain: "vettrack-1c65e.firebaseapp.com", 
+        projectId: "vettrack-1c65e" 
     };
 
-    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
-    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
-    let config = { name: "", mealPrice: 50, waterPrice: 30 };
-    
-    // SCROLL GUARD VARIABLES
-    let longPressTimer;
-    let startY = 0;
-    let isScrolling = false;
+    const app = initializeApp(firebaseConfig), db = getFirestore(app);
+    let allUsers = [], currentEditingId = null;
 
-    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
-    window.logout = () => signOut(auth).then(() => location.reload());
-
-    onAuthStateChanged(auth, async (u) => {
-        if (u) { 
-            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
-            document.getElementById('userPfp').src = u.photoURL;
-            const userDoc = await getDoc(doc(db, "users", u.uid));
-            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
-            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
-            document.getElementById('userLabel').innerText = config.name;
-            updateGreet(); syncData(); 
-        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
+    // Listen to users collection
+    onSnapshot(collection(db, "users"), (snap) => {
+        allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderUsers();
+        calculateGlobalStats();
     });
 
-    function isCurrentMonth() {
-        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
+    async function calculateGlobalStats() {
+        let totalRev = 0;
+        const now = new Date();
+        const logKey = `${now.getFullYear()}_${now.getMonth()}`;
+
+        for (const user of allUsers) {
+            const logSnap = await getDocs(collection(db, "users", user.id, "logs"));
+            logSnap.forEach(lDoc => {
+                const logs = lDoc.data();
+                Object.values(logs).forEach(v => {
+                    if(v.l) totalRev += (user.mealPrice || 0);
+                    if(v.d) totalRev += (user.mealPrice || 0);
+                    if(v.w) totalRev += (user.waterPrice || 0);
+                });
+            });
+        }
+        document.getElementById('totalRev').innerText = `₹${totalRev.toLocaleString('en-IN')}`;
+        document.getElementById('totalUsers').innerText = allUsers.length;
     }
 
-    function updateGreet() {
-        const h = new Date().getHours();
-        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : "Good Evening 🌇";
-    }
-
-    function syncData() {
-        onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
-            logs = d.data() || {}; renderGrid();
+    function renderUsers() {
+        const container = document.getElementById('userList');
+        container.innerHTML = '';
+        allUsers.forEach(u => {
+            const div = document.createElement('div');
+            div.className = 'user-item';
+            div.innerHTML = `
+                <div class="user-info">
+                    <img src="${u.photoURL || 'https://via.placeholder.com/50'}" alt="">
+                    <div class="user-details">
+                        <h3>${u.name || 'Anonymous'}</h3>
+                        <p>ID: ${u.id.substring(0,8)}... • ₹${u.mealPrice}/${u.waterPrice}</p>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn-icon btn-edit" onclick="openEdit('${u.id}')">✎</button>
+                    <button class="btn-icon btn-del" onclick="deleteUser('${u.id}')">✕</button>
+                </div>
+            `;
+            container.appendChild(div);
         });
     }
 
-    window.quickLog = async () => {
-        if (!isCurrentMonth()) return;
-        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        if(obj[type] === 1) return;
-        obj[type] = 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
+    window.openEdit = (id) => {
+        const user = allUsers.find(u => u.id === id);
+        currentEditingId = id;
+        document.getElementById('editName').value = user.name;
+        document.getElementById('editMeal').value = user.mealPrice;
+        document.getElementById('editWater').value = user.waterPrice;
+        document.getElementById('editModal').style.display = 'flex';
     };
 
-    function renderGrid() {
-        const current = isCurrentMonth();
-        document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
-        document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
-        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-        
-        const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
-        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+    window.closeModal = () => { document.getElementById('editModal').style.display = 'none'; };
 
-        const type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const isMarked = logs[todayDate.getDate()] && logs[todayDate.getDate()][type] === 1;
-        
-        if (current) {
-            document.getElementById('quickIcon').innerText = isMarked ? '✅' : '⚡';
-            document.getElementById('quickText').innerText = isMarked ? 'Marked' : `Mark ${type==='l'?'Lunch':'Dinner'}`;
-            if(isMarked) document.getElementById('quickBtn').classList.add('done');
-            else document.getElementById('quickBtn').classList.remove('done');
-        } else {
-            document.getElementById('quickIcon').innerText = '🔒';
-            document.getElementById('quickText').innerText = 'Locked';
+    window.updateUser = async () => {
+        const updated = {
+            name: document.getElementById('editName').value,
+            mealPrice: parseInt(document.getElementById('editMeal').value),
+            waterPrice: parseInt(document.getElementById('editWater').value)
+        };
+        await updateDoc(doc(db, "users", currentEditingId), updated);
+        closeModal();
+    };
+
+    window.deleteUser = async (id) => {
+        if (confirm("🚨 WARNING: This will permanently delete this profile and all their logs. Continue?")) {
+            await deleteDoc(doc(db, "users", id));
         }
-
-        for (let i = 1; i <= daysCount; i++) {
-            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
-            const card = document.createElement('div');
-            card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
-            
-            if (current) {
-                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
-                card.addEventListener('touchstart', (e) => {
-                    startY = e.touches[0].clientY;
-                    isScrolling = false;
-                    longPressTimer = setTimeout(() => {
-                        if (!isScrolling) openNote(i);
-                    }, 650);
-                }, { passive: true });
-
-                card.addEventListener('touchmove', (e) => {
-                    let moveY = e.touches[0].clientY;
-                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
-                        isScrolling = true;
-                        clearTimeout(longPressTimer);
-                    }
-                }, { passive: true });
-
-                card.addEventListener('touchend', () => {
-                    clearTimeout(longPressTimer);
-                });
-            }
-
-            card.innerHTML = `
-                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
-                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
-                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
-                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
-                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
-            `;
-            grid.appendChild(card);
-        }
-        calculate();
-    }
-
-    window.toggle = async (day, type) => {
-        if (!isCurrentMonth()) return;
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        obj[type] = obj[type] ? 0 : 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
     };
-
-    window.openNote = (day) => {
-        activeDayId = day;
-        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
-        document.getElementById('noteInput').value = logs[day]?.n || "";
-        document.getElementById('noteOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
-    };
-    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
-    window.saveNote = async () => {
-        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
-        obj.n = document.getElementById('noteInput').value;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
-        closeNote();
-    };
-
-    window.openSettings = () => {
-        document.getElementById('setUserName').value = config.name;
-        document.getElementById('setMealPrice').value = config.mealPrice;
-        document.getElementById('setWaterPrice').value = config.waterPrice;
-        document.getElementById('settingsOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
-    };
-    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
-    window.saveSettings = async () => {
-        config.name = document.getElementById('setUserName').value;
-        config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
-        config.waterPrice = parseInt(document.getElementById('setWaterPrice').value);
-        await setDoc(doc(db, "users", user.uid), config, { merge: true });
-        document.getElementById('userLabel').innerText = config.name;
-        calculate(); closeSettings();
-    };
-
-    function calculate() {
-        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
-        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
-    }
-
-    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
 </script>
 </body>
 </html>
