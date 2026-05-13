@@ -2,89 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VetTrack Luxe | Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetTrack Luxe | Master Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Outfit:wght@800;900&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); 
-            --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8;
-            --danger: #ff4757;
-        }
-
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif; padding: 25px;
-            background-image: radial-gradient(circle at 100% 0%, #1e293b 0%, transparent 40%);
-        }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header h1 { font-family: 'Outfit'; font-size: 28px; margin: 0; }
-        .admin-badge { background: var(--p); font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 800; vertical-align: middle; margin-left: 10px; }
-
-        .summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .sum-card { background: var(--card); padding: 20px; border-radius: 24px; border: 1px solid var(--surface); }
-        .sum-card label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--sub); }
-        .sum-card .val { font-family: 'Outfit'; font-size: 24px; color: var(--p); display: block; }
-
-        .user-list { display: flex; flex-direction: column; gap: 15px; }
-        .user-item { 
-            background: var(--card); padding: 20px; border-radius: 28px; 
-            border: 1px solid var(--surface); display: flex; align-items: center; justify-content: space-between;
-        }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-info img { width: 45px; height: 45px; border-radius: 14px; background: #222; }
-        .user-details h3 { margin: 0; font-size: 16px; letter-spacing: -0.5px; }
-        .user-details p { margin: 0; font-size: 12px; color: var(--sub); }
-
-        .actions { display: flex; gap: 10px; }
-        .btn-icon { width: 40px; height: 40px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-edit { background: var(--surface); color: white; }
-        .btn-del { background: rgba(255, 71, 87, 0.1); color: var(--danger); }
-        .btn-icon:hover { transform: scale(1.1); }
-
-        /* Modal Styles */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-        .modal-content { background: #161B29; width: 100%; max-width: 400px; padding: 30px; border-radius: 35px; border: 1px solid var(--surface); }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 8px; text-transform: uppercase; }
-        .form-group input { width: 100%; padding: 15px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 15px; color: white; box-sizing: border-box; }
-        .btn-save { background: var(--p); color: white; width: 100%; padding: 18px; border: none; border-radius: 18px; font-weight: 800; cursor: pointer; }
+        :root { --p: #FF8C00; --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5); --text: #FFFFFF; --sub: #94A3B8; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--surface); }
+        .stat-box label { font-size: 10px; text-transform: uppercase; color: var(--p); font-weight: 800; }
+        .stat-box div { font-family: 'Outfit'; font-size: 28px; }
+        .user-card { background: var(--card); padding: 15px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--surface); }
+        .u-info h4 { margin: 0; font-size: 16px; }
+        .u-info p { margin: 0; font-size: 11px; color: var(--sub); }
+        .btn-group { display: flex; gap: 8px; }
+        button { cursor: pointer; border: none; font-weight: 700; border-radius: 10px; }
+        .btn-edit { background: var(--surface); color: white; padding: 8px 12px; }
+        .btn-del { background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 8px 12px; }
+        #loader { text-align: center; color: var(--p); font-weight: 800; padding: 20px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>VetTrack Admin<span class="admin-badge">LUXE</span></h1>
-    <button onclick="location.reload()" style="background:none; border:none; color:var(--p); font-weight:800; cursor:pointer;">Refresh</button>
+    <h1 style="font-family:'Outfit'; margin:0;">Admin<span style="color:var(--p)">.</span></h1>
+    <button onclick="fetchAllData()" style="background:var(--p); color:white; padding:8px 15px;">Sync Data</button>
 </div>
 
-<div class="summary-row">
-    <div class="sum-card"><label>Total Users</label><span class="val" id="totalUsers">0</span></div>
-    <div class="sum-card"><label>Global Revenue</label><span class="val" id="totalRev">₹0</span></div>
+<div class="stat-grid">
+    <div class="stat-box"><label>Total Members</label><div id="count">0</div></div>
+    <div class="stat-box"><label>Est. Revenue</label><div id="rev">₹0</div></div>
 </div>
 
-<div class="user-list" id="userList">
-    <!-- Users will be injected here -->
-</div>
-
-<!-- Edit Modal -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <h2 style="margin-top:0; font-family:'Outfit';">Edit Profile</h2>
-        <div class="form-group"><label>Display Name</label><input type="text" id="editName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-            <div class="form-group"><label>Meal (₹)</label><input type="number" id="editMeal"></div>
-            <div class="form-group"><label>Water (₹)</label><input type="number" id="editWater"></div>
-        </div>
-        <button class="btn-save" onclick="updateUser()">Update Member</button>
-        <button onclick="closeModal()" style="background:none; border:none; color:var(--sub); width:100%; margin-top:15px; font-weight:700;">Cancel</button>
-    </div>
-</div>
+<div id="loader">Fetching Real-time Logs...</div>
+<div id="userList"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", 
@@ -93,84 +49,73 @@
     };
 
     const app = initializeApp(firebaseConfig), db = getFirestore(app);
-    let allUsers = [], currentEditingId = null;
 
-    // Listen to users collection
-    onSnapshot(collection(db, "users"), (snap) => {
-        allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderUsers();
-        calculateGlobalStats();
-    });
-
-    async function calculateGlobalStats() {
+    async function fetchAllData() {
+        document.getElementById('loader').style.display = 'block';
+        const usersSnap = await getDocs(collection(db, "users"));
         let totalRev = 0;
-        const now = new Date();
-        const logKey = `${now.getFullYear()}_${now.getMonth()}`;
+        let userCount = 0;
+        const list = document.getElementById('userList');
+        list.innerHTML = '';
 
-        for (const user of allUsers) {
-            const logSnap = await getDocs(collection(db, "users", user.id, "logs"));
-            logSnap.forEach(lDoc => {
-                const logs = lDoc.data();
-                Object.values(logs).forEach(v => {
-                    if(v.l) totalRev += (user.mealPrice || 0);
-                    if(v.d) totalRev += (user.mealPrice || 0);
-                    if(v.w) totalRev += (user.waterPrice || 0);
+        for (const userDoc of usersSnap.docs) {
+            userCount++;
+            const userData = userDoc.data();
+            const userId = userDoc.id;
+            let userSpend = 0;
+
+            // Fetch this specific user's logs
+            const logsSnap = await getDocs(collection(db, "users", userId, "logs"));
+            logsSnap.forEach(lDoc => {
+                const dayData = lDoc.data();
+                Object.values(dayData).forEach(day => {
+                    if (day.l) userSpend += (userData.mealPrice || 50);
+                    if (day.d) userSpend += (userData.mealPrice || 50);
+                    if (day.w) userSpend += (userData.waterPrice || 30);
                 });
             });
-        }
-        document.getElementById('totalRev').innerText = `₹${totalRev.toLocaleString('en-IN')}`;
-        document.getElementById('totalUsers').innerText = allUsers.length;
-    }
 
-    function renderUsers() {
-        const container = document.getElementById('userList');
-        container.innerHTML = '';
-        allUsers.forEach(u => {
-            const div = document.createElement('div');
-            div.className = 'user-item';
-            div.innerHTML = `
-                <div class="user-info">
-                    <img src="${u.photoURL || 'https://via.placeholder.com/50'}" alt="">
-                    <div class="user-details">
-                        <h3>${u.name || 'Anonymous'}</h3>
-                        <p>ID: ${u.id.substring(0,8)}... • ₹${u.mealPrice}/${u.waterPrice}</p>
-                    </div>
+            totalRev += userSpend;
+
+            // Render Card
+            const card = document.createElement('div');
+            card.className = 'user-card';
+            card.innerHTML = `
+                <div class="u-info">
+                    <h4>${userData.name || 'New User'}</h4>
+                    <p>Bill: ₹${userSpend} | Meals: ${userData.mealPrice} | Water: ${userData.waterPrice}</p>
                 </div>
-                <div class="actions">
-                    <button class="btn-icon btn-edit" onclick="openEdit('${u.id}')">✎</button>
-                    <button class="btn-icon btn-del" onclick="deleteUser('${u.id}')">✕</button>
+                <div class="btn-group">
+                    <button class="btn-edit" onclick="editUser('${userId}', '${userData.name}', ${userData.mealPrice})">Edit</button>
+                    <button class="btn-del" onclick="deleteProfile('${userId}')">Delete</button>
                 </div>
             `;
-            container.appendChild(div);
-        });
+            list.appendChild(card);
+        }
+
+        document.getElementById('count').innerText = userCount;
+        document.getElementById('rev').innerText = `₹${totalRev}`;
+        document.getElementById('loader').style.display = 'none';
     }
 
-    window.openEdit = (id) => {
-        const user = allUsers.find(u => u.id === id);
-        currentEditingId = id;
-        document.getElementById('editName').value = user.name;
-        document.getElementById('editMeal').value = user.mealPrice;
-        document.getElementById('editWater').value = user.waterPrice;
-        document.getElementById('editModal').style.display = 'flex';
-    };
-
-    window.closeModal = () => { document.getElementById('editModal').style.display = 'none'; };
-
-    window.updateUser = async () => {
-        const updated = {
-            name: document.getElementById('editName').value,
-            mealPrice: parseInt(document.getElementById('editMeal').value),
-            waterPrice: parseInt(document.getElementById('editWater').value)
-        };
-        await updateDoc(doc(db, "users", currentEditingId), updated);
-        closeModal();
-    };
-
-    window.deleteUser = async (id) => {
-        if (confirm("🚨 WARNING: This will permanently delete this profile and all their logs. Continue?")) {
-            await deleteDoc(doc(db, "users", id));
+    window.editUser = async (id, oldName, oldPrice) => {
+        const newName = prompt("New Name:", oldName);
+        const newPrice = prompt("New Meal Price:", oldPrice);
+        if (newName && newPrice) {
+            await updateDoc(doc(db, "users", id), { name: newName, mealPrice: parseInt(newPrice) });
+            fetchAllData();
         }
     };
+
+    window.deleteProfile = async (id) => {
+        if(confirm("Permanently delete this user?")) {
+            await deleteDoc(doc(db, "users", id));
+            fetchAllData();
+        }
+    };
+
+    // Initial Load
+    fetchAllData();
 </script>
 </body>
 </html>
