@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geofenced Attendance System</title>
+    <title>Continuous Geofenced Attendance System</title>
     <style>
         :root {
             --primary: #4f46e5;
@@ -45,6 +45,31 @@
             margin-top: 0;
             margin-bottom: 25px;
             font-size: 14px;
+        }
+
+        /* Pulse tracking indicator */
+        .pulse-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #4b5563;
+            margin-bottom: 15px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            animation: pulse-animation 1.5s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
         .status-badge {
@@ -124,7 +149,7 @@
 
         #log {
             margin-top: 20px;
-            max-height: 120px;
+            max-height: 150px;
             overflow-y: auto;
             border-top: 1px solid #e5e7eb;
             padding-top: 15px;
@@ -144,10 +169,15 @@
 <body>
 
     <div class="container">
-        <h1>Attendance Check-In</h1>
+        <h1>Attendance Tracking</h1>
         <p class="subtitle">Geofenced within 65 meters</p>
 
-        <div id="statusBadge" class="status-badge">Checking Location...</div>
+        <div class="pulse-indicator">
+            <div class="dot"></div>
+            <span>Live GPS tracking active...</span>
+        </div>
+
+        <div id="statusBadge" class="status-badge">Initializing Pulse...</div>
 
         <div class="info-box">
             <div class="info-row">
@@ -155,37 +185,38 @@
                 <span id="distanceVal" class="info-value">Calculating...</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Accuracy:</span>
+                <span class="info-label">GPS Accuracy:</span>
                 <span id="accuracyVal" class="info-value">Calculating...</span>
             </div>
         </div>
 
         <button id="checkInBtn" class="btn" disabled>Check In</button>
-        <button id="refreshBtn" class="btn" style="background-color: #6b7280;">Refresh Location</button>
 
         <div id="log">
-            <strong>Activity Log:</strong>
+            <strong>Pulse Activity Log:</strong>
             <div id="logContents"></div>
         </div>
     </div>
 
     <script>
         // ==========================================
-        // CONFIGURATION: Coordinates & Updated 65m Fence
+        // CONFIGURATION: Set coordinates & 65m Fence
         // ==========================================
         const OFFICE_LAT = 24.500893; 
         const OFFICE_LNG = 81.291928; 
         const GEOFENCE_RADIUS_METERS = 65; 
 
+        let watchId = null; // Holds the geo-tracker reference
+
         const statusBadge = document.getElementById('statusBadge');
         const distanceVal = document.getElementById('distanceVal');
         const accuracyVal = document.getElementById('accuracyVal');
         const checkInBtn = document.getElementById('checkInBtn');
-        const refreshBtn = document.getElementById('refreshBtn');
         const logContents = document.getElementById('logContents');
 
+        // Haversine Formula for distance calculation
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; // Earth's radius in meters
+            const R = 6371e3; // Earth radius in meters
             const phi1 = lat1 * Math.PI / 180;
             const phi2 = lat2 * Math.PI / 180;
             const deltaPhi = (lat2 - lat1) * Math.PI / 180;
@@ -207,75 +238,73 @@
             logContents.insertBefore(entry, logContents.firstChild);
         }
 
-        function checkLocation() {
+        // Starts the live tracking loop
+        function startContinuousTracking() {
             if (!navigator.geolocation) {
                 statusBadge.textContent = "Not Supported";
                 statusBadge.className = "status-badge outside";
-                addLog("Geolocation is not supported by your browser.");
+                addLog("Error: Browser does not support location services.");
                 return;
             }
 
-            statusBadge.textContent = "Locating...";
-            statusBadge.className = "status-badge";
-            
             const options = {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
+                enableHighAccuracy: true, // Forces phone GPS chip over network estimation
+                timeout: 15000,           // Wait up to 15s per pulse
+                maximumAge: 0             // Strictly fetch fresh data, no caching
             };
 
-            navigator.geolocation.getCurrentPosition(success, error, options);
+            // watchPosition creates a permanent thread/event listener
+            watchId = navigator.geolocation.watchPosition(successPulse, errorPulse, options);
+            addLog("Continuous GPS stream initialized.");
         }
 
-        function success(position) {
+        // Fired automatically every time the device's location updates
+        function successPulse(position) {
             const userLat = position.coords.latitude;
             const userLng = position.coords.longitude;
             const accuracy = position.coords.accuracy;
 
             const distance = calculateDistance(userLat, userLng, OFFICE_LAT, OFFICE_LNG);
 
+            // Update parameters instantly on the interface
             distanceVal.textContent = `${distance.toFixed(1)} meters`;
             accuracyVal.textContent = `±${accuracy.toFixed(1)} meters`;
 
-            if (accuracy > 40) {
-                addLog("Warning: GPS accuracy is wide. Try shifting positions for a sharper signal.");
-            }
-
+            // State Evaluation
             if (distance <= GEOFENCE_RADIUS_METERS) {
                 statusBadge.textContent = "Inside Geofence";
                 statusBadge.className = "status-badge inside";
                 checkInBtn.disabled = false;
-                addLog("Location verified. Access granted.");
+                addLog(`Pulse Check: Within zone (${Math.round(distance)}m away). Button enabled.`);
             } else {
                 statusBadge.textContent = "Outside Geofence";
                 statusBadge.className = "status-badge outside";
                 checkInBtn.disabled = true;
-                addLog(`Access denied. You are ${Math.round(distance - GEOFENCE_RADIUS_METERS)}m outside the 65m boundary.`);
+                addLog(`Pulse Check: Outside fence by ${Math.round(distance - GEOFENCE_RADIUS_METERS)}m.`);
             }
         }
 
-        function error(err) {
-            console.warn(`ERROR(${err.code}): ${err.message}`);
-            statusBadge.textContent = "Location Error";
-            statusBadge.className = "status-badge outside";
+        function errorPulse(err) {
+            console.warn(`Watch Error(${err.code}): ${err.message}`);
+            statusBadge.textContent = "Syncing GPS...";
+            statusBadge.className = "status-badge";
             
             if(err.code === 1) {
-                addLog("Permission denied. Please enable device location settings.");
+                statusBadge.textContent = "Permission Blocked";
+                statusBadge.className = "status-badge outside";
+                addLog("Error: Please grant site location permissions.");
             } else {
-                addLog("Unable to retrieve location data.");
+                addLog("Tracking pulse connection unstable... waiting for next interval.");
             }
         }
 
         checkInBtn.addEventListener('click', () => {
-            addLog("🎉 Attendance marked successfully!");
-            alert("Attendance recorded!");
+            addLog("🎉 Attendance successfully registered via live coordinates!");
+            alert("Attendance marked!");
         });
 
-        refreshBtn.addEventListener('click', () => {
-            checkLocation();
-        });
-
-        window.onload = checkLocation;
+        // Initialize immediately upon page opening
+        window.onload = startContinuousTracking;
     </script>
 </body>
 </html>
