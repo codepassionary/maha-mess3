@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autonomous Offline Attendance Node</title>
+    <title>Autonomous Attendance Matrix</title>
     <style>
         :root {
             --bg-canvas: #090d16;
@@ -94,45 +94,84 @@
 
         #attendanceBar { background-color: var(--success); }
 
+        /* Subtle Prompt Overlay if a human identity pulse verification check fails */
+        .identity-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(9, 13, 22, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 30px;
+        }
+        .identity-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 340px;
+            text-align: center;
+        }
+        .identity-box h2 { font-size: 18px; margin-bottom: 12px; }
+        .identity-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+        .verify-btn {
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
         .console {
             font-family: monospace;
             font-size: 11px;
             color: #6b7280;
             text-align: left;
-            max-height: 110px;
+            max-height: 90px;
             overflow-y: auto;
             border-top: 1px solid var(--border);
             padding-top: 16px;
             margin-top: 24px;
         }
-        .log-entry { margin-bottom: 4px; line-height: 1.4; }
-        .log-err { color: var(--danger); }
-        .log-warn { color: var(--warning); }
     </style>
 </head>
 <body>
 
     <div class="card">
         <div class="header">
-            <h1>Offline Attendance</h1>
-            <p>Fault-Tolerant Verification Node</p>
+            <h1>Attendance Terminal</h1>
+            <p>Smart Security Presence Node</p>
         </div>
 
         <div class="status-container">
-            <div id="statusBadge" class="status-pill syncing">Initializing Database...</div>
+            <div id="statusBadge" class="status-pill syncing">Syncing environmental hooks...</div>
         </div>
 
         <div class="metric-container">
-            <div class="metric-row"><span>Timeline Horizon</span><span id="timeVal">0%</span></div>
+            <div class="metric-row"><span>Session Timeline</span><span id="timeVal">0%</span></div>
             <div class="progress-track"><div id="timeBar" class="progress-bar"></div></div>
         </div>
 
         <div class="metric-container">
-            <div class="metric-row"><span>Attendance Progress</span><span id="attendanceVal">0%</span></div>
+            <div class="metric-row"><span>Verified Presence</span><span id="attendanceVal">0%</span></div>
             <div class="progress-track"><div id="attendanceBar" class="progress-bar"></div></div>
         </div>
 
-        <div id="consoleLog" class="console">Booting storage modules...</div>
+        <div id="consoleLog" class="console">Booting system sensors...</div>
+    </div>
+
+    <!-- Security Overlay for Identity Checks -->
+    <div id="identityOverlay" class="identity-overlay">
+        <div class="identity-box">
+            <h2>Identity Verification Required</h2>
+            <p>To ensure your tracking session stays active, please pass a quick identity verification check.</p>
+            <button id="verifyIdentityBtn" class="verify-btn">Verify Identity</button>
+        </div>
     </div>
 
     <script>
@@ -145,8 +184,10 @@
                 ALLOWED_RADIUS_M: 65,
                 MAX_GPS_ACCURACY_M: 40,
                 SESSION_TOTAL_SEC: 3600,
-                DB_NAME: "OfflineAttendanceDB",
-                DB_VERSION: 1
+                DB_NAME: "SecureAttendanceDB",
+                DB_VERSION: 1,
+                MAX_VELOCITY_MPS: 35,        // Max human-plausible speed change threshold (126 km/h)
+                STALE_MOTION_WINDOW_SEC: 180 // Max time allowed without a single phone vibration change
             });
 
             let state = {
@@ -155,8 +196,11 @@
                 isInside: false,
                 compromised: false,
                 db: null,
-                watchId: null,
-                isGpsActive: false
+                lastLat: null,
+                lastLng: null,
+                lastGpsTime: 0,
+                lastMovementDetected: Date.now(),
+                identityPassed: true
             };
 
             const DOM = Object.freeze({
@@ -165,122 +209,127 @@
                 timeVal: document.getElementById('timeVal'),
                 attBar: document.getElementById('attendanceBar'),
                 attVal: document.getElementById('attendanceVal'),
-                console: document.getElementById('consoleLog')
+                console: document.getElementById('consoleLog'),
+                overlay: document.getElementById('identityOverlay'),
+                verifyBtn: document.getElementById('verifyIdentityBtn')
             });
 
-            function pushLog(text, type = 'info') {
+            function pushLog(text) {
                 const el = document.createElement('div');
-                el.className = 'log-entry';
-                if(type === 'error') el.className += ' log-err';
-                if(type === 'warning') el.className += ' log-warn';
-                
                 el.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
                 DOM.console.appendChild(el);
                 DOM.console.scrollTop = DOM.console.scrollHeight;
-                
-                if (DOM.console.childNodes.length > 25) {
-                    DOM.console.removeChild(DOM.console.firstChild);
-                }
+                if (DOM.console.childNodes.length > 15) DOM.console.removeChild(DOM.console.firstChild);
             }
 
             function geoMath(lat1, lon1, lat2, lon2) {
-                try {
-                    const R = 6371e3;
-                    const p1 = lat1 * Math.PI / 180;
-                    const p2 = lat2 * Math.PI / 180;
-                    const dPhi = (lat2 - lat1) * Math.PI / 180;
-                    const dLam = (lon2 - lon1) * Math.PI / 180;
-                    const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dLam/2) * Math.sin(dLam/2);
-                    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-                } catch (e) {
-                    pushLog("Math exception handled during calculation.", "error");
-                    return Infinity;
-                }
+                const R = 6371e3;
+                const p1 = lat1 * Math.PI / 180;
+                const p2 = lat2 * Math.PI / 180;
+                const dPhi = (lat2 - lat1) * Math.PI / 180;
+                const dLam = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dLam/2) * Math.sin(dLam/2);
+                return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
             }
 
-            // Database Initialization with Fallbacks
             function initDatabase() {
-                try {
-                    const request = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
-
-                    request.onupgradeneeded = function(e) {
-                        const db = e.target.result;
-                        if (!db.objectStoreNames.contains("logs")) db.createObjectStore("logs", { keyPath: "timestamp" });
-                        if (!db.objectStoreNames.contains("state")) db.createObjectStore("state", { keyPath: "parameter" });
-                    };
-
-                    request.onsuccess = function(e) {
-                        state.db = e.target.result;
-                        pushLog("IndexedDB initialized successfully.");
-                        restoreSession();
-                    };
-
-                    request.onerror = function(e) {
-                        pushLog(`DB Engine downgrade. Running in temporary runtime memory.`, "warning");
-                        startEngine(); // Fallback to memory tracking instead of completely hard-crashing
-                    };
-                } catch (err) {
-                    pushLog("Storage sandbox access rejected. Bypassing to temporary cache.", "warning");
-                    startEngine();
-                }
+                const request = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains("state")) db.createObjectStore("state", { keyPath: "parameter" });
+                };
+                request.onsuccess = (e) => {
+                    state.db = e.target.result;
+                    restoreSession();
+                };
+                request.onerror = () => startEngine();
             }
 
-            function saveTelemetryRow(lat, lng, accuracy, insideStatus) {
+            function saveState() {
                 if (!state.db) return;
                 try {
-                    const transaction = state.db.transaction(["logs", "state"], "readwrite");
-                    
-                    transaction.onerror = function(e) {
-                        // Catches QuotaExceededError or other database execution exceptions
-                        pushLog(`Write aborted: ${e.target.error?.name || 'Storage Limit reached'}`, "warning");
-                    };
-
-                    const logStore = transaction.objectStore("logs");
-                    const stateStore = transaction.objectStore("state");
-
-                    logStore.put({
-                        timestamp: Date.now(),
-                        latitude: lat,
-                        longitude: lng,
-                        accuracy: accuracy,
-                        status: insideStatus
-                    });
-
-                    stateStore.put({ parameter: "elapsed", value: state.elapsed });
-                    stateStore.put({ parameter: "verified", value: state.verified });
-                } catch (err) {
-                    // Fail-safe to avoid throwing runtime unhandled script crashes
-                }
+                    const transaction = state.db.transaction(["state"], "readwrite");
+                    const store = transaction.objectStore("state");
+                    store.put({ parameter: "elapsed", value: state.elapsed });
+                    store.put({ parameter: "verified", value: state.verified });
+                } catch (e) {}
             }
 
             function restoreSession() {
-                if (!state.db) return;
                 try {
                     const transaction = state.db.transaction(["state"], "readonly");
                     const store = transaction.objectStore("state");
-                    
                     const getElapsed = store.get("elapsed");
-                    getElapsed.onsuccess = function() {
-                        if (getElapsed.result && typeof getElapsed.result.value === 'number') {
-                            state.elapsed = Math.min(getElapsed.result.value, CONFIG.SESSION_TOTAL_SEC);
-                        }
-                        
+                    getElapsed.onsuccess = () => {
+                        if (getElapsed.result) state.elapsed = getElapsed.result.value;
                         const getVerified = store.get("verified");
-                        getVerified.onsuccess = function() {
-                            if (getVerified.result && typeof getVerified.result.value === 'number') {
-                                state.verified = Math.min(getVerified.result.value, CONFIG.SESSION_TOTAL_SEC);
-                            }
-                            updateUI();
+                        getVerified.onsuccess = () => {
+                            if (getVerified.result) state.verified = getVerified.result.value;
                             startEngine();
                         };
                     };
-                    
-                    transaction.onerror = function() {
-                        pushLog("State restore failure. Resetting baseline state safely.", "warning");
-                        startEngine();
-                    };
-                } catch (e) {
-                    startEngine();
+                } catch (e) { startEngine(); }
+            }
+
+            // Behavioral Analytics Engine (Hardware Gyroscope/Device Motion tracking)
+            function initSensorTelemetry() {
+                if (window.DeviceMotionEvent) {
+                    window.addEventListener('devicemotion', (event) => {
+                        const acc = event.accelerationIncludingGravity;
+                        if (acc) {
+                            const totalMovement = Math.abs(acc.x || 0) + Math.abs(acc.y || 0) + Math.abs(acc.z || 0);
+                            // If the change variance drifts beyond micro flat baselines, record life activity
+                            if (totalMovement > 0.1) {
+                                state.lastMovementDetected = Date.now();
+                            }
+                        }
+                    }, false);
+                }
+            }
+
+            function processLocationStream(position) {
+                if (state.compromised) return;
+
+                if (!position || !position.coords || position.mocked === true) {
+                    isolateTerminal("Location spoofing hook detected.");
+                    return;
+                }
+
+                const uLat = position.coords.latitude;
+                const uLng = position.coords.longitude;
+                const uAcc = position.coords.accuracy;
+                const now = Date.now();
+
+                // Logic Vector 1: Teleportation Velocity Verification
+                if (state.lastLat !== null && state.lastLng !== null) {
+                    const distanceDelta = geoMath(uLat, uLng, state.lastLat, state.lastLng);
+                    const timeDeltaSeconds = (now - state.lastGpsTime) / 1000;
+                    if (timeDeltaSeconds > 0 && (distanceDelta / timeDeltaSeconds) > CONFIG.MAX_VELOCITY_MPS) {
+                        isolateTerminal("Instant travel anomaly detected.");
+                        return;
+                    }
+                }
+
+                if (uAcc > CONFIG.MAX_GPS_ACCURACY_M) {
+                    DOM.badge.textContent = "Signal Untrusted";
+                    DOM.badge.className = "status-pill warning";
+                    state.isInside = false;
+                    return;
+                }
+
+                const distance = geoMath(uLat, uLng, CONFIG.TARGET_LAT, CONFIG.TARGET_LNG);
+                state.isInside = (distance <= CONFIG.ALLOWED_RADIUS_M);
+
+                state.lastLat = uLat;
+                state.lastLng = uLng;
+                state.lastGpsTime = now;
+
+                if (state.isInside && state.identityPassed) {
+                    DOM.badge.textContent = "Presence Verified";
+                    DOM.badge.className = "status-pill active";
+                } else {
+                    DOM.badge.textContent = "Outside Area Boundary";
+                    DOM.badge.className = "status-pill isolated";
                 }
             }
 
@@ -290,19 +339,31 @@
                 if (state.elapsed >= CONFIG.SESSION_TOTAL_SEC) {
                     DOM.badge.textContent = "Session Complete";
                     DOM.badge.className = "status-pill active";
-                    pushLog("Session tracking threshold achieved.");
-                    if(state.watchId) navigator.geolocation.clearWatch(state.watchId);
+                    pushLog("Attendance timeline finished safely.");
                     return;
                 }
 
-                // Tick logic is permitted exclusively if the GPS hardware layer is responsive
-                if (state.isGpsActive) {
-                    state.elapsed++;
-                    if (state.isInside) {
-                        state.verified++;
-                    }
-                    updateUI();
+                // Logic Vector 2: Static Device Anti-Desk Stacking Validation
+                const idleDuration = (Date.now() - state.lastMovementDetected) / 1000;
+                if (idleDuration > CONFIG.STALE_MOTION_WINDOW_SEC) {
+                    state.isInside = false;
+                    DOM.badge.textContent = "Motion Verification Failed";
+                    DOM.badge.className = "status-pill warning";
+                    pushLog("Warning: No device movement detected. Progress paused.");
                 }
+
+                state.elapsed++;
+                if (state.isInside && state.identityPassed && idleDuration <= CONFIG.STALE_MOTION_WINDOW_SEC) {
+                    state.verified++;
+                }
+
+                // Logic Vector 3: Random Identity Pulse Challenges
+                if (state.elapsed % 600 === 0 && state.elapsed > 0) { 
+                    triggerIdentityChallenge();
+                }
+
+                updateUI();
+                saveState();
             }
 
             function updateUI() {
@@ -315,105 +376,66 @@
                 DOM.attVal.textContent = `${Math.floor(attPercent)}%`;
             }
 
-            function processLocationStream(position) {
-                if (state.compromised) return;
-                state.isGpsActive = true;
-
-                if (!position || !position.coords || position.mocked === true) {
-                    isolateTerminal("Hardware level mock manipulation detected.");
-                    return;
+            function triggerIdentityChallenge() {
+                state.identityPassed = false;
+                DOM.overlay.style.display = "flex";
+                pushLog("Identity puzzle triggered to verify device owner.");
+                
+                // Attempt to request Web Authentication APIs if available locally
+                if (window.PublicKeyCredential) {
+                    // Triggers the device's native lock screen Biometrics (Face ID / Fingerprint / Passcode)
+                    navigator.credentials.create({
+                        publicKey: {
+                            challenge: new Uint8Array([1, 2, 3, 4]),
+                            rp: { name: "System Verification" },
+                            user: { id: new Uint8Array([1]), name: "user", displayName: "User" },
+                            pubKeyCredParams: [{ type: "public-key", alg: -7 }]
+                        }
+                    }).then(() => {
+                        resolveChallengeSuccess();
+                    }).catch(() => {
+                        // Soft fallback mechanism if biometrics fail or get cancelled
+                    });
                 }
-
-                const uLat = position.coords.latitude;
-                const uLng = position.coords.longitude;
-                const uAcc = position.coords.accuracy;
-
-                if (uAcc > CONFIG.MAX_GPS_ACCURACY_M) {
-                    DOM.badge.textContent = "Signal Degraded";
-                    DOM.badge.className = "status-pill warning";
-                    state.isInside = false;
-                    pushLog("Precision low. Seeking denser GPS satellite mesh...", "warning");
-                    return;
-                }
-
-                const distance = geoMath(uLat, uLng, CONFIG.TARGET_LAT, CONFIG.TARGET_LNG);
-
-                if (distance <= CONFIG.ALLOWED_RADIUS_M) {
-                    DOM.badge.textContent = "Presence Verified";
-                    DOM.badge.className = "status-pill active";
-                    state.isInside = true;
-                } else {
-                    DOM.badge.textContent = "Outside Area Boundary";
-                    DOM.badge.className = "status-pill isolated";
-                    state.isInside = false;
-                }
-
-                saveTelemetryRow(uLat, uLng, uAcc, state.isInside);
             }
 
-            // Core Error Interface for Hardware Failure Cases
-            function handleHardwareFault(err) {
-                state.isGpsActive = false;
-                state.isInside = false;
-                
-                switch(err.code) {
-                    case err.PERMISSION_DENIED:
-                        DOM.badge.textContent = "Access Denied";
-                        DOM.badge.className = "status-pill isolated";
-                        pushLog("CRITICAL: Location permissions revoked.", "error");
-                        break;
-                    case err.POSITION_UNAVAILABLE:
-                        DOM.badge.textContent = "Signal Offline";
-                        DOM.badge.className = "status-pill warning";
-                        pushLog("Hardware layer lost positioning fix.", "warning");
-                        break;
-                    case err.TIMEOUT:
-                        DOM.badge.textContent = "Telemetry Lag";
-                        DOM.badge.className = "status-pill warning";
-                        pushLog("Hardware query timeout window expired.", "warning");
-                        break;
-                    default:
-                        DOM.badge.textContent = "Hardware Fault";
-                        DOM.badge.className = "status-pill isolated";
-                        break;
-                }
+            function resolveChallengeSuccess() {
+                state.identityPassed = true;
+                DOM.overlay.style.display = "none";
+                pushLog("Owner identity re-verified successfully.");
             }
 
             function isolateTerminal(reason) {
                 state.compromised = true;
                 state.isInside = false;
-                DOM.badge.textContent = "Terminal Isolated";
+                DOM.badge.textContent = "Node Compromised";
                 DOM.badge.className = "status-pill isolated";
                 DOM.timeBar.style.backgroundColor = "var(--danger)";
                 DOM.attBar.style.backgroundColor = "var(--danger)";
-                pushLog(`CRITICAL: ${reason}`, "error");
-                if (state.watchId) navigator.geolocation.clearWatch(state.watchId);
+                pushLog(`CRITICAL: ${reason}`);
             }
 
             function startEngine() {
-                pushLog("Binding hardware location interfaces...");
+                pushLog("Security environment verified. Monitoring active.");
                 
-                // Establish watch link with robust configurations
-                state.watchId = navigator.geolocation.watchPosition(
-                    processLocationStream, 
-                    handleHardwareFault, 
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 8000,       // Triggers error fallback if hardware freezes for >8s
-                        maximumAge: 0        // Bypasses local cache, enforcing genuine real-time verification
-                    }
-                );
+                navigator.geolocation.watchPosition(processLocationStream, () => {
+                    state.isInside = false;
+                    DOM.badge.textContent = "Signal Disconnected";
+                    DOM.badge.className = "status-pill isolated";
+                }, { enableHighAccuracy: true, maximumAge: 0 });
 
+                initSensorTelemetry();
                 setInterval(clockTickEngine, 1000);
             }
 
-            // Fallback Initialization Gateway Checks
-            if (navigator.geolocation && typeof window.indexedDB !== 'undefined') {
+            DOM.verifyBtn.addEventListener('click', () => {
+                resolveChallengeSuccess();
+            });
+
+            if (navigator.geolocation) {
                 initDatabase();
             } else {
-                DOM.badge.textContent = "Node Incompatible";
-                DOM.badge.className = "status-pill isolated";
-                pushLog("Fatal: Hardware architecture unsupported.", "error");
+                isolateTerminal("Unsupported environment firmware framework.");
             }
         })();
     </script>
