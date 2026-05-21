@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Continuous Geofenced Attendance System</title>
+    <title>Secure Hidden-Metrics Attendance System</title>
     <style>
         :root {
             --primary: #4f46e5;
@@ -22,6 +22,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            user-select: none;
         }
 
         .container {
@@ -43,33 +44,18 @@
         p.subtitle {
             color: #6b7280;
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-size: 14px;
         }
 
-        /* Pulse tracking indicator */
-        .pulse-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #4b5563;
-            margin-bottom: 15px;
-        }
-
-        .dot {
-            width: 8px;
-            height: 8px;
-            background-color: #10b981;
-            border-radius: 50%;
-            animation: pulse-animation 1.5s infinite;
-        }
-
-        @keyframes pulse-animation {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        .pulse-tracker-ui {
+            background-color: #f3f4f6;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #374151;
         }
 
         .status-badge {
@@ -81,7 +67,6 @@
             margin-bottom: 25px;
             background-color: #e5e7eb;
             color: #374151;
-            transition: all 0.3s ease;
         }
 
         .status-badge.inside {
@@ -92,36 +77,6 @@
         .status-badge.outside {
             background-color: #fee2e2;
             color: var(--danger);
-        }
-
-        .info-box {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 25px;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-label {
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        .info-value {
-            color: #1f2937;
-            font-weight: 600;
         }
 
         .btn {
@@ -149,7 +104,7 @@
 
         #log {
             margin-top: 20px;
-            max-height: 150px;
+            max-height: 160px;
             overflow-y: auto;
             border-top: 1px solid #e5e7eb;
             padding-top: 15px;
@@ -169,142 +124,151 @@
 <body>
 
     <div class="container">
-        <h1>Attendance Tracking</h1>
-        <p class="subtitle">Geofenced within 65 meters</p>
+        <h1>Class Attendance</h1>
+        <p class="subtitle">Secure Verification Session</p>
 
-        <div class="pulse-indicator">
-            <div class="dot"></div>
-            <span>Live GPS tracking active...</span>
+        <!-- Dynamic Session Pulse Display -->
+        <div id="pulseCounterUI" class="pulse-tracker-ui">
+            Active Tracking Pulse: 0 / 3
         </div>
 
-        <div id="statusBadge" class="status-badge">Initializing Pulse...</div>
+        <div id="statusBadge" class="status-badge">Awaiting System Sync...</div>
 
-        <div class="info-box">
-            <div class="info-row">
-                <span class="info-label">Your Distance:</span>
-                <span id="distanceVal" class="info-value">Calculating...</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">GPS Accuracy:</span>
-                <span id="accuracyVal" class="info-value">Calculating...</span>
-            </div>
-        </div>
-
-        <button id="checkInBtn" class="btn" disabled>Check In</button>
+        <button id="checkInBtn" class="btn" disabled>Submit Attendance</button>
 
         <div id="log">
-            <strong>Pulse Activity Log:</strong>
+            <strong>Security Tracking Log:</strong>
             <div id="logContents"></div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // CONFIGURATION: Set coordinates & 65m Fence
-        // ==========================================
-        const OFFICE_LAT = 24.500893; 
-        const OFFICE_LNG = 81.291928; 
-        const GEOFENCE_RADIUS_METERS = 65; 
+        (function() {
+            'use strict';
 
-        let watchId = null; // Holds the geo-tracker reference
+            // Fixed Target Configuration 
+            const TARGET_LAT = 24.500893; 
+            const TARGET_LNG = 81.291928; 
+            const ALLOWED_RADIUS = 65; 
+            const MAX_ACCEPTABLE_ACCURACY = 40; 
 
-        const statusBadge = document.getElementById('statusBadge');
-        const distanceVal = document.getElementById('distanceVal');
-        const accuracyVal = document.getElementById('accuracyVal');
-        const checkInBtn = document.getElementById('checkInBtn');
-        const logContents = document.getElementById('logContents');
+            // Time Management (20 minutes interval over a 1-hour session window)
+            const PULSE_INTERVAL_MS = 1200000; 
+            const MAX_PULSES = 3;
 
-        // Haversine Formula for distance calculation
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; // Earth radius in meters
-            const phi1 = lat1 * Math.PI / 180;
-            const phi2 = lat2 * Math.PI / 180;
-            const deltaPhi = (lat2 - lat1) * Math.PI / 180;
-            const deltaLambda = (lon2 - lon1) * Math.PI / 180;
+            let pulseCount = 0;
+            let intervalId = null;
+            let verifiedLocationData = null;
+            let securityToken = Math.random().toString(36).substring(2);
 
-            const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-                      Math.cos(phi1) * Math.cos(phi2) * 
-                      Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-            
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c; 
-        }
+            const statusBadge = document.getElementById('statusBadge');
+            const checkInBtn = document.getElementById('checkInBtn');
+            const logContents = document.getElementById('logContents');
+            const pulseCounterUI = document.getElementById('pulseCounterUI');
 
-        function addLog(message) {
-            const time = new Date().toLocaleTimeString();
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.innerHTML = `<strong>[${time}]</strong> ${message}`;
-            logContents.insertBefore(entry, logContents.firstChild);
-        }
-
-        // Starts the live tracking loop
-        function startContinuousTracking() {
-            if (!navigator.geolocation) {
-                statusBadge.textContent = "Not Supported";
-                statusBadge.className = "status-badge outside";
-                addLog("Error: Browser does not support location services.");
-                return;
+            function geoMath(lat1, lon1, lat2, lon2) {
+                const R = 6371e3;
+                const p1 = lat1 * Math.PI / 180;
+                const p2 = lat2 * Math.PI / 180;
+                const dPhi = (lat2 - lat1) * Math.PI / 180;
+                const dLam = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dLam/2) * Math.sin(dLam/2);
+                return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
             }
 
-            const options = {
-                enableHighAccuracy: true, // Forces phone GPS chip over network estimation
-                timeout: 15000,           // Wait up to 15s per pulse
-                maximumAge: 0             // Strictly fetch fresh data, no caching
-            };
+            function writeLog(msg) {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${msg}`;
+                logContents.insertBefore(entry, logContents.firstChild);
+            }
 
-            // watchPosition creates a permanent thread/event listener
-            watchId = navigator.geolocation.watchPosition(successPulse, errorPulse, options);
-            addLog("Continuous GPS stream initialized.");
-        }
+            function triggerSinglePulse() {
+                if (pulseCount >= MAX_PULSES) {
+                    clearInterval(intervalId);
+                    statusBadge.textContent = "Session Concluded";
+                    statusBadge.className = "status-badge";
+                    writeLog("System Notice: Tracking schedule finished. Hardware links offline.");
+                    return;
+                }
 
-        // Fired automatically every time the device's location updates
-        function successPulse(position) {
-            const userLat = position.coords.latitude;
-            const userLng = position.coords.longitude;
-            const accuracy = position.coords.accuracy;
+                pulseCount++;
+                pulseCounterUI.textContent = `Active Tracking Pulse: ${pulseCount} / 3`;
+                writeLog(`Initializing validation pulse sequence #${pulseCount}...`);
 
-            const distance = calculateDistance(userLat, userLng, OFFICE_LAT, OFFICE_LNG);
+                navigator.geolocation.getCurrentPosition(verifyLocation, pulseError, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                });
+            }
 
-            // Update parameters instantly on the interface
-            distanceVal.textContent = `${distance.toFixed(1)} meters`;
-            accuracyVal.textContent = `±${accuracy.toFixed(1)} meters`;
+            function verifyLocation(position) {
+                if(!position || !position.coords) return;
 
-            // State Evaluation
-            if (distance <= GEOFENCE_RADIUS_METERS) {
-                statusBadge.textContent = "Inside Geofence";
-                statusBadge.className = "status-badge inside";
-                checkInBtn.disabled = false;
-                addLog(`Pulse Check: Within zone (${Math.round(distance)}m away). Button enabled.`);
-            } else {
-                statusBadge.textContent = "Outside Geofence";
-                statusBadge.className = "status-badge outside";
+                const uLat = position.coords.latitude;
+                const uLng = position.coords.longitude;
+                const uAcc = position.coords.accuracy;
+
+                // Hidden distance evaluation calculation
+                const distance = geoMath(uLat, uLng, TARGET_LAT, TARGET_LNG);
+
+                // Anti-Cheat Check: Filter fake networks / desktop proxies without naming distances
+                if (uAcc > MAX_ACCEPTABLE_ACCURACY) {
+                    statusBadge.textContent = "Signal Untrusted";
+                    statusBadge.className = "status-badge outside";
+                    checkInBtn.disabled = true;
+                    writeLog(`Pulse #${pulseCount} Blocked: Low positional resolution. Relocate away from proxies.`);
+                    return;
+                }
+
+                // Compliance Bounds Check
+                if (distance <= ALLOWED_RADIUS) {
+                    statusBadge.textContent = "Inside Perimeter";
+                    statusBadge.className = "status-badge inside";
+                    checkInBtn.disabled = false;
+                    
+                    verifiedLocationData = {
+                        ts: position.timestamp,
+                        tok: securityToken,
+                        currentPulse: pulseCount
+                    };
+                    writeLog(`Pulse #${pulseCount} Approved: Device presence verified inside authorized coordinates.`);
+                } else {
+                    statusBadge.textContent = "Outside Boundary";
+                    statusBadge.className = "status-badge outside";
+                    checkInBtn.disabled = true;
+                    verifiedLocationData = null;
+                    writeLog(`Pulse #${pulseCount} Rejected: Zone validation mismatch.`);
+                }
+            }
+
+            function pulseError(err) {
                 checkInBtn.disabled = true;
-                addLog(`Pulse Check: Outside fence by ${Math.round(distance - GEOFENCE_RADIUS_METERS)}m.`);
-            }
-        }
-
-        function errorPulse(err) {
-            console.warn(`Watch Error(${err.code}): ${err.message}`);
-            statusBadge.textContent = "Syncing GPS...";
-            statusBadge.className = "status-badge";
-            
-            if(err.code === 1) {
-                statusBadge.textContent = "Permission Blocked";
+                statusBadge.textContent = "Hardware Error";
                 statusBadge.className = "status-badge outside";
-                addLog("Error: Please grant site location permissions.");
-            } else {
-                addLog("Tracking pulse connection unstable... waiting for next interval.");
+                writeLog(`Pulse #${pulseCount} Error: GPS hardware ping failure.`);
             }
-        }
 
-        checkInBtn.addEventListener('click', () => {
-            addLog("🎉 Attendance successfully registered via live coordinates!");
-            alert("Attendance marked!");
-        });
+            checkInBtn.addEventListener('click', (e) => {
+                if (!e.isTrusted) return; // Block programmatic click scripts
 
-        // Initialize immediately upon page opening
-        window.onload = startContinuousTracking;
+                if (verifiedLocationData && verifiedLocationData.tok === securityToken) {
+                    writeLog(`🎉 Success: Attendance record generated for pulse entry ${verifiedLocationData.currentPulse}/3.`);
+                    alert(`Attendance Successfully Logged!\nValidated Pulse Window: ${verifiedLocationData.currentPulse} of 3`);
+                    checkInBtn.disabled = true; 
+                }
+            });
+
+            // Tracking initialization loop
+            if (navigator.geolocation) {
+                triggerSinglePulse(); // Initial run on startup
+                intervalId = setInterval(triggerSinglePulse, PULSE_INTERVAL_MS);
+            } else {
+                statusBadge.textContent = "Unsupported Device";
+                writeLog("Critical: Device lacks geo-security tracking interfaces.");
+            }
+        })();
     </script>
 </body>
 </html>
