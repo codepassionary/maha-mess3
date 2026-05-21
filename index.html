@@ -2,323 +2,289 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Premier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geofenced Attendance System</title>
     <style>
-        :root { 
-            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
-            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
-            --text: #FFFFFF; --sub: #94A3B8;
+        :root {
+            --primary: #4f46e5;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --background: #f3f4f6;
+            --card-bg: #ffffff;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
-            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
-                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
-            background-attachment: fixed;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
-        #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
-        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
-        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
-
-        .stat-card {
-            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
-            padding: 30px; border-radius: 35px; margin-bottom: 30px;
-            box-shadow: 0 20px 40px -10px var(--p-glow);
-            position: relative; overflow: hidden;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
+        .container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
         }
-        
-        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
-        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
-        
-        .quick-log-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 14px; border-radius: 24px;
-            display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
-            z-index: 2; min-width: 110px;
+
+        h1 {
+            color: #1f2937;
+            margin-bottom: 5px;
+            font-size: 24px;
         }
-        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
-        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
-        .nav-pill { 
-            display: flex; align-items: center; background: var(--card); padding: 8px; 
-            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
-            backdrop-filter: blur(10px);
+        p.subtitle {
+            color: #6b7280;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 14px;
         }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
-        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
 
-        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
-
-        .day-item { 
-            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
-            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
-            border: 1px solid var(--surface); backdrop-filter: blur(10px);
-            user-select: none;
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 25px;
+            background-color: #e5e7eb;
+            color: #374151;
+            transition: all 0.3s ease;
         }
-        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
-        
-        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
-        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
 
-        .item-pill { 
-            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
+        .status-badge.inside {
+            background-color: #dcfce7;
+            color: var(--success);
         }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
-        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
-        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
 
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
-        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
-        .sheet.up { transform: translateY(0); }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
-        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
-        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
-        
-        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .status-badge.outside {
+            background-color: #fee2e2;
+            color: var(--danger);
+        }
+
+        .info-box {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background-color: #4338ca;
+        }
+
+        .btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        #log {
+            margin-top: 20px;
+            max-height: 120px;
+            overflow-y: auto;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 15px;
+            font-size: 12px;
+            color: #4b5563;
+            text-align: left;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 4px;
+            border-radius: 4px;
+            background: #f9fafb;
+        }
     </style>
 </head>
 <body>
 
-<div id="welcomeScreen">
-    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
-    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
-</div>
+    <div class="container">
+        <h1>Attendance Check-In</h1>
+        <p class="subtitle">Geofenced within 100 meters</p>
 
-<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
-    <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
-        <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
-            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
+        <div id="statusBadge" class="status-badge">Checking Location...</div>
+
+        <div class="info-box">
+            <div class="info-row">
+                <span class="info-label">Your Distance:</span>
+                <span id="distanceVal" class="info-value">Calculating...</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Accuracy:</span>
+                <span id="accuracyVal" class="info-value">Calculating...</span>
+            </div>
         </div>
-        <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
-    </div>
-</div>
 
-<div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
-    <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
-        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
-        <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
-    </div>
-</div>
+        <button id="checkInBtn" class="btn" disabled>Check In</button>
+        <button id="refreshBtn" class="btn" style="background-color: #6b7280;">Refresh Location</button>
 
-<div class="container">
-    <div class="header">
-        <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
-        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-left">
-            <div class="label">Total Bill</div>
-            <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
-        </div>
-        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
-            <i id="quickIcon">⚡</i>
-            <span id="quickText">Loading...</span>
+        <div id="log">
+            <strong>Activity Log:</strong>
+            <div id="logContents"></div>
         </div>
     </div>
 
-    <div class="nav-pill">
-        <button onclick="changeMonth(-1)">‹</button>
-        <span id="monthLabel">Current</span>
-        <button onclick="changeMonth(1)">›</button>
-    </div>
-    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
+    <script>
+        // ==========================================
+        // CONFIGURATION: Set your office coordinates
+        // ==========================================
+        const OFFICE_LAT = 40.7128; // Example: New York Lat
+        const OFFICE_LNG = -74.0060; // Example: New York Lng
+        const GEOFENCE_RADIUS_METERS = 100; 
 
-    <div id="logsGrid"></div>
-</div>
+        // DOM Elements
+        const statusBadge = document.getElementById('statusBadge');
+        const distanceVal = document.getElementById('distanceVal');
+        const accuracyVal = document.getElementById('accuracyVal');
+        const checkInBtn = document.getElementById('checkInBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const logContents = document.getElementById('logContents');
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // Haversine Formula to calculate distance between two coordinates in meters
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Earth's radius in meters
+            const phi1 = lat1 * Math.PI / 180;
+            const phi2 = lat2 * Math.PI / 180;
+            const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+            const deltaLambda = (lon2 - lon1) * Math.PI / 180;
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
-        projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
-        messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
-    };
-
-    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
-    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
-    let config = { name: "", mealPrice: 50, waterPrice: 30 };
-    
-    // SCROLL GUARD VARIABLES
-    let longPressTimer;
-    let startY = 0;
-    let isScrolling = false;
-
-    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
-    window.logout = () => signOut(auth).then(() => location.reload());
-
-    onAuthStateChanged(auth, async (u) => {
-        if (u) { 
-            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
-            document.getElementById('userPfp').src = u.photoURL;
-            const userDoc = await getDoc(doc(db, "users", u.uid));
-            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
-            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
-            document.getElementById('userLabel').innerText = config.name;
-            updateGreet(); syncData(); 
-        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
-    });
-
-    function isCurrentMonth() {
-        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
-    }
-
-    function updateGreet() {
-        const h = new Date().getHours();
-        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : "Good Evening 🌇";
-    }
-
-    function syncData() {
-        onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
-            logs = d.data() || {}; renderGrid();
-        });
-    }
-
-    window.quickLog = async () => {
-        if (!isCurrentMonth()) return;
-        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        if(obj[type] === 1) return;
-        obj[type] = 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
-
-    function renderGrid() {
-        const current = isCurrentMonth();
-        document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
-        document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
-        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-        
-        const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
-        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-
-        const type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const isMarked = logs[todayDate.getDate()] && logs[todayDate.getDate()][type] === 1;
-        
-        if (current) {
-            document.getElementById('quickIcon').innerText = isMarked ? '✅' : '⚡';
-            document.getElementById('quickText').innerText = isMarked ? 'Marked' : `Mark ${type==='l'?'Lunch':'Dinner'}`;
-            if(isMarked) document.getElementById('quickBtn').classList.add('done');
-            else document.getElementById('quickBtn').classList.remove('done');
-        } else {
-            document.getElementById('quickIcon').innerText = '🔒';
-            document.getElementById('quickText').innerText = 'Locked';
+            const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+                      Math.cos(phi1) * Math.cos(phi2) * 
+                      Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+            
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in meters
         }
 
-        for (let i = 1; i <= daysCount; i++) {
-            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
-            const card = document.createElement('div');
-            card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
-            
-            if (current) {
-                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
-                card.addEventListener('touchstart', (e) => {
-                    startY = e.touches[0].clientY;
-                    isScrolling = false;
-                    longPressTimer = setTimeout(() => {
-                        if (!isScrolling) openNote(i);
-                    }, 650);
-                }, { passive: true });
+        function addLog(message) {
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<strong>[${time}]</strong> ${message}`;
+            logContents.insertBefore(entry, logContents.firstChild);
+        }
 
-                card.addEventListener('touchmove', (e) => {
-                    let moveY = e.touches[0].clientY;
-                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
-                        isScrolling = true;
-                        clearTimeout(longPressTimer);
-                    }
-                }, { passive: true });
-
-                card.addEventListener('touchend', () => {
-                    clearTimeout(longPressTimer);
-                });
+        function checkLocation() {
+            if (!navigator.geolocation) {
+                statusBadge.textContent = "Not Supported";
+                statusBadge.className = "status-badge outside";
+                addLog("Geolocation is not supported by your browser.");
+                return;
             }
 
-            card.innerHTML = `
-                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
-                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
-                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
-                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
-                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
-            `;
-            grid.appendChild(card);
+            statusBadge.textContent = "Locating...";
+            statusBadge.className = "status-badge";
+            
+            // Options for high accuracy GPS tracking
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            };
+
+            navigator.geolocation.getCurrentPosition(success, error, options);
         }
-        calculate();
-    }
 
-    window.toggle = async (day, type) => {
-        if (!isCurrentMonth()) return;
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        obj[type] = obj[type] ? 0 : 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
+        function success(position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
 
-    window.openNote = (day) => {
-        activeDayId = day;
-        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
-        document.getElementById('noteInput').value = logs[day]?.n || "";
-        document.getElementById('noteOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
-    };
-    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
-    window.saveNote = async () => {
-        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
-        obj.n = document.getElementById('noteInput').value;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
-        closeNote();
-    };
+            // Calculate distance
+            const distance = calculateDistance(userLat, userLng, OFFICE_LAT, OFFICE_LNG);
 
-    window.openSettings = () => {
-        document.getElementById('setUserName').value = config.name;
-        document.getElementById('setMealPrice').value = config.mealPrice;
-        document.getElementById('setWaterPrice').value = config.waterPrice;
-        document.getElementById('settingsOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
-    };
-    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
-    window.saveSettings = async () => {
-        config.name = document.getElementById('setUserName').value;
-        config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
-        config.waterPrice = parseInt(document.getElementById('setWaterPrice').value);
-        await setDoc(doc(db, "users", user.uid), config, { merge: true });
-        document.getElementById('userLabel').innerText = config.name;
-        calculate(); closeSettings();
-    };
+            // Update UI elements
+            distanceVal.textContent = `${distance.toFixed(1)} meters`;
+            accuracyVal.textContent = `±${accuracy.toFixed(1)} meters`;
 
-    function calculate() {
-        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
-        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
-    }
+            // If GPS accuracy is incredibly poor (e.g., > 100m), warn the user
+            if (accuracy > 100) {
+                addLog("Warning: Poor GPS signal accuracy. Try stepping near a window.");
+            }
 
-    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
-</script>
+            // Verify Geofence
+            if (distance <= GEOFENCE_RADIUS_METERS) {
+                statusBadge.textContent = "Inside Geofence";
+                statusBadge.className = "status-badge inside";
+                checkInBtn.disabled = false;
+                addLog("Location verified. You are within the perimeter.");
+            } else {
+                statusBadge.textContent = "Outside Geofence";
+                statusBadge.className = "status-badge outside";
+                checkInBtn.disabled = true;
+                addLog(`Access denied. You are ${Math.round(distance - GEOFENCE_RADIUS_METERS)}m too far away.`);
+            }
+        }
+
+        function error(err) {
+            console.warn(`ERROR(${err.code}): ${err.message}`);
+            statusBadge.textContent = "Location Error";
+            statusBadge.className = "status-badge outside";
+            
+            if(err.code === 1) {
+                addLog("Permission denied. Please allow location access.");
+            } else {
+                addLog("Unable to retrieve your location reliably.");
+            }
+        }
+
+        // Event Listeners
+        checkInBtn.addEventListener('click', () => {
+            addLog("🎉 Attendance marked successfully!");
+            alert("Attendance successfully captured!");
+        });
+
+        refreshBtn.addEventListener('click', () => {
+            checkLocation();
+        });
+
+        // Initialize on load
+        window.onload = checkLocation;
+    </script>
 </body>
 </html>
