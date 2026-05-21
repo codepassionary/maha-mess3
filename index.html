@@ -3,32 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autonomous Attendance Matrix</title>
+    <title>Autonomous Offline Attendance Node</title>
     <style>
         :root {
-            --bg-canvas: #f8fafc;
-            --surface: #ffffff;
-            --border: #e2e8f0;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --text-muted: #94a3b8;
-            
-            --brand: #4f46e5;
-            
+            --bg-canvas: #090d16;
+            --surface: #111827;
+            --border: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --brand: #6366f1;
             --success: #10b981;
-            --success-dim: #e6fbf4;
             --danger: #ef4444;
-            --danger-dim: #fdf2f2;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-canvas);
             color: var(--text-primary);
             min-height: 100vh;
@@ -36,148 +26,82 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         .card {
             background-color: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             padding: 36px;
-        }
-
-        .header {
             text-align: center;
-            margin-bottom: 32px;
         }
 
-        .header h1 {
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: -0.4px;
-            color: var(--text-primary);
-            margin-bottom: 6px;
-        }
-
-        .header p {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .status-container {
-            text-align: center;
-            margin-bottom: 32px;
-        }
+        .header h1 { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+        .header p { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
 
         .status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
             padding: 8px 18px;
             border-radius: 30px;
             font-size: 13px;
             font-weight: 600;
-            background-color: var(--bg-canvas);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border);
-            color: var(--text-secondary);
+            margin-bottom: 28px;
             transition: all 0.3s ease;
         }
 
-        .status-pill.inside {
-            background-color: var(--success-dim);
-            border-color: rgba(16, 185, 129, 0.2);
-            color: var(--success);
-        }
+        .status-pill.syncing { color: var(--brand); }
+        .status-pill.active { color: var(--success); }
+        .status-pill.isolated { color: var(--danger); }
 
-        .status-pill.outside {
-            background-color: var(--danger-dim);
-            border-color: rgba(239, 68, 68, 0.2);
-            color: var(--danger);
-        }
-
-        .metric-group {
+        .metric-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
             margin-bottom: 24px;
         }
 
-        .metric-header {
+        .metric-row {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
             font-weight: 600;
             color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .metric-val {
-            font-family: monospace;
-            color: var(--text-primary);
+            margin-bottom: 6px;
         }
 
         .progress-track {
-            background-color: var(--bg-canvas);
-            border: 1px solid var(--border);
-            height: 12px;
-            border-radius: 6px;
+            background-color: #1f2937;
+            height: 8px;
+            border-radius: 4px;
             overflow: hidden;
         }
 
         .progress-bar {
             height: 100%;
             width: 0%;
-            border-radius: 6px;
-            transition: width 0.3s ease, background-color 0.3s ease;
-        }
-
-        #timeBar {
             background-color: var(--brand);
+            transition: width 0.3s linear;
         }
 
-        #attendanceBar {
-            background-color: var(--success);
-        }
+        #attendanceBar { background-color: var(--success); }
 
-        .log-section {
-            margin-top: 32px;
-            border-top: 1px solid var(--border);
-            padding-top: 24px;
-        }
-
-        .log-title {
+        .console {
+            font-family: monospace;
             font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        .log-wrapper {
-            max-height: 90px;
+            color: #6b7280;
+            text-align: left;
+            max-height: 85px;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .log-row {
-            font-size: 12px;
-            line-height: 1.4;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: flex-start;
-            gap: 6px;
-        }
-
-        .log-row span {
-            font-weight: 500;
-            color: var(--text-muted);
-            white-space: nowrap;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+            margin-top: 24px;
         }
     </style>
 </head>
@@ -185,72 +109,66 @@
 
     <div class="card">
         <div class="header">
-            <h1>Autonomous Attendance</h1>
-            <p>Real-time Spatial Validation</p>
+            <h1>Offline Attendance</h1>
+            <p>Isolated Edge Verification Node</p>
         </div>
 
         <div class="status-container">
-            <div id="statusBadge" class="status-pill">Awaiting GPS stream...</div>
+            <div id="statusBadge" class="status-pill syncing">Initializing Database...</div>
         </div>
 
-        <div class="metric-group">
-            <div class="metric-header">
-                <span>Session Duration</span>
-                <span id="timeVal" class="metric-val">0%</span>
-            </div>
-            <div class="progress-track">
-                <div id="timeBar" class="progress-bar"></div>
-            </div>
+        <div class="metric-container">
+            <div class="metric-row"><span>Timeline Horizon</span><span id="timeVal">0%</span></div>
+            <div class="progress-track"><div id="timeBar" class="progress-bar"></div></div>
         </div>
 
-        <div class="metric-group">
-            <div class="metric-header">
-                <span>Attendance Verified</span>
-                <span id="attendanceVal" class="metric-val">0%</span>
-            </div>
-            <div class="progress-track">
-                <div id="attendanceBar" class="progress-bar"></div>
-            </div>
+        <div class="metric-container">
+            <div class="metric-row"><span>Attendance Progress</span><span id="attendanceVal">0%</span></div>
+            <div class="progress-track"><div id="attendanceBar" class="progress-bar"></div></div>
         </div>
 
-        <div class="log-section">
-            <div class="log-title">Live Telemetry Trail</div>
-            <div id="logContents" class="log-wrapper"></div>
-        </div>
+        <div id="consoleLog" class="console">Booting encrypted storage engine...</div>
     </div>
 
     <script>
         (function() {
             'use strict';
 
-            // Fixed Target Configuration - Updated to new coordinates
+            // Targeted Verification Parameters
             const CONFIG = Object.freeze({
                 TARGET_LAT: 24.507607,
                 TARGET_LNG: 81.298394,
-                ALLOWED_RADIUS: 65,
-                MAX_GPS_ACCURACY: 40,
-                SESSION_TOTAL_SECONDS: 3600 
+                ALLOWED_RADIUS_M: 65,
+                MAX_GPS_ACCURACY_M: 40,
+                SESSION_TOTAL_SEC: 3600, // 1 Hour session
+                DB_NAME: "OfflineAttendanceDB",
+                DB_VERSION: 1
             });
 
+            // Scoped state locked away from global window execution context
             let state = {
-                elapsedSeconds: 0,
-                verifiedSeconds: 0,
-                isCompromised: false,
-                lastLat: null,
-                lastLng: null,
-                lastPulseTime: 0,
-                isCurrentlyInside: false
+                elapsed: 0,
+                verified: 0,
+                isInside: false,
+                compromised: false,
+                db: null,
+                lastPulse: 0
             };
 
-            const UI = Object.freeze({
+            const DOM = Object.freeze({
                 badge: document.getElementById('statusBadge'),
-                logs: document.getElementById('logContents'),
                 timeBar: document.getElementById('timeBar'),
                 timeVal: document.getElementById('timeVal'),
-                attendanceBar: document.getElementById('attendanceBar'),
-                attendanceVal: document.getElementById('attendanceVal')
+                attBar: document.getElementById('attendanceBar'),
+                attVal: document.getElementById('attendanceVal'),
+                console: document.getElementById('consoleLog')
             });
 
+            function pushLog(text) {
+                DOM.console.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+            }
+
+            // High-Precision Distance Logic
             function geoMath(lat1, lon1, lat2, lon2) {
                 const R = 6371e3;
                 const p1 = lat1 * Math.PI / 180;
@@ -261,127 +179,165 @@
                 return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
             }
 
-            function writeLog(msg) {
-                const row = document.createElement('div');
-                row.className = 'log-row';
-                row.innerHTML = `<span>[${new Date().toLocaleTimeString([], {hour12: false})}]</span> ${msg}`;
-                UI.logs.insertBefore(row, UI.logs.firstChild);
-                if (UI.logs.childNodes.length > 15) UI.logs.removeChild(UI.logs.lastChild);
+            // Local Database Controller Implementation
+            function initDatabase() {
+                const request = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
+
+                request.onupgradeneeded = function(e) {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains("logs")) {
+                        db.createObjectStore("logs", { keyPath: "timestamp" });
+                    }
+                    if (!db.objectStoreNames.contains("state")) {
+                        db.createObjectStore("state", { keyPath: "parameter" });
+                    }
+                };
+
+                request.onsuccess = function(e) {
+                    state.db = e.target.result;
+                    pushLog("IndexedDB connected securely.");
+                    restoreSession();
+                };
+
+                request.onerror = function() {
+                    isolateTerminal("Database initialization failed.");
+                };
             }
 
+            function saveTelemetryRow(lat, lng, accuracy, insideStatus) {
+                if (!state.db) return;
+                const transaction = state.db.transaction(["logs", "state"], "readwrite");
+                
+                const logStore = transaction.objectStore("logs");
+                const stateStore = transaction.objectStore("state");
+
+                logStore.put({
+                    timestamp: Date.now(),
+                    latitude: lat,
+                    longitude: lng,
+                    accuracy: accuracy,
+                    status: insideStatus
+                });
+
+                stateStore.put({ parameter: "elapsed", value: state.elapsed });
+                stateStore.put({ parameter: "verified", value: state.verified });
+            }
+
+            function restoreSession() {
+                const transaction = state.db.transaction(["state"], "readonly");
+                const store = transaction.objectStore("state");
+                
+                const getElapsed = store.get("elapsed");
+                getElapsed.onsuccess = function() {
+                    if (getElapsed.result) state.elapsed = getElapsed.result.value;
+                    
+                    const getVerified = store.get("verified");
+                    getVerified.onsuccess = function() {
+                        if (getVerified.result) state.verified = getVerified.result.value;
+                        
+                        // Synchronize view parameters post-restoration
+                        updateUI();
+                        startEngine();
+                    };
+                };
+            }
+
+            // Real-Time Background Synchronization Clock
             function clockTickEngine() {
-                if (state.isCompromised) return;
+                if (state.compromised) return;
 
-                if (state.elapsedSeconds >= CONFIG.SESSION_TOTAL_SECONDS) {
-                    UI.badge.textContent = "Session Complete";
-                    UI.badge.className = "status-pill";
-                    writeLog("Monitoring allocation completed successfully.");
+                if (state.elapsed >= CONFIG.SESSION_TOTAL_SEC) {
+                    DOM.badge.textContent = "Session Complete";
+                    DOM.badge.className = "status-pill active";
+                    pushLog("Session tracking boundary finalized successfully.");
                     return;
                 }
 
-                state.elapsedSeconds++;
-                const timePercentage = (state.elapsedSeconds / CONFIG.SESSION_TOTAL_SECONDS) * 100;
-                UI.timeBar.style.width = `${timePercentage}%`;
-                UI.timeVal.textContent = `${Math.floor(timePercentage)}%`;
-
-                if (state.isCurrentlyInside) {
-                    state.verifiedSeconds++;
-                    const attendancePercentage = (state.verifiedSeconds / CONFIG.SESSION_TOTAL_SECONDS) * 100;
-                    UI.attendanceBar.style.width = `${attendancePercentage}%`;
-                    UI.attendanceVal.textContent = `${Math.floor(attendancePercentage)}%`;
+                state.elapsed++;
+                
+                if (state.isInside) {
+                    state.verified++;
                 }
+
+                updateUI();
             }
 
-            function handleTelemetryStream(position) {
-                if (state.isCompromised) return;
+            function updateUI() {
+                const timePercent = (state.elapsed / CONFIG.SESSION_TOTAL_SEC) * 100;
+                DOM.timeBar.style.width = `${timePercent}%`;
+                DOM.timeVal.textContent = `${Math.floor(timePercent)}%`;
 
+                const attPercent = (state.verified / CONFIG.SESSION_TOTAL_SEC) * 100;
+                DOM.attBar.style.width = `${attPercent}%`;
+                DOM.attVal.textContent = `${Math.floor(attPercent)}%`;
+            }
+
+            // Telemetry Processor Loop
+            function processLocationStream(position) {
+                if (state.compromised) return;
+
+                // Anti-Spoof: Intercept browser-level virtual mock flags
                 if (!position || !position.coords || position.mocked === true) {
-                    flagExploit();
+                    isolateTerminal("Hardware level mock signature detected.");
                     return;
                 }
 
-                const now = performance.now();
                 const uLat = position.coords.latitude;
                 const uLng = position.coords.longitude;
                 const uAcc = position.coords.accuracy;
 
-                if (state.lastLat !== null && state.lastLng !== null && state.lastPulseTime !== 0) {
-                    const distanceDelta = geoMath(uLat, uLng, state.lastLat, state.lastLng);
-                    const timeDeltaSeconds = (now - state.lastPulseTime) / 1000;
-                    
-                    if (timeDeltaSeconds > 0 && (distanceDelta / timeDeltaSeconds) > 35) { 
-                        flagExploit();
-                        return;
-                    }
-                }
-
-                if (uAcc > CONFIG.MAX_GPS_ACCURACY) {
-                    UI.badge.textContent = "Signal Untrusted";
-                    UI.badge.className = "status-pill outside";
-                    state.isCurrentlyInside = false;
+                // Anti-Spoof: Filter weak/simulated desktop network configurations
+                if (uAcc > CONFIG.MAX_GPS_ACCURACY_M) {
+                    DOM.badge.textContent = "Signal Untrusted";
+                    DOM.badge.className = "status-pill isolated";
+                    state.isInside = false;
                     return;
                 }
 
-                const distanceToTarget = geoMath(uLat, uLng, CONFIG.TARGET_LAT, CONFIG.TARGET_LNG);
+                const distance = geoMath(uLat, uLng, CONFIG.TARGET_LAT, CONFIG.TARGET_LNG);
 
-                if (distanceToTarget <= CONFIG.ALLOWED_RADIUS) {
-                    if (!state.isCurrentlyInside) {
-                        writeLog("Connection secure. Entering perimeter.");
-                    }
-                    UI.badge.textContent = "Active Presence Verified";
-                    UI.badge.className = "status-pill inside";
-                    state.isCurrentlyInside = true;
-                    
-                    state.lastLat = uLat;
-                    state.lastLng = uLng;
-                    state.lastPulseTime = now;
+                if (distance <= CONFIG.ALLOWED_RADIUS_M) {
+                    DOM.badge.textContent = "Active Presence Verified";
+                    DOM.badge.className = "status-pill active";
+                    state.isInside = true;
                 } else {
-                    if (state.isCurrentlyInside) {
-                        writeLog("Alert: Device exited authorized perimeter boundary.");
-                    }
-                    UI.badge.textContent = "Outside Target Boundary";
-                    UI.badge.className = "status-pill outside";
-                    state.isCurrentlyInside = false;
+                    DOM.badge.textContent = "Outside Boundary Base";
+                    DOM.badge.className = "status-pill isolated";
+                    state.isInside = false;
                 }
+
+                saveTelemetryRow(uLat, uLng, uAcc, state.isInside);
             }
 
-            function flagExploit() {
-                state.isCompromised = true;
-                state.isCurrentlyInside = false;
-                sessionStorage.setItem('sec_lockout_active', 'true');
-                UI.badge.textContent = "Security Isolation";
-                UI.badge.className = "status-pill outside";
-                UI.timeBar.style.backgroundColor = "var(--danger)";
-                UI.attendanceBar.style.backgroundColor = "var(--danger)";
-                writeLog("Terminal isolation: Core signature validation breach.");
+            function isolateTerminal(reason) {
+                state.compromised = true;
+                state.isInside = false;
+                DOM.badge.textContent = "Security Isolation";
+                DOM.badge.className = "status-pill isolated";
+                DOM.timeBar.style.backgroundColor = "var(--danger)";
+                DOM.attBar.style.backgroundColor = "var(--danger)";
+                pushLog(`CRITICAL: ${reason}`);
             }
 
-            function handleHardwareFault(err) {
-                state.isCurrentlyInside = false;
-                UI.badge.textContent = "Telemetry Offline";
-                UI.badge.className = "status-pill outside";
-                if (err.code === 1) {
-                    writeLog("Permission Denied: Please enable Location Access.");
-                }
+            function startEngine() {
+                pushLog("Tracking connection hooks listening...");
+                navigator.geolocation.watchPosition(processLocationStream, () => {
+                    DOM.badge.textContent = "Telemetry Link Lost";
+                    DOM.badge.className = "status-pill isolated";
+                }, {
+                    enableHighAccuracy: true,
+                    maximumAge: 0
+                });
+
+                setInterval(clockTickEngine, 1000);
             }
 
-            if (navigator.geolocation) {
-                if (sessionStorage.getItem('sec_lockout_active') === 'true') {
-                    flagExploit();
-                } else {
-                    writeLog("Initializing hardware positioning pipeline...");
-                    
-                    navigator.geolocation.watchPosition(handleTelemetryStream, handleHardwareFault, {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    });
-
-                    setInterval(clockTickEngine, 1000);
-                }
+            // Execution Gateway Entry
+            if (navigator.geolocation && ('indexedDB' in window)) {
+                initDatabase();
             } else {
-                UI.badge.textContent = "Incompatible Device";
-                writeLog("Device environment missing modern telemetry layers.");
+                DOM.badge.textContent = "Hardware Rejection";
+                pushLog("Device missing localized tracking database interfaces.");
             }
         })();
     </script>
