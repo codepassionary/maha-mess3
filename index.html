@@ -145,7 +145,7 @@
 
     <div class="container">
         <h1>Attendance Check-In</h1>
-        <p class="subtitle">Geofenced within 100 meters</p>
+        <p class="subtitle">Geofenced within 65 meters</p>
 
         <div id="statusBadge" class="status-badge">Checking Location...</div>
 
@@ -171,13 +171,12 @@
 
     <script>
         // ==========================================
-        // CONFIGURATION: Set your office coordinates
+        // CONFIGURATION: Coordinates & Updated 65m Fence
         // ==========================================
         const OFFICE_LAT = 24.500893; 
         const OFFICE_LNG = 81.291928; 
-        const GEOFENCE_RADIUS_METERS = 100; 
+        const GEOFENCE_RADIUS_METERS = 65; 
 
-        // DOM Elements
         const statusBadge = document.getElementById('statusBadge');
         const distanceVal = document.getElementById('distanceVal');
         const accuracyVal = document.getElementById('accuracyVal');
@@ -185,7 +184,6 @@
         const refreshBtn = document.getElementById('refreshBtn');
         const logContents = document.getElementById('logContents');
 
-        // Haversine Formula to calculate distance between two coordinates in meters
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371e3; // Earth's radius in meters
             const phi1 = lat1 * Math.PI / 180;
@@ -198,7 +196,7 @@
                       Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
             
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c; // Distance in meters
+            return R * c; 
         }
 
         function addLog(message) {
@@ -234,18 +232,15 @@
             const userLng = position.coords.longitude;
             const accuracy = position.coords.accuracy;
 
-            // Calculate distance
             const distance = calculateDistance(userLat, userLng, OFFICE_LAT, OFFICE_LNG);
 
-            // Update UI
             distanceVal.textContent = `${distance.toFixed(1)} meters`;
             accuracyVal.textContent = `±${accuracy.toFixed(1)} meters`;
 
-            if (accuracy > 100) {
-                addLog("Warning: Weak GPS accuracy. If indoors, try moving closer to a window.");
+            if (accuracy > 40) {
+                addLog("Warning: GPS accuracy is wide. Try shifting positions for a sharper signal.");
             }
 
-            // Geofence Validation
             if (distance <= GEOFENCE_RADIUS_METERS) {
                 statusBadge.textContent = "Inside Geofence";
                 statusBadge.className = "status-badge inside";
@@ -255,7 +250,7 @@
                 statusBadge.textContent = "Outside Geofence";
                 statusBadge.className = "status-badge outside";
                 checkInBtn.disabled = true;
-                addLog(`Access denied. You are ${Math.round(distance - GEOFENCE_RADIUS_METERS)}m outside the zone.`);
+                addLog(`Access denied. You are ${Math.round(distance - GEOFENCE_RADIUS_METERS)}m outside the 65m boundary.`);
             }
         }
 
@@ -265,13 +260,12 @@
             statusBadge.className = "status-badge outside";
             
             if(err.code === 1) {
-                addLog("Permission denied. Please turn on device location services and allow permission.");
+                addLog("Permission denied. Please enable device location settings.");
             } else {
                 addLog("Unable to retrieve location data.");
             }
         }
 
-        // Action Listeners
         checkInBtn.addEventListener('click', () => {
             addLog("🎉 Attendance marked successfully!");
             alert("Attendance recorded!");
@@ -281,7 +275,6 @@
             checkLocation();
         });
 
-        // Run application
         window.onload = checkLocation;
     </script>
 </body>
