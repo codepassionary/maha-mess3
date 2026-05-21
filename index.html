@@ -3,238 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Integrity Terminal</title>
+    <title>Kinematic Telemetry Core</title>
+    <!-- Leaflet.js CSS for open-source mapping architecture -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
-            --bg-canvas: #040712;
-            --surface: #0d1322;
+            --bg-canvas: #030712;
+            --surface: #0b1329;
             --border: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --brand: #6366f1;
-            --success: #10b981;
-            --danger: #f43f5e;
-            --warning: #fbbf24;
+            --text-main: #f8fafc;
+            --text-muted: #64748b;
+            --brand-prime: #6366f1;
+            --brand-glow: rgba(99, 102, 241, 0.15);
+            --state-active: #10b981;
+            --state-alert: #f43f5e;
+            --font-mono: "SF Mono", Monaco, Consolas, monospace;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-canvas);
-            color: var(--text-primary);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .card {
-            background-color: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            width: 100%;
-            max-width: 420px;
-            padding: 36px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-        .header p { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
-
-        .status-pill {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
-            margin-bottom: 24px;
-        }
-
-        .status-pill.active { color: var(--success); border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.02); }
-        .status-pill.warning { color: var(--warning); border-color: rgba(251, 191, 36, 0.2); background: rgba(251, 191, 36, 0.02); }
-        .status-pill.isolated { color: var(--danger); border-color: rgba(244, 63, 94, 0.2); background: rgba(244, 63, 94, 0.02); }
-
-        .metric-box {
-            background: rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .metric-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-
-        .progress-track {
-            background-color: #1e293b;
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background-color: var(--brand);
-            transition: width 0.5s ease;
-        }
-        #attendanceBar { background-color: var(--success); }
-
-        /* Hardware Hardware Error Screen Overlay */
-        .hardware-blindfold {
-            display: none;
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(13, 19, 34, 0.98);
-            z-index: 10;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            text-align: center;
         }
 
-        .hardware-blindfold h2 { color: var(--danger); font-size: 18px; margin-bottom: 8px; }
-        .hardware-blindfold p { color: var(--text-secondary); font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
-        
-        .hardware-toggle-btn {
-            background: var(--brand);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 13px;
+        /* Full Screen Split Grid Setup */
+        .app-container {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
         }
+
+        /* Left Side Dashboard Control Console */
+        .control-console {
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            z-index: 10;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .brand-header h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+        .brand-header p { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+
+        .system-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
+        }
+        .system-pill.offline { color: var(--text-muted); border-color: var(--border); }
+        .system-pill.online { color: var(--state-active); border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.02); }
+
+        /* Metrics Data Panel Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .metric-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+        }
+        .metric-card label { display: block; font-size: 9px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .metric-card span { font-size: 18px; font-weight: 700; font-family: var(--font-mono); color: var(--text-main); }
+        .metric-card span small { font-size: 10px; color: var(--text-muted); margin-left: 2px; font-weight: 500; }
+
+        /* Controls Panel */
+        .btn-action {
+            width: 100%;
+            background: var(--brand-prime);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px var(--brand-glow);
+        }
+        .btn-action:hover { background: #4f46e5; }
+        .btn-action.halt-state { background: var(--state-alert); box-shadow: 0 4px 12px rgba(244, 63, 94, 0.15); }
+
+        .log-terminal {
+            flex-grow: 1;
+            background: #020408;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: #4b5563;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            line-height: 1.4;
+        }
+
+        /* Right Side Map Workspace Canvas */
+        #mapCanvas {
+            width: 100%;
+            height: 100%;
+            background-color: #0c101b;
+        }
+
+        /* Customizing Leaflet Map Theme to dark clinical profile */
+        .leaflet-container { background: #0c101b !important; }
+        .leaflet-bar a { background-color: var(--surface) !important; color: var(--text-main) !important; border-color: var(--border) !important; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <!-- Hardware State Alert Overlay -->
-        <div id="hardwareAlertScreen" class="hardware-blindfold">
-            <h2>Bluetooth Matrix Disconnected</h2>
-            <p>Your timeline presence tracking is frozen. The system requires an active local Bluetooth array link to confirm you are sitting at a valid pair bench configuration.</p>
-            <button id="retryHardwareBtn" class="hardware-toggle-btn">Re-verify Hardware Sensors</button>
+    <div class="app-container">
+        <!-- Control Interface Panel -->
+        <div class="control-console">
+            <div class="brand-header">
+                <h1>Spatial Tracker</h1>
+                <p>Kinematic Telemetry Ledger</p>
+            </div>
+
+            <div id="sysStatus" class="system-pill offline">
+                <span>Core State: Standby</span>
+                <span id="coordPulse">0.00, 0.00</span>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card"><label>Total Distance</label><span id="mDistance">0.00<small>m</small></span></div>
+                <div class="metric-card"><label>Current Velocity</label><span id="mVelocity">0.00<small>m/s</small></span></div>
+                <div class="metric-card"><label>Max Acceleration</label><span id="mAccel">0.00<small>m/s²</small></span></div>
+                <div class="metric-card"><label>Data Frames</label><span id="mFrames">0</span></div>
+            </div>
+
+            <button id="toggleEngineBtn" class="btn-action" onclick="toggleTelemetryCore()">Initialize Telemetry Stream</button>
+
+            <div id="terminalStream" class="log-terminal">
+                <div>[SYSTEM] Core idling. Ready for spatial deployment...</div>
+            </div>
         </div>
 
-        <div class="header">
-            <h1>Presence Core</h1>
-            <p>Radio Environment Monitor</p>
-        </div>
-
-        <div id="statusBadge" class="status-pill active">Syncing Radio Grid...</div>
-
-        <div class="metric-box">
-            <div class="metric-row"><span>Lecture Horizon</span><span id="timeVal">0%</span></div>
-            <div class="progress-track"><div id="timeBar" class="progress-bar"></div></div>
-        </div>
-
-        <div class="metric-box">
-            <div class="metric-row"><span>Verified Timeline</span><span id="attendanceVal">0%</span></div>
-            <div class="progress-track"><div id="attendanceBar" class="progress-bar"></div></div>
-        </div>
+        <!-- Interactive Map Geometry Viewport -->
+        <div id="mapCanvas"></div>
     </div>
 
+    <!-- Leaflet.js Dependencies -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        (function() {
-            'use strict';
+        'use strict';
 
-            let app = {
-                elapsed: 0,
-                verified: 0,
-                bluetoothActive: true, // Core signal tracking link
-                isTracking: true
-            };
-
-            const DOM = Object.freeze({
-                badge: document.getElementById('statusBadge'),
-                timeBar: document.getElementById('timeBar'),
-                timeVal: document.getElementById('timeVal'),
-                attBar: document.getElementById('attendanceBar'),
-                attVal: document.getElementById('attendanceVal'),
-                blindfold: document.getElementById('hardwareAlertScreen'),
-                retryBtn: document.getElementById('retryHardwareBtn')
-            });
-
-            function initDeviceSensors() {
-                // Monitor browser system connectivity layers
-                window.addEventListener('online', evaluateSensorEnvironment);
-                window.addEventListener('offline', evaluateSensorEnvironment);
-
-                // Simulation trigger: Click the retry button to mimic toggling Bluetooth back on
-                DOM.retryBtn.addEventListener('click', () => {
-                    app.bluetoothActive = true;
-                    evaluateSensorEnvironment();
-                });
-
-                // Simulate an unpredictable user action where they turn off Bluetooth after 7 seconds
-                setTimeout(() => {
-                    app.bluetoothActive = false;
-                    evaluateSensorEnvironment();
-                }, 7000);
-
-                setInterval(clockEngine, 1000);
+        let telemetry = {
+            trackingActive: false,
+            watchId: null,
+            map: null,
+            trailLine: null,
+            marker: null,
+            pathCoords: [], // Master array holding all historical lat/lng nodes
+            timestamps: [], // Companion timestamp index array for calculating velocity dynamics
+            metrics: {
+                totalDistance: 0,
+                currentVelocity: 0,
+                maxAcceleration: 0,
+                framesCaptured: 0
             }
+        };
 
-            function evaluateSensorEnvironment() {
-                // In production, navigate via native wrapper check: bluetooth.getAvailability()
-                if (!app.bluetoothActive || !navigator.onLine) {
-                    app.isTracking = false;
-                    DOM.blindfold.style.display = "flex";
-                    DOM.badge.textContent = "Hardware Signal Missing";
-                    DOM.badge.className = "status-pill isolated";
-                } else {
-                    app.isTracking = true;
-                    DOM.blindfold.style.display = "none";
-                    DOM.badge.textContent = "Tracking Environment Secure";
-                    DOM.badge.className = "status-pill active";
-                }
-            }
+        // Initialize Map Object using standard fallback parameters
+        (function bootMapCanvas() {
+            // Default center point
+            const defaultPosition = [24.5373, 81.3042]; 
+            
+            telemetry.map = L.map('mapCanvas', {
+                zoomControl: true,
+                attributionControl: false
+            }).setView(defaultPosition, 16);
 
-            function clockEngine() {
-                if (!app.isTracking) return; // Completely locks tracking and stops adding seconds
+            // Inject CartoDB Dark Matter tile server layer for a clinical, dark-mode aesthetic
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 20
+            }).addTo(telemetry.map);
 
-                if (app.elapsed >= 3600) {
-                    DOM.badge.textContent = "Session Completed Successfully";
-                    DOM.badge.className = "status-pill active";
+            // Instantiate empty vector tracking polyline configuration
+            telemetry.trailLine = L.polyline([], {
+                color: '#6366f1',
+                weight: 4,
+                opacity: 0.85,
+                lineJoin: 'round'
+            }).addTo(telemetry.map);
+        })();
+
+        function printLog(msg, status = 'SYSTEM') {
+            const container = document.getElementById('terminalStream');
+            const row = document.createElement('div');
+            row.textContent = `[${status}] ${msg}`;
+            if(status === 'ERROR') row.style.color = 'var(--state-alert)';
+            if(status === 'PULSE') row.style.color = 'var(--state-active)';
+            container.appendChild(row);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function toggleTelemetryCore() {
+            const btn = document.getElementById('toggleEngineBtn');
+            const statusPill = document.getElementById('sysStatus');
+
+            if (!telemetry.trackingActive) {
+                if (!navigator.geolocation) {
+                    printLog("Hardware missing standard GPS receiver arrays.", "ERROR");
                     return;
                 }
 
-                app.elapsed++;
-                app.verified++;
-                updateInterface();
+                telemetry.trackingActive = true;
+                btn.textContent = "Halt & Seal Telemetry Stream";
+                btn.className = "btn-action halt-state";
+                statusPill.className = "system-pill online";
+                statusPill.firstElementChild.textContent = "Core State: Tracking Active";
+                printLog("Hardware Geolocation thread requested.");
+
+                // Register real-time high-accuracy tracking watcher hook
+                telemetry.watchId = navigator.geolocation.watchPosition(
+                    processIncomingSpatialFrame, 
+                    handleHardwareFault, 
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            } else {
+                // Safely detach background geolocation hardware lines
+                navigator.geolocation.clearWatch(telemetry.watchId);
+                telemetry.trackingActive = false;
+                btn.textContent = "Initialize Telemetry Stream";
+                btn.className = "btn-action";
+                statusPill.className = "system-pill offline";
+                statusPill.firstElementChild.textContent = "Core State: Sealed";
+                printLog("Tracking halted. Final analytics matrix archived.");
+            }
+        }
+
+        function processIncomingSpatialFrame(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const now = Date.now();
+
+            document.getElementById('coordPulse').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            
+            const currentPoint = L.latLng(lat, lng);
+            telemetry.pathCoords.push(currentPoint);
+            telemetry.timestamps.push(now);
+
+            // Append new vertex node directly to map trail polyline
+            telemetry.trailLine.addLatLng(currentPoint);
+
+            // Anchor current location marker
+            if (!telemetry.marker) {
+                telemetry.marker = L.circleMarker(currentPoint, {
+                    radius: 6,
+                    color: '#10b981',
+                    fillColor: '#10b981',
+                    fillOpacity: 1
+                }).addTo(telemetry.map);
+            } else {
+                telemetry.marker.setLatLng(currentPoint);
             }
 
-            function updateInterface() {
-                const limit = 3600;
-                const timePct = (app.elapsed / limit) * 100;
-                DOM.timeBar.style.width = `${timePct}%`;
-                DOM.timeVal.textContent = `${Math.floor(timePct)}%`;
+            // Pan view map viewport to focus on active student coordinate point
+            telemetry.map.panTo(currentPoint);
 
-                const attPct = (app.verified / limit) * 100;
-                DOM.attBar.style.width = `${attPct}%`;
-                DOM.attVal.textContent = `${Math.floor(attPct)}%`;
+            // Execute Kinematic Vector Calculations
+            telemetry.metrics.framesCaptured++;
+            calculateKinematicsAnalysis(currentPoint, now);
+            updateDashboardLayout();
+        }
+
+        function calculateKinematicsAnalysis(currentPoint, now) {
+            const index = telemetry.pathCoords.length - 1;
+            if (index === 0) {
+                printLog("Spatial anchor established successfully.", "PULSE");
+                return;
             }
 
-            // Launch Node
-            initDeviceSensors();
-        })();
+            const priorPoint = telemetry.pathCoords[index - 1];
+            const priorTimestamp = telemetry.timestamps[index - 1];
+
+            // 1. Calculate step distance using internal Haversine metrics
+            const deltaDistance = priorPoint.distanceTo(currentPoint); // Outputs directly in meters
+            telemetry.metrics.totalDistance += deltaDistance;
+
+            // 2. Compute dynamic instantaneous velocity matrix
+            const deltaTimeSec = (now - priorTimestamp) / 1000;
+            let currentVelocity = deltaTimeSec > 0 ? (deltaDistance / deltaTimeSec) : 0;
+            
+            // Filter noise spikes from standard browser geolocation inaccuracies
+            if(currentVelocity > 45) currentVelocity = telemetry.metrics.currentVelocity;
+
+            // 3. Compute acceleration curve patterns
+            const deltaVelocity = currentVelocity - telemetry.metrics.currentVelocity;
+            const currentAcceleration = deltaTimeSec > 0 ? Math.abs(deltaVelocity / deltaTimeSec) : 0;
+
+            if (currentAcceleration > telemetry.metrics.maxAcceleration && index > 1) {
+                telemetry.metrics.maxAcceleration = currentAcceleration;
+            }
+
+            telemetry.metrics.currentVelocity = currentVelocity;
+            printLog(`Captured Frame [${index}] -> Move Delta: ${deltaDistance.toFixed(2)}m @ ${currentVelocity.toFixed(2)}m/s`, "PULSE");
+        }
+
+        function updateDashboardLayout() {
+            document.getElementById('mDistance').innerHTML = `${telemetry.metrics.totalDistance.toFixed(2)}<small>m</small>`;
+            document.getElementById('mVelocity').innerHTML = `${telemetry.metrics.currentVelocity.toFixed(2)}<small>m/s</small>`;
+            document.getElementById('mAccel').innerHTML = `${telemetry.metrics.maxAcceleration.toFixed(3)}<small>m/s²</small>`;
+            document.getElementById('mFrames').textContent = telemetry.metrics.framesCaptured;
+        }
+
+        function handleHardwareFault(err) {
+            printLog(`Hardware Fault code [${err.code}]: ${err.message}`, "ERROR");
+        }
     </script>
 </body>
 </html>
