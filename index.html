@@ -3,337 +3,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kinematic Telemetry Core</title>
-    <!-- Leaflet.js CSS for open-source mapping architecture -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Instagram Core</title>
     <style>
         :root {
-            --bg-canvas: #030712;
-            --surface: #0b1329;
-            --border: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #64748b;
-            --brand-prime: #6366f1;
-            --brand-glow: rgba(99, 102, 241, 0.15);
-            --state-active: #10b981;
-            --state-alert: #f43f5e;
-            --font-mono: "SF Mono", Monaco, Consolas, monospace;
+            --bg-canvas: #000000;
+            --surface: #121212;
+            --border: #262626;
+            --text-main: #f5f5f5;
+            --text-muted: #a8a8a8;
+            --brand-link: #0095f6;
+            --heart-active: #ff3040;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-canvas);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
         }
 
-        /* Full Screen Split Grid Setup */
-        .app-container {
-            display: grid;
-            grid-template-columns: 380px 1fr;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
+        /* Responsive Application Shell Layout */
+        .app-shell {
+            display: flex;
+            width: 100%;
+            max-width: 935px;
+            margin-bottom: 60px; /* Space for mobile navigation rail */
         }
 
-        /* Left Side Dashboard Control Console */
-        .control-console {
-            background-color: var(--surface);
+        /* Navigation Rails Configuration */
+        .nav-rail {
+            width: 244px;
             border-right: 1px solid var(--border);
-            padding: 24px;
+            height: 100vh;
+            position: fixed;
+            left: calc((100vw - 935px) / 2);
+            top: 0;
+            padding: 24px 12px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-            z-index: 10;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            gap: 24px;
+            background: var(--bg-canvas);
+            z-index: 100;
         }
 
-        .brand-header h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
-        .brand-header p { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+        .nav-logo {
+            font-size: 22px;
+            font-weight: 800;
+            font-style: italic;
+            padding-left: 12px;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
 
-        .system-pill {
+        .nav-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            font-family: var(--font-mono);
-            text-transform: uppercase;
-            border: 1px solid var(--border);
-            background: rgba(0,0,0,0.2);
-        }
-        .system-pill.offline { color: var(--text-muted); border-color: var(--border); }
-        .system-pill.online { color: var(--state-active); border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.02); }
-
-        /* Metrics Data Panel Cards */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .metric-card {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-        }
-        .metric-card label { display: block; font-size: 9px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
-        .metric-card span { font-size: 18px; font-weight: 700; font-family: var(--font-mono); color: var(--text-main); }
-        .metric-card span small { font-size: 10px; color: var(--text-muted); margin-left: 2px; font-weight: 500; }
-
-        /* Controls Panel */
-        .btn-action {
-            width: 100%;
-            background: var(--brand-prime);
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
+            gap: 16px;
+            padding: 12px;
+            border-radius: 8px;
             cursor: pointer;
-            font-family: var(--font-mono);
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px var(--brand-glow);
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.2s ease;
         }
-        .btn-action:hover { background: #4f46e5; }
-        .btn-action.halt-state { background: var(--state-alert); box-shadow: 0 4px 12px rgba(244, 63, 94, 0.15); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.1); }
+        .nav-item.active { font-weight: 800; }
+        .nav-item svg { width: 24px; height: 24px; fill: var(--text-main); }
 
-        .log-terminal {
+        /* Core Content Window Viewport */
+        .main-viewport {
+            margin-left: 244px;
             flex-grow: 1;
-            background: #020408;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: #4b5563;
-            overflow-y: auto;
+            padding: 30px 20px;
+            width: 100%;
+        }
+
+        /* View Segments Configuration */
+        .view-pane { display: none; }
+        .view-pane.active-pane { display: block; }
+
+        /* View 1: Feed Interface Architecture */
+        .feed-stream {
+            max-width: 470px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            line-height: 1.4;
+            gap: 24px;
         }
 
-        /* Right Side Map Workspace Canvas */
-        #mapCanvas {
+        .post-card {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 4px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            padding: 2px;
+        }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 2px solid #000; }
+        .post-username { font-size: 14px; font-weight: 700; cursor: pointer; }
+
+        .post-media {
             width: 100%;
-            height: 100%;
-            background-color: #0c101b;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: #121212;
+            aspect-ratio: 1 / 1;
         }
+        .post-media img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Customizing Leaflet Map Theme to dark clinical profile */
-        .leaflet-container { background: #0c101b !important; }
-        .leaflet-bar a { background-color: var(--surface) !important; color: var(--text-main) !important; border-color: var(--border) !important; }
+        .post-actions { display: flex; gap: 16px; padding: 12px 4px 8px 4px; }
+        .action-icon { cursor: pointer; background: transparent; border: none; outline: none; display: flex; align-items: center; justify-content: center; }
+        .action-icon svg { width: 24px; height: 24px; fill: var(--text-main); transition: transform 0.1s ease; }
+        .action-icon:active svg { transform: scale(1.2); }
+        .action-icon.liked svg { fill: var(--heart-active); }
+
+        .post-details { padding: 0 4px; font-size: 14px; }
+        .metrics-likes { font-weight: 700; margin-bottom: 6px; display: block; }
+        .post-caption span:first-child { font-weight: 700; margin-right: 8px; }
+        .post-caption p { display: inline; color: var(--text-main); }
+
+        /* View 2: Profile Interface Architecture */
+        .profile-dashboard { max-width: 935px; margin: 0 auto; }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 80px;
+            padding: 20px 40px 44px 40px;
+            border-bottom: 1px solid var(--border);
+        }
+        .profile-avatar-wrapper { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; background: #262626; }
+        .profile-avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .profile-info h2 { font-size: 20px; font-weight: 300; margin-bottom: 20px; }
+        .profile-stats { display: flex; gap: 40px; margin-bottom: 20px; list-style: none; font-size: 16px; }
+        .profile-stats li span { font-weight: 700; }
+        .profile-bio h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+        .profile-bio p { font-size: 14px; color: #f5f5f5; white-space: pre-line; line-height: 1.4; }
+
+        /* Media Grid System Shared across Profile and Explore */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            padding-top: 24px;
+        }
+        .grid-item {
+            aspect-ratio: 1 / 1;
+            background-color: var(--surface);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+        .grid-item img { width: 100%; height: 100%; object-fit: cover; transition: filter 0.2s ease; }
+        .grid-item:hover img { filter: brightness(0.8); }
+
+        /* Responsive Mobile Layout Adaptations */
+        @media (max-width: 768px) {
+            .nav-rail {
+                width: 100vw;
+                height: 50px;
+                flex-direction: row;
+                justify-content: space-around;
+                bottom: 0; top: auto; left: 0;
+                padding: 0;
+                border-right: none;
+                border-top: 1px solid var(--border);
+            }
+            .nav-logo { display: none; }
+            .nav-item span { display: none; }
+            .nav-item { padding: 12px; }
+            .main-viewport { margin-left: 0; padding: 10px; width: 100%; }
+            .profile-header { gap: 20px; padding: 20px 10px; }
+            .profile-avatar-wrapper { width: 77px; height: 77px; }
+            .profile-stats { gap: 15px; font-size: 13px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <!-- Control Interface Panel -->
-        <div class="control-console">
-            <div class="brand-header">
-                <h1>Spatial Tracker</h1>
-                <p>Kinematic Telemetry Ledger</p>
+    <!-- Application Shell Wrapper -->
+    <div class="app-shell">
+        
+        <!-- Navigation Menu Rail -->
+        <nav class="nav-rail">
+            <div class="nav-logo">Coregram</div>
+            <div class="nav-item active" onclick="switchView('feedView', this)">
+                <svg viewBox="0 0 24 24"><path d="M9.005 16.545a2.997 2.997 0 1 0 2.997-2.997A3 3 0 0 0 9.005 16.545zm12.013-7.21a3.125 3.125 0 0 0-3.124-3.124H6.105a3.125 3.125 0 0 0-3.124 3.124v8.161a3.123 3.123 0 0 0 3.124 3.122h11.789a3.123 3.123 0 0 0 3.124-3.122V9.335zm-2 8.161a1.124 1.124 0 0 1-1.124 1.122H6.105a1.124 1.124 0 0 1-1.124-1.122V9.335a1.125 1.125 0 0 1 1.124-1.124h11.789a1.125 1.125 0 0 1 1.124 1.124v8.161z"/></svg>
+                <span>Home</span>
             </div>
-
-            <div id="sysStatus" class="system-pill offline">
-                <span>Core State: Standby</span>
-                <span id="coordPulse">0.00, 0.00</span>
+            <div class="nav-item" onclick="switchView('exploreView', this)">
+                <svg viewBox="0 0 24 24"><path d="M13.118 10.881a.5.5 0 0 0-.599-.599l-4.14 1.035a1 1 0 0 0-.745.745l-1.036 4.14a.5.5 0 0 0 .599.599l4.14-1.035a1 1 0 0 0 .745-.745l1.036-4.14z"/><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8.01 8.01 0 0 1-8 8z"/></svg>
+                <span>Explore</span>
             </div>
-
-            <div class="metrics-grid">
-                <div class="metric-card"><label>Total Distance</label><span id="mDistance">0.00<small>m</small></span></div>
-                <div class="metric-card"><label>Current Velocity</label><span id="mVelocity">0.00<small>m/s</small></span></div>
-                <div class="metric-card"><label>Max Acceleration</label><span id="mAccel">0.00<small>m/s²</small></span></div>
-                <div class="metric-card"><label>Data Frames</label><span id="mFrames">0</span></div>
+            <div class="nav-item" onclick="switchView('profileView', this)">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-1 4.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm-5 6.204C7.362 15.115 9.531 14 12 14s4.638 11.115 5 3.954C15.65 19.141 13.912 20 12 20s-3.65-.859-5-2.046z"/></svg>
+                <span>Profile</span>
             </div>
+        </nav>
 
-            <button id="toggleEngineBtn" class="btn-action" onclick="toggleTelemetryCore()">Initialize Telemetry Stream</button>
+        <!-- Main Display Viewport Pane Window -->
+        <main class="main-viewport">
 
-            <div id="terminalStream" class="log-terminal">
-                <div>[SYSTEM] Core idling. Ready for spatial deployment...</div>
-            </div>
-        </div>
+            <!-- 1. HOME FEED PANE -->
+            <section id="feedView" class="view-pane active-pane">
+                <div class="feed-stream" id="feedHook">
+                    <!-- Dynamic rendering engine target -->
+                </div>
+            </section>
 
-        <!-- Interactive Map Geometry Viewport -->
-        <div id="mapCanvas"></div>
+            <!-- 2. EXPLORE VIEW PANE -->
+            <section id="exploreView" class="view-pane">
+                <div class="media-grid" id="exploreGridHook">
+                    <!-- Dynamic explore cards map here -->
+                </div>
+            </section>
+
+            <!-- 3. PROFILE VIEW PANE -->
+            <section id="profileView" class="view-pane">
+                <div class="profile-dashboard">
+                    <header class="profile-header">
+                        <div class="profile-avatar-wrapper">
+                            <img src="https://picsum.photos/id/64/300/300" alt="Profile Root">
+                        </div>
+                        <div class="profile-info">
+                            <h2>nature.alpha</h2>
+                            <ul class="profile-stats">
+                                <li><span id="profilePostCount">0</span> posts</li>
+                                <li><span>4.8k</span> followers</li>
+                                <li><span>312</span> following</li>
+                            </ul>
+                            <div class="profile-bio">
+                                <h3>Visual Architecture Ledger</h3>
+                                <p>Capturing structural ecosystems & dynamic layouts.
+                                Designed in plain code frames.</p>
+                            </div>
+                        </div>
+                    </header>
+                    
+                    <div class="media-grid" id="profileGridHook">
+                        <!-- User posts layout hook -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
     </div>
 
-    <!-- Leaflet.js Dependencies -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Interface Logic & Reactive Core Architecture -->
     <script>
         'use strict';
 
-        let telemetry = {
-            trackingActive: false,
-            watchId: null,
-            map: null,
-            trailLine: null,
-            marker: null,
-            pathCoords: [], // Master array holding all historical lat/lng nodes
-            timestamps: [], // Companion timestamp index array for calculating velocity dynamics
-            metrics: {
-                totalDistance: 0,
-                currentVelocity: 0,
-                maxAcceleration: 0,
-                framesCaptured: 0
-            }
-        };
+        // Mock Database Architecture Array
+        const POST_LEDGER = [
+            { id: 101, author: "pixel.forge", src: "https://picsum.photos/id/10/600/600", likes: 124, caption: "Industrial canvas geometry.", liked: false },
+            { id: 102, author: "luna.craft", src: "https://picsum.photos/id/28/600/600", likes: 89, caption: "High altitude vector paths.", liked: false },
+            { id: 103, author: "nature.alpha", src: "https://picsum.photos/id/48/600/600", likes: 412, caption: "Dynamic balance of environmental layers.", liked: false },
+            { id: 104, author: "nature.alpha", src: "https://picsum.photos/id/57/600/600", likes: 231, caption: "Fractal details found in macro environments.", liked: false },
+            { id: 105, author: "spectrum.v", src: "https://picsum.photos/id/22/600/600", likes: 95, caption: "Shifting light spectra layout.", liked: false },
+            { id: 106, author: "nature.alpha", src: "https://picsum.photos/id/29/600/600", likes: 519, caption: "Early tracking lines across open ranges.", liked: false }
+        ];
 
-        // Initialize Map Object using standard fallback parameters
-        (function bootMapCanvas() {
-            // Default center point
-            const defaultPosition = [24.5373, 81.3042]; 
-            
-            telemetry.map = L.map('mapCanvas', {
-                zoomControl: true,
-                attributionControl: false
-            }).setView(defaultPosition, 16);
-
-            // Inject CartoDB Dark Matter tile server layer for a clinical, dark-mode aesthetic
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 20
-            }).addTo(telemetry.map);
-
-            // Instantiate empty vector tracking polyline configuration
-            telemetry.trailLine = L.polyline([], {
-                color: '#6366f1',
-                weight: 4,
-                opacity: 0.85,
-                lineJoin: 'round'
-            }).addTo(telemetry.map);
+        // Initialization Routine
+        (function runtimeBootstrap() {
+            renderHomeFeedStream();
+            renderExploreGrid();
+            renderProfileDashboardGrid();
         })();
 
-        function printLog(msg, status = 'SYSTEM') {
-            const container = document.getElementById('terminalStream');
-            const row = document.createElement('div');
-            row.textContent = `[${status}] ${msg}`;
-            if(status === 'ERROR') row.style.color = 'var(--state-alert)';
-            if(status === 'PULSE') row.style.color = 'var(--state-active)';
-            container.appendChild(row);
-            container.scrollTop = container.scrollHeight;
-        }
+        // View Router Controller Engine
+        function switchView(targetViewId, elementNode) {
+            // Drop all active states across layout views
+            document.querySelectorAll('.view-pane').forEach(pane => pane.classList.remove('active-pane'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
 
-        function toggleTelemetryCore() {
-            const btn = document.getElementById('toggleEngineBtn');
-            const statusPill = document.getElementById('sysStatus');
-
-            if (!telemetry.trackingActive) {
-                if (!navigator.geolocation) {
-                    printLog("Hardware missing standard GPS receiver arrays.", "ERROR");
-                    return;
-                }
-
-                telemetry.trackingActive = true;
-                btn.textContent = "Halt & Seal Telemetry Stream";
-                btn.className = "btn-action halt-state";
-                statusPill.className = "system-pill online";
-                statusPill.firstElementChild.textContent = "Core State: Tracking Active";
-                printLog("Hardware Geolocation thread requested.");
-
-                // Register real-time high-accuracy tracking watcher hook
-                telemetry.watchId = navigator.geolocation.watchPosition(
-                    processIncomingSpatialFrame, 
-                    handleHardwareFault, 
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                );
-            } else {
-                // Safely detach background geolocation hardware lines
-                navigator.geolocation.clearWatch(telemetry.watchId);
-                telemetry.trackingActive = false;
-                btn.textContent = "Initialize Telemetry Stream";
-                btn.className = "btn-action";
-                statusPill.className = "system-pill offline";
-                statusPill.firstElementChild.textContent = "Core State: Sealed";
-                printLog("Tracking halted. Final analytics matrix archived.");
-            }
-        }
-
-        function processIncomingSpatialFrame(position) {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const now = Date.now();
-
-            document.getElementById('coordPulse').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            // Engage requested node view
+            document.getElementById(targetViewId).classList.add('active-pane');
+            elementNode.classList.add('active');
             
-            const currentPoint = L.latLng(lat, lng);
-            telemetry.pathCoords.push(currentPoint);
-            telemetry.timestamps.push(now);
-
-            // Append new vertex node directly to map trail polyline
-            telemetry.trailLine.addLatLng(currentPoint);
-
-            // Anchor current location marker
-            if (!telemetry.marker) {
-                telemetry.marker = L.circleMarker(currentPoint, {
-                    radius: 6,
-                    color: '#10b981',
-                    fillColor: '#10b981',
-                    fillOpacity: 1
-                }).addTo(telemetry.map);
-            } else {
-                telemetry.marker.setLatLng(currentPoint);
-            }
-
-            // Pan view map viewport to focus on active student coordinate point
-            telemetry.map.panTo(currentPoint);
-
-            // Execute Kinematic Vector Calculations
-            telemetry.metrics.framesCaptured++;
-            calculateKinematicsAnalysis(currentPoint, now);
-            updateDashboardLayout();
+            // Re-center window context view frame smoothly
+            window.scrollTo({ top: 0, behavior: 'instant' });
         }
 
-        function calculateKinematicsAnalysis(currentPoint, now) {
-            const index = telemetry.pathCoords.length - 1;
-            if (index === 0) {
-                printLog("Spatial anchor established successfully.", "PULSE");
-                return;
-            }
+        // Home Feed Rendering Pipeline
+        function renderHomeFeedStream() {
+            const hook = document.getElementById('feedHook');
+            hook.innerHTML = ''; // Wipe template buffers
 
-            const priorPoint = telemetry.pathCoords[index - 1];
-            const priorTimestamp = telemetry.timestamps[index - 1];
+            POST_LEDGER.forEach((post) => {
+                const card = document.createElement('article');
+                card.className = 'post-card';
+                card.innerHTML = `
+                    <div class="post-header">
+                        <div class="user-avatar"><img src="https://picsum.photos/id/${post.id - 80}/50/50" alt=""></div>
+                        <span class="post-username">${post.author}</span>
+                    </div>
+                    <div class="post-media" ondblclick="triggerOptimisticLike(${post.id}, this)">
+                        <img src="${post.src}" alt="Media Post Asset" loading="lazy">
+                    </div>
+                    <div class="post-actions">
+                        <button class="action-icon ${post.liked ? 'liked' : ''}" onclick="toggleLikeEngagement(${post.id}, this)">
+                            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        </button>
+                    </div>
+                    <div class="post-details">
+                        <span class="metrics-likes">${post.likes} likes</span>
+                        <div class="post-caption">
+                            <span>${post.author}</span><p>${post.caption}</p>
+                        </div>
+                    </div>
+                `;
+                hook.appendChild(card);
+            });
+        }
 
-            // 1. Calculate step distance using internal Haversine metrics
-            const deltaDistance = priorPoint.distanceTo(currentPoint); // Outputs directly in meters
-            telemetry.metrics.totalDistance += deltaDistance;
-
-            // 2. Compute dynamic instantaneous velocity matrix
-            const deltaTimeSec = (now - priorTimestamp) / 1000;
-            let currentVelocity = deltaTimeSec > 0 ? (deltaDistance / deltaTimeSec) : 0;
+        // Explore Page Grid Array Generation Engine
+        function renderExploreGrid() {
+            const hook = document.getElementById('exploreGridHook');
+            hook.innerHTML = '';
             
-            // Filter noise spikes from standard browser geolocation inaccuracies
-            if(currentVelocity > 45) currentVelocity = telemetry.metrics.currentVelocity;
-
-            // 3. Compute acceleration curve patterns
-            const deltaVelocity = currentVelocity - telemetry.metrics.currentVelocity;
-            const currentAcceleration = deltaTimeSec > 0 ? Math.abs(deltaVelocity / deltaTimeSec) : 0;
-
-            if (currentAcceleration > telemetry.metrics.maxAcceleration && index > 1) {
-                telemetry.metrics.maxAcceleration = currentAcceleration;
+            // Generate a varied explore view layout
+            for(let i = 20; i < 35; i++) {
+                const block = document.createElement('div');
+                block.className = 'grid-item';
+                block.innerHTML = `<img src="https://picsum.photos/id/${i}/400/400" alt="Explore Asset" loading="lazy">`;
+                hook.appendChild(block);
             }
-
-            telemetry.metrics.currentVelocity = currentVelocity;
-            printLog(`Captured Frame [${index}] -> Move Delta: ${deltaDistance.toFixed(2)}m @ ${currentVelocity.toFixed(2)}m/s`, "PULSE");
         }
 
-        function updateDashboardLayout() {
-            document.getElementById('mDistance').innerHTML = `${telemetry.metrics.totalDistance.toFixed(2)}<small>m</small>`;
-            document.getElementById('mVelocity').innerHTML = `${telemetry.metrics.currentVelocity.toFixed(2)}<small>m/s</small>`;
-            document.getElementById('mAccel').innerHTML = `${telemetry.metrics.maxAcceleration.toFixed(3)}<small>m/s²</small>`;
-            document.getElementById('mFrames').textContent = telemetry.metrics.framesCaptured;
+        // Profile Filtered Matrix Mapping Engine
+        function renderProfileDashboardGrid() {
+            const hook = document.getElementById('profileGridHook');
+            hook.innerHTML = '';
+
+            // Filter ledger dataset down to posts owned by "nature.alpha"
+            const userOwnedPosts = POST_LEDGER.filter(post => post.author === "nature.alpha");
+            document.getElementById('profilePostCount').textContent = userOwnedPosts.length;
+
+            userOwnedPosts.forEach(post => {
+                const block = document.createElement('div');
+                block.className = 'grid-item';
+                block.innerHTML = `<img src="${post.src}" alt="User Asset">`;
+                hook.appendChild(block);
+            });
         }
 
-        function handleHardwareFault(err) {
-            printLog(`Hardware Fault code [${err.code}]: ${err.message}`, "ERROR");
+        // Interactive State Management Functions
+        function toggleLikeEngagement(postId, elementNode) {
+            const targetPost = POST_LEDGER.find(p => p.id === postId);
+            if (!targetPost) return;
+
+            targetPost.liked = !targetPost.liked;
+            targetPost.likes += targetPost.liked ? 1 : -1;
+
+            // Immediate UI reconciliation update
+            elementNode.classList.toggle('liked', targetPost.liked);
+            elementNode.closest('.post-card').querySelector('.metrics-likes').textContent = `${targetPost.likes} likes`;
+            
+            // Sync data across secondary rendering pipelines
+            renderProfileDashboardGrid();
+        }
+
+        function triggerOptimisticLike(postId, imageContainerNode) {
+            const likeButton = imageContainerNode.closest('.post-card').querySelector('.action-icon');
+            const targetPost = POST_LEDGER.find(p => p.id === postId);
+            
+            if (targetPost && !targetPost.liked) {
+                toggleLikeEngagement(postId, likeButton);
+            }
         }
     </script>
 </body>
