@@ -14,13 +14,11 @@
             --text-muted: #94a3b8;
             
             --brand: #4f46e5;
-            --brand-dim: #eeebff;
             
             --success: #10b981;
             --success-dim: #e6fbf4;
             --danger: #ef4444;
             --danger-dim: #fdf2f2;
-            --amber: #f59e0b;
         }
 
         * {
@@ -86,7 +84,7 @@
             background-color: var(--bg-canvas);
             border: 1px solid var(--border);
             color: var(--text-secondary);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         .status-pill.inside {
@@ -101,7 +99,6 @@
             color: var(--danger);
         }
 
-        /* Metrics Progress Bars Layout */
         .metric-group {
             margin-bottom: 24px;
         }
@@ -128,14 +125,13 @@
             height: 12px;
             border-radius: 6px;
             overflow: hidden;
-            position: relative;
         }
 
         .progress-bar {
             height: 100%;
             width: 0%;
             border-radius: 6px;
-            transition: width 1s linear, background-color 0.3s ease;
+            transition: width 0.3s ease, background-color 0.3s ease;
         }
 
         #timeBar {
@@ -146,7 +142,6 @@
             background-color: var(--success);
         }
 
-        /* Clean Terminal Logs */
         .log-section {
             margin-top: 32px;
             border-top: 1px solid var(--border);
@@ -195,7 +190,7 @@
         </div>
 
         <div class="status-container">
-            <div id="statusBadge" class="status-pill">Initializing Precision Stream...</div>
+            <div id="statusBadge" class="status-pill">Awaiting GPS stream...</div>
         </div>
 
         <!-- Metric 1: Timeline Progress -->
@@ -209,7 +204,7 @@
             </div>
         </div>
 
-        <!-- Metric 2: Valid Location Presence Scale -->
+        <!-- Metric 2: Attendance Verification Progress -->
         <div class="metric-group">
             <div class="metric-header">
                 <span>Attendance Verified</span>
@@ -235,7 +230,7 @@
                 TARGET_LNG: 81.291928,
                 ALLOWED_RADIUS: 65,
                 MAX_GPS_ACCURACY: 40,
-                SESSION_TOTAL_SECONDS: 3600 // 1 Hour total monitoring runtime window
+                SESSION_TOTAL_SECONDS: 3600 // 1 Hour session total window
             });
 
             let state = {
@@ -244,7 +239,8 @@
                 isCompromised: false,
                 lastLat: null,
                 lastLng: null,
-                lastPulseTime: 0
+                lastPulseTime: 0,
+                isCurrentlyInside: false
             };
 
             const UI = Object.freeze({
@@ -271,38 +267,38 @@
                 row.className = 'log-row';
                 row.innerHTML = `<span>[${new Date().toLocaleTimeString([], {hour12: false})}]</span> ${msg}`;
                 UI.logs.insertBefore(row, UI.logs.firstChild);
-                if (UI.logs.childNodes.length > 20) UI.logs.removeChild(UI.logs.lastChild);
+                if (UI.logs.childNodes.length > 15) UI.logs.removeChild(UI.logs.lastChild);
             }
 
-            // Central Execution Heartbeat - Fires every single second automatically
-            function systemHeartbeat() {
+            // Continuous clock engine running precisely every second to update tracking matrix bars
+            function clockTickEngine() {
                 if (state.isCompromised) return;
 
                 if (state.elapsedSeconds >= CONFIG.SESSION_TOTAL_SECONDS) {
                     UI.badge.textContent = "Session Complete";
                     UI.badge.className = "status-pill";
-                    writeLog("Monitoring allocation framework reached target duration limit.");
+                    writeLog("Monitoring allocation completed successfully.");
                     return;
                 }
 
-                // Increment overall tracked timeline
                 state.elapsedSeconds++;
                 const timePercentage = (state.elapsedSeconds / CONFIG.SESSION_TOTAL_SECONDS) * 100;
                 UI.timeBar.style.width = `${timePercentage}%`;
                 UI.timeVal.textContent = `${Math.floor(timePercentage)}%`;
 
-                // Query precise geolocation hardware structure
-                navigator.geolocation.getCurrentPosition(evaluateTelemetry, handleHardwareFault, {
-                    enableHighAccuracy: true,
-                    timeout: 950, // Strict timeout window to guarantee consistent 1-second ticks
-                    maximumAge: 0
-                });
+                // Accumulate attendance values strictly when localized inside the geographic fence
+                if (state.isCurrentlyInside) {
+                    state.verifiedSeconds++;
+                    const attendancePercentage = (state.verifiedSeconds / CONFIG.SESSION_TOTAL_SECONDS) * 100;
+                    UI.attendanceBar.style.width = `${attendancePercentage}%`;
+                    UI.attendanceVal.textContent = `${Math.floor(attendancePercentage)}%`;
+                }
             }
 
-            function evaluateTelemetry(position) {
+            // Hardware Hook Callback triggered on hardware-layer positional changes
+            function handleTelemetryStream(position) {
                 if (state.isCompromised) return;
 
-                // Anti-Proxy Layer: Intercept virtual hardware hooks
                 if (!position || !position.coords || position.mocked === true) {
                     flagExploit();
                     return;
@@ -313,70 +309,88 @@
                 const uLng = position.coords.longitude;
                 const uAcc = position.coords.accuracy;
 
-                // Anti-Proxy Layer: Velocity Leap Inspection (Max 35 m/s or ~126 km/h within 1 second frame)
+                // Proxy Prevention Logic: Intercept instant coordinate teleportation
                 if (state.lastLat !== null && state.lastLng !== null && state.lastPulseTime !== 0) {
                     const distanceDelta = geoMath(uLat, uLng, state.lastLat, state.lastLng);
-                    if (distanceDelta > 35) {
+                    const timeDeltaSeconds = (now - state.lastPulseTime) / 1000;
+                    
+                    if (timeDeltaSeconds > 0 && (distanceDelta / timeDeltaSeconds) > 35) { // Faster than 126km/h
                         flagExploit();
                         return;
                     }
                 }
 
-                // Anti-Proxy Layer: Low precision network simulation restriction
+                // Proxy Prevention Logic: Filter out simulated desktop low-accuracy mock fields
                 if (uAcc > CONFIG.MAX_GPS_ACCURACY) {
                     UI.badge.textContent = "Signal Untrusted";
                     UI.badge.className = "status-pill outside";
+                    state.isCurrentlyInside = false;
                     return;
                 }
 
-                // Compliance Distance Radius Engine
                 const distanceToTarget = geoMath(uLat, uLng, CONFIG.TARGET_LAT, CONFIG.TARGET_LNG);
 
                 if (distanceToTarget <= CONFIG.ALLOWED_RADIUS) {
+                    if (!state.isCurrentlyInside) {
+                        writeLog("Connection secure. Entering perimeter.");
+                    }
                     UI.badge.textContent = "Active Presence Verified";
                     UI.badge.className = "status-pill inside";
-
-                    // Increment valid location attendance progress
-                    state.verifiedSeconds++;
-                    const attendancePercentage = (state.verifiedSeconds / CONFIG.SESSION_TOTAL_SECONDS) * 100;
-                    UI.attendanceBar.style.width = `${attendancePercentage}%`;
-                    UI.attendanceVal.textContent = `${Math.floor(attendancePercentage)}%`;
+                    state.isCurrentlyInside = true;
                     
                     state.lastLat = uLat;
                     state.lastLng = uLng;
                     state.lastPulseTime = now;
                 } else {
+                    if (state.isCurrentlyInside) {
+                        writeLog("Alert: Device exited authorized perimeter boundary.");
+                    }
                     UI.badge.textContent = "Outside Target Boundary";
                     UI.badge.className = "status-pill outside";
+                    state.isCurrentlyInside = false;
                 }
             }
 
             function flagExploit() {
                 state.isCompromised = true;
+                state.isCurrentlyInside = false;
                 sessionStorage.setItem('sec_lockout_active', 'true');
                 UI.badge.textContent = "Security Isolation";
                 UI.badge.className = "status-pill outside";
                 UI.timeBar.style.backgroundColor = "var(--danger)";
                 UI.attendanceBar.style.backgroundColor = "var(--danger)";
-                writeLog("Terminal isolation initiated: Unauthorized system parameters detected.");
+                writeLog("Terminal isolation: Core signature validation breach.");
             }
 
-            function handleHardwareFault() {
-                UI.badge.textContent = "Telemetry Interrupted";
+            function handleHardwareFault(err) {
+                state.isCurrentlyInside = false;
+                UI.badge.textContent = "Telemetry Offline";
                 UI.badge.className = "status-pill outside";
+                if (err.code === 1) {
+                    writeLog("Permission Denied: Please enable Location Access.");
+                }
             }
 
-            // Safe Boot Interface Validation Loop
+            // Launch and Security Sync
             if (navigator.geolocation) {
                 if (sessionStorage.getItem('sec_lockout_active') === 'true') {
                     flagExploit();
                 } else {
-                    writeLog("Awaiting localized tracking sequence hooks...");
-                    setInterval(systemHeartbeat, 1000);
+                    writeLog("Initializing hardware positioning pipeline...");
+                    
+                    // Native continuous background streams bypass mobile sleep throttling loops
+                    navigator.geolocation.watchPosition(handleTelemetryStream, handleHardwareFault, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    });
+
+                    // Start the deterministic progress bar rendering loops
+                    setInterval(clockTickEngine, 1000);
                 }
             } else {
                 UI.badge.textContent = "Incompatible Device";
-                writeLog("Device environment signature missing strict cryptographic telemetry hooks.");
+                writeLog("Device environment missing modern telemetry layers.");
             }
         })();
     </script>
