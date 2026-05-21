@@ -2,249 +2,518 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Birds-Eye Telemetry Core</title>
-    <!-- CesiumJS Infrastructure Streams -->
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Cesium.js"></script>
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.115/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Clinical Pomodoro Chamber</title>
     <style>
         :root {
-            --bg-canvas: #020408;
-            --surface: #090d16;
-            --border: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #475569;
-            --brand-prime: #6366f1;
-            --state-active: #10b981;
-            --font-mono: "SF Mono", Monaco, Consolas, monospace;
+            --bg-base: #0a0f1d;
+            --panel-glass: rgba(16, 22, 42, 0.65);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --accent-glow: #00ffaa;
+            --accent-alert: #ff3b30;
+            --text-primary: #f1f5f9;
+            --text-muted: #64748b;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-canvas);
-            color: var(--text-main);
-            height: 100vh;
-            width: 100vw;
-            display: grid;
-            grid-template-columns: 360px 1fr;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
             overflow: hidden;
         }
 
-        /* Side Control Panel */
-        .control-panel {
-            background-color: var(--surface);
-            border-right: 1px solid var(--border);
+        /* Landscape Orientation Lock Alert Styling */
+        @media (orientation: portrait) {
+            #orientation-trap {
+                display: flex !important;
+            }
+        }
+
+        #orientation-trap {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg-base);
+            z-index: 99999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #orientation-trap p {
+            color: var(--accent-glow);
+            font-size: 1.2rem;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* Main App Grid Layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            width: 100%;
+            height: 100%;
+            padding: 24px;
+            gap: 24px;
+        }
+
+        /* Glassmorphic Panel Base Blueprint */
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
             padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            z-index: 10;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
-        .brand-header h1 { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
-        .brand-header p { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+        /* Left Section: Active Timer Chamber */
+        .timer-chamber {
+            position: relative;
+        }
 
-        .btn-action {
-            width: 100%;
-            background: var(--brand-prime);
-            color: #fff;
-            border: none;
+        .timer-display {
+            font-size: 7.5rem;
+            font-weight: 200;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -2px;
+            color: var(--text-primary);
+            text-shadow: 0 0 40px rgba(0, 255, 170, 0.15);
+            margin-bottom: 10px;
+        }
+
+        /* Configuration Sub-controls */
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 15px;
+            transition: opacity 0.3s ease;
+        }
+
+        .config-row.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .time-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .time-btn:hover {
+            background: rgba(0, 255, 170, 0.1);
+            border-color: var(--accent-glow);
+            color: var(--accent-glow);
+        }
+
+        .time-input-label {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .start-action-btn {
+            margin-top: 30px;
+            background: transparent;
+            border: 1px solid var(--accent-glow);
+            color: var(--accent-glow);
+            padding: 14px 48px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.05);
+        }
+
+        .start-action-btn:hover {
+            background: var(--accent-glow);
+            color: var(--bg-base);
+            box-shadow: 0 0 25px rgba(0, 255, 170, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Right Section: Progression Module */
+        .progression-panel {
+            justify-content: flex-start;
+            align-items: stretch;
+            gap: 20px;
+        }
+
+        .header-block {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .header-block h2 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        .level-badge {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent-glow);
+            margin-top: 5px;
+        }
+
+        /* Botanical Visualization Sandbox */
+        .plant-habitat {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            border: 1px dashed var(--border-glass);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .botanical-matrix {
+            font-size: 5.5rem;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+            transition: transform 0.5s ease;
+        }
+
+        /* Target Progression Metric Bar */
+        .quota-box {
+            background: rgba(255,255,255,0.02);
             padding: 14px;
             border-radius: 10px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            font-family: var(--font-mono);
-            letter-spacing: 0.5px;
-        }
-        .btn-action:hover { background: #4f46e5; }
-
-        .telemetry-data {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-        }
-        .telemetry-data label { display: block; font-size: 9px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
-        .telemetry-data div { font-size: 15px; font-weight: 700; font-family: var(--font-mono); }
-
-        .terminal-log {
-            flex-grow: 1;
-            background: #010204;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: #4b5563;
-            overflow-y: auto;
-            line-height: 1.5;
+            border: 1px solid var(--border-glass);
         }
 
-        /* Full Screen 3D Earth Viewport */
-        #cesiumContainer {
+        .quota-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
             width: 100%;
-            height: 100%;
-            background: #000;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            overflow: hidden;
         }
 
-        /* Clean UI bypass for Cesium credits */
-        .cesium-viewer-bottom { display: none !important; }
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00ffaa, #00bfff);
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        /* Anti-Escape Defenses UI Overlay */
+        #lockdown-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 8, 16, 0.95);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        #lockdown-overlay h1 {
+            font-size: 2rem;
+            color: var(--accent-alert);
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        #lockdown-overlay p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Anti-Distraction Blur Interceptor */
+        #distraction-trap {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 59, 48, 0.15);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 99998;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            border: 4px solid var(--accent-alert);
+        }
+
+        .alert-box {
+            background: #0a0f1d;
+            border: 1px solid var(--accent-alert);
+            padding: 30px 50px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(255, 59, 48, 0.3);
+        }
+
+        .alert-box h2 {
+            color: var(--accent-alert);
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Control Interface Layout -->
-    <div class="control-panel">
-        <div class="brand-header">
-            <h1>3D Birds-Eye Core</h1>
-            <p>Dimensional Vector Tracker</p>
-        </div>
+    <div id="orientation-trap">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#00ffaa" stroke-width="1.5"><path d="M2 12a10 10 0 0 1 13-9.54M22 12a10 10 0 0 1-13 9.54M2 12h3M19 12h3M12 2v3M12 19v3"/></svg>
+        <p>ROTATION REQUIRED: ROTATE TO LANDSCAPE MODE</p>
+    </div>
 
-        <button class="btn-action" onclick="simulateCampusFlightPath()">Simulate Birds-Eye View Flight</button>
-
-        <div class="telemetry-data">
-            <label>Current Flight Anchor</label>
-            <div id="geoPulse">Awaiting Initialization...</div>
-        </div>
-
-        <div id="consoleLog" class="terminal-log">
-            <div>[SYSTEM] 3D Globular Canvas initialized. Ready for coordinate stream vector injection...</div>
+    <div id="distraction-trap">
+        <div class="alert-box">
+            <h2>CHAMBER BREACH DETECTED</h2>
+            <p style="color: var(--text-primary)">Click anywhere inside this screen instantly to resume quarantine sequence.</p>
         </div>
     </div>
 
-    <!-- WebGL Viewport Map Workframe -->
-    <div id="cesiumContainer"></div>
+    <div id="lockdown-overlay">
+        <h1>CHAMBER ACTIVE</h1>
+        <p>Quarantine Mode Engaged. Timer will release automatically on expiration.</p>
+    </div>
+
+    <main class="dashboard">
+        
+        <section class="glass-panel timer-chamber">
+            <div class="timer-display" id="time-string">25:00</div>
+            
+            <div class="config-row" id="setup-controls">
+                <button class="time-btn" onclick="adjustTime(-5)">-</button>
+                <div class="time-input-label"><span id="minutes-setting">25</span> Minutes</div>
+                <button class="time-btn" onclick="adjustTime(5)">+</button>
+            </div>
+
+            <button class="start-action-btn" id="master-action-btn" onclick="initiateChamberLockdown()">Engage Lock</button>
+        </section>
+
+        <section class="glass-panel progression-panel">
+            <div class="header-block">
+                <h2>Chamber Rank</h2>
+                <div class="level-badge">LEVEL <span id="current-rank-display">10</span></div>
+            </div>
+
+            <div class="plant-habitat">
+                <div class="botanical-matrix" id="plant-stage-canvas">🌱</div>
+            </div>
+
+            <div class="quota-box">
+                <div class="quota-meta">
+                    <span>Rank Progress</span>
+                    <span><span id="session-count-display">0</span> / 20 Completed</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-bar-fill" id="metric-fill"></div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <script>
-        'use strict';
+        // Internal Functional State Engine variables
+        let selectedDurationMinutes = 25;
+        let timerCountdownInstance = null;
+        let timeRemainingSeconds = 0;
+        let isChamberLocked = false;
 
-        let viewer;
-        let flightPathEntity;
-        // Mock historical data array representing a physical movement run through a campus space
-        const RUNTIME_COORDS = [
-            { lat: 24.5360, lng: 81.3030, alt: 5.0 },
-            { lat: 24.5365, lng: 81.3035, alt: 8.0 },
-            { lat: 24.5370, lng: 81.3038, alt: 12.0 },
-            { lat: 24.5375, lng: 81.3042, alt: 15.0 },
-            { lat: 24.5380, lng: 81.3048, alt: 18.0 },
-            { lat: 24.5385, lng: 81.3055, alt: 22.0 }
-        ];
+        // Evolutionary Botanical Array Mapping (Rank 10 Down to Rank 1)
+        const floraEvolutionMatrix = {
+            10: "🌱", // Sprouts
+            9:  "🌿", // Seedling 
+            8:  "🪴", // Potted Greens
+            7:  "🍀", // Four-Leaf Clover
+            6:  "🎍", // Pine Decoration
+            5:  "🌴", // Mature Palm Tree
+            4:  "🌵", // Desert Saguaro
+            3:  "🍁", // Autumn Foliage
+            2:  "🌸", // Cherry Blossom Canopy
+            1:  "🌳"  // Giant Ancient Oak Tree
+        };
 
-        // Self-Executing WebGL Globe Setup Routine
-        (function bootCesiumViewport() {
-            // Instantiate the 3D globe with standard navigation widgets hidden for a minimal look
-            viewer = new Cesium.Viewer('cesiumContainer', {
-                terrainProvider: Cesium.createWorldTerrain(),
-                animation: false,
-                timeline: false,
-                sceneModePicker: false,
-                baseLayerPicker: false,
-                navigationHelpButton: false,
-                geocoder: false,
-                homeButton: false,
-                fullscreenButton: false
-            });
-
-            // Set scene rendering to use dark atmospheric and space configurations
-            viewer.scene.skyAtmosphere.show = true;
-            viewer.scene.globe.enableLighting = true;
-        })();
-
-        function printLog(msg) {
-            const container = document.getElementById('consoleLog');
-            const element = document.createElement('div');
-            element.textContent = `[${new Date().toISOString().slice(11, 19)}] > ${msg}`;
-            container.appendChild(element);
-            container.scrollTop = container.scrollHeight;
+        // Core App Data Initialization Engine
+        function loadApplicationProgress() {
+            if(!localStorage.getItem('pomodoro_rank')) {
+                localStorage.setItem('pomodoro_rank', '10');
+                localStorage.setItem('completed_sessions_count', '0');
+            }
+            renderProgressionMetrics();
         }
 
-        function simulateCampusFlightPath() {
-            printLog("Parsing raw 2D geolocation stream into Cartesian spatial profiles...");
+        function renderProgressionMetrics() {
+            const currentRank = parseInt(localStorage.getItem('pomodoro_rank'));
+            const completeSessions = parseInt(localStorage.getItem('completed_sessions_count'));
             
-            // Map our array of degrees to Cesium's internal Cartesian3 linear distance coordinates
-            const cartesianPositions = [];
-            RUNTIME_COORDS.forEach(node => {
-                cartesianPositions.push(Cesium.Cartesian3.fromDegrees(node.lng, node.lat, node.alt));
-            });
+            document.getElementById('current-rank-display').innerText = currentRank;
+            document.getElementById('plant-stage-canvas').innerText = floraEvolutionMatrix[currentRank] || "🌳";
+            document.getElementById('session-count-display').innerText = completeSessions;
+            
+            const progressPercentage = (completeSessions / 20) * 100;
+            document.getElementById('metric-fill').style.width = `${progressPercentage}%`;
+        }
 
-            // If an older route trail exists, clean it out of the geometry pool
-            if (flightPathEntity) {
-                viewer.entities.remove(flightPathEntity);
+        // Interface Control Panel adjustments
+        function adjustTime(deltaMinutes) {
+            if (isChamberLocked) return;
+            let target = selectedDurationMinutes + deltaMinutes;
+            if (target >= 5 && target <= 180) {
+                selectedDurationMinutes = target;
+                document.getElementById('minutes-setting').innerText = selectedDurationMinutes;
+                document.getElementById('time-string').innerText = `${String(selectedDurationMinutes).padStart(2, '0')}:00`;
+            }
+        }
+
+        // Complete Hardware/Software Level Quarantine Interceptor Engine
+        function initiateChamberLockdown() {
+            if (isChamberLocked) return;
+
+            const element = document.documentElement;
+            // Force hardware-accelerated full-screen viewport layout configurations
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
             }
 
-            // Create a 3D vector polyline path suspended above the globe terrain
-            flightPathEntity = viewer.entities.add({
-                polyline: {
-                    positions: cartesianPositions,
-                    width: 6,
-                    material: new Cesium.PolylineGlowMaterialProperty({
-                        glowPower: 0.25,
-                        taperPower: 1.0,
-                        color: Cesium.Color.fromCssString('#6366f1')
-                    }),
-                    clampToGround: false // Elevated trail to track altitude differences
-                }
-            });
+            // Lock keyboard control mechanisms to terminate exit capabilities if browser version allows
+            if (navigator.keyboard && navigator.keyboard.lock) {
+                navigator.keyboard.lock(["Escape", "F11"]);
+            }
 
-            printLog("3D Path rendered. Triggering Google Earth style kinematic fly-to sequence...");
-            executeBirdsEyeCameraFly(RUNTIME_COORDS[0]);
+            // Engage app software locking architecture states
+            isChamberLocked = true;
+            timeRemainingSeconds = selectedDurationMinutes * 60;
+            
+            document.getElementById('setup-controls').classList.add('hidden');
+            document.getElementById('master-action-btn').style.display = 'none';
+            document.getElementById('lockdown-overlay').style.display = 'flex';
+
+            // Active Execution Timer Core Interrupt loop
+            timerCountdownInstance = setInterval(() => {
+                timeRemainingSeconds--;
+                updateChamberDisplayString();
+
+                if (timeRemainingSeconds <= 0) {
+                    terminateChamberCleanly();
+                }
+            }, 1000);
         }
 
-        function executeBirdsEyeCameraFly(startNode) {
-            // Calculate a bird's-eye camera view matrix looking down at a tilt
-            const targetDestination = Cesium.Cartesian3.fromDegrees(
-                startNode.lng, 
-                startNode.lat - 0.003, // Offset camera latitude slightly backward to get an angled view
-                startNode.alt + 250.0   // Elevate camera to 250m above position for the birds-eye look
-            );
-
-            document.getElementById('geoPulse').textContent = `${startNode.lat.toFixed(4)}°, ${startNode.lng.toFixed(4)}°`;
-
-            viewer.camera.flyTo({
-                destination: targetDestination,
-                orientation: {
-                    heading: Cesium.Math.toRadians(0.0),   // Point direct North
-                    pitch: Cesium.Math.toRadians(-35.0),  // Tilt downward at a 35-degree angle
-                    roll: 0.0
-                },
-                duration: 3.5, // 3.5-second fly-to camera interpolation duration
-                complete: () => {
-                    printLog("Camera locked into active tracking vector.");
-                    animateCameraAlongPath();
-                }
-            });
+        function updateChamberDisplayString() {
+            const displayMinutes = Math.floor(timeRemainingSeconds / 60);
+            const displaySeconds = timeRemainingSeconds % 60;
+            const clockString = `${String(displayMinutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
+            document.getElementById('time-string').innerText = clockString;
         }
 
-        function animateCameraAlongPath() {
-            let step = 0;
-            // Iterate down the path array to simulate moving along the route
-            const pathInterval = setInterval(() => {
-                if (step >= RUNTIME_COORDS.length) {
-                    clearInterval(pathInterval);
-                    printLog("Flight animation finalized. Target route archived.");
-                    return;
+        // Graceful Release Handler Engine upon proper execution
+        function terminateChamberCleanly() {
+            clearInterval(timerCountdownInstance);
+            isChamberLocked = false;
+            
+            document.getElementById('setup-controls').classList.remove('hidden');
+            document.getElementById('master-action-btn').style.display = 'block';
+            document.getElementById('lockdown-overlay').style.display = 'none';
+            document.getElementById('distraction-trap').style.display = 'none';
+
+            // Process Database Updates
+            let totalSessions = parseInt(localStorage.getItem('completed_sessions_count')) + 1;
+            let currentRank = parseInt(localStorage.getItem('pomodoro_rank'));
+
+            if (totalSessions >= 20) {
+                if (currentRank > 1) {
+                    currentRank -= 1; // Progress downward from Rank 10 towards rank 1
+                    localStorage.setItem('pomodoro_rank', currentRank.toString());
+                    alert(`RANK EVOLUTION SECURED! You scaled up to Rank ${currentRank}!`);
                 }
+                totalSessions = 0; 
+            }
 
-                const currentNode = RUNTIME_COORDS[step];
-                document.getElementById('geoPulse').textContent = `${currentNode.lat.toFixed(4)}°, ${currentNode.lng.toFixed(4)}°`;
-                
-                // Adjust camera position in real time as the path progresses
-                viewer.camera.setView({
-                    destination: Cesium.Cartesian3.fromDegrees(currentNode.lng, currentNode.lat - 0.002, currentNode.alt + 180.0),
-                    orientation: {
-                        heading: Cesium.Math.toRadians(0.0),
-                        pitch: Cesium.Math.toRadians(-30.0),
-                        roll: 0.0
-                    }
-                });
+            localStorage.setItem('completed_sessions_count', totalSessions.toString());
+            renderProgressionMetrics();
 
-                step++;
-            }, 1000); // Progress to the next waypoint every second
+            // Exit hardware display configuration parameters safely
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+            }
+
+            document.getElementById('time-string').innerText = `${String(selectedDurationMinutes).padStart(2, '0')}:00`;
+            alert("Focus Matrix Cycle verified successfully. Botanical specimens updated.");
         }
+
+        // Anti-Distraction Focus-Lost Guardrail Engine
+        window.addEventListener('blur', () => {
+            if (isChamberLocked) {
+                // Instantly deploy containment screen layout to pull context focus back
+                document.getElementById('distraction-trap').style.display = 'flex';
+                // Trigger infinite aggressive background re-focusing routines
+                window.focus();
+            }
+        });
+
+        // Clear distraction barrier upon focus containment confirmation
+        document.getElementById('distraction-trap').addEventListener('click', () => {
+            if (isChamberLocked) {
+                document.getElementById('distraction-trap').style.display = 'none';
+                window.focus();
+            }
+        });
+
+        // Intercept browser window disposal attempts (F5 / Alt+F4 / Window Close Close Controls)
+        window.addEventListener('beforeunload', (event) => {
+            if (isChamberLocked) {
+                event.preventDefault();
+                event.returnValue = 'Focus Quarantine active. Escaping will destroy progression data metrics.';
+                return event.returnValue;
+            }
+        });
+
+        // Initialize App Engine Configuration Pipeline execution
+        window.onload = loadApplicationProgress;
     </script>
 </body>
 </html>
