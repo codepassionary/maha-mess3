@@ -31,34 +31,7 @@
             overflow: hidden;
         }
 
-        /* Landscape Orientation Lock Alert Styling */
-        @media (orientation: portrait) {
-            #orientation-trap {
-                display: flex !important;
-            }
-        }
-
-        #orientation-trap {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--bg-base);
-            z-index: 99999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        #orientation-trap p {
-            color: var(--accent-glow);
-            font-size: 1.2rem;
-            margin-top: 10px;
-            letter-spacing: 1px;
-        }
-
-        /* Main App Grid Layout */
+        /* Fluid Responsive Dashboard Layout */
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 320px;
@@ -66,9 +39,44 @@
             height: 100%;
             padding: 24px;
             gap: 24px;
+            transition: all 0.3s ease;
         }
 
-        /* Glassmorphic Panel Base Blueprint */
+        /* Mobile Landscape Optimization */
+        @media (max-height: 500px) {
+            .dashboard {
+                padding: 12px;
+                gap: 12px;
+                grid-template-columns: 1fr 240px;
+            }
+            .timer-display {
+                font-size: 4.5rem !important;
+            }
+            .botanical-matrix {
+                font-size: 3.5rem !important;
+            }
+            .glass-panel {
+                padding: 12px !important;
+            }
+            .start-action-btn {
+                margin-top: 12px !important;
+                padding: 8px 32px !important;
+            }
+        }
+
+        /* Portrait Mode Fallback */
+        @media (max-width: 768px) and (orientation: portrait) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+                overflow-y: auto;
+            }
+            .timer-display {
+                font-size: 5.5rem;
+            }
+        }
+
+        /* Glassmorphic Panel Core */
         .glass-panel {
             background: var(--panel-glass);
             backdrop-filter: blur(20px);
@@ -82,9 +90,11 @@
             align-items: center;
             position: relative;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            height: 100%;
+            min-height: 0;
         }
 
-        /* Left Section: Active Timer Chamber */
+        /* Focus Area Layout */
         .timer-chamber {
             position: relative;
         }
@@ -97,15 +107,18 @@
             color: var(--text-primary);
             text-shadow: 0 0 40px rgba(0, 255, 170, 0.15);
             margin-bottom: 10px;
+            transition: font-size 0.2s ease;
+            z-index: 10;
         }
 
-        /* Configuration Sub-controls */
+        /* Config Adjustment Control Row */
         .config-row {
             display: flex;
             align-items: center;
             gap: 16px;
             margin-top: 15px;
             transition: opacity 0.3s ease;
+            z-index: 10;
         }
 
         .config-row.hidden {
@@ -153,6 +166,7 @@
             text-transform: uppercase;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 0 15px rgba(0, 255, 170, 0.05);
+            z-index: 10;
         }
 
         .start-action-btn:hover {
@@ -162,34 +176,34 @@
             transform: translateY(-1px);
         }
 
-        /* Right Section: Progression Module */
+        /* Right Side Progression Module */
         .progression-panel {
             justify-content: flex-start;
             align-items: stretch;
-            gap: 20px;
+            gap: 16px;
         }
 
         .header-block {
             text-align: center;
-            padding-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 1px solid var(--border-glass);
         }
 
         .header-block h2 {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--text-muted);
         }
 
         .level-badge {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--accent-glow);
             margin-top: 5px;
         }
 
-        /* Botanical Visualization Sandbox */
+        /* Botanical Visualization Box */
         .plant-habitat {
             flex-grow: 1;
             display: flex;
@@ -200,18 +214,19 @@
             border: 1px dashed var(--border-glass);
             position: relative;
             overflow: hidden;
+            min-height: 80px;
         }
 
         .botanical-matrix {
             font-size: 5.5rem;
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
-            transition: transform 0.5s ease;
+            transition: transform 0.5s ease, font-size 0.2s ease;
         }
 
-        /* Target Progression Metric Bar */
+        /* Progress Metrics Footer */
         .quota-box {
             background: rgba(255,255,255,0.02);
-            padding: 14px;
+            padding: 12px;
             border-radius: 10px;
             border: 1px solid var(--border-glass);
         }
@@ -219,7 +234,7 @@
         .quota-meta {
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             margin-bottom: 6px;
         }
@@ -240,37 +255,45 @@
             transition: width 0.4s ease;
         }
 
-        /* Anti-Escape Defenses UI Overlay */
-        #lockdown-overlay {
+        /* NEW: Transparent, Interaction-Blocking Shield Layer */
+        #lockdown-shield {
             position: fixed;
             inset: 0;
-            background: rgba(5, 8, 16, 0.95);
-            z-index: 9999;
+            background: rgba(5, 8, 16, 0.2); /* Tinted transparent base */
+            z-index: 999;
             display: none;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
-            text-align: center;
+            padding-top: 40px;
+            pointer-events: auto; /* Intercepts all clicks */
         }
 
-        #lockdown-overlay h1 {
-            font-size: 2rem;
-            color: var(--accent-alert);
-            letter-spacing: 4px;
-            margin-bottom: 10px;
+        .shield-banner {
+            background: rgba(255, 59, 48, 0.15);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 10px 24px;
+            border-radius: 20px;
+            color: #ff453a;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: pulse-glow 2s infinite alternate;
         }
 
-        #lockdown-overlay p {
-            color: var(--text-muted);
-            font-size: 1rem;
+        @keyframes pulse-glow {
+            from { box-shadow: 0 4px 20px rgba(255, 59, 48, 0.1); }
+            to { box-shadow: 0 4px 20px rgba(255, 59, 48, 0.3); }
         }
 
-        /* Anti-Distraction Blur Interceptor */
+        /* Anti-Distraction Screen Trap UI */
         #distraction-trap {
             position: fixed;
             inset: 0;
-            background: rgba(255, 59, 48, 0.15);
+            background: rgba(255, 59, 48, 0.25);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             z-index: 99998;
@@ -299,21 +322,15 @@
 </head>
 <body>
 
-    <div id="orientation-trap">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#00ffaa" stroke-width="1.5"><path d="M2 12a10 10 0 0 1 13-9.54M22 12a10 10 0 0 1-13 9.54M2 12h3M19 12h3M12 2v3M12 19v3"/></svg>
-        <p>ROTATION REQUIRED: ROTATE TO LANDSCAPE MODE</p>
-    </div>
-
     <div id="distraction-trap">
         <div class="alert-box">
             <h2>CHAMBER BREACH DETECTED</h2>
-            <p style="color: var(--text-primary)">Click anywhere inside this screen instantly to resume quarantine sequence.</p>
+            <p style="color: var(--text-primary)">Click inside this window instantly to re-lock quarantine sequence.</p>
         </div>
     </div>
 
-    <div id="lockdown-overlay">
-        <h1>CHAMBER ACTIVE</h1>
-        <p>Quarantine Mode Engaged. Timer will release automatically on expiration.</p>
+    <div id="lockdown-shield">
+        <div class="shield-banner">🔒 Quarantine Active — System Locked</div>
     </div>
 
     <main class="dashboard">
@@ -343,7 +360,7 @@
             <div class="quota-box">
                 <div class="quota-meta">
                     <span>Rank Progress</span>
-                    <span><span id="session-count-display">0</span> / 20 Completed</span>
+                    <span><span id="session-count-display">0</span> / 20 Done</span>
                 </div>
                 <div class="progress-track">
                     <div class="progress-bar-fill" id="metric-fill"></div>
@@ -353,27 +370,16 @@
     </main>
 
     <script>
-        // Internal Functional State Engine variables
         let selectedDurationMinutes = 25;
         let timerCountdownInstance = null;
         let timeRemainingSeconds = 0;
         let isChamberLocked = false;
 
-        // Evolutionary Botanical Array Mapping (Rank 10 Down to Rank 1)
         const floraEvolutionMatrix = {
-            10: "🌱", // Sprouts
-            9:  "🌿", // Seedling 
-            8:  "🪴", // Potted Greens
-            7:  "🍀", // Four-Leaf Clover
-            6:  "🎍", // Pine Decoration
-            5:  "🌴", // Mature Palm Tree
-            4:  "🌵", // Desert Saguaro
-            3:  "🍁", // Autumn Foliage
-            2:  "🌸", // Cherry Blossom Canopy
-            1:  "🌳"  // Giant Ancient Oak Tree
+            10: "🌱", 9: "🌿", 8: "🪴", 7: "🍀", 6: "🎍",
+            5: "🌴", 4: "🌵", 3: "🍁", 2: "🌸", 1: "🌳"
         };
 
-        // Core App Data Initialization Engine
         function loadApplicationProgress() {
             if(!localStorage.getItem('pomodoro_rank')) {
                 localStorage.setItem('pomodoro_rank', '10');
@@ -394,7 +400,6 @@
             document.getElementById('metric-fill').style.width = `${progressPercentage}%`;
         }
 
-        // Interface Control Panel adjustments
         function adjustTime(deltaMinutes) {
             if (isChamberLocked) return;
             let target = selectedDurationMinutes + deltaMinutes;
@@ -405,12 +410,11 @@
             }
         }
 
-        // Complete Hardware/Software Level Quarantine Interceptor Engine
+        // Native Fullscreen & Transparent Click-Blocking Activation
         function initiateChamberLockdown() {
             if (isChamberLocked) return;
 
             const element = document.documentElement;
-            // Force hardware-accelerated full-screen viewport layout configurations
             if (element.requestFullscreen) {
                 element.requestFullscreen();
             } else if (element.webkitRequestFullscreen) {
@@ -419,20 +423,20 @@
                 element.msRequestFullscreen();
             }
 
-            // Lock keyboard control mechanisms to terminate exit capabilities if browser version allows
             if (navigator.keyboard && navigator.keyboard.lock) {
                 navigator.keyboard.lock(["Escape", "F11"]);
             }
 
-            // Engage app software locking architecture states
             isChamberLocked = true;
             timeRemainingSeconds = selectedDurationMinutes * 60;
             
+            // Hide selection controls, keep timer active and visible
             document.getElementById('setup-controls').classList.add('hidden');
             document.getElementById('master-action-btn').style.display = 'none';
-            document.getElementById('lockdown-overlay').style.display = 'flex';
+            
+            // Bring up the transparent interaction shield
+            document.getElementById('lockdown-shield').style.display = 'flex';
 
-            // Active Execution Timer Core Interrupt loop
             timerCountdownInstance = setInterval(() => {
                 timeRemainingSeconds--;
                 updateChamberDisplayString();
@@ -446,29 +450,26 @@
         function updateChamberDisplayString() {
             const displayMinutes = Math.floor(timeRemainingSeconds / 60);
             const displaySeconds = timeRemainingSeconds % 60;
-            const clockString = `${String(displayMinutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
-            document.getElementById('time-string').innerText = clockString;
+            document.getElementById('time-string').innerText = `${String(displayMinutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
         }
 
-        // Graceful Release Handler Engine upon proper execution
         function terminateChamberCleanly() {
             clearInterval(timerCountdownInstance);
             isChamberLocked = false;
             
             document.getElementById('setup-controls').classList.remove('hidden');
             document.getElementById('master-action-btn').style.display = 'block';
-            document.getElementById('lockdown-overlay').style.display = 'none';
+            document.getElementById('lockdown-shield').style.display = 'none';
             document.getElementById('distraction-trap').style.display = 'none';
 
-            // Process Database Updates
             let totalSessions = parseInt(localStorage.getItem('completed_sessions_count')) + 1;
             let currentRank = parseInt(localStorage.getItem('pomodoro_rank'));
 
             if (totalSessions >= 20) {
                 if (currentRank > 1) {
-                    currentRank -= 1; // Progress downward from Rank 10 towards rank 1
+                    currentRank -= 1;
                     localStorage.setItem('pomodoro_rank', currentRank.toString());
-                    alert(`RANK EVOLUTION SECURED! You scaled up to Rank ${currentRank}!`);
+                    alert(`RANK UPDATED: You scaled up to Rank ${currentRank}!`);
                 }
                 totalSessions = 0; 
             }
@@ -476,26 +477,22 @@
             localStorage.setItem('completed_sessions_count', totalSessions.toString());
             renderProgressionMetrics();
 
-            // Exit hardware display configuration parameters safely
             if (document.exitFullscreen) {
                 document.exitFullscreen().catch(() => {});
             }
 
             document.getElementById('time-string').innerText = `${String(selectedDurationMinutes).padStart(2, '0')}:00`;
-            alert("Focus Matrix Cycle verified successfully. Botanical specimens updated.");
+            alert("Focus sequence processed successfully. Botanical vault updated.");
         }
 
-        // Anti-Distraction Focus-Lost Guardrail Engine
+        // Active Interceptors
         window.addEventListener('blur', () => {
             if (isChamberLocked) {
-                // Instantly deploy containment screen layout to pull context focus back
                 document.getElementById('distraction-trap').style.display = 'flex';
-                // Trigger infinite aggressive background re-focusing routines
                 window.focus();
             }
         });
 
-        // Clear distraction barrier upon focus containment confirmation
         document.getElementById('distraction-trap').addEventListener('click', () => {
             if (isChamberLocked) {
                 document.getElementById('distraction-trap').style.display = 'none';
@@ -503,16 +500,14 @@
             }
         });
 
-        // Intercept browser window disposal attempts (F5 / Alt+F4 / Window Close Close Controls)
         window.addEventListener('beforeunload', (event) => {
             if (isChamberLocked) {
                 event.preventDefault();
-                event.returnValue = 'Focus Quarantine active. Escaping will destroy progression data metrics.';
+                event.returnValue = 'Quarantine process active.';
                 return event.returnValue;
             }
         });
 
-        // Initialize App Engine Configuration Pipeline execution
         window.onload = loadApplicationProgress;
     </script>
 </body>
