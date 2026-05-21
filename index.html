@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Hidden-Metrics Attendance System</title>
+    <title>Secure Network Verified Attendance</title>
     <style>
         :root {
             --primary: #4f46e5;
@@ -23,6 +23,7 @@
             align-items: center;
             min-height: 100vh;
             user-select: none;
+            -webkit-user-select: none;
         }
 
         .container {
@@ -39,6 +40,7 @@
             color: #1f2937;
             margin-bottom: 5px;
             font-size: 24px;
+            letter-spacing: -0.5px;
         }
 
         p.subtitle {
@@ -56,6 +58,7 @@
             font-weight: 600;
             font-size: 14px;
             color: #374151;
+            border: 1px solid #e5e7eb;
         }
 
         .status-badge {
@@ -67,6 +70,7 @@
             margin-bottom: 25px;
             background-color: #e5e7eb;
             color: #374151;
+            transition: all 0.2s ease;
         }
 
         .status-badge.inside {
@@ -104,7 +108,7 @@
 
         #log {
             margin-top: 20px;
-            max-height: 160px;
+            max-height: 140px;
             overflow-y: auto;
             border-top: 1px solid #e5e7eb;
             padding-top: 15px;
@@ -115,29 +119,35 @@
 
         .log-entry {
             margin-bottom: 4px;
-            padding: 4px;
+            padding: 6px;
             border-radius: 4px;
             background: #f9fafb;
+            border-left: 3px solid #cbd5e1;
+        }
+        
+        .log-entry.flagged {
+            border-left-color: var(--danger);
+            background-color: #fff5f5;
+            color: var(--danger);
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Class Attendance</h1>
-        <p class="subtitle">Secure Verification Session</p>
+        <h1>Class Verification</h1>
+        <p class="subtitle">Secure Anti-Proxy Terminal</p>
 
-        <!-- Dynamic Session Pulse Display -->
         <div id="pulseCounterUI" class="pulse-tracker-ui">
-            Active Tracking Pulse: 0 / 3
+            Active Block: 0 / 3
         </div>
 
-        <div id="statusBadge" class="status-badge">Awaiting System Sync...</div>
+        <div id="statusBadge" class="status-badge">Establishing Integrity...</div>
 
-        <button id="checkInBtn" class="btn" disabled>Submit Attendance</button>
+        <button id="checkInBtn" class="btn" disabled>Submit Status</button>
 
         <div id="log">
-            <strong>Security Tracking Log:</strong>
+            <strong>Security Log Sequence:</strong>
             <div id="logContents"></div>
         </div>
     </div>
@@ -146,25 +156,33 @@
         (function() {
             'use strict';
 
-            // Fixed Target Configuration 
-            const TARGET_LAT = 24.500893; 
-            const TARGET_LNG = 81.291928; 
-            const ALLOWED_RADIUS = 65; 
-            const MAX_ACCEPTABLE_ACCURACY = 40; 
+            // Fixed Parameters
+            const CONFIG = Object.freeze({
+                TARGET_LAT: 24.500893,
+                TARGET_LNG: 81.291928,
+                ALLOWED_RADIUS: 65,
+                MAX_GPS_ACCURACY: 40,
+                PULSE_INTERVAL_MS: 1200000, // 20 minutes
+                MAX_PULSES: 3,
+                MAX_VELOCITY_MPS: 28 // ~100 km/h max plausible speed limit between jumps
+            });
 
-            // Time Management (20 minutes interval over a 1-hour session window)
-            const PULSE_INTERVAL_MS = 1200000; 
-            const MAX_PULSES = 3;
+            // State management closed off from window scope
+            let state = {
+                pulseCount: 0,
+                lastPulseTime: 0,
+                lastLat: null,
+                lastLng: null,
+                isCompromised: false,
+                verifiedToken: null
+            };
 
-            let pulseCount = 0;
-            let intervalId = null;
-            let verifiedLocationData = null;
-            let securityToken = Math.random().toString(36).substring(2);
-
-            const statusBadge = document.getElementById('statusBadge');
-            const checkInBtn = document.getElementById('checkInBtn');
-            const logContents = document.getElementById('logContents');
-            const pulseCounterUI = document.getElementById('pulseCounterUI');
+            const UI = Object.freeze({
+                badge: document.getElementById('statusBadge'),
+                btn: document.getElementById('checkInBtn'),
+                logs: document.getElementById('logContents'),
+                counter: document.getElementById('pulseCounterUI')
+            });
 
             function geoMath(lat1, lon1, lat2, lon2) {
                 const R = 6371e3;
@@ -176,97 +194,138 @@
                 return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
             }
 
-            function writeLog(msg) {
+            function writeLog(msg, isWarning = false) {
                 const entry = document.createElement('div');
-                entry.className = 'log-entry';
+                entry.className = `log-entry ${isWarning ? 'flagged' : ''}`;
                 entry.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${msg}`;
-                logContents.insertBefore(entry, logContents.firstChild);
+                UI.logs.insertBefore(entry, UI.logs.firstChild);
             }
 
-            function triggerSinglePulse() {
-                if (pulseCount >= MAX_PULSES) {
-                    clearInterval(intervalId);
-                    statusBadge.textContent = "Session Concluded";
-                    statusBadge.className = "status-badge";
-                    writeLog("System Notice: Tracking schedule finished. Hardware links offline.");
+            function triggerSecurePulse() {
+                if (state.isCompromised) return;
+
+                if (state.pulseCount >= CONFIG.MAX_PULSES) {
+                    UI.badge.textContent = "Session Concluded";
+                    UI.badge.className = "status-badge";
+                    writeLog("Monitoring metrics finalized for this scheduled track loop.");
                     return;
                 }
 
-                pulseCount++;
-                pulseCounterUI.textContent = `Active Tracking Pulse: ${pulseCount} / 3`;
-                writeLog(`Initializing validation pulse sequence #${pulseCount}...`);
+                state.pulseCount++;
+                UI.counter.textContent = `Active Block: ${state.pulseCount} / 3`;
+                writeLog(`Running signature array verification #${state.pulseCount}...`);
 
-                navigator.geolocation.getCurrentPosition(verifyLocation, pulseError, {
+                navigator.geolocation.getCurrentPosition(processSignal, handleHardwareError, {
                     enableHighAccuracy: true,
-                    timeout: 10000,
+                    timeout: 9000,
                     maximumAge: 0
                 });
             }
 
-            function verifyLocation(position) {
-                if(!position || !position.coords) return;
+            function processSignal(position) {
+                if (state.isCompromised) return;
 
-                const uLat = position.coords.latitude;
-                const uLng = position.coords.longitude;
-                const uAcc = position.coords.accuracy;
-
-                // Hidden distance evaluation calculation
-                const distance = geoMath(uLat, uLng, TARGET_LAT, TARGET_LNG);
-
-                // Anti-Cheat Check: Filter fake networks / desktop proxies without naming distances
-                if (uAcc > MAX_ACCEPTABLE_ACCURACY) {
-                    statusBadge.textContent = "Signal Untrusted";
-                    statusBadge.className = "status-badge outside";
-                    checkInBtn.disabled = true;
-                    writeLog(`Pulse #${pulseCount} Blocked: Low positional resolution. Relocate away from proxies.`);
+                // Loophole Shield 1: Hardware Object Redefinition Protection
+                if (!position || !position.coords || position.mocked === true) {
+                    flagExploit("Virtual Mock Environment Intercepted.");
                     return;
                 }
 
-                // Compliance Bounds Check
-                if (distance <= ALLOWED_RADIUS) {
-                    statusBadge.textContent = "Inside Perimeter";
-                    statusBadge.className = "status-badge inside";
-                    checkInBtn.disabled = false;
+                const now = performance.now(); // High resolution relative timing unlinked to clock manipulation
+                const currentLat = position.coords.latitude;
+                const currentLng = position.coords.longitude;
+                const currentAcc = position.coords.accuracy;
+
+                // Loophole Shield 2: Temporal Anomaly Check (System clock skipping)
+                if (state.lastPulseTime !== 0) {
+                    const elapsedRealTime = now - state.lastPulseTime;
+                    if (elapsedRealTime < (CONFIG.PULSE_INTERVAL_MS - 10000)) { 
+                        flagExploit("Clock acceleration anomalies caught.");
+                        return;
+                    }
+                }
+
+                // Loophole Shield 3: Fast Geolocation Teleportation / Jump Check
+                if (state.lastLat !== null && state.lastLng !== null) {
+                    const travelDistance = geoMath(currentLat, currentLng, state.lastLat, state.lastLng);
+                    const timeDeltaSec = (now - state.lastPulseTime) / 1000;
+                    const impliedVelocity = travelDistance / timeDeltaSec;
+
+                    if (impliedVelocity > CONFIG.MAX_VELOCITY_MPS) {
+                        flagExploit("Improbable velocity vector signature found.");
+                        return;
+                    }
+                }
+
+                // Loophole Shield 4: Low-Resolution Core Network Filtering
+                if (currentAcc > CONFIG.MAX_GPS_ACCURACY) {
+                    UI.badge.textContent = "Signal Untrusted";
+                    UI.badge.className = "status-badge outside";
+                    UI.btn.disabled = true;
+                    writeLog("Verification Dropped: Insufficient hardware telemetry resolve.", true);
+                    return;
+                }
+
+                const distanceToTarget = geoMath(currentLat, currentLng, CONFIG.TARGET_LAT, CONFIG.TARGET_LNG);
+
+                if (distanceToTarget <= CONFIG.ALLOWED_RADIUS) {
+                    UI.badge.textContent = "Perimeter Confirmed";
+                    UI.badge.className = "status-badge inside";
+                    UI.btn.disabled = false;
                     
-                    verifiedLocationData = {
-                        ts: position.timestamp,
-                        tok: securityToken,
-                        currentPulse: pulseCount
-                    };
-                    writeLog(`Pulse #${pulseCount} Approved: Device presence verified inside authorized coordinates.`);
+                    // Transient Single-use dynamic verification tokens
+                    state.verifiedToken = crypto.randomUUID();
+                    
+                    state.lastLat = currentLat;
+                    state.lastLng = currentLng;
+                    state.lastPulseTime = now;
+                    writeLog(`Block sequence #${state.pulseCount} validation checks cleared.`);
                 } else {
-                    statusBadge.textContent = "Outside Boundary";
-                    statusBadge.className = "status-badge outside";
-                    checkInBtn.disabled = true;
-                    verifiedLocationData = null;
-                    writeLog(`Pulse #${pulseCount} Rejected: Zone validation mismatch.`);
+                    UI.badge.textContent = "Outside Boundary";
+                    UI.badge.className = "status-badge outside";
+                    UI.btn.disabled = true;
+                    state.verifiedToken = null;
+                    writeLog(`Block sequence #${state.pulseCount} mismatch registered.`, true);
                 }
             }
 
-            function pulseError(err) {
-                checkInBtn.disabled = true;
-                statusBadge.textContent = "Hardware Error";
-                statusBadge.className = "status-badge outside";
-                writeLog(`Pulse #${pulseCount} Error: GPS hardware ping failure.`);
+            function flagExploit(reason) {
+                state.isCompromised = true;
+                UI.btn.disabled = true;
+                UI.badge.textContent = "Security Failure";
+                UI.badge.className = "status-badge outside";
+                writeLog(`CRITICAL CRACK ATTEMPT: ${reason} Session Permanently Halted.`, true);
             }
 
-            checkInBtn.addEventListener('click', (e) => {
-                if (!e.isTrusted) return; // Block programmatic click scripts
+            function handleHardwareError(err) {
+                UI.btn.disabled = true;
+                UI.badge.textContent = "Hardware Error";
+                UI.badge.className = "status-badge outside";
+                writeLog("Device tracking interface channel rejected.", true);
+            }
 
-                if (verifiedLocationData && verifiedLocationData.tok === securityToken) {
-                    writeLog(`🎉 Success: Attendance record generated for pulse entry ${verifiedLocationData.currentPulse}/3.`);
-                    alert(`Attendance Successfully Logged!\nValidated Pulse Window: ${verifiedLocationData.currentPulse} of 3`);
-                    checkInBtn.disabled = true; 
+            UI.btn.addEventListener('click', function(e) {
+                // Loophole Shield 5: Synthetic Automation Click Protections
+                if (!e.isTrusted || String(e.clientX) === "0") {
+                    flagExploit("UI automated injection proxy block triggered.");
+                    return;
+                }
+
+                if (state.verifiedToken) {
+                    writeLog(`🎉 Metrics locked and verified for checkpoint ${state.pulseCount}/3.`);
+                    alert(`Attendance sequence logged!`);
+                    state.verifiedToken = null; // Instantly purge token from client memory
+                    UI.btn.disabled = true;
                 }
             });
 
-            // Tracking initialization loop
+            // Initialization execution isolation
             if (navigator.geolocation) {
-                triggerSinglePulse(); // Initial run on startup
-                intervalId = setInterval(triggerSinglePulse, PULSE_INTERVAL_MS);
+                triggerSecurePulse();
+                setInterval(triggerSecurePulse, CONFIG.PULSE_INTERVAL_MS);
             } else {
-                statusBadge.textContent = "Unsupported Device";
-                writeLog("Critical: Device lacks geo-security tracking interfaces.");
+                UI.badge.textContent = "Terminal Locked";
+                writeLog("Device environment signature missing cryptographic dependencies.", true);
             }
         })();
     </script>
