@@ -193,7 +193,6 @@
             <div id="statusBadge" class="status-pill">Awaiting GPS stream...</div>
         </div>
 
-        <!-- Metric 1: Timeline Progress -->
         <div class="metric-group">
             <div class="metric-header">
                 <span>Session Duration</span>
@@ -204,7 +203,6 @@
             </div>
         </div>
 
-        <!-- Metric 2: Attendance Verification Progress -->
         <div class="metric-group">
             <div class="metric-header">
                 <span>Attendance Verified</span>
@@ -225,12 +223,13 @@
         (function() {
             'use strict';
 
+            // Fixed Target Configuration - Updated to new coordinates
             const CONFIG = Object.freeze({
-                TARGET_LAT: 24.500893,
-                TARGET_LNG: 81.291928,
+                TARGET_LAT: 24.507607,
+                TARGET_LNG: 81.298394,
                 ALLOWED_RADIUS: 65,
                 MAX_GPS_ACCURACY: 40,
-                SESSION_TOTAL_SECONDS: 3600 // 1 Hour session total window
+                SESSION_TOTAL_SECONDS: 3600 
             });
 
             let state = {
@@ -270,7 +269,6 @@
                 if (UI.logs.childNodes.length > 15) UI.logs.removeChild(UI.logs.lastChild);
             }
 
-            // Continuous clock engine running precisely every second to update tracking matrix bars
             function clockTickEngine() {
                 if (state.isCompromised) return;
 
@@ -286,7 +284,6 @@
                 UI.timeBar.style.width = `${timePercentage}%`;
                 UI.timeVal.textContent = `${Math.floor(timePercentage)}%`;
 
-                // Accumulate attendance values strictly when localized inside the geographic fence
                 if (state.isCurrentlyInside) {
                     state.verifiedSeconds++;
                     const attendancePercentage = (state.verifiedSeconds / CONFIG.SESSION_TOTAL_SECONDS) * 100;
@@ -295,7 +292,6 @@
                 }
             }
 
-            // Hardware Hook Callback triggered on hardware-layer positional changes
             function handleTelemetryStream(position) {
                 if (state.isCompromised) return;
 
@@ -309,18 +305,16 @@
                 const uLng = position.coords.longitude;
                 const uAcc = position.coords.accuracy;
 
-                // Proxy Prevention Logic: Intercept instant coordinate teleportation
                 if (state.lastLat !== null && state.lastLng !== null && state.lastPulseTime !== 0) {
                     const distanceDelta = geoMath(uLat, uLng, state.lastLat, state.lastLng);
                     const timeDeltaSeconds = (now - state.lastPulseTime) / 1000;
                     
-                    if (timeDeltaSeconds > 0 && (distanceDelta / timeDeltaSeconds) > 35) { // Faster than 126km/h
+                    if (timeDeltaSeconds > 0 && (distanceDelta / timeDeltaSeconds) > 35) { 
                         flagExploit();
                         return;
                     }
                 }
 
-                // Proxy Prevention Logic: Filter out simulated desktop low-accuracy mock fields
                 if (uAcc > CONFIG.MAX_GPS_ACCURACY) {
                     UI.badge.textContent = "Signal Untrusted";
                     UI.badge.className = "status-pill outside";
@@ -371,21 +365,18 @@
                 }
             }
 
-            // Launch and Security Sync
             if (navigator.geolocation) {
                 if (sessionStorage.getItem('sec_lockout_active') === 'true') {
                     flagExploit();
                 } else {
                     writeLog("Initializing hardware positioning pipeline...");
                     
-                    // Native continuous background streams bypass mobile sleep throttling loops
                     navigator.geolocation.watchPosition(handleTelemetryStream, handleHardwareFault, {
                         enableHighAccuracy: true,
                         timeout: 10000,
                         maximumAge: 0
                     });
 
-                    // Start the deterministic progress bar rendering loops
                     setInterval(clockTickEngine, 1000);
                 }
             } else {
