@@ -173,8 +173,8 @@
         // ==========================================
         // CONFIGURATION: Set your office coordinates
         // ==========================================
-        const OFFICE_LAT = 40.7128; // Example: New York Lat
-        const OFFICE_LNG = -74.0060; // Example: New York Lng
+        const OFFICE_LAT = 24.500893; 
+        const OFFICE_LNG = 81.291928; 
         const GEOFENCE_RADIUS_METERS = 100; 
 
         // DOM Elements
@@ -220,7 +220,6 @@
             statusBadge.textContent = "Locating...";
             statusBadge.className = "status-badge";
             
-            // Options for high accuracy GPS tracking
             const options = {
                 enableHighAccuracy: true,
                 timeout: 10000,
@@ -238,26 +237,25 @@
             // Calculate distance
             const distance = calculateDistance(userLat, userLng, OFFICE_LAT, OFFICE_LNG);
 
-            // Update UI elements
+            // Update UI
             distanceVal.textContent = `${distance.toFixed(1)} meters`;
             accuracyVal.textContent = `±${accuracy.toFixed(1)} meters`;
 
-            // If GPS accuracy is incredibly poor (e.g., > 100m), warn the user
             if (accuracy > 100) {
-                addLog("Warning: Poor GPS signal accuracy. Try stepping near a window.");
+                addLog("Warning: Weak GPS accuracy. If indoors, try moving closer to a window.");
             }
 
-            // Verify Geofence
+            // Geofence Validation
             if (distance <= GEOFENCE_RADIUS_METERS) {
                 statusBadge.textContent = "Inside Geofence";
                 statusBadge.className = "status-badge inside";
                 checkInBtn.disabled = false;
-                addLog("Location verified. You are within the perimeter.");
+                addLog("Location verified. Access granted.");
             } else {
                 statusBadge.textContent = "Outside Geofence";
                 statusBadge.className = "status-badge outside";
                 checkInBtn.disabled = true;
-                addLog(`Access denied. You are ${Math.round(distance - GEOFENCE_RADIUS_METERS)}m too far away.`);
+                addLog(`Access denied. You are ${Math.round(distance - GEOFENCE_RADIUS_METERS)}m outside the zone.`);
             }
         }
 
@@ -267,23 +265,23 @@
             statusBadge.className = "status-badge outside";
             
             if(err.code === 1) {
-                addLog("Permission denied. Please allow location access.");
+                addLog("Permission denied. Please turn on device location services and allow permission.");
             } else {
-                addLog("Unable to retrieve your location reliably.");
+                addLog("Unable to retrieve location data.");
             }
         }
 
-        // Event Listeners
+        // Action Listeners
         checkInBtn.addEventListener('click', () => {
             addLog("🎉 Attendance marked successfully!");
-            alert("Attendance successfully captured!");
+            alert("Attendance recorded!");
         });
 
         refreshBtn.addEventListener('click', () => {
             checkLocation();
         });
 
-        // Initialize on load
+        // Run application
         window.onload = checkLocation;
     </script>
 </body>
