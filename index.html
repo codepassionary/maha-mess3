@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mesh Attendance Core</title>
+    <title>Sensor Integrity Terminal</title>
     <style>
         :root {
-            --bg-canvas: #070a13;
-            --surface: #0f1626;
+            --bg-canvas: #040712;
+            --surface: #0d1322;
             --border: #1e293b;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
@@ -19,7 +19,7 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg-canvas);
             color: var(--text-primary);
             min-height: 100vh;
@@ -33,56 +33,56 @@
             background-color: var(--surface);
             border: 1px solid var(--border);
             border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
             width: 100%;
             max-width: 420px;
             padding: 36px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
         }
 
-        .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
-        .header p { font-size: 13px; color: var(--text-secondary); margin-bottom: 32px; }
+        .header h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .header p { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
 
         .status-pill {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            padding: 10px 20px;
-            border-radius: 30px;
+            justify-content: center;
+            padding: 12px;
+            border-radius: 14px;
             font-size: 13px;
             font-weight: 600;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border);
-            margin-bottom: 32px;
-            width: 100%;
-            justify-content: center;
-            transition: all 0.3s ease;
+            margin-bottom: 24px;
         }
 
-        .status-pill.active { color: var(--success); background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); }
-        .status-pill.isolated { color: var(--danger); background: rgba(244, 63, 94, 0.05); border-color: rgba(244, 63, 94, 0.2); }
-        .status-pill.warning { color: var(--warning); background: rgba(251, 191, 36, 0.05); border-color: rgba(251, 191, 36, 0.2); }
+        .status-pill.active { color: var(--success); border-color: rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.02); }
+        .status-pill.warning { color: var(--warning); border-color: rgba(251, 191, 36, 0.2); background: rgba(251, 191, 36, 0.02); }
+        .status-pill.isolated { color: var(--danger); border-color: rgba(244, 63, 94, 0.2); background: rgba(244, 63, 94, 0.02); }
 
         .metric-box {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.15);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
 
         .metric-row {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .progress-track {
             background-color: #1e293b;
-            height: 10px;
-            border-radius: 5px;
+            height: 8px;
+            border-radius: 4px;
             overflow: hidden;
         }
 
@@ -92,261 +92,148 @@
             background-color: var(--brand);
             transition: width 0.5s ease;
         }
-
         #attendanceBar { background-color: var(--success); }
 
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 24px;
+        /* Hardware Hardware Error Screen Overlay */
+        .hardware-blindfold {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 19, 34, 0.98);
+            z-index: 10;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
         }
 
-        .anal-card {
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            text-align: left;
-        }
-
-        .anal-card div:first-child { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
-        .anal-card div:last-child { font-size: 14px; font-weight: 600; margin-top: 4px; font-family: monospace; }
-
-        .console {
-            font-family: monospace;
-            font-size: 11px;
-            color: #475569;
-            text-align: left;
-            max-height: 90px;
-            overflow-y: auto;
-            border-top: 1px solid var(--border);
-            padding-top: 16px;
-            margin-top: 24px;
-            line-height: 1.5;
+        .hardware-blindfold h2 { color: var(--danger); font-size: 18px; margin-bottom: 8px; }
+        .hardware-blindfold p { color: var(--text-secondary); font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
+        
+        .hardware-toggle-btn {
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div class="header">
-            <h1>Mesh Presence Core</h1>
-            <p>Spatial Density Verification Node</p>
+        <!-- Hardware State Alert Overlay -->
+        <div id="hardwareAlertScreen" class="hardware-blindfold">
+            <h2>Bluetooth Matrix Disconnected</h2>
+            <p>Your timeline presence tracking is frozen. The system requires an active local Bluetooth array link to confirm you are sitting at a valid pair bench configuration.</p>
+            <button id="retryHardwareBtn" class="hardware-toggle-btn">Re-verify Hardware Sensors</button>
         </div>
 
-        <div id="statusBadge" class="status-pill warning">Scanning Local Bench Density...</div>
+        <div class="header">
+            <h1>Presence Core</h1>
+            <p>Radio Environment Monitor</p>
+        </div>
+
+        <div id="statusBadge" class="status-pill active">Syncing Radio Grid...</div>
 
         <div class="metric-box">
-            <div class="metric-row"><span>Timeline Horizon</span><span id="timeVal">0%</span></div>
+            <div class="metric-row"><span>Lecture Horizon</span><span id="timeVal">0%</span></div>
             <div class="progress-track"><div id="timeBar" class="progress-bar"></div></div>
         </div>
 
         <div class="metric-box">
-            <div class="metric-row"><span>Verified Presence</span><span id="attendanceVal">0%</span></div>
+            <div class="metric-row"><span>Verified Timeline</span><span id="attendanceVal">0%</span></div>
             <div class="progress-track"><div id="attendanceBar" class="progress-bar"></div></div>
         </div>
-
-        <div class="analytics-grid">
-            <div class="anal-card">
-                <div>Ultra Proximity</div>
-                <div id="ultraProxCount">0 Devices</div>
-            </div>
-            <div class="anal-card">
-                <div>Bench Vector</div>
-                <div id="benchState">SECURE</div>
-            </div>
-        </div>
-
-        <div id="consoleLog" class="console">Booting spatial micro-correlator...</div>
     </div>
 
     <script>
         (function() {
             'use strict';
 
-            const CONFIG = Object.freeze({
-                TARGET_LAT: 24.507607,
-                TARGET_LNG: 81.298394,
-                GEO_FENCE_RADIUS_M: 65,
-                MAX_ALLOWED_ACCURACY_M: 40,
-                TIMELINE_LIMIT_SEC: 3600,
-                
-                // Centimeter Boundary Configuration Map (RSSI mappings)
-                RSSI_CRITICAL_10CM: -40,  // Radio signals higher than this prove direct physical contact
-                RSSI_WARNING_30CM: -52   // Radio signals higher than this prove extreme density
-            });
-
-            let node = {
+            let app = {
                 elapsed: 0,
                 verified: 0,
-                insideFence: false,
-                isolated: false,
-                db: null,
-                detectedPeers: [] // Tracking array for active local signal points
+                bluetoothActive: true, // Core signal tracking link
+                isTracking: true
             };
 
-            const UI = Object.freeze({
+            const DOM = Object.freeze({
                 badge: document.getElementById('statusBadge'),
                 timeBar: document.getElementById('timeBar'),
                 timeVal: document.getElementById('timeVal'),
                 attBar: document.getElementById('attendanceBar'),
                 attVal: document.getElementById('attendanceVal'),
-                ultraCount: document.getElementById('ultraProxCount'),
-                bench: document.getElementById('benchState'),
-                console: document.getElementById('consoleLog')
+                blindfold: document.getElementById('hardwareAlertScreen'),
+                retryBtn: document.getElementById('retryHardwareBtn')
             });
 
-            function emitLog(msg, level = 'info') {
-                const marker = level === 'error' ? '🛑 ' : level === 'warn' ? '⚠️ ' : '🔹 ';
-                const row = document.createElement('div');
-                row.textContent = `${marker}[${new Date().toLocaleTimeString()}] ${msg}`;
-                UI.console.appendChild(row);
-                UI.console.scrollTop = UI.console.scrollHeight;
-                if (UI.console.childNodes.length > 12) UI.console.removeChild(UI.console.firstChild);
-            }
+            function initDeviceSensors() {
+                // Monitor browser system connectivity layers
+                window.addEventListener('online', evaluateSensorEnvironment);
+                window.addEventListener('offline', evaluateSensorEnvironment);
 
-            function geoMath(lat1, lon1, lat2, lon2) {
-                const R = 6371e3;
-                const p1 = lat1 * Math.PI / 180;
-                const p2 = lat2 * Math.PI / 180;
-                const dPhi = (lat2 - lat1) * Math.PI / 180;
-                const dLam = (lon2 - lon1) * Math.PI / 180;
-                const a = Math.sin(dPhi/2) * Math.sin(dPhi/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dLam/2) * Math.sin(dLam/2);
-                return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-            }
-
-            function initStorageEngine() {
-                const request = indexedDB.open("SpatialMeshLedger", 1);
-                request.onupgradeneeded = (e) => {
-                    e.target.result.createObjectStore("mesh_logs", { keyPath: "timestamp" });
-                };
-                request.onsuccess = (e) => {
-                    node.db = e.target.result;
-                    emitLog("Spatial mesh transaction ledger active.");
-                    bindHardwareArrays();
-                };
-                request.onerror = () => bindHardwareArrays();
-            }
-
-            // Real-Time Hardware Scan Binding
-            function bindHardwareArrays() {
-                navigator.geolocation.watchPosition(evaluateSpatialTelemetry, () => {
-                    node.insideFence = false;
-                }, { enableHighAccuracy: true, maximumAge: 0 });
-
-                // Mimic continuous local background Bluetooth scan loops
-                setInterval(simulateLocalMeshScan, 3000);
-                setInterval(coreClockEngine, 1000);
-            }
-
-            function evaluateSpatialTelemetry(pos) {
-                if (node.isolated || !pos || !pos.coords || pos.mocked === true) return;
-                const distance = geoMath(pos.coords.latitude, pos.coords.longitude, CONFIG.TARGET_LAT, CONFIG.TARGET_LNG);
-                node.insideFence = (distance <= CONFIG.GEO_FENCE_RADIUS_M) && (pos.coords.accuracy <= CONFIG.MAX_ALLOWED_ACCURACY_M);
-            }
-
-            /* 
-               Spatial Mesh Profiling Logic
-               Simulates or tracks incoming local BLE advertisements. 
-               In a production hybrid app wrapper, this binds to native CoreBluetooth or Android BLE Scanner.
-            */
-            function simulateLocalMeshScan() {
-                if (node.isolated) return;
-
-                // For standalone sandbox evaluation, we randomly check physics integrity scenarios
-                // Real implementation updates node.detectedPeers via scanning event listeners
-                const mockScenarios = [
-                    [{ id: "Peer_B", rssi: -65 }], // Secure case: 1 classmate at a normal distance
-                    [{ id: "Peer_B", rssi: -35 }], // Breach case: Direct touch (<10cm)
-                    [{ id: "Peer_B", rssi: -48 }, { id: "Peer_C", rssi: -49 }] // Breach case: >2 phones stacked together (<30cm)
-                ];
-
-                // Check randomly or hold stable patterns for verification
-                node.detectedPeers = mockScenarios[Math.floor(Math.random() * mockScenarios.length)];
-                evaluateClusterDensity();
-            }
-
-            function evaluateClusterDensity() {
-                let criticalTouchCount = 0;
-                let warningCloseCount = 0;
-
-                node.detectedPeers.forEach(peer => {
-                    if (peer.rssi >= CONFIG.RSSI_CRITICAL_10CM) criticalTouchCount++;
-                    if (peer.rssi >= CONFIG.RSSI_WARNING_30CM) warningCloseCount++;
+                // Simulation trigger: Click the retry button to mimic toggling Bluetooth back on
+                DOM.retryBtn.addEventListener('click', () => {
+                    app.bluetoothActive = true;
+                    evaluateSensorEnvironment();
                 });
 
-                UI.ultraCount.textContent = `${warningCloseCount} Devices`;
+                // Simulate an unpredictable user action where they turn off Bluetooth after 7 seconds
+                setTimeout(() => {
+                    app.bluetoothActive = false;
+                    evaluateSensorEnvironment();
+                }, 7000);
 
-                // Rule Enforcement 1: Un-natural absolute touch validation
-                if (criticalTouchCount > 0) {
-                    flagEnforcementBreach("Proxy hardware contact exception (<10cm stack).");
-                    return;
-                }
+                setInterval(clockEngine, 1000);
+            }
 
-                // Rule Enforcement 2: Your Bench Rule (Max 2 people per bench means max 1 external device close by)
-                if (warningCloseCount > 1) {
-                    flagEnforcementBreach(`Bench clutter density limit breached (${warningCloseCount} devices inside <30cm boundary).`);
-                    return;
-                }
-
-                if (warningCloseCount === 1) {
-                    UI.bench.textContent = "PAIR (Standard)";
-                    UI.bench.style.color = "var(--success)";
+            function evaluateSensorEnvironment() {
+                // In production, navigate via native wrapper check: bluetooth.getAvailability()
+                if (!app.bluetoothActive || !navigator.onLine) {
+                    app.isTracking = false;
+                    DOM.blindfold.style.display = "flex";
+                    DOM.badge.textContent = "Hardware Signal Missing";
+                    DOM.badge.className = "status-pill isolated";
                 } else {
-                    UI.bench.textContent = "ISOLATED";
-                    UI.bench.style.color = "var(--text-secondary)";
+                    app.isTracking = true;
+                    DOM.blindfold.style.display = "none";
+                    DOM.badge.textContent = "Tracking Environment Secure";
+                    DOM.badge.className = "status-pill active";
                 }
             }
 
-            function coreClockEngine() {
-                if (node.isolated) return;
+            function clockEngine() {
+                if (!app.isTracking) return; // Completely locks tracking and stops adding seconds
 
-                if (node.elapsed >= CONFIG.TIMELINE_LIMIT_SEC) {
-                    UI.badge.textContent = "Session Complete";
-                    UI.badge.className = "status-pill active";
+                if (app.elapsed >= 3600) {
+                    DOM.badge.textContent = "Session Completed Successfully";
+                    DOM.badge.className = "status-pill active";
                     return;
                 }
 
-                node.elapsed++;
-
-                if (node.insideFence) {
-                    node.verified++;
-                    UI.badge.textContent = "Presence Verified";
-                    UI.badge.className = "status-pill active";
-                } else {
-                    UI.badge.textContent = "Outside Target Boundary";
-                    UI.badge.className = "status-pill isolated";
-                }
-
-                updateUI();
+                app.elapsed++;
+                app.verified++;
+                updateInterface();
             }
 
-            function updateUI() {
-                const timePercent = (node.elapsed / CONFIG.TIMELINE_LIMIT_SEC) * 100;
-                UI.timeBar.style.width = `${timePercent}%`;
-                UI.timeVal.textContent = `${Math.floor(timePercent)}%`;
+            function updateInterface() {
+                const limit = 3600;
+                const timePct = (app.elapsed / limit) * 100;
+                DOM.timeBar.style.width = `${timePct}%`;
+                DOM.timeVal.textContent = `${Math.floor(timePct)}%`;
 
-                const attPercent = (node.verified / CONFIG.TIMELINE_LIMIT_SEC) * 100;
-                UI.attBar.style.width = `${attPercent}%`;
-                UI.attVal.textContent = `${Math.floor(attPercent)}%`;
+                const attPct = (app.verified / limit) * 100;
+                DOM.attBar.style.width = `${attPct}%`;
+                DOM.attVal.textContent = `${Math.floor(attPct)}%`;
             }
 
-            function flagEnforcementBreach(reason) {
-                node.isolated = true;
-                node.insideFence = false;
-                UI.badge.textContent = "Proxy Threat Intercepted";
-                UI.badge.className = "status-pill isolated";
-                UI.timeBar.style.backgroundColor = "var(--danger)";
-                UI.attBar.style.backgroundColor = "var(--danger)";
-                UI.bench.textContent = "FRAUD LOCK";
-                UI.bench.style.color = "var(--danger)";
-                emitLog(`CRITICAL: ${reason}`, "error");
-            }
-
-            if (navigator.geolocation) {
-                initStorageEngine();
-            }
+            // Launch Node
+            initDeviceSensors();
         })();
     </script>
 </body>
