@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clinical Pomodoro Chamber</title>
+    <title>Clinical Pomodoro Space</title>
     <style>
         :root {
             --bg-base: #0a0f1d;
@@ -29,9 +29,11 @@
             background-color: var(--bg-base);
             color: var(--text-primary);
             overflow: hidden;
+            border: 0 solid transparent;
+            transition: border-width 0.1s, border-color 0.1s;
         }
 
-        /* Fluid Responsive Dashboard Layout */
+        /* Fluid Dashboard Layout */
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 320px;
@@ -39,10 +41,9 @@
             height: 100%;
             padding: 24px;
             gap: 24px;
-            transition: all 0.3s ease;
         }
 
-        /* Mobile Landscape Optimization */
+        /* Short Landscape View Responsive Optimization */
         @media (max-height: 500px) {
             .dashboard {
                 padding: 12px;
@@ -64,7 +65,7 @@
             }
         }
 
-        /* Portrait Mode Fallback */
+        /* Portrait View Fallback */
         @media (max-width: 768px) and (orientation: portrait) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -76,7 +77,7 @@
             }
         }
 
-        /* Glassmorphic Panel Core */
+        /* Premium Clinical Glass Panel Layout */
         .glass-panel {
             background: var(--panel-glass);
             backdrop-filter: blur(20px);
@@ -94,35 +95,29 @@
             min-height: 0;
         }
 
-        /* Focus Area Layout */
-        .timer-chamber {
-            position: relative;
-        }
-
+        /* The Timer Text - Maximum Clarity Priority */
         .timer-display {
-            font-size: 7.5rem;
+            font-size: 8rem;
             font-weight: 200;
             font-variant-numeric: tabular-nums;
             letter-spacing: -2px;
             color: var(--text-primary);
             text-shadow: 0 0 40px rgba(0, 255, 170, 0.15);
             margin-bottom: 10px;
-            transition: font-size 0.2s ease;
-            z-index: 10;
         }
 
-        /* Config Adjustment Control Row */
+        /* Setup Adjustment Panel Configuration Row */
         .config-row {
             display: flex;
             align-items: center;
             gap: 16px;
             margin-top: 15px;
-            transition: opacity 0.3s ease;
-            z-index: 10;
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
         .config-row.hidden {
             opacity: 0;
+            transform: translateY(10px);
             pointer-events: none;
         }
 
@@ -164,19 +159,17 @@
             cursor: pointer;
             letter-spacing: 2px;
             text-transform: uppercase;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s ease;
             box-shadow: 0 0 15px rgba(0, 255, 170, 0.05);
-            z-index: 10;
         }
 
         .start-action-btn:hover {
             background: var(--accent-glow);
             color: var(--bg-base);
             box-shadow: 0 0 25px rgba(0, 255, 170, 0.3);
-            transform: translateY(-1px);
         }
 
-        /* Right Side Progression Module */
+        /* Right Hand Progression Core Modules */
         .progression-panel {
             justify-content: flex-start;
             align-items: stretch;
@@ -203,7 +196,7 @@
             margin-top: 5px;
         }
 
-        /* Botanical Visualization Box */
+        /* Botanical Visualization Box Sandbox */
         .plant-habitat {
             flex-grow: 1;
             display: flex;
@@ -220,10 +213,10 @@
         .botanical-matrix {
             font-size: 5.5rem;
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
-            transition: transform 0.5s ease, font-size 0.2s ease;
+            transition: transform 0.5s ease;
         }
 
-        /* Progress Metrics Footer */
+        /* Progress Metrics Metrics Section Footer */
         .quota-box {
             background: rgba(255,255,255,0.02);
             padding: 12px;
@@ -255,87 +248,35 @@
             transition: width 0.4s ease;
         }
 
-        /* NEW: Transparent, Interaction-Blocking Shield Layer */
-        #lockdown-shield {
+        /* Transparent Glass Layer that Blocks Interaction but Keeps UI 100% Legible */
+        #interaction-blocker-shield {
             position: fixed;
             inset: 0;
-            background: rgba(5, 8, 16, 0.2); /* Tinted transparent base */
-            z-index: 999;
+            background: rgba(10, 15, 29, 0.01); /* Invisible base */
+            z-index: 9999;
             display: none;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            padding-top: 40px;
-            pointer-events: auto; /* Intercepts all clicks */
+            cursor: not-allowed;
         }
 
-        .shield-banner {
-            background: rgba(255, 59, 48, 0.15);
-            border: 1px solid rgba(255, 59, 48, 0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 10px 24px;
-            border-radius: 20px;
-            color: #ff453a;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            animation: pulse-glow 2s infinite alternate;
+        /* Escape Attempt Perimeter Defense Alert (Red Flashing Borders) */
+        .perimeter-breach {
+            border: 6px solid var(--accent-alert) !important;
+            animation: flash-warning 0.5s alternate infinite;
         }
 
-        @keyframes pulse-glow {
-            from { box-shadow: 0 4px 20px rgba(255, 59, 48, 0.1); }
-            to { box-shadow: 0 4px 20px rgba(255, 59, 48, 0.3); }
-        }
-
-        /* Anti-Distraction Screen Trap UI */
-        #distraction-trap {
-            position: fixed;
-            inset: 0;
-            background: rgba(255, 59, 48, 0.25);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            z-index: 99998;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            border: 4px solid var(--accent-alert);
-        }
-
-        .alert-box {
-            background: #0a0f1d;
-            border: 1px solid var(--accent-alert);
-            padding: 30px 50px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 0 50px rgba(255, 59, 48, 0.3);
-        }
-
-        .alert-box h2 {
-            color: var(--accent-alert);
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
+        @keyframes flash-warning {
+            from { border-color: rgba(255, 59, 48, 1); }
+            to { border-color: rgba(255, 59, 48, 0.2); }
         }
     </style>
 </head>
 <body>
 
-    <div id="distraction-trap">
-        <div class="alert-box">
-            <h2>CHAMBER BREACH DETECTED</h2>
-            <p style="color: var(--text-primary)">Click inside this window instantly to re-lock quarantine sequence.</p>
-        </div>
-    </div>
-
-    <div id="lockdown-shield">
-        <div class="shield-banner">🔒 Quarantine Active — System Locked</div>
-    </div>
+    <div id="interaction-blocker-shield"></div>
 
     <main class="dashboard">
         
-        <section class="glass-panel timer-chamber">
+        <section class="glass-panel">
             <div class="timer-display" id="time-string">25:00</div>
             
             <div class="config-row" id="setup-controls">
@@ -344,12 +285,12 @@
                 <button class="time-btn" onclick="adjustTime(5)">+</button>
             </div>
 
-            <button class="start-action-btn" id="master-action-btn" onclick="initiateChamberLockdown()">Engage Lock</button>
+            <button class="start-action-btn" id="master-action-btn" onclick="engageLockdownMode()">Engage Lock</button>
         </section>
 
         <section class="glass-panel progression-panel">
             <div class="header-block">
-                <h2>Chamber Rank</h2>
+                <h2>Rank Tier</h2>
                 <div class="level-badge">LEVEL <span id="current-rank-display">10</span></div>
             </div>
 
@@ -360,7 +301,7 @@
             <div class="quota-box">
                 <div class="quota-meta">
                     <span>Rank Progress</span>
-                    <span><span id="session-count-display">0</span> / 20 Done</span>
+                    <span><span id="session-count-display">0</span> / 20 Sessions</span>
                 </div>
                 <div class="progress-track">
                     <div class="progress-bar-fill" id="metric-fill"></div>
@@ -410,8 +351,8 @@
             }
         }
 
-        // Native Fullscreen & Transparent Click-Blocking Activation
-        function initiateChamberLockdown() {
+        // Activates Native Fullscreen & Drops the Invisible Click Blocker Over UI
+        function engageLockdownMode() {
             if (isChamberLocked) return;
 
             const element = document.documentElement;
@@ -430,19 +371,20 @@
             isChamberLocked = true;
             timeRemainingSeconds = selectedDurationMinutes * 60;
             
-            // Hide selection controls, keep timer active and visible
+            // UI elements tuck away gracefully, leaving the viewport immaculate and legible
             document.getElementById('setup-controls').classList.add('hidden');
-            document.getElementById('master-action-btn').style.display = 'none';
+            document.getElementById('master-action-btn').style.opacity = '0';
+            document.getElementById('master-action-btn').style.pointerEvents = 'none';
             
-            // Bring up the transparent interaction shield
-            document.getElementById('lockdown-shield').style.display = 'flex';
+            // Drop the transparent touch block barrier shield over dashboard viewport
+            document.getElementById('interaction-blocker-shield').style.display = 'block';
 
             timerCountdownInstance = setInterval(() => {
                 timeRemainingSeconds--;
                 updateChamberDisplayString();
 
                 if (timeRemainingSeconds <= 0) {
-                    terminateChamberCleanly();
+                    releaseLockdownCleanly();
                 }
             }, 1000);
         }
@@ -453,14 +395,15 @@
             document.getElementById('time-string').innerText = `${String(displayMinutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
         }
 
-        function terminateChamberCleanly() {
+        function releaseLockdownCleanly() {
             clearInterval(timerCountdownInstance);
             isChamberLocked = false;
             
             document.getElementById('setup-controls').classList.remove('hidden');
-            document.getElementById('master-action-btn').style.display = 'block';
-            document.getElementById('lockdown-shield').style.display = 'none';
-            document.getElementById('distraction-trap').style.display = 'none';
+            document.getElementById('master-action-btn').style.opacity = '1';
+            document.getElementById('master-action-btn').style.pointerEvents = 'auto';
+            document.getElementById('interaction-blocker-shield').style.display = 'none';
+            document.body.classList.remove('perimeter-breach');
 
             let totalSessions = parseInt(localStorage.getItem('completed_sessions_count')) + 1;
             let currentRank = parseInt(localStorage.getItem('pomodoro_rank'));
@@ -469,7 +412,6 @@
                 if (currentRank > 1) {
                     currentRank -= 1;
                     localStorage.setItem('pomodoro_rank', currentRank.toString());
-                    alert(`RANK UPDATED: You scaled up to Rank ${currentRank}!`);
                 }
                 totalSessions = 0; 
             }
@@ -482,20 +424,21 @@
             }
 
             document.getElementById('time-string').innerText = `${String(selectedDurationMinutes).padStart(2, '0')}:00`;
-            alert("Focus sequence processed successfully. Botanical vault updated.");
         }
 
-        // Active Interceptors
+        // Target Windows Focus Loss Core Defence Interceptors
         window.addEventListener('blur', () => {
             if (isChamberLocked) {
-                document.getElementById('distraction-trap').style.display = 'flex';
+                // Flash the monitor perimeter borders bright crimson until focus restores
+                document.body.classList.add('perimeter-breach');
                 window.focus();
             }
         });
 
-        document.getElementById('distraction-trap').addEventListener('click', () => {
+        // Clear warning boundaries once focus has been confirmed returned back to system canvas
+        document.getElementById('interaction-blocker-shield').addEventListener('click', () => {
             if (isChamberLocked) {
-                document.getElementById('distraction-trap').style.display = 'none';
+                document.body.classList.remove('perimeter-breach');
                 window.focus();
             }
         });
@@ -503,7 +446,7 @@
         window.addEventListener('beforeunload', (event) => {
             if (isChamberLocked) {
                 event.preventDefault();
-                event.returnValue = 'Quarantine process active.';
+                event.returnValue = 'Focus Quarantine active.';
                 return event.returnValue;
             }
         });
