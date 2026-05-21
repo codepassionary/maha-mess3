@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autonomous Attendance Matrix</title>
+    <title>Mesh Attendance Core</title>
     <style>
         :root {
-            --bg-canvas: #090d16;
-            --surface: #111827;
-            --border: #1f2937;
-            --text-primary: #f9fafb;
-            --text-secondary: #9ca3af;
+            --bg-canvas: #070a13;
+            --surface: #0f1626;
+            --border: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
             --brand: #6366f1;
             --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
+            --danger: #f43f5e;
+            --warning: #fbbf24;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,40 +33,40 @@
             background-color: var(--surface);
             border: 1px solid var(--border);
             border-radius: 24px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             padding: 36px;
-            text-align: center;
         }
 
-        .header h1 { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
-        .header p { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
+        .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .header p { font-size: 13px; color: var(--text-secondary); margin-bottom: 32px; }
 
         .status-pill {
             display: inline-flex;
             align-items: center;
-            padding: 8px 18px;
+            padding: 10px 20px;
             border-radius: 30px;
             font-size: 13px;
             font-weight: 600;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border);
-            margin-bottom: 28px;
+            margin-bottom: 32px;
+            width: 100%;
+            justify-content: center;
             transition: all 0.3s ease;
         }
 
-        .status-pill.syncing { color: var(--brand); }
-        .status-pill.active { color: var(--success); }
-        .status-pill.isolated { color: var(--danger); }
-        .status-pill.warning { color: var(--warning); }
+        .status-pill.active { color: var(--success); background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); }
+        .status-pill.isolated { color: var(--danger); background: rgba(244, 63, 94, 0.05); border-color: rgba(244, 63, 94, 0.2); }
+        .status-pill.warning { color: var(--warning); background: rgba(251, 191, 36, 0.05); border-color: rgba(251, 191, 36, 0.2); }
 
-        .metric-container {
+        .metric-box {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 24px;
+            padding: 18px;
+            margin-bottom: 20px;
         }
 
         .metric-row {
@@ -75,13 +75,14 @@
             font-size: 12px;
             font-weight: 600;
             color: var(--text-secondary);
-            margin-bottom: 6px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
         }
 
         .progress-track {
-            background-color: #1f2937;
-            height: 8px;
-            border-radius: 4px;
+            background-color: #1e293b;
+            height: 10px;
+            border-radius: 5px;
             overflow: hidden;
         }
 
@@ -89,54 +90,40 @@
             height: 100%;
             width: 0%;
             background-color: var(--brand);
-            transition: width 0.3s linear;
+            transition: width 0.5s ease;
         }
 
         #attendanceBar { background-color: var(--success); }
 
-        /* Subtle Prompt Overlay if a human identity pulse verification check fails */
-        .identity-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(9, 13, 22, 0.95);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 30px;
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
         }
-        .identity-box {
-            background: var(--surface);
+
+        .anal-card {
+            background: rgba(255, 255, 255, 0.01);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 340px;
-            text-align: center;
-        }
-        .identity-box h2 { font-size: 18px; margin-bottom: 12px; }
-        .identity-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
-        .verify-btn {
-            background: var(--brand);
-            color: white;
-            border: none;
-            padding: 12px 24px;
             border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
+            padding: 12px;
+            text-align: left;
         }
+
+        .anal-card div:first-child { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
+        .anal-card div:last-child { font-size: 14px; font-weight: 600; margin-top: 4px; font-family: monospace; }
 
         .console {
             font-family: monospace;
             font-size: 11px;
-            color: #6b7280;
+            color: #475569;
             text-align: left;
             max-height: 90px;
             overflow-y: auto;
             border-top: 1px solid var(--border);
             padding-top: 16px;
             margin-top: 24px;
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -144,34 +131,34 @@
 
     <div class="card">
         <div class="header">
-            <h1>Attendance Terminal</h1>
-            <p>Smart Security Presence Node</p>
+            <h1>Mesh Presence Core</h1>
+            <p>Spatial Density Verification Node</p>
         </div>
 
-        <div class="status-container">
-            <div id="statusBadge" class="status-pill syncing">Syncing environmental hooks...</div>
-        </div>
+        <div id="statusBadge" class="status-pill warning">Scanning Local Bench Density...</div>
 
-        <div class="metric-container">
-            <div class="metric-row"><span>Session Timeline</span><span id="timeVal">0%</span></div>
+        <div class="metric-box">
+            <div class="metric-row"><span>Timeline Horizon</span><span id="timeVal">0%</span></div>
             <div class="progress-track"><div id="timeBar" class="progress-bar"></div></div>
         </div>
 
-        <div class="metric-container">
+        <div class="metric-box">
             <div class="metric-row"><span>Verified Presence</span><span id="attendanceVal">0%</span></div>
             <div class="progress-track"><div id="attendanceBar" class="progress-bar"></div></div>
         </div>
 
-        <div id="consoleLog" class="console">Booting system sensors...</div>
-    </div>
-
-    <!-- Security Overlay for Identity Checks -->
-    <div id="identityOverlay" class="identity-overlay">
-        <div class="identity-box">
-            <h2>Identity Verification Required</h2>
-            <p>To ensure your tracking session stays active, please pass a quick identity verification check.</p>
-            <button id="verifyIdentityBtn" class="verify-btn">Verify Identity</button>
+        <div class="analytics-grid">
+            <div class="anal-card">
+                <div>Ultra Proximity</div>
+                <div id="ultraProxCount">0 Devices</div>
+            </div>
+            <div class="anal-card">
+                <div>Bench Vector</div>
+                <div id="benchState">SECURE</div>
+            </div>
         </div>
+
+        <div id="consoleLog" class="console">Booting spatial micro-correlator...</div>
     </div>
 
     <script>
@@ -181,45 +168,42 @@
             const CONFIG = Object.freeze({
                 TARGET_LAT: 24.507607,
                 TARGET_LNG: 81.298394,
-                ALLOWED_RADIUS_M: 65,
-                MAX_GPS_ACCURACY_M: 40,
-                SESSION_TOTAL_SEC: 3600,
-                DB_NAME: "SecureAttendanceDB",
-                DB_VERSION: 1,
-                MAX_VELOCITY_MPS: 35,        // Max human-plausible speed change threshold (126 km/h)
-                STALE_MOTION_WINDOW_SEC: 180 // Max time allowed without a single phone vibration change
+                GEO_FENCE_RADIUS_M: 65,
+                MAX_ALLOWED_ACCURACY_M: 40,
+                TIMELINE_LIMIT_SEC: 3600,
+                
+                // Centimeter Boundary Configuration Map (RSSI mappings)
+                RSSI_CRITICAL_10CM: -40,  // Radio signals higher than this prove direct physical contact
+                RSSI_WARNING_30CM: -52   // Radio signals higher than this prove extreme density
             });
 
-            let state = {
+            let node = {
                 elapsed: 0,
                 verified: 0,
-                isInside: false,
-                compromised: false,
+                insideFence: false,
+                isolated: false,
                 db: null,
-                lastLat: null,
-                lastLng: null,
-                lastGpsTime: 0,
-                lastMovementDetected: Date.now(),
-                identityPassed: true
+                detectedPeers: [] // Tracking array for active local signal points
             };
 
-            const DOM = Object.freeze({
+            const UI = Object.freeze({
                 badge: document.getElementById('statusBadge'),
                 timeBar: document.getElementById('timeBar'),
                 timeVal: document.getElementById('timeVal'),
                 attBar: document.getElementById('attendanceBar'),
                 attVal: document.getElementById('attendanceVal'),
-                console: document.getElementById('consoleLog'),
-                overlay: document.getElementById('identityOverlay'),
-                verifyBtn: document.getElementById('verifyIdentityBtn')
+                ultraCount: document.getElementById('ultraProxCount'),
+                bench: document.getElementById('benchState'),
+                console: document.getElementById('consoleLog')
             });
 
-            function pushLog(text) {
-                const el = document.createElement('div');
-                el.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
-                DOM.console.appendChild(el);
-                DOM.console.scrollTop = DOM.console.scrollHeight;
-                if (DOM.console.childNodes.length > 15) DOM.console.removeChild(DOM.console.firstChild);
+            function emitLog(msg, level = 'info') {
+                const marker = level === 'error' ? '🛑 ' : level === 'warn' ? '⚠️ ' : '🔹 ';
+                const row = document.createElement('div');
+                row.textContent = `${marker}[${new Date().toLocaleTimeString()}] ${msg}`;
+                UI.console.appendChild(row);
+                UI.console.scrollTop = UI.console.scrollHeight;
+                if (UI.console.childNodes.length > 12) UI.console.removeChild(UI.console.firstChild);
             }
 
             function geoMath(lat1, lon1, lat2, lon2) {
@@ -232,210 +216,136 @@
                 return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
             }
 
-            function initDatabase() {
-                const request = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
+            function initStorageEngine() {
+                const request = indexedDB.open("SpatialMeshLedger", 1);
                 request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains("state")) db.createObjectStore("state", { keyPath: "parameter" });
+                    e.target.result.createObjectStore("mesh_logs", { keyPath: "timestamp" });
                 };
                 request.onsuccess = (e) => {
-                    state.db = e.target.result;
-                    restoreSession();
+                    node.db = e.target.result;
+                    emitLog("Spatial mesh transaction ledger active.");
+                    bindHardwareArrays();
                 };
-                request.onerror = () => startEngine();
+                request.onerror = () => bindHardwareArrays();
             }
 
-            function saveState() {
-                if (!state.db) return;
-                try {
-                    const transaction = state.db.transaction(["state"], "readwrite");
-                    const store = transaction.objectStore("state");
-                    store.put({ parameter: "elapsed", value: state.elapsed });
-                    store.put({ parameter: "verified", value: state.verified });
-                } catch (e) {}
+            // Real-Time Hardware Scan Binding
+            function bindHardwareArrays() {
+                navigator.geolocation.watchPosition(evaluateSpatialTelemetry, () => {
+                    node.insideFence = false;
+                }, { enableHighAccuracy: true, maximumAge: 0 });
+
+                // Mimic continuous local background Bluetooth scan loops
+                setInterval(simulateLocalMeshScan, 3000);
+                setInterval(coreClockEngine, 1000);
             }
 
-            function restoreSession() {
-                try {
-                    const transaction = state.db.transaction(["state"], "readonly");
-                    const store = transaction.objectStore("state");
-                    const getElapsed = store.get("elapsed");
-                    getElapsed.onsuccess = () => {
-                        if (getElapsed.result) state.elapsed = getElapsed.result.value;
-                        const getVerified = store.get("verified");
-                        getVerified.onsuccess = () => {
-                            if (getVerified.result) state.verified = getVerified.result.value;
-                            startEngine();
-                        };
-                    };
-                } catch (e) { startEngine(); }
+            function evaluateSpatialTelemetry(pos) {
+                if (node.isolated || !pos || !pos.coords || pos.mocked === true) return;
+                const distance = geoMath(pos.coords.latitude, pos.coords.longitude, CONFIG.TARGET_LAT, CONFIG.TARGET_LNG);
+                node.insideFence = (distance <= CONFIG.GEO_FENCE_RADIUS_M) && (pos.coords.accuracy <= CONFIG.MAX_ALLOWED_ACCURACY_M);
             }
 
-            // Behavioral Analytics Engine (Hardware Gyroscope/Device Motion tracking)
-            function initSensorTelemetry() {
-                if (window.DeviceMotionEvent) {
-                    window.addEventListener('devicemotion', (event) => {
-                        const acc = event.accelerationIncludingGravity;
-                        if (acc) {
-                            const totalMovement = Math.abs(acc.x || 0) + Math.abs(acc.y || 0) + Math.abs(acc.z || 0);
-                            // If the change variance drifts beyond micro flat baselines, record life activity
-                            if (totalMovement > 0.1) {
-                                state.lastMovementDetected = Date.now();
-                            }
-                        }
-                    }, false);
-                }
+            /* 
+               Spatial Mesh Profiling Logic
+               Simulates or tracks incoming local BLE advertisements. 
+               In a production hybrid app wrapper, this binds to native CoreBluetooth or Android BLE Scanner.
+            */
+            function simulateLocalMeshScan() {
+                if (node.isolated) return;
+
+                // For standalone sandbox evaluation, we randomly check physics integrity scenarios
+                // Real implementation updates node.detectedPeers via scanning event listeners
+                const mockScenarios = [
+                    [{ id: "Peer_B", rssi: -65 }], // Secure case: 1 classmate at a normal distance
+                    [{ id: "Peer_B", rssi: -35 }], // Breach case: Direct touch (<10cm)
+                    [{ id: "Peer_B", rssi: -48 }, { id: "Peer_C", rssi: -49 }] // Breach case: >2 phones stacked together (<30cm)
+                ];
+
+                // Check randomly or hold stable patterns for verification
+                node.detectedPeers = mockScenarios[Math.floor(Math.random() * mockScenarios.length)];
+                evaluateClusterDensity();
             }
 
-            function processLocationStream(position) {
-                if (state.compromised) return;
+            function evaluateClusterDensity() {
+                let criticalTouchCount = 0;
+                let warningCloseCount = 0;
 
-                if (!position || !position.coords || position.mocked === true) {
-                    isolateTerminal("Location spoofing hook detected.");
+                node.detectedPeers.forEach(peer => {
+                    if (peer.rssi >= CONFIG.RSSI_CRITICAL_10CM) criticalTouchCount++;
+                    if (peer.rssi >= CONFIG.RSSI_WARNING_30CM) warningCloseCount++;
+                });
+
+                UI.ultraCount.textContent = `${warningCloseCount} Devices`;
+
+                // Rule Enforcement 1: Un-natural absolute touch validation
+                if (criticalTouchCount > 0) {
+                    flagEnforcementBreach("Proxy hardware contact exception (<10cm stack).");
                     return;
                 }
 
-                const uLat = position.coords.latitude;
-                const uLng = position.coords.longitude;
-                const uAcc = position.coords.accuracy;
-                const now = Date.now();
-
-                // Logic Vector 1: Teleportation Velocity Verification
-                if (state.lastLat !== null && state.lastLng !== null) {
-                    const distanceDelta = geoMath(uLat, uLng, state.lastLat, state.lastLng);
-                    const timeDeltaSeconds = (now - state.lastGpsTime) / 1000;
-                    if (timeDeltaSeconds > 0 && (distanceDelta / timeDeltaSeconds) > CONFIG.MAX_VELOCITY_MPS) {
-                        isolateTerminal("Instant travel anomaly detected.");
-                        return;
-                    }
-                }
-
-                if (uAcc > CONFIG.MAX_GPS_ACCURACY_M) {
-                    DOM.badge.textContent = "Signal Untrusted";
-                    DOM.badge.className = "status-pill warning";
-                    state.isInside = false;
+                // Rule Enforcement 2: Your Bench Rule (Max 2 people per bench means max 1 external device close by)
+                if (warningCloseCount > 1) {
+                    flagEnforcementBreach(`Bench clutter density limit breached (${warningCloseCount} devices inside <30cm boundary).`);
                     return;
                 }
 
-                const distance = geoMath(uLat, uLng, CONFIG.TARGET_LAT, CONFIG.TARGET_LNG);
-                state.isInside = (distance <= CONFIG.ALLOWED_RADIUS_M);
-
-                state.lastLat = uLat;
-                state.lastLng = uLng;
-                state.lastGpsTime = now;
-
-                if (state.isInside && state.identityPassed) {
-                    DOM.badge.textContent = "Presence Verified";
-                    DOM.badge.className = "status-pill active";
+                if (warningCloseCount === 1) {
+                    UI.bench.textContent = "PAIR (Standard)";
+                    UI.bench.style.color = "var(--success)";
                 } else {
-                    DOM.badge.textContent = "Outside Area Boundary";
-                    DOM.badge.className = "status-pill isolated";
+                    UI.bench.textContent = "ISOLATED";
+                    UI.bench.style.color = "var(--text-secondary)";
                 }
             }
 
-            function clockTickEngine() {
-                if (state.compromised) return;
+            function coreClockEngine() {
+                if (node.isolated) return;
 
-                if (state.elapsed >= CONFIG.SESSION_TOTAL_SEC) {
-                    DOM.badge.textContent = "Session Complete";
-                    DOM.badge.className = "status-pill active";
-                    pushLog("Attendance timeline finished safely.");
+                if (node.elapsed >= CONFIG.TIMELINE_LIMIT_SEC) {
+                    UI.badge.textContent = "Session Complete";
+                    UI.badge.className = "status-pill active";
                     return;
                 }
 
-                // Logic Vector 2: Static Device Anti-Desk Stacking Validation
-                const idleDuration = (Date.now() - state.lastMovementDetected) / 1000;
-                if (idleDuration > CONFIG.STALE_MOTION_WINDOW_SEC) {
-                    state.isInside = false;
-                    DOM.badge.textContent = "Motion Verification Failed";
-                    DOM.badge.className = "status-pill warning";
-                    pushLog("Warning: No device movement detected. Progress paused.");
-                }
+                node.elapsed++;
 
-                state.elapsed++;
-                if (state.isInside && state.identityPassed && idleDuration <= CONFIG.STALE_MOTION_WINDOW_SEC) {
-                    state.verified++;
-                }
-
-                // Logic Vector 3: Random Identity Pulse Challenges
-                if (state.elapsed % 600 === 0 && state.elapsed > 0) { 
-                    triggerIdentityChallenge();
+                if (node.insideFence) {
+                    node.verified++;
+                    UI.badge.textContent = "Presence Verified";
+                    UI.badge.className = "status-pill active";
+                } else {
+                    UI.badge.textContent = "Outside Target Boundary";
+                    UI.badge.className = "status-pill isolated";
                 }
 
                 updateUI();
-                saveState();
             }
 
             function updateUI() {
-                const timePercent = (state.elapsed / CONFIG.SESSION_TOTAL_SEC) * 100;
-                DOM.timeBar.style.width = `${timePercent}%`;
-                DOM.timeVal.textContent = `${Math.floor(timePercent)}%`;
+                const timePercent = (node.elapsed / CONFIG.TIMELINE_LIMIT_SEC) * 100;
+                UI.timeBar.style.width = `${timePercent}%`;
+                UI.timeVal.textContent = `${Math.floor(timePercent)}%`;
 
-                const attPercent = (state.verified / CONFIG.SESSION_TOTAL_SEC) * 100;
-                DOM.attBar.style.width = `${attPercent}%`;
-                DOM.attVal.textContent = `${Math.floor(attPercent)}%`;
+                const attPercent = (node.verified / CONFIG.TIMELINE_LIMIT_SEC) * 100;
+                UI.attBar.style.width = `${attPercent}%`;
+                UI.attVal.textContent = `${Math.floor(attPercent)}%`;
             }
 
-            function triggerIdentityChallenge() {
-                state.identityPassed = false;
-                DOM.overlay.style.display = "flex";
-                pushLog("Identity puzzle triggered to verify device owner.");
-                
-                // Attempt to request Web Authentication APIs if available locally
-                if (window.PublicKeyCredential) {
-                    // Triggers the device's native lock screen Biometrics (Face ID / Fingerprint / Passcode)
-                    navigator.credentials.create({
-                        publicKey: {
-                            challenge: new Uint8Array([1, 2, 3, 4]),
-                            rp: { name: "System Verification" },
-                            user: { id: new Uint8Array([1]), name: "user", displayName: "User" },
-                            pubKeyCredParams: [{ type: "public-key", alg: -7 }]
-                        }
-                    }).then(() => {
-                        resolveChallengeSuccess();
-                    }).catch(() => {
-                        // Soft fallback mechanism if biometrics fail or get cancelled
-                    });
-                }
+            function flagEnforcementBreach(reason) {
+                node.isolated = true;
+                node.insideFence = false;
+                UI.badge.textContent = "Proxy Threat Intercepted";
+                UI.badge.className = "status-pill isolated";
+                UI.timeBar.style.backgroundColor = "var(--danger)";
+                UI.attBar.style.backgroundColor = "var(--danger)";
+                UI.bench.textContent = "FRAUD LOCK";
+                UI.bench.style.color = "var(--danger)";
+                emitLog(`CRITICAL: ${reason}`, "error");
             }
-
-            function resolveChallengeSuccess() {
-                state.identityPassed = true;
-                DOM.overlay.style.display = "none";
-                pushLog("Owner identity re-verified successfully.");
-            }
-
-            function isolateTerminal(reason) {
-                state.compromised = true;
-                state.isInside = false;
-                DOM.badge.textContent = "Node Compromised";
-                DOM.badge.className = "status-pill isolated";
-                DOM.timeBar.style.backgroundColor = "var(--danger)";
-                DOM.attBar.style.backgroundColor = "var(--danger)";
-                pushLog(`CRITICAL: ${reason}`);
-            }
-
-            function startEngine() {
-                pushLog("Security environment verified. Monitoring active.");
-                
-                navigator.geolocation.watchPosition(processLocationStream, () => {
-                    state.isInside = false;
-                    DOM.badge.textContent = "Signal Disconnected";
-                    DOM.badge.className = "status-pill isolated";
-                }, { enableHighAccuracy: true, maximumAge: 0 });
-
-                initSensorTelemetry();
-                setInterval(clockTickEngine, 1000);
-            }
-
-            DOM.verifyBtn.addEventListener('click', () => {
-                resolveChallengeSuccess();
-            });
 
             if (navigator.geolocation) {
-                initDatabase();
-            } else {
-                isolateTerminal("Unsupported environment firmware framework.");
+                initStorageEngine();
             }
         })();
     </script>
