@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Network Verified Attendance</title>
+    <title>Enterprise Security Verification Terminal</title>
     <style>
         :root {
             --primary: #4f46e5;
-            --success: #16a34a;
-            --danger: #dc2626;
-            --background: #f3f4f6;
-            --card-bg: #ffffff;
+            --primary-hover: #3730a3;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--background);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto, Helvetica, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -27,108 +33,197 @@
         }
 
         .container {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            padding: 30px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 32px;
             width: 100%;
-            max-width: 450px;
+            max-width: 400px;
             text-align: center;
+            box-sizing: border-box;
         }
 
         h1 {
-            color: #1f2937;
-            margin-bottom: 5px;
             font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
             letter-spacing: -0.5px;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        p.subtitle {
-            color: #6b7280;
-            margin-top: 0;
-            margin-bottom: 20px;
+        .subtitle {
+            color: var(--text-muted);
+            margin: 0 0 24px 0;
             font-size: 14px;
         }
 
-        .pulse-tracker-ui {
-            background-color: #f3f4f6;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        /* Checkpoint Tracker UI Component */
+        .session-blocks {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .block-label {
+            font-size: 13px;
             font-weight: 600;
-            font-size: 14px;
-            color: #374151;
-            border: 1px solid #e5e7eb;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
+        .dots-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .dot.active {
+            background: var(--warning);
+            box-shadow: 0 0 12px var(--warning);
+            border-color: transparent;
+        }
+
+        .dot.verified {
+            background: var(--success);
+            box-shadow: 0 0 12px var(--success);
+            border-color: transparent;
+        }
+
+        .dot.failed {
+            background: var(--danger);
+            box-shadow: 0 0 12px var(--danger);
+            border-color: transparent;
+        }
+
+        /* Status Badge Styling */
         .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 40px;
             font-weight: 600;
             font-size: 14px;
-            margin-bottom: 25px;
-            background-color: #e5e7eb;
-            color: #374151;
-            transition: all 0.2s ease;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            transition: all 0.3s ease;
         }
 
         .status-badge.inside {
-            background-color: #dcfce7;
-            color: var(--success);
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #34d399;
         }
 
         .status-badge.outside {
-            background-color: #fee2e2;
-            color: var(--danger);
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
         }
 
+        /* Countdown Visual Element */
+        .countdown-container {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .countdown-timer {
+            font-family: monospace;
+            font-weight: 700;
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Action Buttons */
         .btn {
-            background-color: var(--primary);
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 16px 28px;
             font-size: 16px;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: 16px;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.2s;
-            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
-        .btn:hover {
-            background-color: #4338ca;
+        .btn:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(1px);
         }
 
         .btn:disabled {
-            background-color: #9ca3af;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.25);
+            box-shadow: none;
             cursor: not-allowed;
         }
 
+        /* System Logging Module */
         #log {
-            margin-top: 20px;
-            max-height: 140px;
+            margin-top: 28px;
+            max-height: 120px;
             overflow-y: auto;
-            border-top: 1px solid #e5e7eb;
-            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 16px;
             font-size: 12px;
-            color: #4b5563;
+            color: var(--text-muted);
             text-align: left;
         }
 
         .log-entry {
-            margin-bottom: 4px;
-            padding: 6px;
-            border-radius: 4px;
-            background: #f9fafb;
-            border-left: 3px solid #cbd5e1;
+            margin-bottom: 6px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.15);
+            border-left: 3px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.4;
         }
         
+        .log-entry.secure {
+            border-left-color: var(--success);
+        }
+
         .log-entry.flagged {
             border-left-color: var(--danger);
-            background-color: #fff5f5;
-            color: var(--danger);
+            background: rgba(239, 68, 68, 0.05);
+            color: #f87171;
         }
     </style>
 </head>
@@ -138,16 +233,28 @@
         <h1>Class Verification</h1>
         <p class="subtitle">Secure Anti-Proxy Terminal</p>
 
-        <div id="pulseCounterUI" class="pulse-tracker-ui">
-            Active Block: 0 / 3
+        <!-- Dynamic Visual Checkpoint Indicator Grid -->
+        <div class="session-blocks">
+            <span class="block-label">Session Progress</span>
+            <div class="dots-container">
+                <div id="dot1" class="dot"></div>
+                <div id="dot2" class="dot"></div>
+                <div id="dot3" class="dot"></div>
+            </div>
         </div>
 
-        <div id="statusBadge" class="status-badge">Establishing Integrity...</div>
+        <div id="statusBadge" class="status-badge">Syncing Security Matrix...</div>
 
-        <button id="checkInBtn" class="btn" disabled>Submit Status</button>
+        <!-- Live Dynamic Micro-Timer Check -->
+        <div class="countdown-container">
+            <span>Next hardware validation loop:</span>
+            <span id="timerDisplay" class="countdown-timer">20:00</span>
+        </div>
+
+        <button id="checkInBtn" class="btn" disabled>Submit Attendance Status</button>
 
         <div id="log">
-            <strong>Security Log Sequence:</strong>
+            <strong>Security Timeline:</strong>
             <div id="logContents"></div>
         </div>
     </div>
@@ -156,32 +263,36 @@
         (function() {
             'use strict';
 
-            // Fixed Parameters
             const CONFIG = Object.freeze({
                 TARGET_LAT: 24.500893,
                 TARGET_LNG: 81.291928,
                 ALLOWED_RADIUS: 65,
                 MAX_GPS_ACCURACY: 40,
-                PULSE_INTERVAL_MS: 1200000, // 20 minutes
+                PULSE_INTERVAL_MS: 1200000, // 20 Minutes
                 MAX_PULSES: 3,
-                MAX_VELOCITY_MPS: 28 // ~100 km/h max plausible speed limit between jumps
+                MAX_VELOCITY_MPS: 28 
             });
 
-            // State management closed off from window scope
             let state = {
                 pulseCount: 0,
                 lastPulseTime: 0,
                 lastLat: null,
                 lastLng: null,
                 isCompromised: false,
-                verifiedToken: null
+                verifiedToken: null,
+                secondsRemaining: CONFIG.PULSE_INTERVAL_MS / 1000
             };
 
             const UI = Object.freeze({
                 badge: document.getElementById('statusBadge'),
                 btn: document.getElementById('checkInBtn'),
                 logs: document.getElementById('logContents'),
-                counter: document.getElementById('pulseCounterUI')
+                timer: document.getElementById('timerDisplay'),
+                dots: [
+                    document.getElementById('dot1'),
+                    document.getElementById('dot2'),
+                    document.getElementById('dot3')
+                ]
             });
 
             function geoMath(lat1, lon1, lat2, lon2) {
@@ -194,26 +305,54 @@
                 return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
             }
 
-            function writeLog(msg, isWarning = false) {
+            function writeLog(msg, type = 'default') {
                 const entry = document.createElement('div');
-                entry.className = `log-entry ${isWarning ? 'flagged' : ''}`;
+                entry.className = `log-entry ${type}`;
                 entry.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${msg}`;
                 UI.logs.insertBefore(entry, UI.logs.firstChild);
             }
 
-            function triggerSecurePulse() {
-                if (state.isCompromised) return;
+            // Real-time Visual Micro Countdown loop engine
+            function startVisualCountdown() {
+                setInterval(function() {
+                    if (state.isCompromised || state.pulseCount >= CONFIG.MAX_PULSES) {
+                        UI.timer.textContent = "--:--";
+                        return;
+                    }
 
-                if (state.pulseCount >= CONFIG.MAX_PULSES) {
-                    UI.badge.textContent = "Session Concluded";
-                    UI.badge.className = "status-badge";
-                    writeLog("Monitoring metrics finalized for this scheduled track loop.");
+                    state.secondsRemaining--;
+                    
+                    if (state.secondsRemaining <= 0) {
+                        state.secondsRemaining = CONFIG.PULSE_INTERVAL_MS / 1000;
+                    }
+
+                    const mins = Math.floor(state.secondsRemaining / 60);
+                    const secs = state.secondsRemaining % 60;
+                    UI.timer.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+
+            function triggerSecurePulse() {
+                // Persistent Local Cache Check outmaneuvers page reload cheat loops
+                if (sessionStorage.getItem('sys_integrity_compromised') === 'true' || state.isCompromised) {
+                    flagExploit("Persistent tracking block active.");
                     return;
                 }
 
+                if (state.pulseCount >= CONFIG.MAX_PULSES) {
+                    UI.badge.textContent = "Session Complete";
+                    UI.badge.className = "status-badge";
+                    writeLog("Verification criteria completely fulfilled for this session.", "secure");
+                    return;
+                }
+
+                // UI Progress Node Shift
+                if(UI.dots[state.pulseCount]) {
+                    UI.dots[state.pulseCount].className = 'dot active';
+                }
+
                 state.pulseCount++;
-                UI.counter.textContent = `Active Block: ${state.pulseCount} / 3`;
-                writeLog(`Running signature array verification #${state.pulseCount}...`);
+                writeLog(`Running verification sequence #${state.pulseCount}...`);
 
                 navigator.geolocation.getCurrentPosition(processSignal, handleHardwareError, {
                     enableHighAccuracy: true,
@@ -225,44 +364,44 @@
             function processSignal(position) {
                 if (state.isCompromised) return;
 
-                // Loophole Shield 1: Hardware Object Redefinition Protection
                 if (!position || !position.coords || position.mocked === true) {
-                    flagExploit("Virtual Mock Environment Intercepted.");
+                    flagExploit("Virtual coordinate layer mismatch.");
                     return;
                 }
 
-                const now = performance.now(); // High resolution relative timing unlinked to clock manipulation
+                const now = performance.now();
                 const currentLat = position.coords.latitude;
                 const currentLng = position.coords.longitude;
                 const currentAcc = position.coords.accuracy;
 
-                // Loophole Shield 2: Temporal Anomaly Check (System clock skipping)
+                // Time Vector Manipulation Check
                 if (state.lastPulseTime !== 0) {
                     const elapsedRealTime = now - state.lastPulseTime;
-                    if (elapsedRealTime < (CONFIG.PULSE_INTERVAL_MS - 10000)) { 
-                        flagExploit("Clock acceleration anomalies caught.");
+                    if (elapsedRealTime < (CONFIG.PULSE_INTERVAL_MS - 15000)) { 
+                        flagExploit("Temporal interval mutation caught.");
                         return;
                     }
                 }
 
-                // Loophole Shield 3: Fast Geolocation Teleportation / Jump Check
+                // Spatial Velocity Manipulation Check
                 if (state.lastLat !== null && state.lastLng !== null) {
                     const travelDistance = geoMath(currentLat, currentLng, state.lastLat, state.lastLng);
                     const timeDeltaSec = (now - state.lastPulseTime) / 1000;
                     const impliedVelocity = travelDistance / timeDeltaSec;
 
                     if (impliedVelocity > CONFIG.MAX_VELOCITY_MPS) {
-                        flagExploit("Improbable velocity vector signature found.");
+                        flagExploit("Improbable location hop caught.");
                         return;
                     }
                 }
 
-                // Loophole Shield 4: Low-Resolution Core Network Filtering
+                // Hardware Precision Check
                 if (currentAcc > CONFIG.MAX_GPS_ACCURACY) {
                     UI.badge.textContent = "Signal Untrusted";
                     UI.badge.className = "status-badge outside";
                     UI.btn.disabled = true;
-                    writeLog("Verification Dropped: Insufficient hardware telemetry resolve.", true);
+                    if(UI.dots[state.pulseCount - 1]) UI.dots[state.pulseCount - 1].className = 'dot failed';
+                    writeLog(`Pulse #${state.pulseCount} dropped: Core precision threshold breach.`, "flagged");
                     return;
                 }
 
@@ -273,59 +412,69 @@
                     UI.badge.className = "status-badge inside";
                     UI.btn.disabled = false;
                     
-                    // Transient Single-use dynamic verification tokens
                     state.verifiedToken = crypto.randomUUID();
-                    
                     state.lastLat = currentLat;
                     state.lastLng = currentLng;
                     state.lastPulseTime = now;
-                    writeLog(`Block sequence #${state.pulseCount} validation checks cleared.`);
+                    writeLog(`Pulse #${state.pulseCount} cleared cryptographic parameters.`, "secure");
                 } else {
                     UI.badge.textContent = "Outside Boundary";
                     UI.badge.className = "status-badge outside";
                     UI.btn.disabled = true;
                     state.verifiedToken = null;
-                    writeLog(`Block sequence #${state.pulseCount} mismatch registered.`, true);
+                    if(UI.dots[state.pulseCount - 1]) UI.dots[state.pulseCount - 1].className = 'dot failed';
+                    writeLog(`Pulse #${state.pulseCount} validation mismatch registered.`, "flagged");
                 }
             }
 
             function flagExploit(reason) {
                 state.isCompromised = true;
+                sessionStorage.setItem('sys_integrity_compromised', 'true');
                 UI.btn.disabled = true;
-                UI.badge.textContent = "Security Failure";
+                UI.badge.textContent = "Hardware Lockedout";
                 UI.badge.className = "status-badge outside";
-                writeLog(`CRITICAL CRACK ATTEMPT: ${reason} Session Permanently Halted.`, true);
+                state.secondsRemaining = 0;
+                UI.dots.forEach(d => d.className = 'dot failed');
+                writeLog(`ALERT: ${reason} Operational Terminal Killed.`, "flagged");
             }
 
             function handleHardwareError(err) {
                 UI.btn.disabled = true;
-                UI.badge.textContent = "Hardware Error";
+                UI.badge.textContent = "Telemetry Offline";
                 UI.badge.className = "status-badge outside";
-                writeLog("Device tracking interface channel rejected.", true);
+                if(UI.dots[state.pulseCount - 1]) UI.dots[state.pulseCount - 1].className = 'dot failed';
+                writeLog("Device precision signal interface failed.", "flagged");
             }
 
             UI.btn.addEventListener('click', function(e) {
-                // Loophole Shield 5: Synthetic Automation Click Protections
                 if (!e.isTrusted || String(e.clientX) === "0") {
-                    flagExploit("UI automated injection proxy block triggered.");
+                    flagExploit("UI execution proxy intercept.");
                     return;
                 }
 
                 if (state.verifiedToken) {
-                    writeLog(`🎉 Metrics locked and verified for checkpoint ${state.pulseCount}/3.`);
-                    alert(`Attendance sequence logged!`);
-                    state.verifiedToken = null; // Instantly purge token from client memory
+                    writeLog(`Attendance checkpoint verified for pulse window ${state.pulseCount}/3.`, "secure");
+                    alert(`Checkpoint Secure! Attendance recorded for window ${state.pulseCount}.`);
+                    
+                    if(UI.dots[state.pulseCount - 1]) UI.dots[state.pulseCount - 1].className = 'dot verified';
+                    
+                    state.verifiedToken = null; 
                     UI.btn.disabled = true;
                 }
             });
 
-            // Initialization execution isolation
+            // Initialize Security Sequence
             if (navigator.geolocation) {
-                triggerSecurePulse();
-                setInterval(triggerSecurePulse, CONFIG.PULSE_INTERVAL_MS);
+                if (sessionStorage.getItem('sys_integrity_compromised') === 'true') {
+                    flagExploit("Previous breach lock active.");
+                } else {
+                    triggerSecurePulse();
+                    startVisualCountdown();
+                    setInterval(triggerSecurePulse, CONFIG.PULSE_INTERVAL_MS);
+                }
             } else {
-                UI.badge.textContent = "Terminal Locked";
-                writeLog("Device environment signature missing cryptographic dependencies.", true);
+                UI.badge.textContent = "Terminal Blocked";
+                writeLog("Crypto-telemetry engine unsupported on device configuration.", "flagged");
             }
         })();
     </script>
