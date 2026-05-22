@@ -158,35 +158,53 @@
 
         /* --- Interactive Surprise Module --- */
         .surprise-vault {
-            background: linear-gradient(135deg, rgba(223, 183, 108, 0.05) 0%, rgba(10,12,18,0.8) 100%);
-            border: 1px dashed var(--gold-core); border-radius: 20px; padding: 20px 14px; margin: 28px 0;
+            background: linear-gradient(135deg, rgba(223, 183, 108, 0.08) 0%, rgba(10,12,18,0.9) 100%);
+            border: 1px dashed var(--gold-core); border-radius: 20px; padding: 24px 18px; margin: 28px 0;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: structurePulse var(--escalation-pulse) infinite ease-in-out;
+            position: relative; overflow: hidden;
         }
         
         @keyframes structurePulse {
-            0%, 100% { transform: scale(1); border-color: var(--gold-core); }
-            50% { transform: scale(1.01); border-color: var(--neon-amber); }
+            0%, 100% { transform: scale(1); border-color: var(--gold-core); box-shadow: 0 0 10px rgba(223, 183, 108, 0.05); }
+            50% { transform: scale(1.01); border-color: var(--neon-amber); box-shadow: 0 0 20px rgba(255, 159, 28, 0.15); }
         }
         
         .surprise-btn {
             background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold-core) 100%);
-            color: #030406; border: none; width: 100%; padding: 14px; border-radius: 12px;
-            font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 800; letter-spacing: 1.5px;
-            text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 20px var(--gold-glow);
+            color: #030406; border: none; width: 100%; padding: 16px; border-radius: 12px;
+            font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 800; letter-spacing: 1.8px;
+            text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 24px var(--gold-glow);
+            transition: all 0.3s ease;
         }
+        .surprise-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(223, 183, 108, 0.4); }
         .surprise-btn:active { transform: scale(0.97); }
 
         .secret-reward-unlocked {
             display: none; opacity: 0; transform: scale(0.9);
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 16px; padding: 12px; background: rgba(57, 255, 20, 0.04);
-            border: 1px solid var(--neon-green); border-radius: 12px;
+            margin-top: 8px; padding: 16px; background: rgba(57, 255, 20, 0.03);
+            border: 1px solid var(--neon-green); border-radius: 14px;
+            box-shadow: inset 0 0 15px rgba(57, 255, 20, 0.05), 0 4px 20px rgba(57, 255, 20, 0.1);
         }
         .reward-badge {
-            font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 700; color: var(--neon-green);
-            text-shadow: 0 0 10px rgba(57, 255, 20, 0.3); letter-spacing: 1px;
+            font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 800; color: var(--neon-green);
+            text-shadow: 0 0 12px rgba(57, 255, 20, 0.5); letter-spacing: 2px; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
+
+        /* --- Dynamic Phone Action Anchor Element --- */
+        .phone-call-action-anchor {
+            text-decoration: none; display: flex; flex-direction: column; align-items: center; width: 100%;
+            -webkit-user-select: auto; user-select: auto;
+        }
+        .call-organizer-btn {
+            background: transparent; border: 1px solid var(--neon-amber); color: #ffffff;
+            width: 100%; padding: 12px; border-radius: 12px; font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+            cursor: pointer; box-shadow: 0 0 15px rgba(255, 159, 28, 0.05); display: flex;
+            align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease;
+        }
+        .call-organizer-btn:active { transform: scale(0.98); background: rgba(255, 159, 28, 0.08); }
 
         /* --- Flow Itinerary --- */
         .itinerary-structure { display: flex; flex-direction: column; gap: 16px; margin: 28px 0 12px 0; }
@@ -232,7 +250,7 @@
             
             <span class="notice-banner anim-reveal delay-3" id="notice-tag">Important: Please turn off your mess or tiffin for tonight!</span>
 
-            <!-- Live Countdown Linked to May 30 -->
+            <!-- Live Countdown Linked to May 23 -->
             <div class="countdown-container anim-reveal delay-3" id="timer-box">
                 <div class="countdown-label" id="timer-status">Time Left Until Party Starts</div>
                 <div class="countdown-digits" id="timer-digits">
@@ -243,12 +261,15 @@
                 </div>
             </div>
 
-            <!-- Surprise Component -->
+            <!-- Enhanced Surprise Component -->
             <div class="surprise-vault anim-reveal delay-4">
                 <button class="surprise-btn" id="vault-trigger" onclick="unlockDopamineToken()">Claim My Feast Permit 🎁</button>
                 <div class="secret-reward-unlocked" id="vault-content">
-                    <div class="reward-badge">VIP FOOD PASS UNLOCKED ✔</div>
-                    <div style="font-family:'Montserrat'; font-size:0.72rem; color:#fff; margin-top:4px; letter-spacing:0.5px;">Permit verified for maximum gourmet dining consumption.</div>
+                    <div class="reward-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        VIP FOOD PASS UNLOCKED
+                    </div>
+                    <div style="font-family:'Montserrat'; font-size:0.75rem; color:#fff; margin-top:8px; letter-spacing:0.5px; font-weight: 500; line-height: 1.4;">Permit verified for maximum gourmet dining consumption tonight. See you at the table!</div>
                 </div>
             </div>
 
@@ -256,7 +277,7 @@
             <div class="itinerary-structure anim-reveal delay-5">
                 <div class="itinerary-node">
                     <span class="node-tag">When</span>
-                    <span class="node-info" style="color: var(--gold-core); font-weight: 600;">30 May 2026 at 06:00 PM Sharp</span>
+                    <span class="node-info" style="color: var(--gold-core); font-weight: 600;">23 May 2026 at 06:00 PM Sharp</span>
                 </div>
                 
                 <div class="node-divider"></div>
@@ -285,6 +306,19 @@
                 <div class="itinerary-node">
                     <span class="node-tag">Rides</span>
                     <span class="node-info" style="color: var(--text-sub); font-size: 0.85rem;">Those who have bikes or cars, please bring them along to help pool everyone!</span>
+                </div>
+
+                <div class="node-divider"></div>
+
+                <!-- Call Support Action Framework Node -->
+                <div class="itinerary-node">
+                    <span class="node-tag">Need Assistance?</span>
+                    <a href="tel:9691021378" class="phone-call-action-anchor">
+                        <button class="call-organizer-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transform: scaleX(-1);"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            Call Event Organiser
+                        </button>
+                    </a>
                 </div>
 
                 <div class="node-divider"></div>
@@ -345,8 +379,10 @@
         const ctx = canvas.getContext('2d');
         let fluidNodes = [];
         let networkBurst = [];
-        let globalDriftVelocity = 0.12; // Controlled via date calculation
+        let hoverParticles = [];
+        let globalDriftVelocity = 0.12; 
         let maxLineDistance = 130;
+        let isPortalUnlocked = false;
 
         function layoutMatrix() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', layoutMatrix);
@@ -386,6 +422,36 @@
             }
         }
 
+        /* --- Hover Micro-Ember Particle Blueprint --- */
+        class HoverParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 1.4;
+                this.vy = (Math.random() - 0.7) * 1.2 - 0.3; // Slight natural upward lift
+                this.radius = Math.random() * 1.5 + 0.5;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.01;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                // Luxury rich gold core output
+                ctx.fillStyle = 'rgba(223, 183, 108, 0.75)';
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = '#dfb76c';
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
         for (let i = 0; i < 25; i++) fluidNodes.push(new LiquidNode());
 
         function spawnBlastWave(x, y, color) {
@@ -394,7 +460,11 @@
 
         function runRenderLoop() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Render basic layout nodes
             fluidNodes.forEach(n => { n.drift(); n.render(); });
+            
+            // Build structural mesh links
             for (let i = 0; i < fluidNodes.length; i++) {
                 for (let j = i + 1; j < fluidNodes.length; j++) {
                     const lineDistance = Math.hypot(fluidNodes[i].x - fluidNodes[j].x, fluidNodes[i].y - fluidNodes[j].y);
@@ -404,25 +474,39 @@
                     }
                 }
             }
+            
+            // Process explosion bursts
             for(let i = networkBurst.length - 1; i >= 0; i--) {
                 networkBurst[i].update();
                 if(networkBurst[i].alpha <= 0) networkBurst.splice(i, 1);
                 else networkBurst[i].draw();
             }
+
+            // Process dynamic mouse hovers
+            for (let i = hoverParticles.length - 1; i >= 0; i--) {
+                hoverParticles[i].update();
+                if (hoverParticles[i].alpha <= 0) {
+                    hoverParticles.splice(i, 1);
+                } else {
+                    hoverParticles[i].draw();
+                }
+            }
+            
             requestAnimationFrame(runRenderLoop);
         }
         runRenderLoop();
 
-        /* --- Same-Day Countdown & Escalation Logic Engine --- */
-        const targetTime = new Date("May 30, 2026 18:00:00").getTime();
+        /* --- Saturday, 23 May Countdown & Escalation Logic Engine --- */
+        const targetTime = new Date("May 23, 2026 18:00:00").getTime();
 
         function runClockPipeline() {
             const now = new Date().getTime(); const distance = targetTime - now;
             if (distance < 0) {
-                document.getElementById('timer-status').innerText = "Time's Up!";
+                document.getElementById('timer-status').innerText = "The Party Has Started!";
                 document.getElementById('timer-status').style.color = "#ef4444";
                 document.getElementById('timer-box').style.borderColor = "rgba(239, 68, 68, 0.4)";
                 document.getElementById('timer-digits').innerHTML = "<span style='color:#ef4444; font-size:0.9rem; letter-spacing:1px; font-weight:800;'>HEAD TO NIRANJAN'S HOUSE RIGHT NOW</span>";
+                computeTemporalEscalation(0, 0);
                 return;
             }
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -445,23 +529,20 @@
             const noticeTag = document.getElementById('notice-tag');
             
             if (daysLeft <= 0) {
-                // Extreme Stage: Final 24 hours approach
-                globalDriftVelocity = 0.45; // Fast energetic particles
+                globalDriftVelocity = 0.45; 
                 maxLineDistance = 160;
                 root.style.setProperty('--escalation-glow', 'inset 0 0 25px rgba(255, 159, 28, 0.15)');
-                root.style.setProperty('--escalation-pulse', '0.6s'); // Hyper pulse vault
+                root.style.setProperty('--escalation-pulse', '0.6s'); 
                 timerBox.style.borderColor = "var(--neon-amber)";
                 noticeTag.style.background = "rgba(239, 68, 68, 0.05)";
                 noticeTag.style.borderColor = "rgba(239, 68, 68, 0.3)";
             } else if (daysLeft <= 3) {
-                // High Stage: 3 days remaining close watch
                 globalDriftVelocity = 0.25; 
                 maxLineDistance = 145;
                 root.style.setProperty('--escalation-glow', 'inset 0 0 15px rgba(223, 183, 108, 0.08)');
                 root.style.setProperty('--escalation-pulse', '1.2s');
                 timerBox.style.borderColor = "rgba(212, 175, 55, 0.3)";
             } else {
-                // Default Standard Staging Frame
                 globalDriftVelocity = 0.12;
                 maxLineDistance = 130;
                 root.style.setProperty('--escalation-glow', '0px 0px 0px transparent');
@@ -502,7 +583,7 @@
                 uiFrame.style.opacity = '1';
                 uiFrame.style.transform = 'translateY(0) scale(1)';
                 uiFrame.classList.add('active'); 
-                initSpecularLighting();
+                initInteractivePhysicsEngines();
                 
                 scrambleText('title-1', "Shivam's Birthday Bash");
                 scrambleText('title-2', "Dr. Shivani Miskare's Success");
@@ -537,17 +618,34 @@
             localStorage.setItem('vipPassClaimed', 'true');
         }
 
-        /* --- Specular Shine Engine --- */
-        function initSpecularLighting() {
+        /* --- Combined Specular Lighting & Hover Particle Spawner Engine --- */
+        function initInteractivePhysicsEngines() {
+            isPortalUnlocked = true;
             const tiltCard = document.getElementById('tilt-card');
             const root = document.documentElement;
+            
             document.addEventListener('mousemove', (event) => {
+                // Update Specular Card Highlight Properties
                 const cardRect = tiltCard.getBoundingClientRect();
                 const specX = event.clientX - cardRect.left;
                 const specY = event.clientY - cardRect.top;
                 root.style.setProperty('--mouse-x', `${specX}px`);
                 root.style.setProperty('--mouse-y', `${specY}px`);
+                
+                // Inject interactive hover particles into stack
+                if (isPortalUnlocked && hoverParticles.length < 120) {
+                    for(let i=0; i<2; i++) { // Dual emitter array optimization
+                        hoverParticles.push(new HoverParticle(event.clientX, event.clientY));
+                    }
+                }
             });
+
+            // Touch device dragging support mapping
+            document.addEventListener('touchmove', (event) => {
+                if(isPortalUnlocked && event.touches.length > 0 && hoverParticles.length < 120) {
+                    hoverParticles.push(new HoverParticle(event.touches[0].clientX, event.touches[0].clientY));
+                }
+            }, { passive: true });
         }
     </script>
 </body>
