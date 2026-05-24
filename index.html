@@ -2,765 +2,323 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PARTY INVITATION</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VetTrack Luxe | Premier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap');
-
-        :root {
-            --surface-glass: rgba(10, 12, 18, 0.55);
-            --border-specular: rgba(223, 183, 108, 0.16);
-            --gold-core: #dfb76c;
-            --gold-bright: #fff3d6;
-            --gold-glow: rgba(223, 183, 108, 0.22);
-            --neon-amber: #ff9f1c;
-            --neon-amber-glow: rgba(255, 159, 28, 0.35);
-            --neon-green: #39ff14;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --mouse-x: 50%;
-            --mouse-y: 50%;
-            --royal-color-1: #030408;
-            --royal-color-2: #090e1a;
-            --royal-color-3: #140b12;
-            --royal-color-4: #050b0a;
-            
-            /* Dynamic Escalation Modifiers via JS */
-            --escalation-glow: 0px 0px 0px transparent;
-            --escalation-pulse: 2s;
+        :root { 
+            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
+            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
+            --text: #FFFFFF; --sub: #94A3B8;
         }
 
-        /* --- Global Scrollbar & Text Selection Removals --- */
-        ::-webkit-scrollbar { display: none; width: 0px; background: transparent; }
-
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            scrollbar-width: none; -ms-overflow-style: none;
-            
-            /* Strict Security Text Locks */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-        }
-
-        body, html {
-            width: 100%; height: 100%; overflow: hidden; perspective: 1200px;
-            background: radial-gradient(circle at 30% 20%, var(--royal-color-1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 40%, var(--royal-color-2) 0%, transparent 60%),
-                        radial-gradient(circle at 40% 80%, var(--royal-color-3) 0%, transparent 50%),
-                        radial-gradient(circle at 10% 90%, var(--royal-color-4) 0%, transparent 45%),
-                        #020204;
-            transition: var(--royal-color-1) 4s ease, var(--royal-color-2) 4s ease, var(--royal-color-3) 4s ease, var(--royal-color-4) 4s ease;
-        }
-
-        #fluid-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
-
-        .plasma-glow {
-            position: fixed; width: 140vw; height: 140vw; background: radial-gradient(circle, rgba(223, 183, 108, 0.04) 0%, transparent 65%);
-            z-index: 1; top: -40vw; left: -40vw; animation: atmosphericDrift 25s infinite alternate ease-in-out; pointer-events: none;
-        }
-
-        @keyframes atmosphericDrift {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            100% { transform: translate(6vw, 4vh) scale(1.15) rotate(15deg); }
-        }
-
-        /* --- Entry Unlock Portal Screen --- */
-        #portal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #0a0b12 0%, #010203 100%);
-            z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .portal-node-button {
-            width: 92px; height: 92px; border-radius: 50%; border: 1px solid var(--gold-core);
-            display: flex; justify-content: center; align-items: center; cursor: pointer;
-            background: rgba(223, 183, 108, 0.01); animation: coreBreathe 2s infinite ease-in-out;
-        }
-
-        @keyframes coreBreathe {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--gold-glow); }
-            50% { transform: scale(1.05); box-shadow: 0 0 45px var(--gold-core), inset 0 0 14px var(--gold-glow); border-color: var(--gold-bright); }
-        }
-
-        .portal-label {
-            margin-top: 24px; font-family: 'Montserrat', sans-serif; font-size: 0.65rem;
-            letter-spacing: 6px; color: var(--text-sub); text-transform: uppercase; font-weight: 600;
-        }
-
-        /* --- Core Layout Wrapper --- */
-        .container {
-            position: relative; z-index: 2; width: 100%; max-width: 440px; padding: 16px; margin: 0 auto;
-            display: flex; flex-direction: column; min-height: 100vh; justify-content: center;
-            opacity: 0; transform: translateY(40px) scale(0.95);
-            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* --- Premium Glassmorphic Card Container --- */
-        .premium-spec-card {
-            background: var(--surface-glass); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border: 1px solid var(--border-specular); border-radius: 32px; padding: 36px 24px;
-            box-shadow: 0 60px 120px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            text-align: center; max-height: 94vh; overflow-y: auto; position: relative;
-            box-shadow: var(--escalation-glow), 0 60px 120px rgba(0, 0, 0, 0.9);
-            transition: box-shadow 1s ease, border-color 0.4s ease, transform 0.3s ease;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
-        .premium-spec-card::-webkit-scrollbar { display: none; }
-
-        .premium-spec-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 32px;
-            background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.06) 0%, transparent 50%);
-            pointer-events: none; z-index: 3;
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
+            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
+                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
+            background-attachment: fixed;
         }
 
-        /* --- Cascading Text Animations --- */
-        .anim-reveal { opacity: 0; transform: translateY(15px); }
-        .container.active .anim-reveal { animation: textRevealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
 
-        .delay-1 { animation-delay: 0.1s !important; }
-        .delay-2 { animation-delay: 0.25s !important; }
-        .delay-3 { animation-delay: 0.4s !important; }
-        .delay-4 { animation-delay: 0.55s !important; }
-        .delay-5 { animation-delay: 0.7s !important; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+        #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
+        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
+        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
 
-        @keyframes textRevealUp { to { opacity: 1; transform: translateY(0); } }
-
-        .monogram-sigil { font-family: 'Cinzel', serif; font-size: 1.65rem; color: var(--gold-core); letter-spacing: 7px; margin-bottom: 24px; }
-        .invitation-tier-line { font-family: 'Montserrat', sans-serif; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 4px; color: var(--text-sub); margin-bottom: 24px; font-weight: 500; }
-
-        /* Metallic Shimmer Header */
-        .gala-title {
-            font-family: 'Cinzel', serif; font-size: 1.55rem; font-weight: 600; letter-spacing: 1px; line-height: 1.35;
-            background: linear-gradient(90deg, #ffffff, var(--gold-bright), #ffffff); background-size: 200% auto;
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: runFoilShimmer 4s infinite linear;
-        }
-        @keyframes runFoilShimmer { to { background-position: 200% center; } }
-        .gala-meta { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; color: var(--text-sub); margin-top: 5px; letter-spacing: 0.5px; }
-        .conjunction-element { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--gold-core); margin: 16px 0; opacity: 0.4; }
-
-        .notice-banner {
-            background: rgba(223, 183, 108, 0.01); border-top: 1px solid rgba(223, 183, 108, 0.12); border-bottom: 1px solid rgba(223, 183, 108, 0.12);
-            color: #fca5a5; padding: 12px; font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin: 24px 0; display: block;
-            transition: all 0.5s ease;
-        }
-
-        /* --- High-Contrast Neon Countdown --- */
-        .countdown-container { background: rgba(255, 159, 28, 0.02); border: 1px solid rgba(255, 159, 28, 0.15); border-radius: 20px; padding: 18px 14px; margin: 24px 0; transition: all 0.5s ease; }
-        .countdown-label { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; color: #ffb703; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; margin-bottom: 12px; transition: color 0.5s ease; }
-        .countdown-digits { display: flex; justify-content: center; gap: 16px; font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 800; }
-        .digit-segment { display: flex; flex-direction: column; align-items: center; min-width: 50px; }
-        .digit-segment span:first-child { color: var(--neon-amber); text-shadow: 0 0 12px var(--neon-amber-glow); letter-spacing: 0.5px; transition: color 0.5s ease; }
-        .digit-segment span:last-child { font-size: 0.55rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 600; }
-
-        /* --- Interactive Surprise Module --- */
-        .surprise-vault {
-            background: linear-gradient(135deg, rgba(223, 183, 108, 0.08) 0%, rgba(10,12,18,0.9) 100%);
-            border: 1px dashed var(--gold-core); border-radius: 20px; padding: 24px 18px; margin: 28px 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: structurePulse var(--escalation-pulse) infinite ease-in-out;
+        .stat-card {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
+            padding: 30px; border-radius: 35px; margin-bottom: 30px;
+            box-shadow: 0 20px 40px -10px var(--p-glow);
             position: relative; overflow: hidden;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255,255,255,0.2);
         }
         
-        @keyframes structurePulse {
-            0%, 100% { transform: scale(1); border-color: var(--gold-core); box-shadow: 0 0 10px rgba(223, 183, 108, 0.05); }
-            50% { transform: scale(1.01); border-color: var(--neon-amber); box-shadow: 0 0 20px rgba(255, 159, 28, 0.15); }
-        }
+        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
+        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
         
-        .surprise-btn {
-            background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold-core) 100%);
-            color: #030406; border: none; width: 100%; padding: 16px; border-radius: 12px;
-            font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 800; letter-spacing: 1.8px;
-            text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 24px var(--gold-glow);
-            transition: all 0.3s ease;
+        .quick-log-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 14px; border-radius: 24px;
+            display: flex; flex-direction: column; align-items: center;
+            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
+            z-index: 2; min-width: 110px;
         }
-        .surprise-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(223, 183, 108, 0.4); }
-        .surprise-btn:active { transform: scale(0.97); }
+        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
+        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
-        .secret-reward-unlocked {
-            display: none; opacity: 0; transform: scale(0.9);
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 8px; padding: 16px; background: rgba(57, 255, 20, 0.03);
-            border: 1px solid var(--neon-green); border-radius: 14px;
-            box-shadow: inset 0 0 15px rgba(57, 255, 20, 0.05), 0 4px 20px rgba(57, 255, 20, 0.1);
+        .nav-pill { 
+            display: flex; align-items: center; background: var(--card); padding: 8px; 
+            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
+            backdrop-filter: blur(10px);
         }
-        .reward-badge {
-            font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 800; color: var(--neon-green);
-            text-shadow: 0 0 12px rgba(57, 255, 20, 0.5); letter-spacing: 2px; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
+        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
 
-        /* --- Dynamic Phone Action Anchor Element --- */
-        .phone-call-action-anchor {
-            text-decoration: none; display: flex; flex-direction: column; align-items: center; width: 100%;
-            -webkit-user-select: auto; user-select: auto;
-        }
-        .call-organizer-btn {
-            background: transparent; border: 1px solid var(--neon-amber); color: #ffffff;
-            width: 100%; padding: 12px; border-radius: 12px; font-family: 'Montserrat', sans-serif;
-            font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-            cursor: pointer; box-shadow: 0 0 15px rgba(255, 159, 28, 0.05); display: flex;
-            align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease;
-        }
-        .call-organizer-btn:active { transform: scale(0.98); background: rgba(255, 159, 28, 0.08); }
+        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
 
-        /* --- Flow Itinerary --- */
-        .itinerary-structure { display: flex; flex-direction: column; gap: 16px; margin: 28px 0 12px 0; }
-        .itinerary-node { display: flex; flex-direction: column; align-items: center; }
-        .node-tag { font-family: 'Montserrat', sans-serif; font-size: 0.55rem; text-transform: uppercase; color: var(--gold-core); letter-spacing: 2px; margin-bottom: 5px; font-weight: 700; }
-        .node-info { font-family: 'Montserrat', sans-serif; font-size: 0.88rem; color: #ffffff; font-weight: 500; line-height: 1.4; }
-        .node-divider { width: 45px; height: 1px; background: linear-gradient(90deg, transparent, var(--border-specular), transparent); margin: 6px auto; }
-
-        .enforced-footer-seal {
-            margin-top: 36px; width: 100%; background: transparent; border: 1px solid var(--gold-core); color: var(--gold-bright);
-            padding: 16px; font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; box-shadow: 0 0 20px rgba(223, 183, 108, 0.05);
+        .day-item { 
+            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
+            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
+            border: 1px solid var(--surface); backdrop-filter: blur(10px);
+            user-select: none;
         }
+        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
+        
+        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
+        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
 
-        /* --- Elegant Global Pulse Overlay for Active Party & Final Countdown Phase --- */
-        @keyframes pulseActiveLive {
-            0%, 100% { transform: scale(1.02); box-shadow: 0 0 35px rgba(57, 255, 20, 0.2), 0 60px 120px rgba(0, 0, 0, 0.9); }
-            50% { transform: scale(1.04); box-shadow: 0 0 55px rgba(57, 255, 20, 0.4), 0 60px 120px rgba(0, 0, 0, 0.9); }
+        .item-pill { 
+            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
         }
+        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
+        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
+        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
 
-        @keyframes pulseIntenseEscalation {
-            0%, 100% { transform: scale(1.01); box-shadow: 0 0 30px rgba(255, 69, 0, 0.25), 0 60px 120px rgba(0, 0, 0, 0.9); }
-            50% { transform: scale(1.03); box-shadow: 0 0 50px rgba(255, 159, 28, 0.45), 0 60px 120px rgba(0, 0, 0, 0.9); }
-        }
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
+        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
+        .sheet.up { transform: translateY(0); }
+        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
+        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
+        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
+        
+        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div class="plasma-glow" id="ambient-plasma"></div>
-    <canvas id="fluid-canvas"></canvas>
+<div id="welcomeScreen">
+    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
+    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
+</div>
 
-    <!-- Entry Portal Sheet -->
-    <div id="portal">
-        <div class="portal-node-button" onclick="unlockStationGrid()">
-            <svg style="width:24px; height:24px; fill:none; stroke:var(--gold-core); stroke-width:1.5" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM12 6v6l4 2"/></svg>
+<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
+    <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
+        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
+        <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
+            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
         </div>
-        <div class="portal-label">Open Invitation</div>
+        <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
+        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
+    </div>
+</div>
+
+<div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
+    <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
+        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
+        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
+        <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
+        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
     </div>
 
-    <!-- UI Core Layout -->
-    <div class="container" id="ui">
-        <div class="premium-spec-card" id="tilt-card">
-            
-            <div class="monogram-sigil anim-reveal delay-1">S ◆ M</div>
-            <div class="invitation-tier-line anim-reveal delay-1">You are warmly invited</div>
-            
-            <!-- Clear Milestones -->
-            <div class="gala-title anim-reveal delay-2" id="title-1">Shivam's Birthday Bash</div>
-            <div class="gala-meta anim-reveal delay-2">Let's celebrate another great year together</div>
-            
-            <div class="conjunction-element anim-reveal delay-2">✦</div>
-            
-            <div class="gala-title anim-reveal delay-2" id="title-2">Dr. Shivani Miskare's Success</div>
-            <div class="gala-meta anim-reveal delay-2">Celebrating her completing her MBBS degree beautifully</div>
-            
-            <span class="notice-banner anim-reveal delay-3" id="notice-tag">Important: Please turn off your mess or tiffin for tonight!</span>
-
-            <!-- Live Countdown Linked to May 23 -->
-            <div class="countdown-container anim-reveal delay-3" id="timer-box">
-                <div class="countdown-label" id="timer-status">Party starts within</div>
-                <div class="countdown-digits" id="timer-digits">
-                    <div class="digit-segment"><span id="days">00</span><span>Days</span></div>
-                    <div class="digit-segment"><span id="hours">00</span><span>Hours</span></div>
-                    <div class="digit-segment"><span id="minutes">00</span><span>Mins</span></div>
-                    <div class="digit-segment"><span id="seconds">00</span><span>Secs</span></div>
-                </div>
-            </div>
-
-            <!-- Enhanced Surprise Component -->
-            <div class="surprise-vault anim-reveal delay-4" id="feast-vault">
-                <button class="surprise-btn" id="vault-trigger" onclick="unlockDopamineToken()">Claim your Feast Permit 🎁</button>
-                <div class="secret-reward-unlocked" id="vault-content">
-                    <div class="reward-badge">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        VIP FOOD PASS UNLOCKED
-                    </div>
-                    <div style="font-family:'Montserrat'; font-size:0.75rem; color:#fff; margin-top:8px; letter-spacing:0.5px; font-weight: 500; line-height: 1.4;">Your guest visit is confirmed for vip topa gang passes for dinner. See you at the table!</div>
-                </div>
-            </div>
-
-            <!-- Details Flow -->
-            <div class="itinerary-structure anim-reveal delay-5">
-                <div class="itinerary-node">
-                    <span class="node-tag">When</span>
-                    <span class="node-info" style="color: var(--gold-core); font-weight: 600;">23 May 2026 at 06:00 PM Sharp</span>
-                </div>
-                
-                <div class="node-divider"></div>
-                
-                <div class="itinerary-node">
-                    <span class="node-tag">Where to Gather</span>
-                    <span class="node-info">Niranjan's House</span>
-                </div>
-                
-                <div class="node-divider"></div>
-
-                <div class="itinerary-node">
-                    <span class="node-tag">Please Note</span>
-                    <span class="node-info" style="color: #fca5a5;">Please be exactly on time. We won't be able to wait for latecomers so that we don't get delayed in reaching the venue!</span>
-                </div>
-                
-                <div class="node-divider"></div>
-                
-                <div class="itinerary-node">
-                    <span class="node-tag">The Party Venue</span>
-                    <span class="node-info" style="color: var(--text-sub); font-size: 0.85rem;">Will be disclosed once everyone gathers at Niranjan's house</span>
-                </div>
-                
-                <div class="node-divider"></div>
-                
-                <div class="itinerary-node">
-                    <span class="node-tag">Rides</span>
-                    <span class="node-info" style="color: var(--text-sub); font-size: 0.85rem;">Those who have bikes or scooty, please bring them along to help pool everyone!</span>
-                </div>
-
-                <div class="node-divider"></div>
-
-                <!-- Call Support Action Framework Node -->
-                <div class="itinerary-node">
-                    <span class="node-tag">Need Assistance?</span>
-                    <a href="tel:9691021378" class="phone-call-action-anchor">
-                        <button class="call-organizer-btn">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transform: scaleX(-1);"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                            Call Event Organiser
-                        </button>
-                    </a>
-                </div>
-
-                <div class="node-divider"></div>
-
-                <div class="itinerary-node">
-                    <span class="node-tag">Brought to you by</span>
-                    <span class="node-info" style="color: var(--gold-core); font-family: 'Cinzel', serif; font-size: 0.82rem; letter-spacing: 1px;">Organised in collaboration with Topa Gang</span>
-                </div>
-            </div>
-
-            <div class="enforced-footer-seal anim-reveal delay-5" id="card-seal">
-                See You There!
-            </div>
+    <div class="stat-card">
+        <div class="stat-left">
+            <div class="label">Total Bill</div>
+            <div class="total-val" id="totalValue">₹0</div>
+            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
+        </div>
+        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
+            <i id="quickIcon">⚡</i>
+            <span id="quickText">Loading...</span>
         </div>
     </div>
 
-    <script>
-        /* --- Anti-Developer Tools & Security Engine Infrastructure --- */
-        document.addEventListener('contextmenu', event => event.preventDefault());
+    <div class="nav-pill">
+        <button onclick="changeMonth(-1)">‹</button>
+        <span id="monthLabel">Current</span>
+        <button onclick="changeMonth(1)">›</button>
+    </div>
+    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
 
-        document.addEventListener('keydown', event => {
-            if (
-                event.key === "F12" ||
-                (event.ctrlKey && event.shiftKey && (event.key === "I" || event.key === "J" || event.key === "C")) ||
-                (event.ctrlKey && event.key === "U")
-            ) {
-                event.preventDefault();
-                return false;
-            }
+    <div id="logsGrid"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
+        projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
+        messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
+    };
+
+    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
+    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
+    let config = { name: "", mealPrice: 50, waterPrice: 30 };
+    
+    // SCROLL GUARD VARIABLES
+    let longPressTimer;
+    let startY = 0;
+    let isScrolling = false;
+
+    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
+    window.logout = () => signOut(auth).then(() => location.reload());
+
+    onAuthStateChanged(auth, async (u) => {
+        if (u) { 
+            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
+            document.getElementById('userPfp').src = u.photoURL;
+            const userDoc = await getDoc(doc(db, "users", u.uid));
+            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
+            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
+            document.getElementById('userLabel').innerText = config.name;
+            updateGreet(); syncData(); 
+        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
+    });
+
+    function isCurrentMonth() {
+        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
+    }
+
+    function updateGreet() {
+        const h = new Date().getHours();
+        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : "Good Evening 🌇";
+    }
+
+    function syncData() {
+        onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
+            logs = d.data() || {}; renderGrid();
         });
+    }
 
-        setInterval(() => {
-            (function() { return false; }["constructor"]("debugger")());
-        }, 200);
+    window.quickLog = async () => {
+        if (!isCurrentMonth()) return;
+        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
+        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
+        if(obj[type] === 1) return;
+        obj[type] = 1;
+        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
+    };
 
-        /* --- Luxury Changing Background Patterns --- */
-        const royalPalettes = [
-            ["#04050e", "#0e091b", "#140713", "#040c0b"], 
-            ["#07030d", "#1c0b15", "#061314", "#090913"], 
-            ["#02040b", "#09121a", "#12080a", "#070c06"], 
-            ["#0b060d", "#11091c", "#170c0d", "#05080e"]  
-        ];
-
-        function shiftRoyalGradient() {
-            const chosenIndex = Math.floor(Math.random() * royalPalettes.length);
-            const palette = royalPalettes[chosenIndex];
-            const rootStyles = document.documentElement.style;
-            rootStyles.setProperty('--royal-color-1', palette[0]);
-            rootStyles.setProperty('--royal-color-2', palette[1]);
-            rootStyles.setProperty('--royal-color-3', palette[2]);
-            rootStyles.setProperty('--royal-color-4', palette[3]);
-        }
-        setInterval(shiftRoyalGradient, 5000);
-        shiftRoyalGradient();
-
-        /* --- Dynamic Canvas System Global States --- */
-        const canvas = document.getElementById('fluid-canvas');
-        const ctx = canvas.getContext('2d');
-        let fluidNodes = [];
-        let networkBurst = [];
-        let hoverParticles = [];
-        let globalDriftVelocity = 0.12; 
-        let maxLineDistance = 130;
-        let isPortalUnlocked = false;
-        let stopRenderLoop = false;
-
-        function layoutMatrix() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', layoutMatrix);
-        layoutMatrix();
-
-        class LiquidNode {
-            constructor() {
-                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 2; this.vy = (Math.random() - 0.5) * 2;
-                this.r = Math.random() * 1.2 + 0.4;
-            }
-            drift() {
-                this.x += this.vx * globalDriftVelocity; this.y += this.vy * globalDriftVelocity;
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-            }
-            render() {
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(223, 183, 108, 0.16)'; ctx.fill();
-            }
-        }
-
-        class BurstParticle {
-            constructor(x, y, color) {
-                this.x = x; this.y = y; this.color = color;
-                this.radius = Math.random() * 3 + 1.5;
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 7 + 4;
-                this.vx = Math.cos(angle) * speed; this.vy = Math.sin(angle) * speed;
-                this.g = 0.12; this.alpha = 1;
-            }
-            update() { this.x += this.vx; this.y += this.vy; this.vy += this.g; this.alpha -= 0.016; }
-            draw() {
-                ctx.save(); ctx.globalAlpha = this.alpha; ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color; ctx.shadowBlur = 10; ctx.shadowColor = this.color; ctx.fill(); ctx.restore();
-            }
-        }
-
-        class HoverParticle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.vx = (Math.random() - 0.5) * 1.4;
-                this.vy = (Math.random() - 0.7) * 1.2 - 0.3; 
-                this.radius = Math.random() * 1.5 + 0.5;
-                this.alpha = 1;
-                this.decay = Math.random() * 0.015 + 0.01;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.alpha -= this.decay;
-            }
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(223, 183, 108, 0.75)';
-                ctx.shadowBlur = 4;
-                ctx.shadowColor = '#dfb76c';
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        for (let i = 0; i < 25; i++) fluidNodes.push(new LiquidNode());
-
-        function spawnBlastWave(x, y, color) {
-            for(let i=0; i<90; i++) networkBurst.push(new BurstParticle(x, y, color));
-        }
-
-        function runRenderLoop() {
-            if (stopRenderLoop) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                return;
-            }
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            fluidNodes.forEach(n => { n.drift(); n.render(); });
-            
-            for (let i = 0; i < fluidNodes.length; i++) {
-                for (let j = i + 1; j < fluidNodes.length; j++) {
-                    const lineDistance = Math.hypot(fluidNodes[i].x - fluidNodes[j].x, fluidNodes[i].y - fluidNodes[j].y);
-                    if (lineDistance < maxLineDistance) {
-                        ctx.beginPath(); ctx.moveTo(fluidNodes[i].x, fluidNodes[i].y); ctx.lineTo(fluidNodes[j].x, fluidNodes[j].y);
-                        ctx.strokeStyle = `rgba(223, 183, 108, ${0.025 * (1 - lineDistance / maxLineDistance)})`; ctx.lineWidth = 0.5; ctx.stroke();
-                    }
-                }
-            }
-            
-            for(let i = networkBurst.length - 1; i >= 0; i--) {
-                networkBurst[i].update();
-                if(networkBurst[i].alpha <= 0) networkBurst.splice(i, 1);
-                else networkBurst[i].draw();
-            }
-
-            for (let i = hoverParticles.length - 1; i >= 0; i--) {
-                hoverParticles[i].update();
-                if (hoverParticles[i].alpha <= 0) {
-                    hoverParticles.splice(i, 1);
-                } else {
-                    hoverParticles[i].draw();
-                }
-            }
-            
-            requestAnimationFrame(runRenderLoop);
-        }
-        runRenderLoop();
-
-        /* --- Global Countdown & Multi-Phase Timeline Engine --- */
-        const targetTime = new Date("May 23, 2026 18:00:00").getTime();
-        const expiryTime = new Date("May 23, 2026 21:00:00").getTime();
-
-        function runClockPipeline() {
-            const now = new Date().getTime(); 
-            
-            // PHASE 3: Expired State (After 9:00 PM)
-            if (now >= expiryTime) {
-                stopRenderLoop = true;
-                isPortalUnlocked = false;
-                document.getElementById('portal').style.display = 'none';
-                document.getElementById('ambient-plasma').style.display = 'none';
-                
-                const uiContainer = document.getElementById('ui');
-                uiContainer.style.opacity = '1';
-                uiContainer.style.transform = 'translateY(0) scale(1)';
-                
-                uiContainer.innerHTML = `
-                    <div class="premium-spec-card" style="border-color: rgba(239, 68, 68, 0.25); box-shadow: 0 40px 100px rgba(0,0,0,0.95); animation: none; padding: 48px 24px;">
-                        <div class="monogram-sigil" style="color: var(--text-sub); opacity: 0.5; margin-bottom: 16px;">S ◆ M</div>
-                        <div class="gala-title" style="font-size: 1.45rem; background: linear-gradient(90deg, #94a3b8, #f1f5f9, #94a3b8); -webkit-background-clip: text; margin-bottom: 16px;">
-                            Invitation Expired
-                        </div>
-                        <div style="width: 40px; height: 1px; background: rgba(255,255,255,0.1); margin: 16px auto;"></div>
-                        <p style="font-family: 'Montserrat', sans-serif; font-size: 0.88rem; color: var(--text-main); line-height: 1.6; font-weight: 400; letter-spacing: 0.5px;">
-                            The event has already successfully happened.
-                        </p>
-                        <p style="font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--gold-core); margin-top: 32px; letter-spacing: 2px; font-weight: 600;">
-                            Thank you for your kind consideration.
-                        </p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // PHASE 2: Live Party State (Between 6:00 PM and 9:00 PM)
-            if (now >= targetTime && now < expiryTime) {
-                const timerStatus = document.getElementById('timer-status');
-                const timerDigits = document.getElementById('timer-digits');
-                const timerBox = document.getElementById('timer-box');
-                const tiltCard = document.getElementById('tilt-card');
-                
-                if(timerStatus && timerDigits) {
-                    timerStatus.innerText = "⚡ THE CELEBRATION IS LIVE ⚡";
-                    timerStatus.style.color = "#39ff14";
-                    timerStatus.style.textShadow = "0 0 10px rgba(57,255,20,0.5)";
-                    timerBox.style.background = "rgba(57, 255, 20, 0.03)";
-                    timerBox.style.borderColor = "rgba(57, 255, 20, 0.4)";
-                    timerDigits.innerHTML = "<span style='color:#f8fafc; font-size:0.95rem; letter-spacing:1.5px; font-weight:700; font-family:Montserrat; text-transform:uppercase;'>The party is going on right now! Head over!</span>";
-                    
-                    tiltCard.style.animation = "pulseActiveLive 2s infinite ease-in-out";
-                }
-                computeTemporalEscalation(0, 0, 0);
-                return;
-            }
-            
-            // PHASE 1: Active Countdown Flow (Before 6:00 PM)
-            const distance = targetTime - now;
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            
-            const daysEl = document.getElementById('days');
-            const hoursEl = document.getElementById('hours');
-            const minsEl = document.getElementById('minutes');
-            const secsEl = document.getElementById('seconds');
-            
-            if(daysEl) daysEl.innerText = String(days).padStart(2, '0');
-            if(hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
-            if(minsEl) minsEl.innerText = String(minutes).padStart(2, '0');
-            if(secsEl) secsEl.innerText = String(seconds).padStart(2, '0');
-
-            const totalMinutesLeft = (days * 24 * 60) + (hours * 60) + minutes;
-            computeTemporalEscalation(days, hours, totalMinutesLeft);
-        }
+    function renderGrid() {
+        const current = isCurrentMonth();
+        document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
+        document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
+        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
         
-        function computeTemporalEscalation(daysLeft, hoursLeft, totalMinutesLeft) {
-            const root = document.documentElement;
-            const timerBox = document.getElementById('timer-box');
-            const timerStatus = document.getElementById('timer-status');
-            const noticeTag = document.getElementById('notice-tag');
-            const tiltCard = document.getElementById('tilt-card');
+        const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
+        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+
+        const type = todayDate.getHours() < 16 ? 'l' : 'd';
+        const isMarked = logs[todayDate.getDate()] && logs[todayDate.getDate()][type] === 1;
+        
+        if (current) {
+            document.getElementById('quickIcon').innerText = isMarked ? '✅' : '⚡';
+            document.getElementById('quickText').innerText = isMarked ? 'Marked' : `Mark ${type==='l'?'Lunch':'Dinner'}`;
+            if(isMarked) document.getElementById('quickBtn').classList.add('done');
+            else document.getElementById('quickBtn').classList.remove('done');
+        } else {
+            document.getElementById('quickIcon').innerText = '🔒';
+            document.getElementById('quickText').innerText = 'Locked';
+        }
+
+        for (let i = 1; i <= daysCount; i++) {
+            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
+            const card = document.createElement('div');
+            card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
             
-            if (!timerBox || !noticeTag) return;
-            
-            const now = new Date().getTime();
-            if (now >= targetTime) return; // Handled by live state module
-            
-            // SUB-CRITICAL PHASE: Less than 50 minutes remaining!
-            if (totalMinutesLeft <= 50 && daysLeft === 0 && hoursLeft === 0) {
-                globalDriftVelocity = 0.95; // Hyper-accelerate canvas node physics
-                maxLineDistance = 180;
-                root.style.setProperty('--escalation-glow', 'inset 0 0 35px rgba(255, 69, 0, 0.35)');
-                
-                if (timerStatus) {
-                    timerStatus.innerText = "FINAL REMINDER";
-                    timerStatus.style.color = "#ff4500";
-                    timerStatus.style.textShadow = "0 0 15px rgba(255, 69, 0, 0.6)";
-                }
-                
-                timerBox.style.background = "rgba(255, 69, 0, 0.05)";
-                timerBox.style.borderColor = "#ff4500";
-                
-                // Switch segment digits to aggressive crimson-orange core aura output
-                const digits = timerBox.querySelectorAll('.digit-segment span:first-child');
-                digits.forEach(d => {
-                    d.style.color = "#ff4500";
-                    d.style.textShadow = "0 0 15px rgba(255, 69, 0, 0.7)";
+            if (current) {
+                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
+                card.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                    isScrolling = false;
+                    longPressTimer = setTimeout(() => {
+                        if (!isScrolling) openNote(i);
+                    }, 650);
+                }, { passive: true });
+
+                card.addEventListener('touchmove', (e) => {
+                    let moveY = e.touches[0].clientY;
+                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
+                        isScrolling = true;
+                        clearTimeout(longPressTimer);
+                    }
+                }, { passive: true });
+
+                card.addEventListener('touchend', () => {
+                    clearTimeout(longPressTimer);
                 });
-                
-                noticeTag.style.background = "rgba(255, 69, 0, 0.08)";
-                noticeTag.style.borderColor = "rgba(255, 69, 0, 0.5)";
-                noticeTag.style.color = "#fff";
-                
-                if (tiltCard) {
-                    tiltCard.style.animation = "pulseIntenseEscalation 0.8s infinite ease-in-out";
-                }
             }
-            // CRITICAL PHASE: Under 24 hours left but more than 50 mins
-            else if (daysLeft <= 0) {
-                globalDriftVelocity = 0.45; 
-                maxLineDistance = 160;
-                root.style.setProperty('--escalation-glow', 'inset 0 0 25px rgba(255, 159, 28, 0.15)');
-                root.style.setProperty('--escalation-pulse', '0.6s'); 
-                timerBox.style.borderColor = "var(--neon-amber)";
-                noticeTag.style.background = "rgba(239, 68, 68, 0.05)";
-                noticeTag.style.borderColor = "rgba(239, 68, 68, 0.3)";
-            } 
-            // APPROACHING PHASE: Under 3 days left
-            else if (daysLeft <= 3) {
-                globalDriftVelocity = 0.25; 
-                maxLineDistance = 145;
-                root.style.setProperty('--escalation-glow', 'inset 0 0 15px rgba(223, 183, 108, 0.08)');
-                root.style.setProperty('--escalation-pulse', '1.2s');
-                timerBox.style.borderColor = "rgba(212, 175, 55, 0.3)";
-            } 
-            // DEFAULT PHASE
-            else {
-                globalDriftVelocity = 0.12;
-                maxLineDistance = 130;
-                root.style.setProperty('--escalation-glow', '0px 0px 0px transparent');
-                root.style.setProperty('--escalation-pulse', '2s');
-            }
+
+            card.innerHTML = `
+                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
+                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
+                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
+                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
+                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
+            `;
+            grid.appendChild(card);
         }
-        
-        setInterval(runClockPipeline, 1000); 
-        runClockPipeline();
+        calculate();
+    }
 
-        /* --- Text Matrix Scrambler Engine --- */
-        function scrambleText(elementId, ultimateText) {
-            const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789◆★🔥⚡";
-            let iterations = 0;
-            const targetElement = document.getElementById(elementId);
-            if(!targetElement) return;
-            
-            const interval = setInterval(() => {
-                targetElement.innerText = ultimateText.split("")
-                    .map((char, index) => {
-                        if(index < iterations) return ultimateText[index];
-                        return charset[Math.floor(Math.random() * charset.length)];
-                    }).join("");
-                
-                if(iterations >= ultimateText.length) clearInterval(interval);
-                iterations += 1 / 2;
-            }, 30);
-        }
+    window.toggle = async (day, type) => {
+        if (!isCurrentMonth()) return;
+        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
+        obj[type] = obj[type] ? 0 : 1;
+        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
+    };
 
-        function unlockStationGrid() {
-            if(navigator.vibrate) navigator.vibrate([60, 30, 60]);
-            spawnBlastWave(window.innerWidth/2, window.innerHeight/2, '#dfb76c');
-            
-            document.getElementById('portal').style.opacity = '0';
-            document.getElementById('portal').style.transform = 'scale(1.04)';
-            
-            setTimeout(() => {
-                document.getElementById('portal').style.display = 'none';
-                
-                if(new Date().getTime() >= expiryTime) {
-                    runClockPipeline();
-                    return;
-                }
-                
-                const uiFrame = document.getElementById('ui');
-                uiFrame.style.opacity = '1';
-                uiFrame.style.transform = 'translateY(0) scale(1)';
-                uiFrame.classList.add('active'); 
-                initInteractivePhysicsEngines();
-                
-                scrambleText('title-1', "Shivam's Birthday Bash");
-                scrambleText('title-2', "Dr. Shivani Miskare's Success");
-                
-                checkPersistentStorageState();
-            }, 550);
-        }
+    window.openNote = (day) => {
+        activeDayId = day;
+        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
+        document.getElementById('noteInput').value = logs[day]?.n || "";
+        document.getElementById('noteOverlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
+    };
+    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
+    window.saveNote = async () => {
+        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
+        obj.n = document.getElementById('noteInput').value;
+        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
+        closeNote();
+    };
 
-        /* --- Local Storage Persistent State Engine --- */
-        function checkPersistentStorageState() {
-            if (localStorage.getItem('vipPassClaimed') === 'true') {
-                const trigger = document.getElementById('vault-trigger');
-                const content = document.getElementById('vault-content');
-                if(trigger) trigger.style.display = 'none';
-                if(content) {
-                    content.style.display = 'block';
-                    content.style.opacity = '1'; 
-                    content.style.transform = 'scale(1)';
-                }
-            }
-        }
+    window.openSettings = () => {
+        document.getElementById('setUserName').value = config.name;
+        document.getElementById('setMealPrice').value = config.mealPrice;
+        document.getElementById('setWaterPrice').value = config.waterPrice;
+        document.getElementById('settingsOverlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
+    };
+    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
+    window.saveSettings = async () => {
+        config.name = document.getElementById('setUserName').value;
+        config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
+        config.waterPrice = parseInt(document.getElementById('setWaterPrice').value);
+        await setDoc(doc(db, "users", user.uid), config, { merge: true });
+        document.getElementById('userLabel').innerText = config.name;
+        calculate(); closeSettings();
+    };
 
-        function unlockDopamineToken() {
-            if(navigator.vibrate) navigator.vibrate([100, 50, 150]);
-            
-            spawnBlastWave(window.innerWidth / 2, window.innerHeight / 3, '#39ff14');
-            setTimeout(() => spawnBlastWave(window.innerWidth / 3, window.innerHeight / 2, '#ff007f'), 150);
-            setTimeout(() => spawnBlastWave(window.innerWidth / 1.5, window.innerHeight * 0.4, '#00f3ff'), 300);
+    function calculate() {
+        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
+        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
+        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
+    }
 
-            document.getElementById('vault-trigger').style.display = 'none';
-            const content = document.getElementById('vault-content');
-            content.style.display = 'block';
-            setTimeout(() => { content.style.opacity = '1'; content.style.transform = 'scale(1)'; }, 50);
-
-            localStorage.setItem('vipPassClaimed', 'true');
-        }
-
-        /* --- Combined Specular Lighting & Hover Particle Spawner Engine --- */
-        function initInteractivePhysicsEngines() {
-            isPortalUnlocked = true;
-            const tiltCard = document.getElementById('tilt-card');
-            const root = document.documentElement;
-            
-            document.addEventListener('mousemove', (event) => {
-                if(!tiltCard) return;
-                const cardRect = tiltCard.getBoundingClientRect();
-                const specX = event.clientX - cardRect.left;
-                const specY = event.clientY - cardRect.top;
-                root.style.setProperty('--mouse-x', `${specX}px`);
-                root.style.setProperty('--mouse-y', `${specY}px`);
-                
-                if (isPortalUnlocked && hoverParticles.length < 120) {
-                    for(let i=0; i<2; i++) { 
-                        hoverParticles.push(new HoverParticle(event.clientX, event.clientY));
-                    }
-                }
-            });
-
-            document.addEventListener('touchmove', (event) => {
-                if(isPortalUnlocked && event.touches.length > 0 && hoverParticles.length < 120) {
-                    hoverParticles.push(new HoverParticle(event.touches[0].clientX, event.touches[0].clientY));
-                }
-            }, { passive: true });
-        }
-    </script>
-      
+    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
+</script>
 </body>
 </html>
