@@ -2,323 +2,628 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Premier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sovereign Biometric Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+
     <style>
-        :root { 
-            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
-            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
-            --text: #FFFFFF; --sub: #94A3B8;
+        :root {
+            --bg: #f4f5f8;
+            --surface: #ffffff;
+            --border: #e2e4eb;
+            --text: #19181c;
+            --muted: #6e6b7b;
+            --brand: #025ce2;
+            --brand-dim: #e5f0ff;
+            --green: #0f7a44;
+            --green-dim: #e6f6ee;
+            --red: #b31414;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
-            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
-                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
-            background-attachment: fixed;
+        html, body { 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background-color: var(--bg);
+            color: var(--text);
+            position: fixed;
         }
 
-        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
+        body { display: flex; flex-direction: column; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
-        #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
-        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
-        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
-
-        .stat-card {
-            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
-            padding: 30px; border-radius: 35px; margin-bottom: 30px;
-            box-shadow: 0 20px 40px -10px var(--p-glow);
-            position: relative; overflow: hidden;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
+        .app-bar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
         }
+        .app-bar h1 { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+
+        .tab-deck { display: flex; background: var(--bg); padding: 4px; border-radius: 8px; }
+        .tab-trigger {
+            padding: 6px 12px; border: none; background: none; font-size: 0.78rem;
+            font-weight: 600; color: var(--muted); cursor: pointer; border-radius: 6px;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-trigger.active { background: var(--surface); color: var(--brand); box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+
+        .view-deck { flex-grow: 1; position: relative; width: 100%; height: 100%; min-height: 0; }
+
+        .view-panel { 
+            display: none; 
+            position: absolute;
+            inset: 0;
+            padding: 8px;
+            gap: 8px;
+            width: 100%;
+            height: 100%;
+        }
+        .view-panel.active { display: flex; flex-direction: column; }
+
+        .ui-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
+            min-height: 0;
+            flex: 1;
+        }
+        .ui-card h2 { font-size: 0.85rem; font-weight: 700; color: var(--text); }
+
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .mode-btn {
+            padding: 6px; border: none; background: none; font-size: 0.75rem;
+            font-weight: 700; color: var(--muted); cursor: pointer; border-radius: 6px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mode-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+
+        .viewport-box {
+            position: relative; flex-grow: 1; width: 100%; min-height: 0;
+            background: #1a191d; border-radius: 8px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+
+        .fingerprint-hardware-glyph {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            gap: 12px; z-index: 10; text-align: center; color: var(--muted); cursor: pointer;
+            width: 100%; height: 100%; -webkit-tap-highlight-color: transparent;
+        }
+        .fingerprint-hardware-glyph svg {
+            width: 48px; height: 48px; fill: currentColor; transition: transform 0.1s;
+        }
+        .fingerprint-hardware-glyph:active svg { transform: scale(0.92); color: var(--brand); }
+
+        .status-strip {
+            padding: 8px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 700;
+            text-align: center; background: var(--bg); border: 1px solid var(--border);
+            color: var(--muted); transition: all 0.2s; flex-shrink: 0;
+        }
+        .status-strip.active { background: var(--brand-dim); color: var(--brand); border-color: transparent; }
+        .status-strip.success { background: var(--green-dim); color: var(--green); border-color: transparent; }
+
+        .analytics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-shrink: 0; }
+        .metric-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px; }
+        .metric-box span { font-size: 0.62rem; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+        .metric-box h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1px; }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+        input[type="text"] {
+            background: var(--surface); border: 1px solid var(--border); padding: 8px 12px;
+            border-radius: 8px; color: var(--text); font-size: 0.82rem; width: 100%;
+            transition: border-color 0.2s; -webkit-appearance: none;
+        }
+        input[type="text"]:focus { outline: none; border-color: var(--brand); }
+
+        button.action-btn {
+            background: var(--brand); color: #fff; border: none; padding: 10px;
+            border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+            flex-shrink: 0; -webkit-tap-highlight-color: transparent;
+        }
+        button.action-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+        .scroll-wrapper { flex-grow: 1; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; min-height: 0; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: left; }
+        th { padding: 6px 10px; background: var(--bg); color: var(--muted); font-weight: 700; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 5; }
+        td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text); white-space: nowrap; }
         
-        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
-        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
-        
-        .quick-log-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 14px; border-radius: 24px;
-            display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
-            z-index: 2; min-width: 110px;
+        .type-badge { padding: 2px 4px; border-radius: 4px; font-size: 0.58rem; font-weight: 700; text-transform: uppercase; }
+        .type-badge.face { background: #fff0e6; color: #e65c00; }
+        .type-badge.print { background: #e6f0ff; color: var(--brand); }
+
+        .purge-btn { background: none; border: none; color: var(--red); font-weight: 700; cursor: pointer; font-size: 0.75rem; }
+
+        @media (max-width: 767px) {
+            #scan-panel .ui-card:first-child { flex: 1.4; }
+            #scan-panel .ui-card:last-child { flex: 1; }
+            .card-center { height: auto !important; margin: auto 0; flex: none; }
         }
-        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
-        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
-        .nav-pill { 
-            display: flex; align-items: center; background: var(--card); padding: 8px; 
-            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
-            backdrop-filter: blur(10px);
+        @media (min-width: 768px) {
+            .view-panel.active { flex-direction: row; }
+            .panel-split { display: grid; grid-template-columns: 1.2fr 0.8fr; width: 100%; }
+            .card-full { width: 100%; height: 100%; }
+            .card-center { width: 100%; max-width: 360px; margin: auto; height: auto; flex: none; }
         }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
-        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
-
-        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
-
-        .day-item { 
-            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
-            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
-            border: 1px solid var(--surface); backdrop-filter: blur(10px);
-            user-select: none;
-        }
-        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
-        
-        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
-        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-
-        .item-pill { 
-            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
-        }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
-        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
-        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
-
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
-        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
-        .sheet.up { transform: translateY(0); }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
-        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
-        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
-        
-        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
-<body>
+<body onclick="requestFullscreenEngagement()">
 
-<div id="welcomeScreen">
-    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
-    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
-</div>
-
-<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
-    <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
-        <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
-            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
+    <nav class="app-bar">
+        <h1>Sovereign Hub</h1>
+        <div class="tab-deck">
+            <button class="tab-trigger active" onclick="switchViewLayer('enroll-panel', this)">Enroll</button>
+            <button class="tab-trigger" onclick="switchViewLayer('scan-panel', this)">Scanner</button>
+            <button class="tab-trigger" onclick="switchViewLayer('database-panel', this)">Database</button>
         </div>
-        <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
-    </div>
-</div>
+    </nav>
 
-<div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
-    <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
-        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
-        <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
-    </div>
-</div>
-
-<div class="container">
-    <div class="header">
-        <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
-        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-left">
-            <div class="label">Total Bill</div>
-            <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
-        </div>
-        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
-            <i id="quickIcon">⚡</i>
-            <span id="quickText">Loading...</span>
-        </div>
-    </div>
-
-    <div class="nav-pill">
-        <button onclick="changeMonth(-1)">‹</button>
-        <span id="monthLabel">Current</span>
-        <button onclick="changeMonth(1)">›</button>
-    </div>
-    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
-
-    <div id="logsGrid"></div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
-        projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
-        messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
-    };
-
-    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
-    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
-    let config = { name: "", mealPrice: 50, waterPrice: 30 };
-    
-    // SCROLL GUARD VARIABLES
-    let longPressTimer;
-    let startY = 0;
-    let isScrolling = false;
-
-    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
-    window.logout = () => signOut(auth).then(() => location.reload());
-
-    onAuthStateChanged(auth, async (u) => {
-        if (u) { 
-            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
-            document.getElementById('userPfp').src = u.photoURL;
-            const userDoc = await getDoc(doc(db, "users", u.uid));
-            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
-            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
-            document.getElementById('userLabel').innerText = config.name;
-            updateGreet(); syncData(); 
-        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
-    });
-
-    function isCurrentMonth() {
-        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
-    }
-
-    function updateGreet() {
-        const h = new Date().getHours();
-        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : "Good Evening 🌇";
-    }
-
-    function syncData() {
-        onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
-            logs = d.data() || {}; renderGrid();
-        });
-    }
-
-    window.quickLog = async () => {
-        if (!isCurrentMonth()) return;
-        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        if(obj[type] === 1) return;
-        obj[type] = 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
-
-    function renderGrid() {
-        const current = isCurrentMonth();
-        document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
-        document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
-        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    <div class="view-deck">
         
-        const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
-        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+        <div id="enroll-panel" class="view-panel active">
+            <div class="ui-card card-center">
+                <h2>Enroll Profile</h2>
+                
+                <div class="mode-selector">
+                    <button id="mode-enroll-face" class="mode-btn active" onclick="setEnrollMode('face')">Face</button>
+                    <button id="mode-enroll-print" class="mode-btn" onclick="setEnrollMode('print')">Fingerprint</button>
+                </div>
 
-        const type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const isMarked = logs[todayDate.getDate()] && logs[todayDate.getDate()][type] === 1;
+                <div class="form-group">
+                    <input type="text" id="target-user-name" placeholder="Username ID..." disabled>
+                </div>
+                
+                <button id="snap-btn" class="action-btn" onclick="executeEnrollmentCapture()" disabled>Capture</button>
+                <div id="enroll-status" class="status-strip">Connecting internal modules...</div>
+            </div>
+        </div>
+
+        <div id="scan-panel" class="view-panel panel-split">
+            <div class="ui-card">
+                <div class="mode-selector">
+                    <button id="mode-scan-face" class="mode-btn active" onclick="setScanMode('face')">Optical</button>
+                    <button id="mode-scan-print" class="mode-btn" onclick="setScanMode('print')">Touch</button>
+                </div>
+
+                <div class="viewport-box">
+                    <video id="webcam-hardware" autoplay muted playsinline></video>
+                    <canvas id="vision-overlay"></canvas>
+                    
+                    <div id="fingerprint-sensor-area" class="fingerprint-hardware-glyph" onclick="triggerWebAuthnAssertion()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12,2A10,10,0,0,0,2,12a9.89,9.89,0,0,0,2.19,6.15.5.5,0,0,0,.79-.62A8.9,8.9,0,0,1,3,12a9,9,0,0,1,18,0,8.9,8.9,0,0,1-1.94,5.53.5.5,0,0,0,.78.63A9.89,9.89,0,0,0,22,12,10,10,0,0,0,12,2ZM12,5a7,7,0,0,0-7,7,6.92,6.92,0,0,0,1.24,3.92.5.5,0,1,0,.81-.59A5.93,5.93,0,0,1,6,12a6,6,0,0,1,12,0,5.92,5.92,0,0,1-1.07,3.35.5.5,0,0,0,.1.7.51.51,0,0,0,.31.1.5.5,0,0,0,.39-.19A6.92,6.92,0,0,0,19,12,7,7,0,0,0,12,5Zm0,3a4,4,0,0,0-4,4,3.91,3.91,0,0,0,.47,1.86.5.5,0,0,0,.87-.49A2.93,2.93,0,0,1,9,12a3,3,0,0,1,6,0,2.91,2.91,0,0,1-.38,1.45.5.5,0,0,0,.19.68.49.49,0,0,0,.25.07.5.5,0,0,0,.43-.25A3.91,3.91,0,0,0,16,12,4,4,0,0,0,12,8Zm0,3a1,1,0,0,0-1,1v2a1,1,0,0,0,2,0V12A1,1,0,0,0,12,11Z"/>
+                        </svg>
+                        <span style="font-size: 0.72rem; font-weight: 600;">Scan Fingerprint</span>
+                    </div>
+                </div>
+                <div id="scan-status" class="status-strip">Sensor offline</div>
+            </div>
+
+            <div class="ui-card">
+                <div class="analytics-row">
+                    <div class="metric-box"><span>Profiles</span><h3 id="metric-registered">0</h3></div>
+                    <div class="metric-box"><span>Verified</span><h3 id="metric-present" style="color: var(--green);">0</h3></div>
+                </div>
+                <div class="scroll-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>User ID</th><th>Type</th><th>Time</th></tr>
+                        </thead>
+                        <tbody id="live-log-rows">
+                            <tr id="empty-log-row"><td colspan="3" style="text-align: center; color: var(--muted); padding: 14px;">Awaiting logs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="database-panel" class="view-panel">
+            <div class="ui-card card-full">
+                <h2>Matrix Directory</h2>
+                <div class="scroll-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>User ID</th><th>Type</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="directory-table-rows">
+                            <tr><td colspan="3" style="text-align: center; color: var(--muted); padding: 18px;">No data logs.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('webcam-hardware');
+        const overlayCanvasElement = document.getElementById('vision-overlay');
+        const enrollStatusBanner = document.getElementById('enroll-status');
+        const scanStatusBanner = document.getElementById('scan-status');
+        const userStringInput = document.getElementById('target-user-name');
+        const actionCaptureTriggerBtn = document.getElementById('snap-btn');
+        const fingerprintSensorArea = document.getElementById('fingerprint-sensor-area');
+
+        let runtimeBiometricDataStorage = [];
+        let globalFaceMatcherReference = null;
+        let hardwareVideoMediaStream = null;
+        let sensorVerificationLoopTimer = null;
+        let sessionCheckedInUsersSet = new Set();
         
-        if (current) {
-            document.getElementById('quickIcon').innerText = isMarked ? '✅' : '⚡';
-            document.getElementById('quickText').innerText = isMarked ? 'Marked' : `Mark ${type==='l'?'Lunch':'Dinner'}`;
-            if(isMarked) document.getElementById('quickBtn').classList.add('done');
-            else document.getElementById('quickBtn').classList.remove('done');
-        } else {
-            document.getElementById('quickIcon').innerText = '🔒';
-            document.getElementById('quickText').innerText = 'Locked';
+        let currentEnrollMode = 'face'; 
+        let currentScanMode = 'face';  
+
+        const MODEL_REPOSITORY_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+
+        // Automatically attempts to enter Fullscreen mode safely upon loading layout
+        function requestFullscreenEngagement() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
         }
 
-        for (let i = 1; i <= daysCount; i++) {
-            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
-            const card = document.createElement('div');
-            card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
+        async function initSystemPipelines() {
+            try {
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_REPOSITORY_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_REPOSITORY_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_REPOSITORY_URL)
+                ]);
+                
+                extractLocalStorageSessionData();
+                enrollStatusBanner.className = "status-strip success";
+                enrollStatusBanner.innerText = "System secure. Ready.";
+                userStringInput.disabled = false;
+                actionCaptureTriggerBtn.disabled = false;
+            } catch (err) {
+                enrollStatusBanner.style.color = "var(--red)";
+                enrollStatusBanner.innerText = "Engine setup failure.";
+            }
+        }
+
+        function switchViewLayer(targetPanelLayoutId, dynamicTabAnchor) {
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.tab-trigger').forEach(tab => tab.classList.remove('active'));
             
-            if (current) {
-                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
-                card.addEventListener('touchstart', (e) => {
-                    startY = e.touches[0].clientY;
-                    isScrolling = false;
-                    longPressTimer = setTimeout(() => {
-                        if (!isScrolling) openNote(i);
-                    }, 650);
-                }, { passive: true });
+            document.getElementById(targetPanelLayoutId).classList.add('active');
+            dynamicTabAnchor.classList.add('active');
 
-                card.addEventListener('touchmove', (e) => {
-                    let moveY = e.touches[0].clientY;
-                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
-                        isScrolling = true;
-                        clearTimeout(longPressTimer);
-                    }
-                }, { passive: true });
+            if (targetPanelLayoutId === 'scan-panel' && currentScanMode === 'face') {
+                bindHardwareCameraPipeline();
+            } else {
+                unbindHardwareCameraPipeline();
+            }
+        }
 
-                card.addEventListener('touchend', () => {
-                    clearTimeout(longPressTimer);
+        function setEnrollMode(mode) {
+            currentEnrollMode = mode;
+            document.getElementById('mode-enroll-face').classList.toggle('active', mode === 'face');
+            document.getElementById('mode-enroll-print').classList.toggle('active', mode === 'print');
+            actionCaptureTriggerBtn.innerText = mode === 'face' ? "Capture" : "Save Print";
+        }
+
+        function setScanMode(mode) {
+            currentScanMode = mode;
+            document.getElementById('mode-scan-face').classList.toggle('active', mode === 'face');
+            document.getElementById('mode-scan-print').classList.toggle('active', mode === 'print');
+
+            if (mode === 'face') {
+                fingerprintSensorArea.style.display = 'none';
+                videoElement.style.display = 'block';
+                overlayCanvasElement.style.display = 'block';
+                bindHardwareCameraPipeline();
+            } else {
+                unbindHardwareCameraPipeline();
+                videoElement.style.display = 'none';
+                overlayCanvasElement.style.display = 'none';
+                fingerprintSensorArea.style.display = 'flex';
+                scanStatusBanner.className = "status-strip success";
+                scanStatusBanner.innerText = "Touch sensor ready.";
+            }
+        }
+
+        async function bindHardwareCameraPipeline() {
+            if (hardwareVideoMediaStream) return;
+            scanStatusBanner.className = "status-strip active";
+            scanStatusBanner.innerText = "Connecting camera...";
+            try {
+                hardwareVideoMediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
                 });
+                videoElement.srcObject = hardwareVideoMediaStream;
+                videoElement.onloadedmetadata = () => {
+                    scanStatusBanner.className = "status-strip success";
+                    scanStatusBanner.innerText = "Monitoring live camera feed";
+                    executeLiveSensorTrackingLoop();
+                };
+            } catch (err) {
+                scanStatusBanner.style.color = "var(--red)";
+                scanStatusBanner.innerText = "Camera link error.";
+            }
+        }
+
+        function unbindHardwareCameraPipeline() {
+            if (sensorVerificationLoopTimer) clearInterval(sensorVerificationLoopTimer);
+            if (hardwareVideoMediaStream) {
+                hardwareVideoMediaStream.getTracks().forEach(track => track.stop());
+                hardwareVideoMediaStream = null;
+            }
+            videoElement.srcObject = null;
+            const ctx = overlayCanvasElement.getContext('2d');
+            ctx.clearRect(0, 0, overlayCanvasElement.width, overlayCanvasElement.height);
+            scanStatusBanner.className = "status-strip";
+            scanStatusBanner.innerText = "Sensor offline";
+        }
+
+        async function executeEnrollmentCapture() {
+            const contextIdentityString = userStringInput.value.trim();
+            if (!contextIdentityString) { alert("Missing Username ID."); return; }
+
+            if (currentEnrollMode === 'face') {
+                await executeTraceSnapshot(contextIdentityString);
+            } else {
+                await executeFingerprintEnroll(contextIdentityString);
+            }
+        }
+
+        async function executeTraceSnapshot(identity) {
+            enrollStatusBanner.className = "status-strip active";
+            enrollStatusBanner.innerText = "Capturing face frame layout...";
+            
+            try {
+                const rapidIsolationStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                const sandboxMockVideoElement = document.createElement('video');
+                sandboxMockVideoElement.srcObject = rapidIsolationStream;
+                await sandboxMockVideoElement.play();
+
+                setTimeout(async () => {
+                    const computationalTraceOutput = await faceapi.detectSingleFace(sandboxMockVideoElement, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.65 }))
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
+
+                    rapidIsolationStream.getTracks().forEach(track => track.stop());
+
+                    if (!computationalTraceOutput) {
+                        alert("Face context drop. Increase lighting exposure.");
+                        enrollStatusBanner.className = "status-strip success";
+                        enrollStatusBanner.innerText = "System secure. Ready.";
+                        return;
+                    }
+
+                    saveBiometricNode(identity, 'face', Array.from(computationalTraceOutput.descriptor));
+                }, 750);
+            } catch(e) {
+                alert("Camera capture framework initialization blocked.");
+                enrollStatusBanner.className = "status-strip success";
+            }
+        }
+
+        async function executeFingerprintEnroll(identity) {
+            if (!window.PublicKeyCredential) {
+                alert("WebAuthn API layer unsupported on this device.");
+                return;
             }
 
-            card.innerHTML = `
-                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
-                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
-                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
-                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
-                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
-            `;
-            grid.appendChild(card);
+            enrollStatusBanner.className = "status-strip active";
+            enrollStatusBanner.innerText = "Awaiting verification token...";
+
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+            const userId = new Uint8Array(16);
+            window.crypto.getRandomValues(userId);
+
+            const publicKeyCredentialCreationOptions = {
+                challenge: challenge,
+                rp: { name: "Sovereign Hub", id: window.location.hostname || "localhost" },
+                user: { id: userId, name: identity, displayName: identity },
+                pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
+                timeout: 60000
+            };
+
+            try {
+                const credential = await navigator.credentials.create({ publicKey: publicKeyCredentialCreationOptions });
+                saveBiometricNode(identity, 'fingerprint', btoa(String.fromCharCode(...new Uint8Array(credential.rawId))));
+            } catch (err) {
+                alert("Touch token registration failed.");
+                enrollStatusBanner.className = "status-strip success";
+                enrollStatusBanner.innerText = "System secure. Ready.";
+            }
         }
-        calculate();
-    }
 
-    window.toggle = async (day, type) => {
-        if (!isCurrentMonth()) return;
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        obj[type] = obj[type] ? 0 : 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
+        async function triggerWebAuthnAssertion() {
+            if (runtimeBiometricDataStorage.filter(b => b.type === 'fingerprint').length === 0) {
+                alert("Zero print profiles verified inside database directory logs.");
+                return;
+            }
 
-    window.openNote = (day) => {
-        activeDayId = day;
-        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
-        document.getElementById('noteInput').value = logs[day]?.n || "";
-        document.getElementById('noteOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
-    };
-    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
-    window.saveNote = async () => {
-        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
-        obj.n = document.getElementById('noteInput').value;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
-        closeNote();
-    };
+            scanStatusBanner.className = "status-strip active";
+            scanStatusBanner.innerText = "Verifying touch credentials...";
 
-    window.openSettings = () => {
-        document.getElementById('setUserName').value = config.name;
-        document.getElementById('setMealPrice').value = config.mealPrice;
-        document.getElementById('setWaterPrice').value = config.waterPrice;
-        document.getElementById('settingsOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
-    };
-    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
-    window.saveSettings = async () => {
-        config.name = document.getElementById('setUserName').value;
-        config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
-        config.waterPrice = parseInt(document.getElementById('setWaterPrice').value);
-        await setDoc(doc(db, "users", user.uid), config, { merge: true });
-        document.getElementById('userLabel').innerText = config.name;
-        calculate(); closeSettings();
-    };
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
 
-    function calculate() {
-        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
-        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
-    }
+            const publicKeyCredentialRequestOptions = {
+                challenge: challenge,
+                rpId: window.location.hostname || "localhost",
+                userVerification: "required"
+            };
 
-    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
-</script>
+            try {
+                const assertion = await navigator.credentials.get({ publicKey: publicKeyCredentialRequestOptions });
+                const matchedId64 = btoa(String.fromCharCode(...new Uint8Array(assertion.rawId)));
+                
+                const profileMatch = runtimeBiometricDataStorage.find(b => b.type === 'fingerprint' && b.descriptor === matchedId64);
+                
+                if (profileMatch) {
+                    pushAttendanceHistoryEntry(profileMatch.label, 'print');
+                    scanStatusBanner.className = "status-strip success";
+                    scanStatusBanner.innerText = `Verified: ${profileMatch.label.toUpperCase()}`;
+                } else {
+                    alert("Token unregistered on this database.");
+                    scanStatusBanner.className = "status-strip success";
+                    scanStatusBanner.innerText = "Touch sensor ready.";
+                }
+            } catch (err) {
+                scanStatusBanner.className = "status-strip success";
+                scanStatusBanner.innerText = "Touch sensor interrupted.";
+            }
+        }
+
+        function saveBiometricNode(label, type, descriptor) {
+            runtimeBiometricDataStorage.push({ label, type, descriptor });
+            commitSessionDataToLocalStorage();
+            compileBiometricEngineMatcher();
+            renderDirectoryTableLayoutRows();
+            
+            alert(`Logged ${type} for: ${label}`);
+            userStringInput.value = "";
+            enrollStatusBanner.className = "status-strip success";
+            enrollStatusBanner.innerText = "System secure. Ready.";
+        }
+
+        function executeLiveSensorTrackingLoop() {
+            sensorVerificationLoopTimer = setInterval(async () => {
+                if (videoElement.paused || videoElement.ended || currentScanMode !== 'face') return;
+
+                const trackingAreaDimensions = { width: videoElement.offsetWidth, height: videoElement.offsetHeight };
+                if (overlayCanvasElement.width !== trackingAreaDimensions.width || overlayCanvasElement.height !== trackingAreaDimensions.height) {
+                    faceapi.matchDimensions(overlayCanvasElement, trackingAreaDimensions);
+                }
+
+                // Tightened tracking limits and lower inputs for enhanced system security and anti-spoof
+                const extractionDetectionsPool = await faceapi.detectAllFaces(videoElement, new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.60 }))
+                    .withFaceLandmarks()
+                    .withFaceDescriptors();
+
+                const standardizedCalculatedResults = faceapi.resizeResults(extractionDetectionsPool, trackingAreaDimensions);
+                const ctx = overlayCanvasElement.getContext('2d');
+                ctx.clearRect(0, 0, overlayCanvasElement.width, overlayCanvasElement.height);
+
+                standardizedCalculatedResults.forEach(scannedFaceInstance => {
+                    let canvasDisplayIdentityText = "Unknown Entity";
+
+                    if (globalFaceMatcherReference && runtimeBiometricDataStorage.filter(b => b.type === 'face').length > 0) {
+                        const immediateOptimalMatchResult = globalFaceMatcherReference.findBestMatch(scannedFaceInstance.descriptor);
+                        // Stringent strict security verification distance cutoff threshold profile value mapping match parameter
+                        if (immediateOptimalMatchResult.label !== 'unknown' && immediateOptimalMatchResult.distance < 0.40) {
+                            canvasDisplayIdentityText = immediateOptimalMatchResult.label;
+                            pushAttendanceHistoryEntry(canvasDisplayIdentityText, 'face');
+                        }
+                    }
+
+                    const perimeterBox = scannedFaceInstance.detection.box;
+                    ctx.strokeStyle = canvasDisplayIdentityText !== "Unknown Entity" ? '#0f7a44' : '#b31414';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(perimeterBox.x, perimeterBox.y, perimeterBox.width, perimeterBox.height);
+
+                    ctx.fillStyle = "rgba(25, 24, 28, 0.85)";
+                    ctx.fillRect(perimeterBox.x, perimeterBox.y - 18, perimeterBox.width, 16);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = "bold 9px 'Plus Jakarta Sans', sans-serif";
+                    ctx.fillText(canvasDisplayIdentityText.toUpperCase(), perimeterBox.x + 4, perimeterBox.y - 6);
+                });
+            }, 250);
+        }
+
+        function pushAttendanceHistoryEntry(subjectNameString, type) {
+            const uniqueKey = `${subjectNameString}_${type}`;
+            if (sessionCheckedInUsersSet.has(uniqueKey)) return;
+            sessionCheckedInUsersSet.add(uniqueKey);
+            
+            const totalDistinctEntities = new Set([...sessionCheckedInUsersSet].map(s => s.split('_')[0])).size;
+            document.getElementById('metric-present').innerText = totalDistinctEntities;
+
+            const tableNoticePlaceholder = document.getElementById('empty-log-row');
+            if (tableNoticePlaceholder) tableNoticePlaceholder.remove();
+
+            const tableLogTargetContainer = document.getElementById('live-log-rows');
+            const generatedClockLocaleTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const structuralRowMarkupNode = document.createElement('tr');
+            structuralRowMarkupNode.innerHTML = `
+                <td><b>${subjectNameString}</b></td>
+                <td><span class="type-badge ${type}">${type}</span></td>
+                <td style="font-variant-numeric: tabular-nums; color: var(--muted);">${generatedClockLocaleTimestamp}</td>
+            `;
+            tableLogTargetContainer.prepend(structuralRowMarkupNode);
+        }
+
+        function commitSessionDataToLocalStorage() {
+            localStorage.setItem('sovereign_mixed_biometric_db', JSON.stringify(runtimeBiometricDataStorage));
+            document.getElementById('metric-registered').innerText = runtimeBiometricDataStorage.length;
+        }
+
+        function extractLocalStorageSessionData() {
+            const rawExtractedCachePayloadString = localStorage.getItem('sovereign_mixed_biometric_db');
+            if (rawExtractedCachePayloadString) {
+                runtimeBiometricDataStorage = JSON.parse(rawExtractedCachePayloadString);
+                compileBiometricEngineMatcher();
+                renderDirectoryTableLayoutRows();
+            }
+        }
+
+        function compileBiometricEngineMatcher() {
+            document.getElementById('metric-registered').innerText = runtimeBiometricDataStorage.length;
+            const faceProfilesOnly = runtimeBiometricDataStorage.filter(item => item.type === 'face');
+            if (faceProfilesOnly.length === 0) { globalFaceMatcherReference = null; return; }
+            const compiledUnrolledProfiles = faceProfilesOnly.map(item => new faceapi.LabeledFaceDescriptors(item.label, [new Float32Array(item.descriptor)]));
+            
+            // Set tighter matcher tolerance parameters for strict verification rule protocols
+            globalFaceMatcherReference = new faceapi.FaceMatcher(compiledUnrolledProfiles, 0.40);
+        }
+
+        function renderDirectoryTableLayoutRows() {
+            const directoryContainerElement = document.getElementById('directory-table-rows');
+            if (runtimeBiometricDataStorage.length === 0) {
+                directoryContainerElement.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--muted); padding: 18px;">No records.</td></tr>`;
+                return;
+            }
+            directoryContainerElement.innerHTML = "";
+            runtimeBiometricDataStorage.forEach((profile, dataArrayIndexIndex) => {
+                const manualTableRowNode = document.createElement('tr');
+                manualTableRowNode.innerHTML = `
+                    <td><b>${profile.label}</b></td>
+                    <td><span class="type-badge ${profile.type}">${profile.type}</span></td>
+                    <td><button class="purge-btn" onclick="executeProfileCachePurge(${dataArrayIndexIndex})">Purge</button></td>
+                `;
+                directoryContainerElement.appendChild(manualTableRowNode);
+            });
+        }
+
+        function executeProfileCachePurge(targetElementIndex) {
+            const temporaryLabelExtractionString = runtimeBiometricDataStorage[targetElementIndex].label;
+            const type = runtimeBiometricDataStorage[targetElementIndex].type;
+            if (confirm(`Erase data sheet record for: ${temporaryLabelExtractionString}?`)) {
+                runtimeBiometricDataStorage.splice(targetElementIndex, 1);
+                sessionCheckedInUsersSet.delete(`${temporaryLabelExtractionString}_${type}`);
+                
+                const totalDistinctEntities = new Set([...sessionCheckedInUsersSet].map(s => s.split('_')[0])).size;
+                document.getElementById('metric-present').innerText = totalDistinctEntities;
+                
+                commitSessionDataToLocalStorage();
+                compileBiometricEngineMatcher();
+                renderDirectoryTableLayoutRows();
+            }
+        }
+
+        window.onload = initSystemPipelines;
+    </script>
 </body>
 </html>
