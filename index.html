@@ -3,627 +3,643 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sovereign Biometric Hub</title>
+    <title>Birthday Cake Cutting Celebration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=600;700;900&family=Plus+Jakarta+Sans:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --bg: #f4f5f8;
-            --surface: #ffffff;
-            --border: #e2e4eb;
-            --text: #19181c;
-            --muted: #6e6b7b;
-            --brand: #025ce2;
-            --brand-dim: #e5f0ff;
-            --green: #0f7a44;
-            --green-dim: #e6f6ee;
-            --red: #b31414;
+            --bg-dark: #02040a;
+            --card-glass: rgba(6, 10, 23, 0.45);
+            --gold-primary: #e2bf65;
+            --gold-linear: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fcf6ba 75%, #aa771c 100%);
+            --text-pure: #f8fafc;
+            --text-muted: #94a3b8;
+            --glow-color: rgba(226, 191, 101, 0.08);
+            --alert-red: #ef4444;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        
-        html, body { 
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden; 
-            background-color: var(--bg);
-            color: var(--text);
-            position: fixed;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
         }
 
-        body { display: flex; flex-direction: column; }
-
-        .app-bar {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 10px 16px;
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-pure);
+            min-height: 100vh;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
-            z-index: 10;
+            justify-content: center;
+            padding: 24px;
+            overflow-x: hidden;
         }
-        .app-bar h1 { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
 
-        .tab-deck { display: flex; background: var(--bg); padding: 4px; border-radius: 8px; }
-        .tab-trigger {
-            padding: 6px 12px; border: none; background: none; font-size: 0.78rem;
-            font-weight: 600; color: var(--muted); cursor: pointer; border-radius: 6px;
-            transition: all 0.15s ease;
-            -webkit-tap-highlight-color: transparent;
+        /* Animated Cosmic Background Elements */
+        .cosmic-engine {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0; left: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
         }
-        .tab-trigger.active { background: var(--surface); color: var(--brand); box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
-
-        .view-deck { flex-grow: 1; position: relative; width: 100%; height: 100%; min-height: 0; }
-
-        .view-panel { 
-            display: none; 
+        .nebula-core {
             position: absolute;
-            inset: 0;
-            padding: 8px;
-            gap: 8px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(179, 135, 40, 0.12) 0%, transparent 65%);
+            top: -10%; left: 20%;
+            filter: blur(40px);
+            animation: orbitalDrift 18s infinite ease-in-out alternate;
+        }
+        .nebula-pulse {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(30, 41, 59, 0.5) 0%, transparent 70%);
+            bottom: -5%; right: 15%;
+            filter: blur(20px);
+            animation: orbitalDrift 24s infinite ease-in-out alternate-reverse;
+        }
+
+        /* Kinetic Laser Border Outer Wrapper */
+        .kinetic-border-wrapper {
+            position: relative;
             width: 100%;
-            height: 100%;
+            max-width: 410px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 30px;
+            padding: 1px;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.9);
+            margin: 20px 0;
         }
-        .view-panel.active { display: flex; flex-direction: column; }
 
-        .ui-card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
-            min-height: 0;
-            flex: 1;
+        .kinetic-border-wrapper::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%; left: -25%;
+            background: conic-gradient(from 0deg, transparent 20%, var(--gold-primary) 45%, #fff 50%, var(--gold-primary) 55%, transparent 80%);
+            animation: laserRotate 6s linear infinite;
+            z-index: 0;
         }
-        .ui-card h2 { font-size: 0.85rem; font-weight: 700; color: var(--text); }
 
-        .mode-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        /* Premium Glass Portal Master Canvas */
+        .portal-card {
+            position: relative;
+            background: var(--card-glass);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 29px;
+            padding: 40px 24px 32px;
+            text-align: center;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* Structural Design Crest */
+        .crest-icon-frame {
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 20px;
+            background: #040711;
+            border: 1px solid rgba(226, 191, 101, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(226,191,101,0.1);
+            position: relative;
+        }
+        .crest-icon-frame::after {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 1px solid var(--gold-primary);
+            opacity: 0.3;
+            animation: microPulse 2.5s infinite ease-out;
+        }
+        .crest-icon-frame svg {
+            width: 28px;
+            height: 28px;
+            fill: url(#gold-svg-gradient);
+            filter: drop-shadow(0 2px 8px rgba(226,191,101,0.3));
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 30%, #d4b257 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .subtitle {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        /* Dynamic Time Warning Ticker Banner */
+        .warning-banner {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.05);
+            animation: warningPulse 2s infinite alternate;
+        }
+        .warning-banner svg {
+            width: 14px; height: 14px;
+            fill: var(--alert-red);
+        }
+
+        /* Contribution Display Box */
+        .amount-display-box {
+            background: linear-gradient(145deg, rgba(0,0,0,0.4) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .amount-display-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            animation: lightSweep 4.5s infinite linear;
+        }
+        .amount-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.85;
+        }
+        .amount-value {
+            font-family: 'Cinzel', serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            margin-top: 4px;
+            background: var(--gold-linear);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             gap: 6px;
-            background: var(--bg);
-            padding: 4px;
-            border-radius: 8px;
-            flex-shrink: 0;
         }
-        .mode-btn {
-            padding: 6px; border: none; background: none; font-size: 0.75rem;
-            font-weight: 700; color: var(--muted); cursor: pointer; border-radius: 6px;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .mode-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
-
-        .viewport-box {
-            position: relative; flex-grow: 1; width: 100%; min-height: 0;
-            background: #1a191d; border-radius: 8px; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-        }
-        video, canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-
-        .fingerprint-hardware-glyph {
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            gap: 12px; z-index: 10; text-align: center; color: var(--muted); cursor: pointer;
-            width: 100%; height: 100%; -webkit-tap-highlight-color: transparent;
-        }
-        .fingerprint-hardware-glyph svg {
-            width: 48px; height: 48px; fill: currentColor; transition: transform 0.1s;
-        }
-        .fingerprint-hardware-glyph:active svg { transform: scale(0.92); color: var(--brand); }
-
-        .status-strip {
-            padding: 8px 12px; border-radius: 8px; font-size: 0.72rem; font-weight: 700;
-            text-align: center; background: var(--bg); border: 1px solid var(--border);
-            color: var(--muted); transition: all 0.2s; flex-shrink: 0;
-        }
-        .status-strip.active { background: var(--brand-dim); color: var(--brand); border-color: transparent; }
-        .status-strip.success { background: var(--green-dim); color: var(--green); border-color: transparent; }
-
-        .analytics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-shrink: 0; }
-        .metric-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px; }
-        .metric-box span { font-size: 0.62rem; color: var(--muted); text-transform: uppercase; font-weight: 700; }
-        .metric-box h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1px; }
-
-        .form-group { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
-        input[type="text"] {
-            background: var(--surface); border: 1px solid var(--border); padding: 8px 12px;
-            border-radius: 8px; color: var(--text); font-size: 0.82rem; width: 100%;
-            transition: border-color 0.2s; -webkit-appearance: none;
-        }
-        input[type="text"]:focus { outline: none; border-color: var(--brand); }
-
-        button.action-btn {
-            background: var(--brand); color: #fff; border: none; padding: 10px;
-            border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
-            flex-shrink: 0; -webkit-tap-highlight-color: transparent;
-        }
-        button.action-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
-
-        .scroll-wrapper { flex-grow: 1; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; min-height: 0; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: left; }
-        th { padding: 6px 10px; background: var(--bg); color: var(--muted); font-weight: 700; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 5; }
-        td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text); white-space: nowrap; }
-        
-        .type-badge { padding: 2px 4px; border-radius: 4px; font-size: 0.58rem; font-weight: 700; text-transform: uppercase; }
-        .type-badge.face { background: #fff0e6; color: #e65c00; }
-        .type-badge.print { background: #e6f0ff; color: var(--brand); }
-
-        .purge-btn { background: none; border: none; color: var(--red); font-weight: 700; cursor: pointer; font-size: 0.75rem; }
-
-        @media (max-width: 767px) {
-            #scan-panel .ui-card:first-child { flex: 1.4; }
-            #scan-panel .ui-card:last-child { flex: 1; }
-            .card-center { height: auto !important; margin: auto 0; flex: none; }
+        .currency-symbol {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--gold-primary);
         }
 
-        @media (min-width: 768px) {
-            .view-panel.active { flex-direction: row; }
-            .panel-split { display: grid; grid-template-columns: 1.2fr 0.8fr; width: 100%; }
-            .card-full { width: 100%; height: 100%; }
-            .card-center { width: 100%; max-width: 360px; margin: auto; height: auto; flex: none; }
+        /* Clock Countdown Components */
+        .countdown-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .countdown-box {
+            background: rgba(2, 4, 10, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 12px 4px;
+            backdrop-filter: blur(5px);
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .countdown-box:hover {
+            border-color: rgba(226, 191, 101, 0.2);
+            transform: translateY(-2px);
+        }
+        .countdown-time {
+            font-family: 'Cinzel', serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .countdown-label {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* Manifest Ledger Architecture Grid */
+        .event-details-box {
+            background: rgba(2, 4, 10, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.01);
+            border-radius: 20px;
+            padding: 8px 18px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            transition: transform 0.25s ease;
+        }
+        .detail-row:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .detail-row:hover {
+            transform: translateX(4px);
+        }
+        .detail-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px; height: 24px;
+        }
+        .detail-icon svg {
+            width: 18px; height: 18px;
+            fill: var(--text-muted);
+            transition: fill 0.3s, filter 0.3s;
+        }
+        .detail-row:hover .detail-icon svg {
+            fill: var(--gold-primary);
+            filter: drop-shadow(0 0 6px rgba(226,191,101,0.6));
+        }
+        .detail-content {
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-title {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+        .detail-text {
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            font-weight: 500;
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+
+        /* High-Impact Liquid Gold Command Trigger Button */
+        .btn-pay-now {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 18px;
+            background: var(--gold-linear);
+            color: #02040a;
+            font-weight: 800;
+            font-size: 0.88rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 6px 24px rgba(179, 135, 40, 0.3);
+            transition: box-shadow 0.4s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-pay-now::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -150%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-25deg);
+            animation: interactiveShimmer 5s infinite linear;
+        }
+        .btn-pay-now:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(179, 135, 40, 0.55), 0 0 15px rgba(255,255,255,0.2);
+        }
+        .btn-pay-now svg {
+            width: 16px; height: 16px;
+            fill: #02040a;
+            transition: transform 0.3s;
+        }
+        .btn-pay-now:hover svg {
+            transform: translateX(5px);
+        }
+
+        /* Secure Validation Footer */
+        .secure-footer {
+            margin-top: 24px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .secure-footer svg {
+            width: 12px; height: 12px;
+            fill: var(--gold-primary);
+            opacity: 0.6;
+        }
+
+        /* KEYFRAME ANIMATIONS */
+        @keyframes laserRotate {
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes orbitalDrift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-60px, 40px) scale(1.15); }
+        }
+        @keyframes microPulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+        @keyframes lightSweep {
+            0% { left: -100%; }
+            30%, 100% { left: 150%; }
+        }
+        @keyframes interactiveShimmer {
+            0% { left: -150%; }
+            15%, 100% { left: 150%; }
+        }
+        @keyframes warningPulse {
+            0% { border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); }
+            100% { border-color: rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.12); }
         }
     </style>
 </head>
-<body onclick="requestFullscreenEngagement()">
+<body>
 
-    <nav class="app-bar">
-        <h1>Sovereign Hub</h1>
-        <div class="tab-deck">
-            <button class="tab-trigger active" onclick="switchViewLayer('enroll-panel', this)">Enroll</button>
-            <button class="tab-trigger" onclick="switchViewLayer('scan-panel', this)">Scanner</button>
-            <button class="tab-trigger" onclick="switchViewLayer('database-panel', this)">Database</button>
-        </div>
-    </nav>
+    <div class="cosmic-engine">
+        <div class="nebula-core"></div>
+        <div class="nebula-pulse"></div>
+    </div>
 
-    <div class="view-deck">
-        
-        <div id="enroll-panel" class="view-panel active">
-            <div class="ui-card card-center">
-                <h2>Enroll Profile</h2>
-                
-                <div class="mode-selector">
-                    <button id="mode-enroll-face" class="mode-btn active" onclick="setEnrollMode('face')">Face</button>
-                    <button id="mode-enroll-print" class="mode-btn" onclick="setEnrollMode('print')">Fingerprint</button>
-                </div>
+    <svg style="position: absolute; width: 0; height: 0;" width="0" height="0">
+        <defs>
+            <linearGradient id="gold-svg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#bf953f" />
+                <stop offset="50%" stop-color="#fcf6ba" />
+                <stop offset="100%" stop-color="#aa771c" />
+            </linearGradient>
+        </defs>
+    </svg>
 
-                <div class="form-group">
-                    <input type="text" id="target-user-name" placeholder="Username ID..." disabled>
-                </div>
-                
-                <button id="snap-btn" class="action-btn" onclick="executeEnrollmentCapture()" disabled>Capture</button>
-                <div id="enroll-status" class="status-strip">Connecting internal modules...</div>
+    <div class="kinetic-border-wrapper">
+        <div class="portal-card">
+            
+            <div class="crest-icon-frame">
+                <svg viewBox="0 0 24 24">
+                    <path d="M5 16L3 5l5 5 4-7 4 7 5-5-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+                </svg>
             </div>
-        </div>
 
-        <div id="scan-panel" class="view-panel panel-split">
-            <div class="ui-card">
-                <div class="mode-selector">
-                    <button id="mode-scan-face" class="mode-btn active" onclick="setScanMode('face')">Optical</button>
-                    <button id="mode-scan-print" class="mode-btn" onclick="setScanMode('print')">Touch</button>
+            <h1>Shivam Miskare</h1>
+            <div class="subtitle">Birthday Celebration</div>
+
+            <div class="warning-banner">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                Strict Request: Do Not Be Delayed!
+            </div>
+            
+            <div class="amount-display-box">
+                <div class="amount-label">Contribution Asset</div>
+                <div class="amount-value"><span class="currency-symbol">₹</span>50</div>
+            </div>
+
+            <div class="countdown-container">
+                <div class="countdown-box">
+                    <div class="countdown-time" id="days">00</div>
+                    <div class="countdown-label">Days</div>
                 </div>
+                <div class="countdown-box">
+                    <div class="countdown-time" id="hours">00</div>
+                    <div class="countdown-label">Hrs</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-time" id="minutes">00</div>
+                    <div class="countdown-label">Min</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-time" id="seconds">00</div>
+                    <div class="countdown-label">Sec</div>
+                </div>
+            </div>
 
-                <div class="viewport-box">
-                    <video id="webcam-hardware" autoplay muted playsinline></video>
-                    <canvas id="vision-overlay"></canvas>
-                    
-                    <div id="fingerprint-sensor-area" class="fingerprint-hardware-glyph" onclick="triggerWebAuthnAssertion()">
+            <div class="event-details-box">
+                <div class="detail-row">
+                    <div class="detail-icon">
                         <svg viewBox="0 0 24 24">
-                            <path d="M12,2A10,10,0,0,0,2,12a9.89,9.89,0,0,0,2.19,6.15.5.5,0,0,0,.79-.62A8.9,8.9,0,0,1,3,12a9,9,0,0,1,18,0,8.9,8.9,0,0,1-1.94,5.53.5.5,0,0,0,.78.63A9.89,9.89,0,0,0,22,12,10,10,0,0,0,12,2ZM12,5a7,7,0,0,0-7,7,6.92,6.92,0,0,0,1.24,3.92.5.5,0,1,0,.81-.59A5.93,5.93,0,0,1,6,12a6,6,0,0,1,12,0,5.92,5.92,0,0,1-1.07,3.35.5.5,0,0,0,.1.7.51.51,0,0,0,.31.1.5.5,0,0,0,.39-.19A6.92,6.92,0,0,0,19,12,7,7,0,0,0,12,5Zm0,3a4,4,0,0,0-4,4,3.91,3.91,0,0,0,.47,1.86.5.5,0,0,0,.87-.49A2.93,2.93,0,0,1,9,12a3,3,0,0,1,6,0,2.91,2.91,0,0,1-.38,1.45.5.5,0,0,0,.19.68.49.49,0,0,0,.25.07.5.5,0,0,0,.43-.25A3.91,3.91,0,0,0,16,12,4,4,0,0,0,12,8Zm0,3a1,1,0,0,0-1,1v2a1,1,0,0,0,2,0V12A1,1,0,0,0,12,11Z"/>
+                            <path d="M12 6a2 2 0 0 0 2-2c0-.38-.22-.68-.4-.9A1 1 0 0 0 12 1a1 1 0 0 0-.6.1c-.18.22-.4.52-.4.9a2 2 0 0 0 2 2zm6 5H6V9h12v2zm0 5H6v-3h12v3zm1 4H5v-2h14v2z"/>
                         </svg>
-                        <span style="font-size: 0.72rem; font-weight: 600;">Scan Fingerprint</span>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Ceremony</div>
+                        <div class="detail-text">Cake Cutting Celebration</div>
                     </div>
                 </div>
-                <div id="scan-status" class="status-strip">Sensor offline</div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5C6.34 5 5 1.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Organizers</div>
+                        <div class="detail-text">Topa Gang</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Coordinator</div>
+                        <div class="detail-text">Vikram Dhakad</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Venue Allocation</div>
+                        <div class="detail-text" style="color: var(--gold-primary); font-weight: 700;">Location will be disclosed at Niranjan's House</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Date of Celebration</div>
+                        <div class="detail-text">30 May 2026</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Time of Event</div>
+                        <div class="detail-text">07:30 PM</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="ui-card">
-                <div class="analytics-row">
-                    <div class="metric-box"><span>Profiles</span><h3 id="metric-registered">0</h3></div>
-                    <div class="metric-box"><span>Verified</span><h3 id="metric-present" style="color: var(--green);">0</h3></div>
-                </div>
-                <div class="scroll-wrapper">
-                    <table>
-                        <thead>
-                            <tr><th>User ID</th><th>Type</th><th>Time</th></tr>
-                        </thead>
-                        <tbody id="live-log-rows">
-                            <tr id="empty-log-row"><td colspan="3" style="text-align: center; color: var(--muted); padding: 14px;">Awaiting logs...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <button class="btn-pay-now" onclick="triggerPhonePeIntent(event)">
+                Initialize Security Pay
+                <svg viewBox="0 0 24 24">
+                    <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/>
+                </svg>
+            </button>
+
+            <div class="secure-footer">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+                Direct PhonePe Intent Handshake Secure
             </div>
         </div>
-
-        <div id="database-panel" class="view-panel">
-            <div class="ui-card card-full">
-                <h2>Matrix Directory</h2>
-                <div class="scroll-wrapper">
-                    <table>
-                        <thead>
-                            <tr><th>User ID</th><th>Type</th><th>Action</th></tr>
-                        </thead>
-                        <tbody id="directory-table-rows">
-                            <tr><td colspan="3" style="text-align: center; color: var(--muted); padding: 18px;">No data logs.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <script>
-        const videoElement = document.getElementById('webcam-hardware');
-        const overlayCanvasElement = document.getElementById('vision-overlay');
-        const enrollStatusBanner = document.getElementById('enroll-status');
-        const scanStatusBanner = document.getElementById('scan-status');
-        const userStringInput = document.getElementById('target-user-name');
-        const actionCaptureTriggerBtn = document.getElementById('snap-btn');
-        const fingerprintSensorArea = document.getElementById('fingerprint-sensor-area');
-
-        let runtimeBiometricDataStorage = [];
-        let globalFaceMatcherReference = null;
-        let hardwareVideoMediaStream = null;
-        let sensorVerificationLoopTimer = null;
-        let sessionCheckedInUsersSet = new Set();
-        
-        let currentEnrollMode = 'face'; 
-        let currentScanMode = 'face';  
-
-        const MODEL_REPOSITORY_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-
-        // Automatically attempts to enter Fullscreen mode safely upon loading layout
-        function requestFullscreenEngagement() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(() => {});
+        // 1. Core Code Security Protections
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "F12" || 
+                (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "C" || e.key === "J")) || 
+                (e.ctrlKey && e.key === "U")) {
+                e.preventDefault();
+                return false;
             }
-        }
+        });
+        document.addEventListener('dragstart', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
 
-        async function initSystemPipelines() {
-            try {
-                await Promise.all([
-                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_REPOSITORY_URL),
-                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_REPOSITORY_URL),
-                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_REPOSITORY_URL)
-                ]);
-                
-                extractLocalStorageSessionData();
-                enrollStatusBanner.className = "status-strip success";
-                enrollStatusBanner.innerText = "System secure. Ready.";
-                userStringInput.disabled = false;
-                actionCaptureTriggerBtn.disabled = false;
-            } catch (err) {
-                enrollStatusBanner.style.color = "var(--red)";
-                enrollStatusBanner.innerText = "Engine setup failure.";
+        // 2. Countdown Engine Architecture (Targeting May 30, 2026 @ 19:30:00)
+        const celebrationTargetDate = new Date("May 30, 2026 19:30:00").getTime();
+
+        const countdownEngine = setInterval(function() {
+            const rightNow = new Date().getTime();
+            const distanceRemainder = celebrationTargetDate - rightNow;
+
+            const d = Math.floor(distanceRemainder / (1000 * 60 * 60 * 24));
+            const h = Math.floor((distanceRemainder % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((distanceRemainder % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((distanceRemainder % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = d < 10 ? "0" + d : d;
+            document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
+            document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
+            document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+
+            if (distanceRemainder < 0) {
+                clearInterval(countdownEngine);
+                ["days", "hours", "minutes", "seconds"].forEach(id => document.getElementById(id).innerText = "00");
             }
-        }
+        }, 1000);
 
-        function switchViewLayer(targetPanelLayoutId, dynamicTabAnchor) {
-            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
-            document.querySelectorAll('.tab-trigger').forEach(tab => tab.classList.remove('active'));
-            
-            document.getElementById(targetPanelLayoutId).classList.add('active');
-            dynamicTabAnchor.classList.add('active');
+        // 3. Direct PhonePe Intent Sequence Engine
+        function triggerPhonePeIntent(e) {
+            e.preventDefault();
 
-            if (targetPanelLayoutId === 'scan-panel' && currentScanMode === 'face') {
-                bindHardwareCameraPipeline();
-            } else {
-                unbindHardwareCameraPipeline();
-            }
-        }
-
-        function setEnrollMode(mode) {
-            currentEnrollMode = mode;
-            document.getElementById('mode-enroll-face').classList.toggle('active', mode === 'face');
-            document.getElementById('mode-enroll-print').classList.toggle('active', mode === 'print');
-            actionCaptureTriggerBtn.innerText = mode === 'face' ? "Capture" : "Save Print";
-        }
-
-        function setScanMode(mode) {
-            currentScanMode = mode;
-            document.getElementById('mode-scan-face').classList.toggle('active', mode === 'face');
-            document.getElementById('mode-scan-print').classList.toggle('active', mode === 'print');
-
-            if (mode === 'face') {
-                fingerprintSensorArea.style.display = 'none';
-                videoElement.style.display = 'block';
-                overlayCanvasElement.style.display = 'block';
-                bindHardwareCameraPipeline();
-            } else {
-                unbindHardwareCameraPipeline();
-                videoElement.style.display = 'none';
-                overlayCanvasElement.style.display = 'none';
-                fingerprintSensorArea.style.display = 'flex';
-                scanStatusBanner.className = "status-strip success";
-                scanStatusBanner.innerText = "Touch sensor ready.";
-            }
-        }
-
-        async function bindHardwareCameraPipeline() {
-            if (hardwareVideoMediaStream) return;
-            scanStatusBanner.className = "status-strip active";
-            scanStatusBanner.innerText = "Connecting camera...";
-            try {
-                hardwareVideoMediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
-                });
-                videoElement.srcObject = hardwareVideoMediaStream;
-                videoElement.onloadedmetadata = () => {
-                    scanStatusBanner.className = "status-strip success";
-                    scanStatusBanner.innerText = "Monitoring live camera feed";
-                    executeLiveSensorTrackingLoop();
-                };
-            } catch (err) {
-                scanStatusBanner.style.color = "var(--red)";
-                scanStatusBanner.innerText = "Camera link error.";
-            }
-        }
-
-        function unbindHardwareCameraPipeline() {
-            if (sensorVerificationLoopTimer) clearInterval(sensorVerificationLoopTimer);
-            if (hardwareVideoMediaStream) {
-                hardwareVideoMediaStream.getTracks().forEach(track => track.stop());
-                hardwareVideoMediaStream = null;
-            }
-            videoElement.srcObject = null;
-            const ctx = overlayCanvasElement.getContext('2d');
-            ctx.clearRect(0, 0, overlayCanvasElement.width, overlayCanvasElement.height);
-            scanStatusBanner.className = "status-strip";
-            scanStatusBanner.innerText = "Sensor offline";
-        }
-
-        async function executeEnrollmentCapture() {
-            const contextIdentityString = userStringInput.value.trim();
-            if (!contextIdentityString) { alert("Missing Username ID."); return; }
-
-            if (currentEnrollMode === 'face') {
-                await executeTraceSnapshot(contextIdentityString);
-            } else {
-                await executeFingerprintEnroll(contextIdentityString);
-            }
-        }
-
-        async function executeTraceSnapshot(identity) {
-            enrollStatusBanner.className = "status-strip active";
-            enrollStatusBanner.innerText = "Capturing face frame layout...";
-            
-            try {
-                const rapidIsolationStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                const sandboxMockVideoElement = document.createElement('video');
-                sandboxMockVideoElement.srcObject = rapidIsolationStream;
-                await sandboxMockVideoElement.play();
-
-                setTimeout(async () => {
-                    const computationalTraceOutput = await faceapi.detectSingleFace(sandboxMockVideoElement, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.65 }))
-                        .withFaceLandmarks()
-                        .withFaceDescriptor();
-
-                    rapidIsolationStream.getTracks().forEach(track => track.stop());
-
-                    if (!computationalTraceOutput) {
-                        alert("Face context drop. Increase lighting exposure.");
-                        enrollStatusBanner.className = "status-strip success";
-                        enrollStatusBanner.innerText = "System secure. Ready.";
-                        return;
-                    }
-
-                    saveBiometricNode(identity, 'face', Array.from(computationalTraceOutput.descriptor));
-                }, 750);
-            } catch(e) {
-                alert("Camera capture framework initialization blocked.");
-                enrollStatusBanner.className = "status-strip success";
-            }
-        }
-
-        async function executeFingerprintEnroll(identity) {
-            if (!window.PublicKeyCredential) {
-                alert("WebAuthn API layer unsupported on this device.");
-                return;
-            }
-
-            enrollStatusBanner.className = "status-strip active";
-            enrollStatusBanner.innerText = "Awaiting verification token...";
-
-            const challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-            const userId = new Uint8Array(16);
-            window.crypto.getRandomValues(userId);
-
-            const publicKeyCredentialCreationOptions = {
-                challenge: challenge,
-                rp: { name: "Sovereign Hub", id: window.location.hostname || "localhost" },
-                user: { id: userId, name: identity, displayName: identity },
-                pubKeyCredParams: [{ type: "public-key", alg: -7 }],
-                authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
-                timeout: 60000
-            };
-
-            try {
-                const credential = await navigator.credentials.create({ publicKey: publicKeyCredentialCreationOptions });
-                saveBiometricNode(identity, 'fingerprint', btoa(String.fromCharCode(...new Uint8Array(credential.rawId))));
-            } catch (err) {
-                alert("Touch token registration failed.");
-                enrollStatusBanner.className = "status-strip success";
-                enrollStatusBanner.innerText = "System secure. Ready.";
-            }
-        }
-
-        async function triggerWebAuthnAssertion() {
-            if (runtimeBiometricDataStorage.filter(b => b.type === 'fingerprint').length === 0) {
-                alert("Zero print profiles verified inside database directory logs.");
-                return;
-            }
-
-            scanStatusBanner.className = "status-strip active";
-            scanStatusBanner.innerText = "Verifying touch credentials...";
-
-            const challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-
-            const publicKeyCredentialRequestOptions = {
-                challenge: challenge,
-                rpId: window.location.hostname || "localhost",
-                userVerification: "required"
-            };
-
-            try {
-                const assertion = await navigator.credentials.get({ publicKey: publicKeyCredentialRequestOptions });
-                const matchedId64 = btoa(String.fromCharCode(...new Uint8Array(assertion.rawId)));
-                
-                const profileMatch = runtimeBiometricDataStorage.find(b => b.type === 'fingerprint' && b.descriptor === matchedId64);
-                
-                if (profileMatch) {
-                    pushAttendanceHistoryEntry(profileMatch.label, 'print');
-                    scanStatusBanner.className = "status-strip success";
-                    scanStatusBanner.innerText = `Verified: ${profileMatch.label.toUpperCase()}`;
-                } else {
-                    alert("Token unregistered on this database.");
-                    scanStatusBanner.className = "status-strip success";
-                    scanStatusBanner.innerText = "Touch sensor ready.";
-                }
-            } catch (err) {
-                scanStatusBanner.className = "status-strip success";
-                scanStatusBanner.innerText = "Touch sensor interrupted.";
-            }
-        }
-
-        function saveBiometricNode(label, type, descriptor) {
-            runtimeBiometricDataStorage.push({ label, type, descriptor });
-            commitSessionDataToLocalStorage();
-            compileBiometricEngineMatcher();
-            renderDirectoryTableLayoutRows();
-            
-            alert(`Logged ${type} for: ${label}`);
-            userStringInput.value = "";
-            enrollStatusBanner.className = "status-strip success";
-            enrollStatusBanner.innerText = "System secure. Ready.";
-        }
-
-        function executeLiveSensorTrackingLoop() {
-            sensorVerificationLoopTimer = setInterval(async () => {
-                if (videoElement.paused || videoElement.ended || currentScanMode !== 'face') return;
-
-                const trackingAreaDimensions = { width: videoElement.offsetWidth, height: videoElement.offsetHeight };
-                if (overlayCanvasElement.width !== trackingAreaDimensions.width || overlayCanvasElement.height !== trackingAreaDimensions.height) {
-                    faceapi.matchDimensions(overlayCanvasElement, trackingAreaDimensions);
-                }
-
-                // Tightened tracking limits and lower inputs for enhanced system security and anti-spoof
-                const extractionDetectionsPool = await faceapi.detectAllFaces(videoElement, new faceapi.TinyFaceDetectorOptions({ inputSize: 128, scoreThreshold: 0.60 }))
-                    .withFaceLandmarks()
-                    .withFaceDescriptors();
-
-                const standardizedCalculatedResults = faceapi.resizeResults(extractionDetectionsPool, trackingAreaDimensions);
-                const ctx = overlayCanvasElement.getContext('2d');
-                ctx.clearRect(0, 0, overlayCanvasElement.width, overlayCanvasElement.height);
-
-                standardizedCalculatedResults.forEach(scannedFaceInstance => {
-                    let canvasDisplayIdentityText = "Unknown Entity";
-
-                    if (globalFaceMatcherReference && runtimeBiometricDataStorage.filter(b => b.type === 'face').length > 0) {
-                        const immediateOptimalMatchResult = globalFaceMatcherReference.findBestMatch(scannedFaceInstance.descriptor);
-                        // Stringent strict security verification distance cutoff threshold profile value mapping match parameter
-                        if (immediateOptimalMatchResult.label !== 'unknown' && immediateOptimalMatchResult.distance < 0.40) {
-                            canvasDisplayIdentityText = immediateOptimalMatchResult.label;
-                            pushAttendanceHistoryEntry(canvasDisplayIdentityText, 'face');
-                        }
-                    }
-
-                    const perimeterBox = scannedFaceInstance.detection.box;
-                    ctx.strokeStyle = canvasDisplayIdentityText !== "Unknown Entity" ? '#0f7a44' : '#b31414';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(perimeterBox.x, perimeterBox.y, perimeterBox.width, perimeterBox.height);
-
-                    ctx.fillStyle = "rgba(25, 24, 28, 0.85)";
-                    ctx.fillRect(perimeterBox.x, perimeterBox.y - 18, perimeterBox.width, 16);
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = "bold 9px 'Plus Jakarta Sans', sans-serif";
-                    ctx.fillText(canvasDisplayIdentityText.toUpperCase(), perimeterBox.x + 4, perimeterBox.y - 6);
-                });
-            }, 250);
-        }
-
-        function pushAttendanceHistoryEntry(subjectNameString, type) {
-            const uniqueKey = `${subjectNameString}_${type}`;
-            if (sessionCheckedInUsersSet.has(uniqueKey)) return;
-            sessionCheckedInUsersSet.add(uniqueKey);
-            
-            const totalDistinctEntities = new Set([...sessionCheckedInUsersSet].map(s => s.split('_')[0])).size;
-            document.getElementById('metric-present').innerText = totalDistinctEntities;
-
-            const tableNoticePlaceholder = document.getElementById('empty-log-row');
-            if (tableNoticePlaceholder) tableNoticePlaceholder.remove();
-
-            const tableLogTargetContainer = document.getElementById('live-log-rows');
-            const generatedClockLocaleTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            const structuralRowMarkupNode = document.createElement('tr');
-            structuralRowMarkupNode.innerHTML = `
-                <td><b>${subjectNameString}</b></td>
-                <td><span class="type-badge ${type}">${type}</span></td>
-                <td style="font-variant-numeric: tabular-nums; color: var(--muted);">${generatedClockLocaleTimestamp}</td>
-            `;
-            tableLogTargetContainer.prepend(structuralRowMarkupNode);
-        }
-
-        function commitSessionDataToLocalStorage() {
-            localStorage.setItem('sovereign_mixed_biometric_db', JSON.stringify(runtimeBiometricDataStorage));
-            document.getElementById('metric-registered').innerText = runtimeBiometricDataStorage.length;
-        }
-
-        function extractLocalStorageSessionData() {
-            const rawExtractedCachePayloadString = localStorage.getItem('sovereign_mixed_biometric_db');
-            if (rawExtractedCachePayloadString) {
-                runtimeBiometricDataStorage = JSON.parse(rawExtractedCachePayloadString);
-                compileBiometricEngineMatcher();
-                renderDirectoryTableLayoutRows();
-            }
-        }
-
-        function compileBiometricEngineMatcher() {
-            document.getElementById('metric-registered').innerText = runtimeBiometricDataStorage.length;
-            const faceProfilesOnly = runtimeBiometricDataStorage.filter(item => item.type === 'face');
-            if (faceProfilesOnly.length === 0) { globalFaceMatcherReference = null; return; }
-            const compiledUnrolledProfiles = faceProfilesOnly.map(item => new faceapi.LabeledFaceDescriptors(item.label, [new Float32Array(item.descriptor)]));
-            
-            // Set tighter matcher tolerance parameters for strict verification rule protocols
-            globalFaceMatcherReference = new faceapi.FaceMatcher(compiledUnrolledProfiles, 0.40);
-        }
-
-        function renderDirectoryTableLayoutRows() {
-            const directoryContainerElement = document.getElementById('directory-table-rows');
-            if (runtimeBiometricDataStorage.length === 0) {
-                directoryContainerElement.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--muted); padding: 18px;">No records.</td></tr>`;
-                return;
-            }
-            directoryContainerElement.innerHTML = "";
-            runtimeBiometricDataStorage.forEach((profile, dataArrayIndexIndex) => {
-                const manualTableRowNode = document.createElement('tr');
-                manualTableRowNode.innerHTML = `
-                    <td><b>${profile.label}</b></td>
-                    <td><span class="type-badge ${profile.type}">${profile.type}</span></td>
-                    <td><button class="purge-btn" onclick="executeProfileCachePurge(${dataArrayIndexIndex})">Purge</button></td>
-                `;
-                directoryContainerElement.appendChild(manualTableRowNode);
+            // Fire premium particle explosion
+            confetti({
+                particleCount: 160,
+                spread: 80,
+                origin: { y: 0.65 },
+                colors: ['#bf953f', '#fcf6ba', '#b38728', '#ffffff']
             });
-        }
 
-        function executeProfileCachePurge(targetElementIndex) {
-            const temporaryLabelExtractionString = runtimeBiometricDataStorage[targetElementIndex].label;
-            const type = runtimeBiometricDataStorage[targetElementIndex].type;
-            if (confirm(`Erase data sheet record for: ${temporaryLabelExtractionString}?`)) {
-                runtimeBiometricDataStorage.splice(targetElementIndex, 1);
-                sessionCheckedInUsersSet.delete(`${temporaryLabelExtractionString}_${type}`);
-                
-                const totalDistinctEntities = new Set([...sessionCheckedInUsersSet].map(s => s.split('_')[0])).size;
-                document.getElementById('metric-present').innerText = totalDistinctEntities;
-                
-                commitSessionDataToLocalStorage();
-                compileBiometricEngineMatcher();
-                renderDirectoryTableLayoutRows();
+            // Target Parameters
+            const payeeUPI = "8103509439@ybl"; 
+            const payeeName = "Vikram Dhakad";    
+            const amount = "50";
+            const transactionNote = "Contribution for Shivam Miskare Birthday Celebration";
+
+            // Universal fallback string layout
+            const standardUpiUrl = `upi://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            
+            // Direct PhonePe Execution Schemes (Using native Android intent filters and iOS deep-linking structures)
+            const phonePeAndroidIntent = `intent://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}#Intent;scheme=upi;package=com.phonepe.app;end`;
+            const phonePeIosScheme = `phonepe://upi/pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+
+            // Device architecture assessment
+            const userAgentString = navigator.userAgent || navigator.vendor || window.opera;
+            const isAndroidDevice = /android/i.test(userAgentString);
+            const isIosDevice = /iPad|iPhone|iPod/.test(userAgentString) && !window.MSStream;
+
+            if (isAndroidDevice) {
+                // Instantly force deep-link bypass straight to native PhonePe application
+                window.location.href = phonePeAndroidIntent;
+            } else if (isIosDevice) {
+                // Route through iOS target app registers
+                window.location.href = phonePeIosScheme;
+                setTimeout(() => { window.location.href = standardUpiUrl; }, 800);
+            } else {
+                // Desktop or generic fallback sequence
+                window.location.href = standardUpiUrl;
             }
         }
-
-        window.onload = initSystemPipelines;
     </script>
 </body>
 </html>
