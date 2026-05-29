@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Monolith | Shivam Miskare</title>
-    
+    <title>The Celebration | Shivam Miskare</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Marcellus&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --obsidian: #050507;
-            --marble-white: #f5f5f9;
-            --muted-slate: #64748b;
-            --deep-onyx: #0c0d12;
-            --gold-primary: #dfba6b;
-            --gold-gradient: linear-gradient(135deg, #c5a059 0%, #fef8cc 30%, #bfa054 65%, #ecc67a 100%);
-            --border-subtle: rgba(255, 255, 255, 0.04);
-            --card-glass: rgba(12, 13, 18, 0.75);
+            --bg-sacred: #160200; /* Deepest Midnight Crimson - Ultra Premium Core */
+            --surface-royal: #240502; /* Rich Burnt Saffron Shadow */
+            --surface-inner: #0d0100; /* Obsidian Altar Core */
+            --gold-base: #dfb76c; /* Antique Chola Gold */
+            --gold-bright: #fbf0b9; /* Shimmering Diya Flame Radiance */
+            --text-pure: #fcf9f2; /* Ivory Silk White */
+            --text-dim: #9e7e7a; /* Muted Rose-Copper */
+            --border-fine: rgba(223, 183, 108, 0.15);
+            --border-accent: rgba(223, 183, 108, 0.4);
+            --alert-bg: #300300;
         }
 
         * {
@@ -31,649 +31,399 @@
             user-select: none;
             -webkit-user-select: none;
             outline: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--obsidian);
-            color: var(--marble-white);
+            background-color: var(--bg-sacred);
+            background-image: 
+                radial-gradient(circle at 50% 20%, #3a0b06 0%, var(--bg-sacred) 65%),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
+            color: var(--text-pure);
             min-height: 100vh;
-            min-height: -webkit-fill-available;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px 16px;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
+            padding: 32px 16px;
+            letter-spacing: 0.3px;
         }
 
-        /* Fluid Structural Space Wrapper */
-        .stage-container {
+        /* Sovereign Structural Canvas */
+        .royal-canvas {
             width: 100%;
-            max-width: 400px;
-            perspective: 2000px;
-            z-index: 5;
-            opacity: 0;
-            transform: scale(0.92) translateY(30px);
-            will-change: transform, opacity;
-        }
-
-        /* Fine-Artisan Monolith Container */
-        .monolith-card {
-            width: 100%;
-            background: var(--card-glass);
-            border: 1px solid var(--border-subtle);
-            border-radius: 28px;
-            padding: 36px 24px;
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            box-shadow: 
-                0 50px 100px rgba(0, 0, 0, 0.85),
-                inset 0 1px 0px rgba(255, 255, 255, 0.1);
-            transform-style: preserve-3d;
+            max-width: 420px;
+            background: var(--surface-royal);
+            border: 1px solid var(--gold-base);
+            border-radius: 24px;
+            padding: 44px 28px 36px;
             position: relative;
+            box-shadow: 
+                0 40px 90px rgba(0, 0, 0, 0.85), 
+                inset 0 0 50px rgba(0, 0, 0, 0.6);
             overflow: hidden;
         }
 
-        /* Polished Metallic Liquid Outer Frame */
-        .monolith-card::before {
+        /* Elite Architectural Frame Accents */
+        .royal-canvas::before {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: 28px;
-            padding: 1px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(223,186,107,0.4), rgba(255,255,255,0.02), rgba(223,186,107,0.4));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            inset: 8px;
+            border: 1px solid var(--border-fine);
+            border-radius: 18px;
             pointer-events: none;
         }
 
-        /* Immersive Reactive Light Reflection Overlay */
-        .specular-glare {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at var(--shine-x, 50%) var(--shine-y, 50%), rgba(255, 255, 255, 0.05) 0%, transparent 55%);
-            pointer-events: none;
-            z-index: 3;
-        }
-
-        /* Clean Cinematic Gate Opener */
-        #loading-curtain {
-            position: fixed;
-            inset: 0;
-            background: #000000;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .curtain-logo {
-            font-family: 'Cinzel', serif;
-            font-size: 0.95rem;
-            font-weight: 500;
-            letter-spacing: 12px;
-            color: var(--marble-white);
-            text-transform: uppercase;
-            opacity: 0;
-            transform: scale(0.95);
-        }
-
-        /* Fine-Art Headings */
-        .brand-header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .crest-shield {
-            width: 44px;
-            height: 44px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Sacred Geometric Centerpiece */
+        .sacred-crest-container {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 24px;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .crest-shield svg {
-            width: 24px;
-            height: 24px;
-            fill: url(#gold-metallic-def);
+        .mandala-svg-engine {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: slowSpiritualRotation 45s linear infinite;
         }
 
-        h1.headline-title {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(1.6rem, 5.5vw, 2rem);
-            font-weight: 600;
-            letter-spacing: 3px;
-            color: var(--marble-white);
-            text-transform: uppercase;
-            line-height: 1.25;
-            margin-bottom: 6px;
-        }
-
-        .badge-subtitle {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            color: var(--gold-primary);
-            font-weight: 600;
-            opacity: 0.9;
-        }
-
-        /* Minimalist Urgent Warning Block */
-        .alert-strip {
-            background: rgba(239, 68, 68, 0.03);
-            border: 1px solid rgba(239, 68, 68, 0.15);
-            color: #fca5a5;
-            font-size: 0.68rem;
-            line-height: 1.5;
-            padding: 12px 14px;
-            border-radius: 12px;
-            margin-bottom: 28px;
-            text-align: center;
-            letter-spacing: 0.5px;
-            font-weight: 500;
-        }
-
-        /* Clean High-Contrast Premium Display Token */
-        .valuation-monolith {
-            background: linear-gradient(180deg, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0.3) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.02);
-            border-radius: 16px;
-            padding: 16px 0;
-            margin-bottom: 24px;
-            text-align: center;
-        }
-
-        .valuation-lbl {
-            font-size: 0.6rem;
+        .crest-monogram {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.35rem;
             font-weight: 700;
-            color: var(--muted-slate);
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            color: var(--gold-bright);
+            text-shadow: 0 0 12px rgba(251, 240, 185, 0.4);
+            z-index: 2;
         }
 
-        .valuation-amount {
-            font-family: 'Cinzel', serif;
-            font-size: 2.4rem;
-            font-weight: 500;
-            margin-top: 4px;
-            background: var(--gold-gradient);
+        /* Luxury Minimalist Typography */
+        .header-panel {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-family: 'Marcellus', serif;
+            font-size: 2.25rem;
+            font-weight: 400;
+            letter-spacing: 3px;
+            color: var(--text-pure);
+            margin-bottom: 4px;
+            background: linear-gradient(180deg, #ffffff 40%, var(--gold-bright) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* High-Animation Architectural Grid Countdown */
-        .chronograph-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 28px;
-        }
-
-        .chronograph-cell {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 14px 4px;
-            text-align: center;
-            position: relative;
-        }
-
-        .metric-value {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(1.2rem, 4vw, 1.45rem);
-            font-weight: 500;
-            color: var(--marble-white);
-            display: block;
-        }
-
-        .metric-label {
-            font-size: 0.5rem;
+        .subtitle {
+            font-family: 'Marcellus', serif;
+            font-size: 0.75rem;
+            color: var(--gold-base);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--muted-slate);
-            margin-top: 6px;
-            font-weight: 700;
+            letter-spacing: 5px;
+            opacity: 0.85;
         }
 
-        /* Micro-Information Architecture Table */
-        .ledger-box {
-            background: rgba(0, 0, 0, 0.2);
+        /* Shubh Strategic Alert Banner */
+        .shubh-banner {
+            background-color: var(--alert-bg);
+            border: 1px solid rgba(223, 183, 108, 0.2);
+            color: var(--gold-bright);
+            font-family: 'Marcellus', serif;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            letter-spacing: 1.5px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 32px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        /* Classical Asymmetric Heritage Matrix */
+        .heritage-matrix {
+            background: var(--surface-inner);
+            border: 1px solid var(--border-fine);
             border-radius: 16px;
-            padding: 6px 16px;
+            padding: 8px 20px;
             margin-bottom: 28px;
         }
 
-        .ledger-node {
+        .matrix-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 14px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            will-change: transform, opacity;
+            border-bottom: 1px solid rgba(223, 183, 108, 0.06);
         }
 
-        .ledger-node:last-child {
+        .matrix-row:last-child {
             border-bottom: none;
         }
 
-        .node-key {
-            font-size: 0.68rem;
+        .matrix-label {
+            font-family: 'Marcellus', serif;
+            font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: var(--muted-slate);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: var(--text-dim);
         }
 
-        .node-key svg {
-            width: 14px;
-            height: 14px;
-            fill: var(--muted-slate);
-        }
-
-        .node-val {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #e2e8f0;
+        .matrix-value {
+            font-size: 0.88rem;
+            font-weight: 400;
+            color: var(--text-pure);
             text-align: right;
+            opacity: 0.95;
         }
 
-        .node-val.highlight-gold {
-            font-family: 'Cinzel', serif;
-            color: var(--gold-primary);
-            font-weight: 600;
+        .matrix-value.gold-highlight {
+            font-family: 'Marcellus', serif;
+            color: var(--gold-bright);
+            font-size: 1rem;
             letter-spacing: 0.5px;
         }
 
-        /* Ultra-Premium Gold Command Core Button */
-        .btn-command-trigger {
+        /* Refined Symmetrical Countdown Strips */
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .countdown-cell {
+            background: var(--surface-inner);
+            border: 1px solid var(--border-fine);
+            border-radius: 10px;
+            padding: 14px 2px;
+            text-align: center;
+            transition: border 0.3s;
+        }
+
+        .countdown-cell:hover {
+            border-color: var(--border-accent);
+        }
+
+        .countdown-metric {
+            font-family: 'Marcellus', serif;
+            font-size: 1.5rem;
+            color: var(--gold-bright);
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.52rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* Monolithic Elite Action Component */
+        .btn-elite-action {
             width: 100%;
-            padding: 18px;
-            background: var(--gold-gradient);
-            color: #000000;
+            padding: 20px;
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 30%, #b38728 70%, #aa771c 100%);
+            color: #160200;
             border: none;
             border-radius: 14px;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 0.82rem;
-            font-weight: 700;
+            font-family: 'Marcellus', serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            cursor: pointer;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .btn-elite-action::before {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .btn-elite-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(223, 183, 108, 0.2);
+            filter: brightness(1.08);
+        }
+
+        .heritage-footer {
+            text-align: center;
+            margin-top: 28px;
+            font-family: 'Marcellus', serif;
+            font-size: 0.6rem;
             text-transform: uppercase;
             letter-spacing: 4px;
-            cursor: pointer;
-            box-shadow: 0 16px 35px rgba(197, 160, 89, 0.25);
-            position: relative;
-            overflow: hidden;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            color: var(--text-dim);
+            opacity: 0.6;
         }
 
-        .btn-command-trigger .shimmer-fluid {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-            transform: translateX(-100%);
-        }
-
-        .btn-command-trigger svg {
-            width: 14px;
-            height: 14px;
-            fill: #000000;
-        }
-
-        /* Ambient Space Lighting System */
-        .nebula-ambience {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-            overflow: hidden;
-        }
-
-        .glowing-cloud {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(130px);
-            opacity: 0.04;
-            background: #ffffff;
-            will-change: transform;
-        }
-
-        /* Institutional Safety Curtain System */
-        #horizon-lockout {
+        /* Autonomous Expiry Lockout Overlay Layer */
+        #sacred-lockout-curtain {
             position: fixed;
             inset: 0;
-            background: #000000;
+            background: #090100;
             z-index: 999999;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 24px;
+            padding: 20px;
         }
 
-        #horizon-lockout h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
-            color: var(--marble-white);
-            letter-spacing: 5px;
+        #sacred-lockout-curtain h2 {
+            font-family: 'Marcellus', serif;
+            font-size: 1.75rem;
+            color: #ef4444;
+            letter-spacing: 4px;
         }
 
-        .footer-handshake {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 0.55rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .footer-handshake svg {
-            width: 10px; height: 10px; fill: rgba(255, 255, 255, 0.15);
+        @keyframes slowSpiritualRotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
-    <div id="horizon-lockout">
-        <h2>LINK TERMINATED</h2>
-        <p style="font-size: 0.65rem; color: var(--muted-slate); margin-top: 14px; letter-spacing: 2px; text-transform: uppercase;">The schedule transaction system has reached its final operational boundary.</p>
+    <div id="sacred-lockout-curtain">
+        <h2>UTSAVA_CONCLUDED</h2>
+        <p style="font-family:'Plus Jakarta Sans'; font-size:0.72rem; color:var(--text-dim); margin-top:12px; letter-spacing:2px; text-transform:uppercase;">The celebratory window has concluded.</p>
     </div>
 
-    <div id="loading-curtain">
-        <div class="curtain-logo">The Invitation</div>
-    </div>
-
-    <div class="nebula-ambience">
-        <div class="glowing-cloud" id="cloud-alpha" style="width: 500px; height: 500px; top: -15%; left: -10%;"></div>
-        <div class="glowing-cloud" id="cloud-beta" style="width: 500px; height: 500px; bottom: -15%; right: -10%;"></div>
-    </div>
-
-    <svg style="position: absolute; width: 0; height: 0;" width="0" height="0">
-        <defs>
-            <linearGradient id="gold-metallic-def" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#c5a059" />
-                <stop offset="50%" stop-color="#fef8cc" />
-                <stop offset="100%" stop-color="#bfa054" />
-            </linearGradient>
-        </defs>
-    </svg>
-
-    <div class="stage-container" id="spatial-root-anchor">
-        <div class="monolith-card" id="tilt-hull">
-            <div class="specular-glare"></div>
-            
-            <div class="brand-header">
-                <div class="crest-shield">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 2L2 22h20L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/>
-                    </svg>
-                </div>
-                <h1 class="headline-title">Shivam Miskare</h1>
-                <div class="badge-subtitle">Janmotsav Celebration</div>
+    <div class="royal-canvas">
+        
+        <div class="header-panel">
+            <div class="sacred-crest-container">
+                <svg class="mandala-svg-engine" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#dfb76c" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.4"/>
+                    <circle cx="50" cy="50" r="38" fill="none" stroke="#dfb76c" stroke-width="0.75" opacity="0.3"/>
+                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(0 50 50)" opacity="0.7"/>
+                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(45 50 50)" opacity="0.5"/>
+                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(90 50 50)" opacity="0.7"/>
+                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(135 50 50)" opacity="0.5"/>
+                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(180 50 50)" opacity="0.7"/>
+                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(225 50 50)" opacity="0.5"/>
+                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(270 50 50)" opacity="0.7"/>
+                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(315 50 50)" opacity="0.5"/>
+                </svg>
+                <div class="crest-monogram">ॐ</div>
             </div>
-
-            <div class="alert-strip">
-                Secure your ledger allocation prior to 11:59 PM on 29 May 2026.
-            </div>
-
-            <div class="valuation-monolith">
-                <div class="valuation-lbl">Entry Contribution</div>
-                <div class="valuation-amount">&#x20B9;50</div>
-            </div>
-
-            <div class="chronograph-grid">
-                <div class="chronograph-cell"><span class="metric-value" id="days">00</span><div class="metric-label">Days</div></div>
-                <div class="chronograph-cell"><span class="metric-value" id="hours">00</span><div class="metric-label">Hours</div></div>
-                <div class="chronograph-cell"><span class="metric-value" id="min">00</span><div class="metric-label">Min</div></div>
-                <div class="chronograph-cell"><span class="metric-value" id="sec">00</span><div class="metric-label">Sec</div></div>
-            </div>
-
-            <div class="ledger-box">
-                <div class="ledger-node">
-                    <div class="node-key">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
-                        Assembly
-                    </div>
-                    <div class="node-val">Cake Cutting Ceremony</div>
-                </div>
-                <div class="ledger-node">
-                    <div class="node-key">
-                        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5C6.34 5 5 1.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                        Guild Group
-                    </div>
-                    <div class="node-val">Topa Gang</div>
-                </div>
-                <div class="ledger-node">
-                    <div class="node-key">
-                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z"/></svg>
-                        Manager
-                    </div>
-                    <div class="node-val">Vikram Dhakad</div>
-                </div>
-                <div class="ledger-node">
-                    <div class="node-key">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                        Sthan / Venue
-                    </div>
-                    <div class="node-val highlight-gold">Niranjan's House</div>
-                </div>
-                <div class="ledger-node">
-                    <div class="node-key">
-                        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-                        Tithi / Date
-                    </div>
-                    <div class="node-val">30 May 2026</div>
-                </div>
-                <div class="ledger-node">
-                    <div class="node-key">
-                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                        Samaya / Time
-                    </div>
-                    <div class="node-val highlight-gold">06:30 PM</div>
-                </div>
-            </div>
-
-            <button class="btn-command-trigger" id="master-trigger" onclick="executePremiumGateway(event)">
-                Initialize Payment
-                <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
-                <div class="shimmer-fluid"></div>
-            </button>
-
-            <div class="footer-handshake">
-                <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-                Direct PhonePe Protocol Handshake Secure
-            </div>
-
+            <h1>Shivam Miskare</h1>
+            <div class="subtitle">Janmotsav Invitation</div>
         </div>
+
+        <div class="shubh-banner">
+            Kindly clear the celebration contribution before 11:59 PM on 29/05/2026.
+        </div>
+
+        <div class="countdown-grid">
+            <div class="countdown-cell"><div class="countdown-metric" id="days">00</div><div class="countdown-label">Days</div></div>
+            <div class="countdown-cell"><div class="countdown-metric" id="hours">00</div><div class="countdown-label">Hours</div></div>
+            <div class="countdown-cell"><div class="countdown-metric" id="minutes">00</div><div class="countdown-label">Mins</div></div>
+            <div class="countdown-cell"><div class="countdown-metric" id="seconds">00</div><div class="countdown-label">Secs</div></div>
+        </div>
+
+        <div class="heritage-matrix">
+            <div class="matrix-row"><div class="matrix-label">Utsav Ceremony</div><div class="matrix-value">Cake Cutting Celebration</div></div>
+            <div class="matrix-row"><div class="matrix-label">Organizers</div><div class="matrix-value">Topa Gang</div></div>
+            <div class="matrix-row"><div class="matrix-label">Prabandhak</div><div class="matrix-value">Vikram Dhakad</div></div>
+            <div class="matrix-row"><div class="matrix-label">Sthan / Venue</div><div class="matrix-value gold-highlight">Niranjan's House</div></div>
+            <div class="matrix-row"><div class="matrix-label">Tithi / Date</div><div class="matrix-value">30 May 2026</div></div>
+            <div class="matrix-row"><div class="matrix-label">Samaya / Time</div><div class="matrix-value">07:30 PM</div></div>
+            <div class="matrix-row"><div class="matrix-label">Contribution</div><div class="matrix-value gold-highlight">₹50</div></div>
+        </div>
+
+        <button class="btn-elite-action" onclick="invokeUpiPayment(event)">Pay</button>
+
+        <div class="heritage-footer">
+            Direct Handshake Protocol Secure
+        </div>
+
     </div>
 
     <script>
-        // High-Security DevTools Protection Layer
+        // Elite Security Systems
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
             if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","C","J"].includes(e.key)) || (e.ctrlKey && e.key === "U")) e.preventDefault();
         });
 
-        // Countdown Target Boundary: May 30, 2026 @ 18:30:00 (6:30 PM)
-        const timelineTargetMilestone = new Date("May 30, 2026 18:30:00").getTime();
-        const absoluteCeilingLockout = timelineTargetMilestone + (6 * 60 * 60 * 1000);
+        const targetUtsavTimestamp = new Date("May 30, 2026 19:30:00").getTime();
+        const secureLockoutTimestamp = targetUtsavTimestamp + (6 * 60 * 60 * 1000);
 
-        function verifySystemLifespan() {
-            if (new Date().getTime() >= absoluteCeilingLockout) {
-                document.getElementById("horizon-lockout").style.display = "flex";
+        function enforceSacredTimeline() {
+            if (new Date().getTime() >= secureLockoutTimestamp) {
+                document.getElementById("sacred-lockout-curtain").style.display = "flex";
                 document.body.style.overflow = "hidden";
                 setTimeout(() => {
-                    document.querySelectorAll("body > :not(#horizon-lockout)").forEach(el => el.remove());
-                }, 40);
+                    document.querySelectorAll("body > :not(#sacred-lockout-curtain)").forEach(el => el.remove());
+                }, 50);
             }
         }
-        verifySystemLifespan();
+        enforceSacredTimeline();
+        setInterval(enforceSacredTimeline, 10000);
 
-        // High-End Fluid Cinematic Entry Orchestration
-        window.addEventListener('DOMContentLoaded', () => {
-            const entranceTimeline = gsap.timeline();
-
-            // Set spatial properties baseline
-            gsap.set('.ledger-node', { opacity: 0, y: 15 });
-            gsap.set('.chronograph-cell', { opacity: 0, y: 12 });
-
-            // Step 1: Open branding curtain smoothly
-            entranceTimeline.to('.curtain-logo', { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" });
-            entranceTimeline.to('#loading-curtain', { yPercent: -100, duration: 1, ease: "power3.inOut" }, '+=0.3');
-
-            // Step 2: Unfold master visual layout frame gracefully
-            entranceTimeline.to('.stage-container', { opacity: 1, scale: 1, y: 0, duration: 1.2, ease: "power3.out" }, '-=0.6');
-
-            // Step 3: Flow inner components sequentially
-            entranceTimeline.from('.crest-shield', { opacity: 0, scale: 0.8, duration: 0.5, ease: "back.out(2)" }, '-=0.7');
-            entranceTimeline.from('.headline-title', { opacity: 0, letterSpacing: '10px', duration: 0.8, ease: "power2.out" }, '-=0.6');
-            entranceTimeline.from('.badge-subtitle', { opacity: 0, y: 8, duration: 0.4 }, '-=0.4');
-            entranceTimeline.from('.alert-strip', { opacity: 0, scaleX: 0.96, duration: 0.6 }, '-=0.4');
-            entranceTimeline.from('.valuation-monolith', { opacity: 0, y: 10, duration: 0.5 }, '-=0.3');
+        const clockEngine = setInterval(() => {
+            const currentDelta = targetUtsavTimestamp - new Date().getTime();
             
-            // Stagger computational blocks
-            entranceTimeline.to('.chronograph-cell', { opacity: 1, y: 0, stagger: 0.04, duration: 0.5, ease: "power2.out" }, '-=0.35');
-            entranceTimeline.to('.ledger-node', { opacity: 1, y: 0, stagger: 0.04, duration: 0.5, ease: "power2.out" }, '-=0.3');
-            entranceTimeline.from('#master-trigger', { opacity: 0, y: 15, duration: 0.5, ease: "back.out(1.2)" }, '-=0.15');
+            const daysCount = Math.max(0, Math.floor(currentDelta / (1000 * 60 * 60 * 24)));
+            const hoursCount = Math.max(0, Math.floor((currentDelta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+            const minsCount = Math.max(0, Math.floor((currentDelta % (1000 * 60 * 60)) / (1000 * 60)));
+            const secsCount = Math.max(0, Math.floor((currentDelta % (1000 * 60)) / 1000));
 
-            // Slow Motion Ambient Coordinate Vectors Loops
-            gsap.to('#cloud-alpha', { x: 35, y: -25, duration: 9, repeat: -1, yoyo: true, ease: "sine.inOut" });
-            gsap.to('#cloud-beta', { x: -35, y: 25, duration: 11, repeat: -1, yoyo: true, ease: "sine.inOut" });
-        });
+            document.getElementById("days").innerText = daysCount < 10 ? "0" + daysCount : daysCount;
+            document.getElementById("hours").innerText = hoursCount < 10 ? "0" + hoursCount : hoursCount;
+            document.getElementById("minutes").innerText = minsCount < 10 ? "0" + minsCount : minsCount;
+            document.getElementById("seconds").innerText = secsCount < 10 ? "0" + secsCount : secsCount;
 
-        // Frictionless 3D Inertial Parallax Dynamic Tracking Mechanics
-        const tiltHull = document.getElementById('tilt-hull');
-        let targetX = 0, targetY = 0;
-        let currentX = 0, currentY = 0;
-
-        function processPointerMovement(e) {
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            
-            const middlePointX = window.innerWidth / 2;
-            const middlePointY = window.innerHeight / 2;
-            
-            // Ultra elegant, subtle tilt angles matching modern high-end web designs
-            targetY = (middlePointX - clientX) / 35;
-            targetX = (middlePointY - clientY) / 35;
-
-            const boundingBox = tiltHull.getBoundingClientRect();
-            const localX = ((clientX - boundingBox.left) / boundingBox.width) * 100;
-            const localY = ((clientY - boundingBox.top) / boundingBox.height) * 100;
-            tiltHull.style.setProperty('--shine-x', `${localX}%`);
-            tiltHull.style.setProperty('--shine-y', `${localY}%`);
-        }
-
-        function renderInterpolationTick() {
-            currentY += (targetY - currentY) * 0.07;
-            currentX += (targetX - currentX) * 0.07;
-            
-            gsap.set(tiltHull, { 
-                rotationY: currentY, 
-                rotationX: -currentX,
-                transformPerspective: 2000
-            });
-            requestAnimationFrame(renderInterpolationTick);
-        }
-
-        if (window.matchMedia('(hover: hover)').matches) {
-            document.addEventListener('mousemove', processPointerMovement);
-            document.addEventListener('mouseleave', () => { targetY = 0; targetX = 0; });
-            requestAnimationFrame(renderInterpolationTick);
-        }
-
-        // Real-Time System Precision Chronograph Loop
-        const systematicClockEngine = setInterval(() => {
-            const activeDelta = timelineTargetMilestone - new Date().getTime();
-            
-            const daysLeft = Math.max(0, Math.floor(activeDelta / (1000 * 60 * 60 * 24)));
-            const hoursLeft = Math.max(0, Math.floor((activeDelta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-            const minutesLeft = Math.max(0, Math.floor((activeDelta % (1000 * 60 * 60)) / (1000 * 60)));
-            const secondsLeft = Math.max(0, Math.floor((activeDelta % (1000 * 60)) / 1000));
-
-            refreshClockMetricNode("days", daysLeft);
-            refreshClockMetricNode("hours", hoursLeft);
-            refreshClockMetricNode("min", minutesLeft);
-            refreshClockMetricNode("sec", secondsLeft);
-
-            if (activeDelta <= 0) {
-                clearInterval(systematicClockEngine);
+            if (currentDelta <= 0) {
+                clearInterval(clockEngine);
             }
         }, 1000);
 
-        function refreshClockMetricNode(targetNodeId, mathematicalValue) {
-            const nodeDomElement = document.getElementById(targetNodeId);
-            const standardizedString = mathematicalValue < 10 ? "0" + mathematicalValue : "" + mathematicalValue;
-            
-            if (nodeDomElement.innerText !== standardizedString) {
-                // High-fidelity micro pop animation on text value variation
-                gsap.fromTo(nodeDomElement, { opacity: 0.3, scale: 0.88, y: -4 }, { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: "power2.out" });
-                nodeDomElement.innerText = standardizedString;
-            }
-        }
-
-        // Row Interactions Micro Triggers
-        document.querySelectorAll('.ledger-node').forEach(node => {
-            node.addEventListener('mouseenter', () => {
-                gsap.to(node, { paddingLeft: '4px', paddingRight: '4px', backgroundColor: 'rgba(255,255,255,0.01)', duration: 0.2 });
-            });
-            node.addEventListener('mouseleave', () => {
-                gsap.to(node, { paddingLeft: '0px', paddingRight: '0px', backgroundColor: 'transparent', duration: 0.25 });
-            });
-        });
-
-        // Luxury Deep Link Handshake Engine Setup
-        function executePremiumGateway(e) {
+        function invokeUpiPayment(e) {
             e.preventDefault();
 
-            // Premium Monochrome Particle Explosion Layer
-            const runtimeBoundary = Date.now() + 2000;
-            (function engineTick() {
-                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.82 }, colors: ['#c5a059', '#fef8cc', '#ffffff'] });
-                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.82 }, colors: ['#c5a059', '#fef8cc', '#ffffff'] });
-                if (Date.now() < runtimeBoundary) {
-                    requestAnimationFrame(engineTick);
-                }
-            }());
+            confetti({
+                particleCount: 180, spread: 85, origin: { y: 0.75 },
+                colors: ['#dfb76c', '#fbf0b9', '#ffffff']
+            });
 
-            gsap.fromTo('.shimmer-fluid', { x: '-100%' }, { x: '100%', duration: 0.55, ease: "power2.inOut" });
-            gsap.fromTo('#master-trigger', { scale: 0.97 }, { scale: 1, duration: 0.25, ease: "power2.out" });
+            const upiAddress = "8103509439@ybl"; 
+            const receiverName = "Vikram Dhakad";    
+            const exactAmount = "50";
+            const billingNarration = "Contribution for Shivam Miskare Birthday Celebration";
 
-            const targetVpa = "8103509439@ybl"; 
-            const legalName = "Vikram Dhakad";    
-            const paymentTokenValue = "50";
-            const transactionNarrative = "Contribution for Shivam Miskare Birthday Celebration";
+            const plainUpiString = `upi://pay?pa=${upiAddress}&pn=${encodeURIComponent(receiverName)}&am=${exactAmount}&cu=INR&tn=${encodeURIComponent(billingNarration)}`;
+            const appAndroidIntent = `intent://pay?pa=${upiAddress}&pn=${encodeURIComponent(receiverName)}&am=${exactAmount}&cu=INR&tn=${encodeURIComponent(billingNarration)}#Intent;scheme=upi;package=com.phonepe.app;end`;
+            const appIosScheme = `phonepe://upi/pay?pa=${upiAddress}&pn=${encodeURIComponent(receiverName)}&am=${exactAmount}&cu=INR&tn=${encodeURIComponent(billingNarration)}`;
 
-            const canonicalUpiString = `upi://pay?pa=${targetVpa}&pn=${encodeURIComponent(legalName)}&am=${paymentTokenValue}&cu=INR&tn=${encodeURIComponent(transactionNarrative)}`;
-            const systemIntentAndroid = `intent://pay?pa=${targetVpa}&pn=${encodeURIComponent(legalName)}&am=${paymentTokenValue}&cu=INR&tn=${encodeURIComponent(transactionNarrative)}#Intent;scheme=upi;package=com.phonepe.app;end`;
-            const appleCustomSchemeIos = `phonepe://upi/pay?pa=${targetVpa}&pn=${encodeURIComponent(legalName)}&am=${paymentTokenValue}&cu=INR&tn=${encodeURIComponent(transactionNarrative)}`;
+            const currentPlatformAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const checkAndroidSystem = /android/i.test(currentPlatformAgent);
+            const checkAppleIosSystem = /iPad|iPhone|iPod/.test(currentPlatformAgent) && !window.MSStream;
 
-            const agentSignatures = navigator.userAgent || navigator.vendor || window.opera;
-            const matchesAndroidSign = /android/i.test(agentSignatures);
-            const matchesAppleSign = /iPad|iPhone|iPod/.test(agentSignatures) && !window.MSStream;
-
-            setTimeout(() => {
-                if (matchesAndroidSign) {
-                    window.location.href = systemIntentAndroid;
-                } else if (matchesAppleSign) {
-                    window.location.href = appleCustomSchemeIos;
-                    setTimeout(() => { window.location.href = canonicalUpiString; }, 750);
-                } else {
-                    window.location.href = canonicalUpiString;
-                }
-            }, 350);
+            if (checkAndroidSystem) {
+                window.location.href = appAndroidIntent;
+            } else if (checkAppleIosSystem) {
+                window.location.href = appIosScheme;
+                setTimeout(() => { window.location.href = plainUpiString; }, 800);
+            } else {
+                window.location.href = plainUpiString;
+            }
         }
     </script>
 </body>
