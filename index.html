@@ -3,25 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Celebration | Shivam Miskare</title>
+    <title>The Assembly Gateway</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Marcellus&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
     <style>
         :root {
-            --bg-sacred: #160200; /* Deepest Midnight Crimson - Ultra Premium Core */
-            --surface-royal: #240502; /* Rich Burnt Saffron Shadow */
-            --surface-inner: #0d0100; /* Obsidian Altar Core */
-            --gold-base: #dfb76c; /* Antique Chola Gold */
-            --gold-bright: #fbf0b9; /* Shimmering Diya Flame Radiance */
-            --text-pure: #fcf9f2; /* Ivory Silk White */
-            --text-dim: #9e7e7a; /* Muted Rose-Copper */
-            --border-fine: rgba(223, 183, 108, 0.15);
-            --border-accent: rgba(223, 183, 108, 0.4);
-            --alert-bg: #300300;
+            --bg-dark: #02040a;
+            --card-glass: rgba(10, 16, 36, 0.4);
+            --gold-primary: #e2bf65;
+            --gold-linear: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fcf6ba 75%, #aa771c 100%);
+            --text-pure: #ffffff;
+            --text-muted: #64748b;
+            --laser-glow: conic-gradient(from 0deg, transparent 10%, #bf953f 35%, #fff 50%, #bf953f 65%, transparent 90%);
         }
 
         * {
@@ -30,399 +25,586 @@
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
-            outline: none;
+            -webkit-touch-callout: none;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-sacred);
-            background-image: 
-                radial-gradient(circle at 50% 20%, #3a0b06 0%, var(--bg-sacred) 65%),
-                linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
+            background-color: var(--bg-dark);
             color: var(--text-pure);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 32px 16px;
-            letter-spacing: 0.3px;
+            padding: 24px;
+            overflow-x: hidden;
+            position: relative;
+            perspective: 1000px;
         }
 
-        /* Sovereign Structural Canvas */
-        .royal-canvas {
-            width: 100%;
-            max-width: 420px;
-            background: var(--surface-royal);
-            border: 1px solid var(--gold-base);
-            border-radius: 24px;
-            padding: 44px 28px 36px;
-            position: relative;
-            box-shadow: 
-                0 40px 90px rgba(0, 0, 0, 0.85), 
-                inset 0 0 50px rgba(0, 0, 0, 0.6);
+        /* Animated Complex Vector Cosmic Background Engine */
+        .ambient-cosmic-engine {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0; left: 0;
+            z-index: 0;
+            pointer-events: none;
             overflow: hidden;
         }
+        .nebula-cluster-1 {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(191, 149, 63, 0.09) 0%, transparent 70%);
+            top: -25%; left: -15%;
+            filter: blur(60px);
+            animation: orbitalDrift 25s infinite ease-in-out alternate;
+        }
+        .nebula-cluster-2 {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(147, 51, 234, 0.05) 0%, transparent 65%);
+            bottom: -20%; right: -10%;
+            filter: blur(50px);
+            animation: orbitalDrift 30s infinite ease-in-out alternate-reverse;
+        }
 
-        /* Elite Architectural Frame Accents */
-        .royal-canvas::before {
+        /* Background Particle Array Matrix */
+        .star-field-grid {
+            position: absolute;
+            width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 0);
+            background-size: 40px 40px;
+            opacity: 0.3;
+            transform: translateZ(-100px);
+            animation: macroGridScroll 40s linear infinite;
+        }
+
+        /* 3D Reactive Kinetic Border Wrapper Frame */
+        .kinetic-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 36px;
+            padding: 2px;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 60px 110px -30px rgba(0, 0, 0, 0.95), 
+                        0 0 100px -20px rgba(191, 149, 63, 0.06);
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1), box-shadow 0.5s ease;
+        }
+        
+        /* High-Definition Rotating Laser Outline */
+        .kinetic-wrapper::before {
             content: '';
             position: absolute;
-            inset: 8px;
-            border: 1px solid var(--border-fine);
-            border-radius: 18px;
-            pointer-events: none;
+            width: 220%; height: 220%;
+            top: -60%; left: -60%;
+            background: var(--laser-glow);
+            animation: laserRotate 3.5s linear infinite;
+            z-index: 0;
         }
 
-        /* Sacred Geometric Centerpiece */
-        .sacred-crest-container {
-            width: 72px;
-            height: 72px;
-            margin: 0 auto 24px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mandala-svg-engine {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            animation: slowSpiritualRotation 45s linear infinite;
-        }
-
-        .crest-monogram {
-            font-family: 'Cinzel Decorative', serif;
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: var(--gold-bright);
-            text-shadow: 0 0 12px rgba(251, 240, 185, 0.4);
-            z-index: 2;
-        }
-
-        /* Luxury Minimalist Typography */
-        .header-panel {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        h1 {
-            font-family: 'Marcellus', serif;
-            font-size: 2.25rem;
-            font-weight: 400;
-            letter-spacing: 3px;
-            color: var(--text-pure);
-            margin-bottom: 4px;
-            background: linear-gradient(180deg, #ffffff 40%, var(--gold-bright) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            font-family: 'Marcellus', serif;
-            font-size: 0.75rem;
-            color: var(--gold-base);
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            opacity: 0.85;
-        }
-
-        /* Shubh Strategic Alert Banner */
-        .shubh-banner {
-            background-color: var(--alert-bg);
-            border: 1px solid rgba(223, 183, 108, 0.2);
-            color: var(--gold-bright);
-            font-family: 'Marcellus', serif;
-            font-size: 0.75rem;
-            line-height: 1.6;
-            letter-spacing: 1.5px;
-            padding: 14px 16px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 32px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
-        }
-
-        /* Classical Asymmetric Heritage Matrix */
-        .heritage-matrix {
-            background: var(--surface-inner);
-            border: 1px solid var(--border-fine);
-            border-radius: 16px;
-            padding: 8px 20px;
-            margin-bottom: 28px;
-        }
-
-        .matrix-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(223, 183, 108, 0.06);
-        }
-
-        .matrix-row:last-child {
-            border-bottom: none;
-        }
-
-        .matrix-label {
-            font-family: 'Marcellus', serif;
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-dim);
-        }
-
-        .matrix-value {
-            font-size: 0.88rem;
-            font-weight: 400;
-            color: var(--text-pure);
-            text-align: right;
-            opacity: 0.95;
-        }
-
-        .matrix-value.gold-highlight {
-            font-family: 'Marcellus', serif;
-            color: var(--gold-bright);
-            font-size: 1rem;
-            letter-spacing: 0.5px;
-        }
-
-        /* Refined Symmetrical Countdown Strips */
-        .countdown-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-
-        .countdown-cell {
-            background: var(--surface-inner);
-            border: 1px solid var(--border-fine);
-            border-radius: 10px;
-            padding: 14px 2px;
-            text-align: center;
-            transition: border 0.3s;
-        }
-
-        .countdown-cell:hover {
-            border-color: var(--border-accent);
-        }
-
-        .countdown-metric {
-            font-family: 'Marcellus', serif;
-            font-size: 1.5rem;
-            color: var(--gold-bright);
-            line-height: 1;
-        }
-
-        .countdown-label {
-            font-size: 0.52rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-dim);
-            margin-top: 6px;
-            font-weight: 500;
-        }
-
-        /* Monolithic Elite Action Component */
-        .btn-elite-action {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 30%, #b38728 70%, #aa771c 100%);
-            color: #160200;
-            border: none;
-            border-radius: 14px;
-            font-family: 'Marcellus', serif;
-            font-size: 1.15rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 6px;
-            cursor: pointer;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-        }
-
-        .btn-elite-action::before {
+        /* Premium Depth Micro Reflection */
+        .kinetic-wrapper::after {
             content: '';
             position: absolute;
             inset: 2px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
+            border-radius: 34px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
+            z-index: 2;
             pointer-events: none;
-            opacity: 0.6;
         }
 
-        .btn-elite-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(223, 183, 108, 0.2);
-            filter: brightness(1.08);
-        }
-
-        .heritage-footer {
+        /* Premium Glass Portal Master Canvas Panel */
+        .portal-card {
+            position: relative;
+            background: var(--card-glass);
+            backdrop-filter: blur(60px);
+            -webkit-backdrop-filter: blur(60px);
+            border-radius: 34px;
+            padding: 48px 30px 40px;
             text-align: center;
-            margin-top: 28px;
-            font-family: 'Marcellus', serif;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            color: var(--text-dim);
-            opacity: 0.6;
+            width: 100%;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            transform: translateZ(30px); /* 3D Depth Layer Layering */
         }
 
-        /* Autonomous Expiry Lockout Overlay Layer */
-        #sacred-lockout-curtain {
-            position: fixed;
-            inset: 0;
-            background: #090100;
-            z-index: 999999;
-            display: none;
-            flex-direction: column;
+        /* Crest Geometry Frame */
+        .crest-icon-frame {
+            width: 82px; height: 82px;
+            margin: 0 auto 28px;
+            background: #030611;
+            border: 1px solid rgba(191, 149, 63, 0.3);
+            border-radius: 50%;
+            display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 25px rgba(191,149,63,0.12);
+            position: relative;
+            transition: border-color 0.4s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .crest-icon-frame::after {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 1px solid var(--gold-primary);
+            opacity: 0.25;
+            animation: dynamicPulse 2.5s infinite ease-out;
+        }
+        .kinetic-wrapper:hover .crest-icon-frame {
+            border-color: var(--gold-primary);
+            transform: scale(1.08) rotate(-10deg);
+        }
+        .crest-icon-frame svg {
+            width: 34px; height: 34px;
+            fill: url(#gold-svg-gradient);
+            filter: drop-shadow(0 2px 12px rgba(191,149,63,0.35));
         }
 
-        #sacred-lockout-curtain h2 {
-            font-family: 'Marcellus', serif;
-            font-size: 1.75rem;
-            color: #ef4444;
-            letter-spacing: 4px;
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 15%, #e2bf65 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.6);
         }
 
-        @keyframes slowSpiritualRotation {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .subtitle {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            transition: color 0.4s;
+        }
+        .kinetic-wrapper:hover .subtitle {
+            color: var(--gold-primary);
+        }
+
+        /* Warning Micro Ticker */
+        .warning-banner {
+            background: rgba(239, 68, 68, 0.03);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 14px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 25px rgba(239, 68, 68, 0.01);
+            animation: warningPulse 2s infinite alternate;
+        }
+        .warning-banner svg {
+            width: 16px; height: 16px;
+            fill: #ef4444;
+        }
+
+        /* High-Visual Floating Amount Core Box */
+        .amount-display-box {
+            background: linear-gradient(135deg, rgba(1, 3, 10, 0.6) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 1px 20px rgba(0,0,0,0.4);
+        }
+        .amount-display-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+            animation: lightSweep 4s infinite linear;
+        }
+        .amount-label {
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: var(--gold-primary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.9;
+        }
+        .amount-value {
+            font-family: 'Cinzel', serif;
+            font-size: 3.1rem;
+            font-weight: 700;
+            margin-top: 8px;
+            background: var(--gold-linear);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            filter: drop-shadow(0 2px 15px rgba(191,149,63,0.2));
+        }
+        .currency-symbol {
+            font-size: 2.1rem;
+            font-weight: 600;
+            color: var(--gold-primary);
+        }
+
+        /* Kinetic Ticker Countdown Layout Matrix */
+        .countdown-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+        .countdown-box {
+            background: rgba(1, 2, 6, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 16px 4px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            transition: border-color 0.4s, transform 0.4s inside, background-color 0.4s;
+        }
+        .countdown-box::after {
+            content: '';
+            position: absolute;
+            inset: 0; border-radius: 16px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+            pointer-events: none;
+        }
+        .countdown-box:hover {
+            border-color: rgba(191, 149, 63, 0.3);
+            background: rgba(1, 2, 6, 0.9);
+            transform: scale(1.05);
+        }
+        .countdown-time {
+            font-family: 'Cinzel', serif;
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 12px rgba(255,255,255,0.15);
+        }
+        .countdown-label {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            margin-top: 8px;
+            font-weight: 800;
+        }
+
+        /* Modular Architecture Info Box Frame */
+        .event-details-box {
+            background: rgba(1, 3, 10, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.01);
+            border-radius: 24px;
+            padding: 12px 24px;
+            margin-bottom: 40px;
+            text-align: left;
+            box-shadow: inset 0 2px 15px rgba(0,0,0,0.3);
+        }
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 16px 0;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .detail-row:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .detail-row:hover {
+            transform: translateX(8px);
+        }
+        .detail-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px; height: 28px;
+        }
+        .detail-icon svg {
+            width: 22px; height: 22px;
+            fill: var(--text-muted);
+            transition: fill 0.3s, filter 0.3s, transform 0.3s;
+        }
+        .detail-row:hover .detail-icon svg {
+            fill: var(--gold-primary);
+            filter: drop-shadow(0 0 10px rgba(191,149,63,0.8));
+            transform: scale(1.1);
+        }
+        .detail-content {
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-title {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 2.5px;
+            font-weight: 800;
+        }
+        .detail-text {
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            font-weight: 600;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        /* Dynamic Core Action Interactive CTA Button */
+        .btn-pay-now {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            width: 100%;
+            padding: 22px;
+            background: var(--gold-linear);
+            color: #02040a;
+            font-weight: 900;
+            font-size: 0.92rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-radius: 18px;
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 10px 35px rgba(179, 135, 40, 0.25);
+            transition: box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-pay-now::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -150%;
+            width: 60%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.55), transparent);
+            transform: skewX(-30deg);
+            animation: interactiveShimmer 4s infinite linear;
+        }
+        .btn-pay-now:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 22px 50px rgba(179, 135, 40, 0.5), 0 0 25px rgba(255,255,255,0.25);
+        }
+        .btn-pay-now svg {
+            width: 20px; height: 20px;
+            fill: #02040a;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-pay-now:hover svg {
+            transform: translateX(8px) scale(1.1);
+        }
+
+        /* System Security Footer Node */
+        .secure-footer {
+            margin-top: 32px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .secure-footer svg {
+            width: 14px; height: 14px;
+            fill: var(--gold-primary);
+            opacity: 0.6;
+        }
+
+        /* CORE GRAPHICS KEYFRAMES ENGINE */
+        @keyframes laserRotate { 100% { transform: rotate(360deg); } }
+        @keyframes orbitalDrift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-40px, 40px) scale(1.15); }
+        }
+        @keyframes dynamicPulse {
+            0% { transform: scale(1); opacity: 0.25; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        @keyframes lightSweep { 0% { left: -100%; } 20%, 100% { left: 150%; } }
+        @keyframes interactiveShimmer { 0% { left: -150%; } 10%, 100% { left: 150%; } }
+        @keyframes warningPulse {
+            0% { border-color: rgba(239, 68, 68, 0.1); background: rgba(239, 68, 68, 0.02); }
+            100% { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); }
+        }
+        @keyframes macroGridScroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 80px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="sacred-lockout-curtain">
-        <h2>UTSAVA_CONCLUDED</h2>
-        <p style="font-family:'Plus Jakarta Sans'; font-size:0.72rem; color:var(--text-dim); margin-top:12px; letter-spacing:2px; text-transform:uppercase;">The celebratory window has concluded.</p>
+    <div class="ambient-cosmic-engine">
+        <div class="nebula-cluster-1"></div>
+        <div class="nebula-cluster-2"></div>
+        <div class="star-field-grid"></div>
     </div>
 
-    <div class="royal-canvas">
-        
-        <div class="header-panel">
-            <div class="sacred-crest-container">
-                <svg class="mandala-svg-engine" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" fill="none" stroke="#dfb76c" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.4"/>
-                    <circle cx="50" cy="50" r="38" fill="none" stroke="#dfb76c" stroke-width="0.75" opacity="0.3"/>
-                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(0 50 50)" opacity="0.7"/>
-                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(45 50 50)" opacity="0.5"/>
-                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(90 50 50)" opacity="0.7"/>
-                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(135 50 50)" opacity="0.5"/>
-                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(180 50 50)" opacity="0.7"/>
-                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(225 50 50)" opacity="0.5"/>
-                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(270 50 50)" opacity="0.7"/>
-                    <path d="M50 2 L53 12 L63 15 L55 22 L58 32 L50 26 L42 32 L45 22 L37 15 L47 12 Z" fill="none" stroke="#dfb76c" stroke-width="0.75" transform="rotate(315 50 50)" opacity="0.5"/>
+    <svg style="position: absolute; width: 0; height: 0;" width="0" height="0">
+        <defs>
+            <linearGradient id="gold-svg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#bf953f" />
+                <stop offset="50%" stop-color="#fcf6ba" />
+                <stop offset="100%" stop-color="#aa771c" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <div class="kinetic-wrapper" id="depth-frame">
+        <div class="portal-card">
+            
+            <div class="crest-icon-frame">
+                <svg viewBox="0 0 24 24">
+                    <path d="M5 16L3 5l5 5 4-7 4 7 5-5-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
                 </svg>
-                <div class="crest-monogram">ॐ</div>
             </div>
+
             <h1>Shivam Miskare</h1>
-            <div class="subtitle">Janmotsav Invitation</div>
+            <div class="subtitle">Secret Assembly Gateway</div>
+
+            <div class="warning-banner">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                BE THERE: MANDATORY SQUAD PRESENCE
+            </div>
+            
+            <div class="amount-display-box">
+                <div class="amount-label">Your Secure Contribution</div>
+                <div class="amount-value"><span class="currency-symbol">₹</span>50</div>
+            </div>
+
+            <div class="countdown-container">
+                <div class="countdown-box"><div class="countdown-time" id="days">00</div><div class="countdown-label">Days</div></div>
+                <div class="countdown-box"><div class="countdown-time" id="hours">00</div><div class="countdown-label">Hrs</div></div>
+                <div class="countdown-box"><div class="countdown-time" id="minutes">00</div><div class="countdown-label">Min</div></div>
+                <div class="countdown-box"><div class="countdown-time" id="seconds">00</div><div class="countdown-label">Sec</div></div>
+            </div>
+
+            <div class="event-details-box">
+                <div class="detail-row">
+                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+                    <div class="detail-content"><div class="detail-title">Location</div><div class="detail-text">Secret HQ Assembly Area</div></div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5C6.34 5 5 1.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+                    <div class="detail-content"><div class="detail-title">Target Network</div><div class="detail-text">Topa Gang Tactical Unit</div></div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z"/></svg></div>
+                    <div class="detail-content"><div class="detail-title">Ledger Administrator</div><div class="detail-text">Vikram Dhakad (Verified)</div></div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
+                    <div class="detail-content"><div class="detail-title">Deployment Window</div><div class="detail-text">30 May 2026</div></div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
+                    <div class="detail-content"><div class="detail-title">Strict Lock-In</div><div class="detail-text">07:30 PM Sharp</div></div>
+                </div>
+            </div>
+
+            <button class="btn-pay-now" onclick="triggerDirectUPI(event)">
+                Proceed to Payment
+                <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+            </button>
+
+            <div class="secure-footer">
+                <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                End-To-End Encrypted Gateway Vector
+            </div>
+
         </div>
-
-        <div class="shubh-banner">
-            Kindly clear the celebration contribution before 11:59 PM on 29/05/2026.
-        </div>
-
-        <div class="countdown-grid">
-            <div class="countdown-cell"><div class="countdown-metric" id="days">00</div><div class="countdown-label">Days</div></div>
-            <div class="countdown-cell"><div class="countdown-metric" id="hours">00</div><div class="countdown-label">Hours</div></div>
-            <div class="countdown-cell"><div class="countdown-metric" id="minutes">00</div><div class="countdown-label">Mins</div></div>
-            <div class="countdown-cell"><div class="countdown-metric" id="seconds">00</div><div class="countdown-label">Secs</div></div>
-        </div>
-
-        <div class="heritage-matrix">
-            <div class="matrix-row"><div class="matrix-label">Utsav Ceremony</div><div class="matrix-value">Cake Cutting Celebration</div></div>
-            <div class="matrix-row"><div class="matrix-label">Organizers</div><div class="matrix-value">Topa Gang</div></div>
-            <div class="matrix-row"><div class="matrix-label">Prabandhak</div><div class="matrix-value">Vikram Dhakad</div></div>
-            <div class="matrix-row"><div class="matrix-label">Sthan / Venue</div><div class="matrix-value gold-highlight">Niranjan's House</div></div>
-            <div class="matrix-row"><div class="matrix-label">Tithi / Date</div><div class="matrix-value">30 May 2026</div></div>
-            <div class="matrix-row"><div class="matrix-label">Samaya / Time</div><div class="matrix-value">07:30 PM</div></div>
-            <div class="matrix-row"><div class="matrix-label">Contribution</div><div class="matrix-value gold-highlight">₹50</div></div>
-        </div>
-
-        <button class="btn-elite-action" onclick="invokeUpiPayment(event)">Pay</button>
-
-        <div class="heritage-footer">
-            Direct Handshake Protocol Secure
-        </div>
-
     </div>
 
     <script>
-        // Elite Security Systems
+        // High-Security Integrity Interceptors
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
             if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","C","J"].includes(e.key)) || (e.ctrlKey && e.key === "U")) e.preventDefault();
         });
 
-        const targetUtsavTimestamp = new Date("May 30, 2026 19:30:00").getTime();
-        const secureLockoutTimestamp = targetUtsavTimestamp + (6 * 60 * 60 * 1000);
-
-        function enforceSacredTimeline() {
-            if (new Date().getTime() >= secureLockoutTimestamp) {
-                document.getElementById("sacred-lockout-curtain").style.display = "flex";
-                document.body.style.overflow = "hidden";
-                setTimeout(() => {
-                    document.querySelectorAll("body > :not(#sacred-lockout-curtain)").forEach(el => el.remove());
-                }, 50);
-            }
-        }
-        enforceSacredTimeline();
-        setInterval(enforceSacredTimeline, 10000);
-
-        const clockEngine = setInterval(() => {
-            const currentDelta = targetUtsavTimestamp - new Date().getTime();
+        // 3D Parallax Gyro Mouse-Tracking Interactivity Matrix Engine
+        const elementFrame = document.getElementById('depth-frame');
+        
+        document.addEventListener('mousemove', (e) => {
+            const coordinateX = (window.innerWidth / 2 - e.clientX) / 25;
+            const coordinateY = (window.innerHeight / 2 - e.clientY) / 25;
             
-            const daysCount = Math.max(0, Math.floor(currentDelta / (1000 * 60 * 60 * 24)));
-            const hoursCount = Math.max(0, Math.floor((currentDelta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-            const minsCount = Math.max(0, Math.floor((currentDelta % (1000 * 60 * 60)) / (1000 * 60)));
-            const secsCount = Math.max(0, Math.floor((currentDelta % (1000 * 60)) / 1000));
+            elementFrame.style.transform = `rotateY(${-coordinateX}deg) rotateX(${coordinateY}deg)`;
+        });
 
-            document.getElementById("days").innerText = daysCount < 10 ? "0" + daysCount : daysCount;
-            document.getElementById("hours").innerText = hoursCount < 10 ? "0" + hoursCount : hoursCount;
-            document.getElementById("minutes").innerText = minsCount < 10 ? "0" + minsCount : minsCount;
-            document.getElementById("seconds").innerText = secsCount < 10 ? "0" + secsCount : secsCount;
+        document.addEventListener('mouseleave', () => {
+            elementFrame.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
 
-            if (currentDelta <= 0) {
-                clearInterval(clockEngine);
+        // Precision Math Real-Time Countdown Engine Module
+        const celebrationTargetDate = new Date("May 30, 2026 19:30:00").getTime();
+        const calculationLoop = setInterval(function() {
+            const remainder = celebrationTargetDate - new Date().getTime();
+            const d = Math.floor(remainder / (1000 * 60 * 60 * 24)),
+                  h = Math.floor((remainder % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+                  m = Math.floor((remainder % (1000 * 60 * 60)) / (1000 * 60)),
+                  s = Math.floor((remainder % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = d < 10 ? "0" + d : d;
+            document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
+            document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
+            document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+
+            if (remainder < 0) {
+                clearInterval(calculationLoop);
+                ["days", "hours", "minutes", "seconds"].forEach(id => document.getElementById(id).innerText = "00");
             }
         }, 1000);
 
-        function invokeUpiPayment(e) {
+        // Hardware Handshake Intent Routing Engine
+        function triggerDirectUPI(e) {
             e.preventDefault();
 
-            confetti({
-                particleCount: 180, spread: 85, origin: { y: 0.75 },
-                colors: ['#dfb76c', '#fbf0b9', '#ffffff']
-            });
+            const payeeUPI = "8103509439@ybl"; 
+            const payeeName = "Vikram Dhakad";    
+            const amount = "50";
+            const note = "Assembly Token Access";
 
-            const upiAddress = "8103509439@ybl"; 
-            const receiverName = "Vikram Dhakad";    
-            const exactAmount = "50";
-            const billingNarration = "Contribution for Shivam Miskare Birthday Celebration";
+            const standardUpiUrl = `upi://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+            const phonePeAndroidIntent = `intent://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}#Intent;scheme=upi;package=com.phonepe.app;end`;
+            const phonePeIosScheme = `phonepe://upi/pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
 
-            const plainUpiString = `upi://pay?pa=${upiAddress}&pn=${encodeURIComponent(receiverName)}&am=${exactAmount}&cu=INR&tn=${encodeURIComponent(billingNarration)}`;
-            const appAndroidIntent = `intent://pay?pa=${upiAddress}&pn=${encodeURIComponent(receiverName)}&am=${exactAmount}&cu=INR&tn=${encodeURIComponent(billingNarration)}#Intent;scheme=upi;package=com.phonepe.app;end`;
-            const appIosScheme = `phonepe://upi/pay?pa=${upiAddress}&pn=${encodeURIComponent(receiverName)}&am=${exactAmount}&cu=INR&tn=${encodeURIComponent(billingNarration)}`;
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isAndroid = /android/i.test(ua);
+            const isIos = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
 
-            const currentPlatformAgent = navigator.userAgent || navigator.vendor || window.opera;
-            const checkAndroidSystem = /android/i.test(currentPlatformAgent);
-            const checkAppleIosSystem = /iPad|iPhone|iPod/.test(currentPlatformAgent) && !window.MSStream;
-
-            if (checkAndroidSystem) {
-                window.location.href = appAndroidIntent;
-            } else if (checkAppleIosSystem) {
-                window.location.href = appIosScheme;
-                setTimeout(() => { window.location.href = plainUpiString; }, 800);
+            if (isAndroid) {
+                window.location.href = phonePeAndroidIntent;
+            } else if (isIos) {
+                window.location.href = phonePeIosScheme;
+                setTimeout(() => { window.location.href = standardUpiUrl; }, 800);
             } else {
-                window.location.href = plainUpiString;
+                window.location.href = standardUpiUrl;
             }
         }
     </script>
