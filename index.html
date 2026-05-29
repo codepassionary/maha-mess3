@@ -233,6 +233,71 @@
             color: var(--gold-primary);
         }
 
+        /* Secure Native QR Portal System */
+        .qr-anchor-frame {
+            background: rgba(2, 4, 10, 0.7);
+            border: 1px solid rgba(226, 191, 101, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+        }
+        .qr-bounding-box {
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 16px;
+            width: 170px;
+            height: 170px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        .qr-bounding-box img {
+            width: 146px;
+            height: 146px;
+            display: block;
+        }
+        .fallback-clipboard-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 8px 12px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 260px;
+        }
+        .fallback-token-text {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--gold-primary);
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .btn-copy-token {
+            background: rgba(226, 191, 101, 0.1);
+            border: 1px solid rgba(226, 191, 101, 0.3);
+            color: var(--gold-primary);
+            padding: 4px 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-copy-token:hover {
+            background: var(--gold-primary);
+            color: #02040a;
+        }
+
         /* Clock Countdown Components */
         .countdown-container {
             display: grid;
@@ -323,7 +388,13 @@
             line-height: 1.3;
         }
 
-        /* High-Impact Liquid Gold Command Trigger Button */
+        /* High-Impact App Routing Command Architecture */
+        .action-button-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
         .btn-pay-now {
             position: relative;
             display: inline-flex;
@@ -331,18 +402,18 @@
             justify-content: center;
             gap: 12px;
             width: 100%;
-            padding: 18px;
+            padding: 16px;
             background: var(--gold-linear);
             color: #02040a;
             font-weight: 800;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             letter-spacing: 2px;
             text-transform: uppercase;
             border-radius: 14px;
             border: none;
             cursor: pointer;
             overflow: hidden;
-            box-shadow: 0 6px 24px rgba(179, 135, 40, 0.3);
+            box-shadow: 0 6px 24px rgba(179, 135, 40, 0.2);
             transition: box-shadow 0.4s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .btn-pay-now::before {
@@ -356,15 +427,11 @@
         }
         .btn-pay-now:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(179, 135, 40, 0.55), 0 0 15px rgba(255,255,255,0.2);
+            box-shadow: 0 12px 28px rgba(179, 135, 40, 0.45);
         }
         .btn-pay-now svg {
             width: 16px; height: 16px;
             fill: #02040a;
-            transition: transform 0.3s;
-        }
-        .btn-pay-now:hover svg {
-            transform: translateX(5px);
         }
 
         /* Secure Validation Footer */
@@ -444,12 +511,22 @@
                 <svg viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
                 </svg>
-                Strict Request: Do Not Be Delayed!
+                Security Block Fix: Use App or Scan QR Below!
             </div>
             
             <div class="amount-display-box">
                 <div class="amount-label">Contribution Asset</div>
                 <div class="amount-value"><span class="currency-symbol">₹</span>50</div>
+            </div>
+
+            <div class="qr-anchor-frame">
+                <div class="qr-bounding-box">
+                    <img src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=upi://pay?pa=8103509439@ybl%26pn=Vikram%20Dhakad%26am=50%26cu=INR%26tn=Contribution%20for%20Shivam%20Miskare%20Birthday%20Celebration" alt="Payment Gate QR">
+                </div>
+                <div class="fallback-clipboard-row">
+                    <span class="fallback-token-text" id="rawUpiToken">8103509439@ybl</span>
+                    <button class="btn-copy-token" onclick="executeTokenCopy()">Copy ID</button>
+                </div>
             </div>
 
             <div class="countdown-container">
@@ -545,18 +622,20 @@
                 </div>
             </div>
 
-            <button class="btn-pay-now" onclick="triggerUniversalUpiIntent(event)">
-                Pay via Any UPI App
-                <svg viewBox="0 0 24 24">
-                    <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/>
-                </svg>
-            </button>
+            <div class="action-button-stack">
+                <button class="btn-pay-now" onclick="triggerDirectAppIntent('phonepe')">
+                    Launch PhonePe Direct
+                </button>
+                <button class="btn-pay-now" style="background: linear-gradient(135deg, #1a73e8 0%, #34a853 100%); color: #fff;" onclick="triggerDirectAppIntent('gpay')">
+                    Launch Google Pay Direct
+                </button>
+            </div>
 
             <div class="secure-footer">
                 <svg viewBox="0 0 24 24">
                     <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
                 </svg>
-                Supports GPay, PhonePe, Paytm, Amazon Pay & More
+                Screenshot QR & Upload via Scanner if links fail
             </div>
         </div>
     </div>
@@ -598,34 +677,48 @@
             }
         }, 1000);
 
-        // 3. Multi-App Open-End UPI Intent Discovery Architecture
-        function triggerUniversalUpiIntent(e) {
-            e.preventDefault();
+        // 3. Fallback Clipboard Copier
+        function executeTokenCopy() {
+            const targetId = document.getElementById('rawUpiToken').innerText;
+            const bufferZone = document.createElement('textarea');
+            bufferZone.value = targetId;
+            document.body.appendChild(bufferZone);
+            bufferZone.select();
+            document.execCommand('copy');
+            document.body.removeChild(bufferZone);
+            
+            alert('UPI ID Copied! Paste it into your payment app.');
+        }
 
-            // Fire premium particle explosion
+        // 4. Force App Package Bypasser (Fixes Browser Blocks)
+        function triggerDirectAppIntent(targetApp) {
             confetti({
-                particleCount: 160,
-                spread: 80,
-                origin: { y: 0.65 },
+                particleCount: 140,
+                spread: 70,
+                origin: { y: 0.7 },
                 colors: ['#bf953f', '#fcf6ba', '#b38728', '#ffffff']
             });
 
-            // Target Parameters
             const payeeUPI = "8103509439@ybl"; 
             const payeeName = "Vikram Dhakad";    
             const amount = "50";
             const transactionNote = "Contribution for Shivam Miskare Birthday Celebration";
 
-            /* 
-               The standardized universal `upi://pay` deep link structure.
-               When called directly on a mobile operating system (Android or iOS), 
-               the OS intercepts the deep link scheme and queries its app register. 
-               This naturally opens a multi-app selection sheet showing PhonePe, GPay, Paytm, etc.
-            */
-            const universalUpiUrl = `upi://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            const stringPayload = `pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
             
-            // Execute the intent handshake
-            window.location.href = universalUpiUrl;
+            if (targetApp === 'phonepe') {
+                const androidIntent = `intent://pay?${stringPayload}#Intent;scheme=upi;package=com.phonepe.app;end`;
+                const iosScheme = `phonepe://upi/pay?${stringPayload}`;
+                
+                if (/android/i.test(navigator.userAgent)) {
+                    window.location.href = androidIntent;
+                } else {
+                    window.location.href = iosScheme;
+                    setTimeout(() => { window.location.href = `upi://pay?${stringPayload}`; }, 600);
+                }
+            } else if (targetApp === 'gpay') {
+                window.location.href = `tez://upi/pay?${stringPayload}`;
+            }
         }
     </script>
 </body>
