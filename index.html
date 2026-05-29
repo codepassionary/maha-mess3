@@ -545,8 +545,8 @@
                 </div>
             </div>
 
-            <button class="btn-pay-now" onclick="triggerPhonePeIntent(event)">
-                Initialize Security Pay
+            <button class="btn-pay-now" onclick="triggerUniversalUpiIntent(event)">
+                Pay via Any UPI App
                 <svg viewBox="0 0 24 24">
                     <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/>
                 </svg>
@@ -556,7 +556,7 @@
                 <svg viewBox="0 0 24 24">
                     <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
                 </svg>
-                Direct PhonePe Intent Handshake Secure
+                Supports GPay, PhonePe, Paytm, Amazon Pay & More
             </div>
         </div>
     </div>
@@ -598,8 +598,8 @@
             }
         }, 1000);
 
-        // 3. Direct PhonePe Intent Sequence Engine
-        function triggerPhonePeIntent(e) {
+        // 3. Multi-App Open-End UPI Intent Discovery Architecture
+        function triggerUniversalUpiIntent(e) {
             e.preventDefault();
 
             // Fire premium particle explosion
@@ -616,29 +616,16 @@
             const amount = "50";
             const transactionNote = "Contribution for Shivam Miskare Birthday Celebration";
 
-            // Universal fallback string layout
-            const standardUpiUrl = `upi://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            /* 
+               The standardized universal `upi://pay` deep link structure.
+               When called directly on a mobile operating system (Android or iOS), 
+               the OS intercepts the deep link scheme and queries its app register. 
+               This naturally opens a multi-app selection sheet showing PhonePe, GPay, Paytm, etc.
+            */
+            const universalUpiUrl = `upi://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
             
-            // Direct PhonePe Execution Schemes (Using native Android intent filters and iOS deep-linking structures)
-            const phonePeAndroidIntent = `intent://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}#Intent;scheme=upi;package=com.phonepe.app;end`;
-            const phonePeIosScheme = `phonepe://upi/pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-
-            // Device architecture assessment
-            const userAgentString = navigator.userAgent || navigator.vendor || window.opera;
-            const isAndroidDevice = /android/i.test(userAgentString);
-            const isIosDevice = /iPad|iPhone|iPod/.test(userAgentString) && !window.MSStream;
-
-            if (isAndroidDevice) {
-                // Instantly force deep-link bypass straight to native PhonePe application
-                window.location.href = phonePeAndroidIntent;
-            } else if (isIosDevice) {
-                // Route through iOS target app registers
-                window.location.href = phonePeIosScheme;
-                setTimeout(() => { window.location.href = standardUpiUrl; }, 800);
-            } else {
-                // Desktop or generic fallback sequence
-                window.location.href = standardUpiUrl;
-            }
+            // Execute the intent handshake
+            window.location.href = universalUpiUrl;
         }
     </script>
 </body>
