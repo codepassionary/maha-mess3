@@ -3,28 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Assembly Gateway</title>
+    <title>Birthday Cake Cutting Celebration</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=600;700;900&family=Plus+Jakarta+Sans:wght=300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
         :root {
             --bg-dark: #02040a;
-            --card-glass: rgba(10, 16, 36, 0.4);
+            --card-glass: rgba(6, 10, 23, 0.45);
             --gold-primary: #e2bf65;
             --gold-linear: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fcf6ba 75%, #aa771c 100%);
-            --text-pure: #ffffff;
-            --text-muted: #64748b;
-            --laser-glow: conic-gradient(from 0deg, transparent 10%, #bf953f 35%, #fff 50%, #bf953f 65%, transparent 90%);
+            --text-pure: #f8fafc;
+            --text-muted: #94a3b8;
+            --glow-color: rgba(226, 191, 101, 0.08);
+            --alert-red: #ef4444;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none;
             -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
             -webkit-touch-callout: none;
         }
 
@@ -38,12 +43,10 @@
             justify-content: center;
             padding: 24px;
             overflow-x: hidden;
-            position: relative;
-            perspective: 1000px;
         }
 
-        /* Animated Complex Vector Cosmic Background Engine */
-        .ambient-cosmic-engine {
+        /* Animated Cosmic Background Elements */
+        .cosmic-engine {
             position: fixed;
             width: 100vw;
             height: 100vh;
@@ -52,102 +55,76 @@
             pointer-events: none;
             overflow: hidden;
         }
-        .nebula-cluster-1 {
+        .nebula-core {
             position: absolute;
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(191, 149, 63, 0.09) 0%, transparent 70%);
-            top: -25%; left: -15%;
-            filter: blur(60px);
-            animation: orbitalDrift 25s infinite ease-in-out alternate;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(179, 135, 40, 0.12) 0%, transparent 65%);
+            top: -10%; left: 20%;
+            filter: blur(40px);
+            animation: orbitalDrift 18s infinite ease-in-out alternate;
         }
-        .nebula-cluster-2 {
+        .nebula-pulse {
             position: absolute;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(147, 51, 234, 0.05) 0%, transparent 65%);
-            bottom: -20%; right: -10%;
-            filter: blur(50px);
-            animation: orbitalDrift 30s infinite ease-in-out alternate-reverse;
-        }
-
-        /* Background Particle Array Matrix */
-        .star-field-grid {
-            position: absolute;
-            width: 100%; height: 100%;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 0);
-            background-size: 40px 40px;
-            opacity: 0.3;
-            transform: translateZ(-100px);
-            animation: macroGridScroll 40s linear infinite;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(30, 41, 59, 0.5) 0%, transparent 70%);
+            bottom: -5%; right: 15%;
+            filter: blur(20px);
+            animation: orbitalDrift 24s infinite ease-in-out alternate-reverse;
         }
 
-        /* 3D Reactive Kinetic Border Wrapper Frame */
-        .kinetic-wrapper {
+        /* Kinetic Laser Border Outer Wrapper */
+        .kinetic-border-wrapper {
             position: relative;
             width: 100%;
-            max-width: 420px;
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 36px;
-            padding: 2px;
+            max-width: 410px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 30px;
+            padding: 1px;
             overflow: hidden;
             z-index: 1;
-            box-shadow: 0 60px 110px -30px rgba(0, 0, 0, 0.95), 
-                        0 0 100px -20px rgba(191, 149, 63, 0.06);
-            transform-style: preserve-3d;
-            transition: transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1), box-shadow 0.5s ease;
+            box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.9);
+            margin: 20px 0;
         }
-        
-        /* High-Definition Rotating Laser Outline */
-        .kinetic-wrapper::before {
+
+        .kinetic-border-wrapper::before {
             content: '';
             position: absolute;
-            width: 220%; height: 220%;
-            top: -60%; left: -60%;
-            background: var(--laser-glow);
-            animation: laserRotate 3.5s linear infinite;
+            width: 150%;
+            height: 150%;
+            top: -25%; left: -25%;
+            background: conic-gradient(from 0deg, transparent 20%, var(--gold-primary) 45%, #fff 50%, var(--gold-primary) 55%, transparent 80%);
+            animation: laserRotate 6s linear infinite;
             z-index: 0;
         }
 
-        /* Premium Depth Micro Reflection */
-        .kinetic-wrapper::after {
-            content: '';
-            position: absolute;
-            inset: 2px;
-            border-radius: 34px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* Premium Glass Portal Master Canvas Panel */
+        /* Premium Glass Portal Master Canvas */
         .portal-card {
             position: relative;
             background: var(--card-glass);
-            backdrop-filter: blur(60px);
-            -webkit-backdrop-filter: blur(60px);
-            border-radius: 34px;
-            padding: 48px 30px 40px;
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 29px;
+            padding: 40px 24px 32px;
             text-align: center;
             width: 100%;
             z-index: 1;
-            border: 1px solid rgba(255, 255, 255, 0.02);
-            transform: translateZ(30px); /* 3D Depth Layer Layering */
         }
 
-        /* Crest Geometry Frame */
+        /* Structural Design Crest */
         .crest-icon-frame {
-            width: 82px; height: 82px;
-            margin: 0 auto 28px;
-            background: #030611;
-            border: 1px solid rgba(191, 149, 63, 0.3);
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 20px;
+            background: #040711;
+            border: 1px solid rgba(226, 191, 101, 0.3);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 25px rgba(191,149,63,0.12);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 15px rgba(226,191,101,0.1);
             position: relative;
-            transition: border-color 0.4s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .crest-icon-frame::after {
             content: '';
@@ -155,101 +132,93 @@
             width: 100%; height: 100%;
             border-radius: 50%;
             border: 1px solid var(--gold-primary);
-            opacity: 0.25;
-            animation: dynamicPulse 2.5s infinite ease-out;
-        }
-        .kinetic-wrapper:hover .crest-icon-frame {
-            border-color: var(--gold-primary);
-            transform: scale(1.08) rotate(-10deg);
+            opacity: 0.3;
+            animation: microPulse 2.5s infinite ease-out;
         }
         .crest-icon-frame svg {
-            width: 34px; height: 34px;
+            width: 28px;
+            height: 28px;
             fill: url(#gold-svg-gradient);
-            filter: drop-shadow(0 2px 12px rgba(191,149,63,0.35));
+            filter: drop-shadow(0 2px 8px rgba(226,191,101,0.3));
         }
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 900;
-            letter-spacing: 5px;
-            margin-bottom: 6px;
+            letter-spacing: 3px;
+            margin-bottom: 4px;
             text-transform: uppercase;
-            background: linear-gradient(180deg, #ffffff 15%, #e2bf65 100%);
+            background: linear-gradient(180deg, #ffffff 30%, #d4b257 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 4px 30px rgba(0,0,0,0.6);
+            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
         .subtitle {
             font-size: 0.72rem;
-            font-weight: 800;
+            font-weight: 700;
             color: var(--text-muted);
-            letter-spacing: 6px;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            margin-bottom: 32px;
-            transition: color 0.4s;
-        }
-        .kinetic-wrapper:hover .subtitle {
-            color: var(--gold-primary);
+            margin-bottom: 24px;
         }
 
-        /* Warning Micro Ticker */
+        /* Dynamic Time Warning Ticker Banner */
         .warning-banner {
-            background: rgba(239, 68, 68, 0.03);
-            border: 1px solid rgba(239, 68, 68, 0.15);
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
             color: #fca5a5;
             font-size: 0.68rem;
-            font-weight: 800;
-            letter-spacing: 2px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            padding: 14px;
-            border-radius: 16px;
-            margin-bottom: 32px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            box-shadow: 0 4px 25px rgba(239, 68, 68, 0.01);
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.05);
             animation: warningPulse 2s infinite alternate;
         }
         .warning-banner svg {
-            width: 16px; height: 16px;
-            fill: #ef4444;
+            width: 14px; height: 14px;
+            fill: var(--alert-red);
         }
 
-        /* High-Visual Floating Amount Core Box */
+        /* Contribution Display Box */
         .amount-display-box {
-            background: linear-gradient(135deg, rgba(1, 3, 10, 0.6) 0%, rgba(255,255,255,0.01) 100%);
+            background: linear-gradient(145deg, rgba(0,0,0,0.4) 0%, rgba(255,255,255,0.01) 100%);
             border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: 24px;
-            padding: 24px;
-            margin-bottom: 32px;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 24px;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 1px 20px rgba(0,0,0,0.4);
         }
         .amount-display-box::before {
             content: '';
             position: absolute;
             top: 0; left: -100%;
             width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-            animation: lightSweep 4s infinite linear;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            animation: lightSweep 4.5s infinite linear;
         }
         .amount-label {
-            font-size: 0.68rem;
-            font-weight: 800;
+            font-size: 0.65rem;
+            font-weight: 700;
             color: var(--gold-primary);
             text-transform: uppercase;
-            letter-spacing: 3px;
-            opacity: 0.9;
+            letter-spacing: 2px;
+            opacity: 0.85;
         }
         .amount-value {
             font-family: 'Cinzel', serif;
-            font-size: 3.1rem;
+            font-size: 2.6rem;
             font-weight: 700;
-            margin-top: 8px;
+            margin-top: 4px;
             background: var(--gold-linear);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -257,206 +226,196 @@
             justify-content: center;
             align-items: center;
             gap: 6px;
-            filter: drop-shadow(0 2px 15px rgba(191,149,63,0.2));
         }
         .currency-symbol {
-            font-size: 2.1rem;
+            font-size: 1.8rem;
             font-weight: 600;
             color: var(--gold-primary);
         }
 
-        /* Kinetic Ticker Countdown Layout Matrix */
+        /* Clock Countdown Components */
         .countdown-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin-bottom: 32px;
+            gap: 10px;
+            margin-bottom: 24px;
         }
         .countdown-box {
-            background: rgba(1, 2, 6, 0.6);
+            background: rgba(2, 4, 10, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.02);
-            border-radius: 16px;
-            padding: 16px 4px;
-            backdrop-filter: blur(15px);
-            position: relative;
-            transition: border-color 0.4s, transform 0.4s inside, background-color 0.4s;
-        }
-        .countdown-box::after {
-            content: '';
-            position: absolute;
-            inset: 0; border-radius: 16px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
-            pointer-events: none;
+            border-radius: 12px;
+            padding: 12px 4px;
+            backdrop-filter: blur(5px);
+            transition: border-color 0.3s, transform 0.3s;
         }
         .countdown-box:hover {
-            border-color: rgba(191, 149, 63, 0.3);
-            background: rgba(1, 2, 6, 0.9);
-            transform: scale(1.05);
+            border-color: rgba(226, 191, 101, 0.2);
+            transform: translateY(-2px);
         }
         .countdown-time {
             font-family: 'Cinzel', serif;
-            font-size: 1.55rem;
+            font-size: 1.35rem;
             font-weight: 700;
             color: #ffffff;
-            text-shadow: 0 0 12px rgba(255,255,255,0.15);
         }
         .countdown-label {
             font-size: 0.55rem;
             text-transform: uppercase;
             color: var(--text-muted);
-            letter-spacing: 1.5px;
-            margin-top: 8px;
-            font-weight: 800;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            font-weight: 600;
         }
 
-        /* Modular Architecture Info Box Frame */
+        /* Manifest Ledger Architecture Grid */
         .event-details-box {
-            background: rgba(1, 3, 10, 0.4);
+            background: rgba(2, 4, 10, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.01);
-            border-radius: 24px;
-            padding: 12px 24px;
-            margin-bottom: 40px;
+            border-radius: 20px;
+            padding: 8px 18px;
+            margin-bottom: 32px;
             text-align: left;
-            box-shadow: inset 0 2px 15px rgba(0,0,0,0.3);
         }
         .detail-row {
             display: flex;
             align-items: center;
-            gap: 18px;
-            padding: 16px 0;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            gap: 14px;
+            padding: 12px 0;
+            transition: transform 0.25s ease;
         }
         .detail-row:not(:last-child) {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         }
         .detail-row:hover {
-            transform: translateX(8px);
+            transform: translateX(4px);
         }
         .detail-icon {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 28px; height: 28px;
+            width: 24px; height: 24px;
         }
         .detail-icon svg {
-            width: 22px; height: 22px;
+            width: 18px; height: 18px;
             fill: var(--text-muted);
-            transition: fill 0.3s, filter 0.3s, transform 0.3s;
+            transition: fill 0.3s, filter 0.3s;
         }
         .detail-row:hover .detail-icon svg {
             fill: var(--gold-primary);
-            filter: drop-shadow(0 0 10px rgba(191,149,63,0.8));
-            transform: scale(1.1);
+            filter: drop-shadow(0 0 6px rgba(226,191,101,0.6));
         }
         .detail-content {
             display: flex;
             flex-direction: column;
         }
         .detail-title {
-            font-size: 0.62rem;
+            font-size: 0.6rem;
             text-transform: uppercase;
             color: var(--text-muted);
-            letter-spacing: 2.5px;
-            font-weight: 800;
+            letter-spacing: 1.5px;
+            font-weight: 700;
         }
         .detail-text {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #e2e8f0;
-            font-weight: 600;
-            margin-top: 4px;
-            line-height: 1.4;
+            font-weight: 500;
+            margin-top: 2px;
+            line-height: 1.3;
         }
 
-        /* Dynamic Core Action Interactive CTA Button */
+        /* High-Impact Liquid Gold Command Trigger Button */
         .btn-pay-now {
             position: relative;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 16px;
+            gap: 12px;
             width: 100%;
-            padding: 22px;
+            padding: 18px;
             background: var(--gold-linear);
             color: #02040a;
-            font-weight: 900;
-            font-size: 0.92rem;
-            letter-spacing: 3px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            border-radius: 18px;
+            border-radius: 14px;
             border: none;
             cursor: pointer;
             overflow: hidden;
-            box-shadow: 0 10px 35px rgba(179, 135, 40, 0.25);
-            transition: box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 6px 24px rgba(179, 135, 40, 0.3);
+            transition: box-shadow 0.4s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .btn-pay-now::before {
             content: '';
             position: absolute;
             top: 0; left: -150%;
-            width: 60%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.55), transparent);
-            transform: skewX(-30deg);
-            animation: interactiveShimmer 4s infinite linear;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-25deg);
+            animation: interactiveShimmer 5s infinite linear;
         }
         .btn-pay-now:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 22px 50px rgba(179, 135, 40, 0.5), 0 0 25px rgba(255,255,255,0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(179, 135, 40, 0.55), 0 0 15px rgba(255,255,255,0.2);
         }
         .btn-pay-now svg {
-            width: 20px; height: 20px;
+            width: 16px; height: 16px;
             fill: #02040a;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.3s;
         }
         .btn-pay-now:hover svg {
-            transform: translateX(8px) scale(1.1);
+            transform: translateX(5px);
         }
 
-        /* System Security Footer Node */
+        /* Secure Validation Footer */
         .secure-footer {
-            margin-top: 32px;
+            margin-top: 24px;
             font-size: 0.65rem;
             color: var(--text-muted);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            letter-spacing: 2px;
+            gap: 8px;
+            letter-spacing: 1px;
             text-transform: uppercase;
         }
         .secure-footer svg {
-            width: 14px; height: 14px;
+            width: 12px; height: 12px;
             fill: var(--gold-primary);
             opacity: 0.6;
         }
 
-        /* CORE GRAPHICS KEYFRAMES ENGINE */
-        @keyframes laserRotate { 100% { transform: rotate(360deg); } }
+        /* KEYFRAME ANIMATIONS */
+        @keyframes laserRotate {
+            100% { transform: rotate(360deg); }
+        }
         @keyframes orbitalDrift {
             0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-40px, 40px) scale(1.15); }
+            100% { transform: translate(-60px, 40px) scale(1.15); }
         }
-        @keyframes dynamicPulse {
-            0% { transform: scale(1); opacity: 0.25; }
-            100% { transform: scale(1.3); opacity: 0; }
+        @keyframes microPulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.2); opacity: 0; }
         }
-        @keyframes lightSweep { 0% { left: -100%; } 20%, 100% { left: 150%; } }
-        @keyframes interactiveShimmer { 0% { left: -150%; } 10%, 100% { left: 150%; } }
+        @keyframes lightSweep {
+            0% { left: -100%; }
+            30%, 100% { left: 150%; }
+        }
+        @keyframes interactiveShimmer {
+            0% { left: -150%; }
+            15%, 100% { left: 150%; }
+        }
         @keyframes warningPulse {
-            0% { border-color: rgba(239, 68, 68, 0.1); background: rgba(239, 68, 68, 0.02); }
-            100% { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.1); }
-        }
-        @keyframes macroGridScroll {
-            0% { background-position: 0 0; }
-            100% { background-position: 40px 80px; }
+            0% { border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); }
+            100% { border-color: rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.12); }
         }
     </style>
 </head>
 <body>
 
-    <div class="ambient-cosmic-engine">
-        <div class="nebula-cluster-1"></div>
-        <div class="nebula-cluster-2"></div>
-        <div class="star-field-grid"></div>
+    <div class="cosmic-engine">
+        <div class="nebula-core"></div>
+        <div class="nebula-pulse"></div>
     </div>
 
     <svg style="position: absolute; width: 0; height: 0;" width="0" height="0">
@@ -469,7 +428,7 @@
         </defs>
     </svg>
 
-    <div class="kinetic-wrapper" id="depth-frame">
+    <div class="kinetic-border-wrapper">
         <div class="portal-card">
             
             <div class="crest-icon-frame">
@@ -479,131 +438,205 @@
             </div>
 
             <h1>Shivam Miskare</h1>
-            <div class="subtitle">Secret Assembly Gateway</div>
+            <div class="subtitle">Birthday Celebration</div>
 
             <div class="warning-banner">
                 <svg viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
                 </svg>
-                BE THERE: MANDATORY SQUAD PRESENCE
+                Strict Request: Do Not Be Delayed!
             </div>
             
             <div class="amount-display-box">
-                <div class="amount-label">Your Secure Contribution</div>
+                <div class="amount-label">Contribution Asset</div>
                 <div class="amount-value"><span class="currency-symbol">₹</span>50</div>
             </div>
 
             <div class="countdown-container">
-                <div class="countdown-box"><div class="countdown-time" id="days">00</div><div class="countdown-label">Days</div></div>
-                <div class="countdown-box"><div class="countdown-time" id="hours">00</div><div class="countdown-label">Hrs</div></div>
-                <div class="countdown-box"><div class="countdown-time" id="minutes">00</div><div class="countdown-label">Min</div></div>
-                <div class="countdown-box"><div class="countdown-time" id="seconds">00</div><div class="countdown-label">Sec</div></div>
+                <div class="countdown-box">
+                    <div class="countdown-time" id="days">00</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-time" id="hours">00</div>
+                    <div class="countdown-label">Hrs</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-time" id="minutes">00</div>
+                    <div class="countdown-label">Min</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-time" id="seconds">00</div>
+                    <div class="countdown-label">Sec</div>
+                </div>
             </div>
 
             <div class="event-details-box">
                 <div class="detail-row">
-                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
-                    <div class="detail-content"><div class="detail-title">Location</div><div class="detail-text">Secret HQ Assembly Area</div></div>
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 6a2 2 0 0 0 2-2c0-.38-.22-.68-.4-.9A1 1 0 0 0 12 1a1 1 0 0 0-.6.1c-.18.22-.4.52-.4.9a2 2 0 0 0 2 2zm6 5H6V9h12v2zm0 5H6v-3h12v3zm1 4H5v-2h14v2z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Ceremony</div>
+                        <div class="detail-text">Cake Cutting Celebration</div>
+                    </div>
                 </div>
 
                 <div class="detail-row">
-                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5C6.34 5 5 1.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
-                    <div class="detail-content"><div class="detail-title">Target Network</div><div class="detail-text">Topa Gang Tactical Unit</div></div>
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5C6.34 5 5 1.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Organizers</div>
+                        <div class="detail-text">Topa Gang</div>
+                    </div>
                 </div>
 
                 <div class="detail-row">
-                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z"/></svg></div>
-                    <div class="detail-content"><div class="detail-title">Ledger Administrator</div><div class="detail-text">Vikram Dhakad (Verified)</div></div>
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Coordinator</div>
+                        <div class="detail-text">Vikram Dhakad</div>
+                    </div>
                 </div>
 
                 <div class="detail-row">
-                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
-                    <div class="detail-content"><div class="detail-title">Deployment Window</div><div class="detail-text">30 May 2026</div></div>
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Venue Allocation</div>
+                        <div class="detail-text" style="color: var(--gold-primary); font-weight: 700;">Location will be disclosed at Niranjan's House</div>
+                    </div>
                 </div>
 
                 <div class="detail-row">
-                    <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
-                    <div class="detail-content"><div class="detail-title">Strict Lock-In</div><div class="detail-text">07:30 PM Sharp</div></div>
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Date of Celebration</div>
+                        <div class="detail-text">30 May 2026</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-title">Time of Event</div>
+                        <div class="detail-text">06:30 PM</div>
+                    </div>
                 </div>
             </div>
 
-            <button class="btn-pay-now" onclick="triggerDirectUPI(event)">
-                Proceed to Payment
-                <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+            <button class="btn-pay-now" onclick="triggerPhonePeIntent(event)">
+                Initialize Security Pay
+                <svg viewBox="0 0 24 24">
+                    <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/>
+                </svg>
             </button>
 
             <div class="secure-footer">
-                <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-                End-To-End Encrypted Gateway Vector
+                <svg viewBox="0 0 24 24">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+                Direct PhonePe Intent Handshake Secure
             </div>
-
         </div>
     </div>
 
     <script>
-        // High-Security Integrity Interceptors
+        // 1. Core Code Security Protections
         document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","C","J"].includes(e.key)) || (e.ctrlKey && e.key === "U")) e.preventDefault();
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "F12" || 
+                (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "C" || e.key === "J")) || 
+                (e.ctrlKey && e.key === "U")) {
+                e.preventDefault();
+                return false;
+            }
         });
+        document.addEventListener('dragstart', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
 
-        // 3D Parallax Gyro Mouse-Tracking Interactivity Matrix Engine
-        const elementFrame = document.getElementById('depth-frame');
-        
-        document.addEventListener('mousemove', (e) => {
-            const coordinateX = (window.innerWidth / 2 - e.clientX) / 25;
-            const coordinateY = (window.innerHeight / 2 - e.clientY) / 25;
-            
-            elementFrame.style.transform = `rotateY(${-coordinateX}deg) rotateX(${coordinateY}deg)`;
-        });
+        // 2. Countdown Engine Architecture (Targeting May 30, 2026 @ 18:30:00)
+        const celebrationTargetDate = new Date("May 30, 2026 18:30:00").getTime();
 
-        document.addEventListener('mouseleave', () => {
-            elementFrame.style.transform = `rotateY(0deg) rotateX(0deg)`;
-        });
+        const countdownEngine = setInterval(function() {
+            const rightNow = new Date().getTime();
+            const distanceRemainder = celebrationTargetDate - rightNow;
 
-        // Precision Math Real-Time Countdown Engine Module
-        const celebrationTargetDate = new Date("May 30, 2026 19:30:00").getTime();
-        const calculationLoop = setInterval(function() {
-            const remainder = celebrationTargetDate - new Date().getTime();
-            const d = Math.floor(remainder / (1000 * 60 * 60 * 24)),
-                  h = Math.floor((remainder % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-                  m = Math.floor((remainder % (1000 * 60 * 60)) / (1000 * 60)),
-                  s = Math.floor((remainder % (1000 * 60)) / 1000);
+            const d = Math.floor(distanceRemainder / (1000 * 60 * 60 * 24));
+            const h = Math.floor((distanceRemainder % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((distanceRemainder % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((distanceRemainder % (1000 * 60)) / 1000);
 
             document.getElementById("days").innerText = d < 10 ? "0" + d : d;
             document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
             document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
             document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
 
-            if (remainder < 0) {
-                clearInterval(calculationLoop);
+            if (distanceRemainder < 0) {
+                clearInterval(countdownEngine);
                 ["days", "hours", "minutes", "seconds"].forEach(id => document.getElementById(id).innerText = "00");
             }
         }, 1000);
 
-        // Hardware Handshake Intent Routing Engine
-        function triggerDirectUPI(e) {
+        // 3. Direct PhonePe Intent Sequence Engine
+        function triggerPhonePeIntent(e) {
             e.preventDefault();
 
+            // Fire premium particle explosion
+            confetti({
+                particleCount: 160,
+                spread: 80,
+                origin: { y: 0.65 },
+                colors: ['#bf953f', '#fcf6ba', '#b38728', '#ffffff']
+            });
+
+            // Target Parameters
             const payeeUPI = "8103509439@ybl"; 
             const payeeName = "Vikram Dhakad";    
             const amount = "50";
-            const note = "Assembly Token Access";
+            const transactionNote = "Contribution for Shivam Miskare Birthday Celebration";
 
-            const standardUpiUrl = `upi://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
-            const phonePeAndroidIntent = `intent://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}#Intent;scheme=upi;package=com.phonepe.app;end`;
-            const phonePeIosScheme = `phonepe://upi/pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+            // Universal fallback string layout
+            const standardUpiUrl = `upi://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+            
+            // Direct PhonePe Execution Schemes (Using native Android intent filters and iOS deep-linking structures)
+            const phonePeAndroidIntent = `intent://pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}#Intent;scheme=upi;package=com.phonepe.app;end`;
+            const phonePeIosScheme = `phonepe://upi/pay?pa=${payeeUPI}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
 
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            const isAndroid = /android/i.test(ua);
-            const isIos = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            // Device architecture assessment
+            const userAgentString = navigator.userAgent || navigator.vendor || window.opera;
+            const isAndroidDevice = /android/i.test(userAgentString);
+            const isIosDevice = /iPad|iPhone|iPod/.test(userAgentString) && !window.MSStream;
 
-            if (isAndroid) {
+            if (isAndroidDevice) {
+                // Instantly force deep-link bypass straight to native PhonePe application
                 window.location.href = phonePeAndroidIntent;
-            } else if (isIos) {
+            } else if (isIosDevice) {
+                // Route through iOS target app registers
                 window.location.href = phonePeIosScheme;
                 setTimeout(() => { window.location.href = standardUpiUrl; }, 800);
             } else {
+                // Desktop or generic fallback sequence
                 window.location.href = standardUpiUrl;
             }
         }
