@@ -1,72 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Attendance</title>
-    <script src="face-api.min.js"></script>
-    <style>
-        :root { --bg: #0f172a; --card: #1e293b; --accent: #4f46e5; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: var(--card); padding: 2rem; border-radius: 20px; width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        video { width: 100%; border-radius: 12px; background: #000; transform: scaleX(-1); margin-bottom: 1rem; }
-        button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; background: var(--accent); color: white; transition: 0.2s; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        #status { margin-top: 15px; padding: 10px; border-radius: 6px; font-size: 0.9rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biometric Geo Attendance</title>
+
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:20px;
+}
+
+.card{
+width:450px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(12px);
+border-radius:20px;
+padding:20px;
+text-align:center;
+}
+
+video{
+width:100%;
+border-radius:12px;
+margin-top:10px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:16px;
+}
+
+.primary{
+background:#22c55e;
+color:white;
+}
+
+.secondary{
+background:#3b82f6;
+color:white;
+}
+
+.status{
+margin-top:15px;
+padding:10px;
+background:#1e293b;
+border-radius:10px;
+}
+
+.success{
+color:#22c55e;
+}
+
+.error{
+color:#ef4444;
+}
+</style>
 </head>
+
 <body>
 
 <div class="card">
-    <video id="video" autoplay muted playsinline></video>
-    <button id="btnInit" onclick="initApp()">Initialize System</button>
-    <button id="btnReg" onclick="register()" disabled>Register Face</button>
-    <button id="btnMark" onclick="mark()" disabled>Mark Attendance</button>
-    <div id="status">Click "Initialize" to begin.</div>
+
+<h2>Biometric Geo Attendance</h2>
+
+<video id="video" autoplay muted></video>
+
+<button class="secondary" onclick="registerFace()">
+Register Face
+</button>
+
+<button class="primary" onclick="markAttendance()">
+Mark Attendance
+</button>
+
+<div class="status" id="status">
+Waiting...
+</div>
+
 </div>
 
 <script>
-    const video = document.getElementById('video'), status = document.getElementById('status');
-    const TARGET = { lat: 24.507574, lon: 81.298351 };
 
-    async function initApp() {
-        try {
-            status.innerText = "Loading AI models...";
-            await Promise.all([
-                faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-                faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-                faceapi.nets.faceRecognitionNet.loadFromUri('/models')
-            ]);
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            document.querySelectorAll('button').forEach(b => b.disabled = false);
-            status.innerText = "System Ready.";
-        } catch (e) { status.innerText = "Error: Camera/Location access required."; }
-    }
+const video=document.getElementById("video");
+const statusBox=document.getElementById("status");
 
-    async function register() {
-        const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-        if(!det) return status.innerText = "Error: No face detected.";
-        localStorage.setItem('userFace', JSON.stringify(Array.from(det.descriptor)));
-        status.innerText = "Registration complete!";
-    }
+const OFFICE_LAT=25.3176;
+const OFFICE_LNG=82.9739;
+const GEOFENCE_RADIUS=20;
 
-    async function mark() {
-        status.innerText = "Verifying location and identity...";
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const dist = Math.sqrt((pos.coords.latitude - TARGET.lat)**2 + (pos.coords.longitude - TARGET.lon)**2) * 111000;
-            if(dist > 20) return status.innerText = `Out of range: ${Math.round(dist)}m.`;
-            
-            const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
-            const saved = localStorage.getItem('userFace');
-            if(!det || !saved) return status.innerText = "Error: Please register first.";
-            
-            const matcher = new faceapi.FaceMatcher(new faceapi.LabeledFaceDescriptors('User', [new Float32Array(JSON.parse(saved))]));
-            if(matcher.findBestMatch(det.descriptor).distance < 0.5) {
-                status.innerText = "Attendance logged successfully.";
-            } else status.innerText = "Identity mismatch!";
-        }, () => status.innerText = "Location access denied.", { enableHighAccuracy: true });
-    }
+async function loadModels(){
+
+status("Loading AI models...");
+
+await faceapi.nets.tinyFaceDetector.loadFromUri('./models');
+await faceapi.nets.faceLandmark68Net.loadFromUri('./models');
+await faceapi.nets.faceRecognitionNet.loadFromUri('./models');
+
+status("Models Loaded");
+}
+
+async function startCamera(){
+
+try{
+
+const stream=await navigator.mediaDevices.getUserMedia({
+video:true
+});
+
+video.srcObject=stream;
+
+}catch(e){
+
+status("Camera Permission Denied",true);
+
+}
+}
+
+function status(text,error=false){
+
+statusBox.innerHTML=text;
+
+statusBox.className="status " + (error ? "error":"success");
+
+}
+
+function getDistance(lat1,lon1,lat2,lon2){
+
+const R=6371000;
+
+const dLat=(lat2-lat1)*Math.PI/180;
+const dLon=(lon2-lon1)*Math.PI/180;
+
+const a=
+Math.sin(dLat/2)**2+
+Math.cos(lat1*Math.PI/180)*
+Math.cos(lat2*Math.PI/180)*
+Math.sin(dLon/2)**2;
+
+const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+
+return R*c;
+}
+
+async function registerFace(){
+
+status("Registering face...");
+
+const detection=await faceapi
+.detectSingleFace(
+video,
+new faceapi.TinyFaceDetectorOptions()
+)
+.withFaceLandmarks()
+.withFaceDescriptor();
+
+if(!detection){
+
+status("Face Not Detected",true);
+return;
+}
+
+localStorage.setItem(
+"faceDescriptor",
+JSON.stringify(Array.from(detection.descriptor))
+);
+
+status("Face Registered Successfully");
+
+}
+
+async function verifyFace(){
+
+const stored=localStorage.getItem("faceDescriptor");
+
+if(!stored){
+
+status("No Registered Face Found",true);
+return false;
+}
+
+const savedDescriptor=
+new Float32Array(JSON.parse(stored));
+
+const detection=await faceapi
+.detectSingleFace(
+video,
+new faceapi.TinyFaceDetectorOptions()
+)
+.withFaceLandmarks()
+.withFaceDescriptor();
+
+if(!detection){
+
+status("Face Not Detected",true);
+return false;
+}
+
+const distance=
+faceapi.euclideanDistance(
+savedDescriptor,
+detection.descriptor
+);
+
+return distance<0.55;
+}
+
+function getLocation(){
+
+return new Promise((resolve,reject)=>{
+
+navigator.geolocation.getCurrentPosition(
+resolve,
+reject,
+{
+enableHighAccuracy:true,
+timeout:10000
+}
+);
+
+});
+}
+
+async function markAttendance(){
+
+status("Verifying Face...");
+
+const faceVerified=await verifyFace();
+
+if(!faceVerified){
+
+status("Face Verification Failed",true);
+return;
+}
+
+status("Checking Location...");
+
+try{
+
+const pos=await getLocation();
+
+const lat=pos.coords.latitude;
+const lng=pos.coords.longitude;
+
+const distance=getDistance(
+lat,
+lng,
+OFFICE_LAT,
+OFFICE_LNG
+);
+
+if(distance>GEOFENCE_RADIUS){
+
+status(
+"Outside Geofence ("+
+Math.round(distance)+
+"m)",
+true
+);
+
+return;
+}
+
+const attendance={
+time:new Date().toLocaleString(),
+latitude:lat,
+longitude:lng
+};
+
+localStorage.setItem(
+"lastAttendance",
+JSON.stringify(attendance)
+);
+
+status(
+"Attendance Marked Successfully"
+);
+
+}catch(e){
+
+status("Location Access Failed",true);
+
+}
+
+}
+
+loadModels();
+startCamera();
+
 </script>
+
 </body>
 </html>
