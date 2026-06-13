@@ -296,7 +296,7 @@
     async function executeBiometricAction() {
         UI.actionBtn.disabled = true;
         UI.statusText.innerText = "Analyzing Neural Vectors... Hold Still";
-        UI.reticle.style.borderColor = var(--primary);
+        UI.reticle.style.borderColor = "var(--primary)";
 
         // 1. Detect Face and Extract Descriptor (128-point Float32Array)
         const detection = await faceapi.detectSingleFace(UI.video)
