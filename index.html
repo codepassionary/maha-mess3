@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Enterprise Biometric Gateway</title>
+    <title>Advanced Biometric Gateway</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;500;700&display=swap');
 
         :root {
             --bg-color: #050505;
-            --surface: rgba(20, 20, 25, 0.7);
+            --surface: rgba(20, 20, 25, 0.85);
             --border: rgba(255, 255, 255, 0.1);
             --primary: #00d2ff;
             --primary-glow: rgba(0, 210, 255, 0.4);
@@ -24,217 +25,175 @@
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-color);
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(0, 230, 118, 0.05), transparent 25%);
             color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            user-select: none; /* Anti-tamper UX */
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden; user-select: none;
         }
 
-        /* Main App Container - Glassmorphism */
         .app-container {
             background: var(--surface);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            width: 100%;
-            max-width: 450px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+            width: 100%; max-width: 450px; height: 100vh;
+            display: flex; flex-direction: column; position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
         }
 
         @media (min-width: 500px) {
-            .app-container {
-                height: 85vh;
-                max-height: 850px;
-                border-radius: 24px;
-            }
+            .app-container { height: 85vh; max-height: 850px; border-radius: 24px; }
         }
 
-        /* Header */
+        /* Headers */
         .header {
-            padding: 24px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            z-index: 10;
+            padding: 24px 20px; text-align: center; border-bottom: 1px solid var(--border); z-index: 10;
         }
         .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; }
         .badge {
             display: inline-block; margin-top: 8px; padding: 4px 12px;
             background: rgba(0, 210, 255, 0.1); border: 1px solid var(--primary);
             border-radius: 20px; font-size: 0.75rem; color: var(--primary);
-            box-shadow: 0 0 10px var(--primary-glow);
         }
 
-        /* Camera & Liveness Area */
-        .viewport {
-            flex-grow: 1;
-            position: relative;
-            background: #000;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        /* View Sections */
+        .view-section { display: none; flex-direction: column; flex-grow: 1; height: 100%; }
+        .view-section.active { display: flex; }
 
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1);
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
-
-        /* Dynamic Biometric Reticle */
-        .reticle {
-            position: absolute;
-            width: 260px; height: 340px;
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Face shape */
-            transition: all 0.4s ease;
-            display: none;
-            z-index: 5;
-        }
-        .reticle.active { border-color: var(--primary); box-shadow: 0 0 20px var(--primary-glow), inset 0 0 20px var(--primary-glow); }
-        .reticle.success { border-color: var(--success); box-shadow: 0 0 20px rgba(0,230,118,0.4); border-style: solid; }
-        
-        .liveness-instruction {
-            position: absolute;
-            bottom: 30px;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            text-align: center;
-            backdrop-filter: blur(4px);
-            z-index: 6;
-            display: none;
-            border: 1px solid var(--border);
-        }
-
-        /* Controls */
-        .controls {
-            padding: 24px;
-            background: linear-gradient(to top, var(--bg-color), var(--surface));
-            z-index: 10;
-        }
-
-        button {
-            width: 100%; padding: 16px; border: none; border-radius: 12px;
-            font-size: 1rem; font-weight: 700; font-family: 'Inter', sans-serif;
-            text-transform: uppercase; letter-spacing: 1px;
-            cursor: pointer; transition: all 0.3s;
-            position: relative; overflow: hidden;
-            display: none;
-        }
-
-        .btn-auth {
-            background: transparent; color: var(--primary);
-            border: 1px solid var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
-        .btn-auth:hover { background: var(--primary); color: #000; }
-        .btn-auth:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--text-muted); color: var(--text-muted); box-shadow: none; }
-
-        /* Security Audit Overlay */
-        .audit-overlay {
+        /* Full Screen Overlays (Loading/Audits) */
+        .overlay {
             position: absolute; inset: 0; background: var(--bg-color);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 50; transition: opacity 0.5s; padding: 20px;
+            z-index: 50; padding: 20px; text-align: center; transition: opacity 0.3s;
         }
-        
-        .radar {
-            width: 80px; height: 80px; border-radius: 50%;
-            border: 2px solid var(--primary); position: relative; margin-bottom: 30px;
-        }
-        .radar::after {
-            content: ''; position: absolute; top: 50%; left: 50%;
-            width: 40px; height: 40px; background: conic-gradient(from 0deg, transparent 70%, var(--primary) 100%);
-            transform-origin: 0 0; animation: sweep 2s infinite linear;
-        }
-        @keyframes sweep { 100% { transform: rotate(360deg); } }
-
-        .log-list { width: 100%; max-width: 300px; font-family: monospace; font-size: 0.8rem; color: var(--text-muted); }
+        .log-list { width: 100%; max-width: 300px; font-family: monospace; font-size: 0.8rem; color: var(--text-muted); margin-top: 20px; text-align: left;}
         .log-item { margin: 8px 0; display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding-bottom: 4px; }
         .log-status { color: var(--primary); }
         .log-error { color: var(--error); }
 
-        /* Canvas for invisible frame capture */
-        canvas { display: none; }
+        /* Dashboard View */
+        .dashboard { padding: 40px 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+        .dash-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            padding: 30px 20px; border-radius: 16px; cursor: pointer; transition: all 0.3s;
+        }
+        .dash-card:hover { background: rgba(0, 210, 255, 0.1); border-color: var(--primary); }
+        .dash-card h3 { margin-bottom: 10px; font-family: 'Orbitron', sans-serif; }
+        .dash-card p { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* Camera Viewport */
+        .viewport { flex-grow: 1; position: relative; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: scaleX(-1); pointer-events: none; }
+        
+        .reticle {
+            position: absolute; width: 240px; height: 320px;
+            border: 2px dashed rgba(255, 255, 255, 0.4); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            transition: all 0.3s; z-index: 5;
+        }
+
+        /* Controls */
+        .controls { padding: 20px; background: linear-gradient(to top, var(--bg-color), var(--surface)); z-index: 10; display: flex; gap: 10px; flex-direction: column;}
+        button {
+            width: 100%; padding: 16px; border: none; border-radius: 12px;
+            font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .btn-auth { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+        .btn-auth:hover { background: var(--primary); color: #000; }
+        .btn-auth:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--text-muted); color: var(--text-muted); }
+        .btn-secondary { background: transparent; color: var(--text-muted); font-size: 0.8rem; padding: 10px; }
+        .btn-secondary:hover { color: var(--text); }
+
+        /* Spinner */
+        .spinner { width: 50px; height: 50px; border: 3px solid rgba(0,210,255,0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="header">
-        <h1>Identity Gateway</h1>
-        <div id="zoneBadge" class="badge">Awaiting Signal</div>
+        <h1>Secure Gateway</h1>
+        <div id="zoneBadge" class="badge">Initializing System</div>
     </div>
 
-    <div id="auditOverlay" class="audit-overlay">
-        <div class="radar"></div>
-        <div class="log-list" id="auditLogs">
-            <div class="log-item"><span>Initializing Secure Context</span><span class="log-status">...</span></div>
+    <div id="auditOverlay" class="overlay">
+        <div class="spinner" id="auditSpinner"></div>
+        <div class="log-list" id="auditLogs"></div>
+        <button id="retryBtn" class="btn-auth" style="margin-top: 30px; display: none; border-color: var(--error); color: var(--error);" onclick="location.reload()">Reboot System</button>
+    </div>
+
+    <div id="dashboardView" class="view-section dashboard">
+        <div class="dash-card" onclick="openCameraView('register')">
+            <h3>Register Identity</h3>
+            <p>Enroll a new facial biometric vector to this device securely.</p>
         </div>
-        <button id="retryBtn" class="btn-auth" style="margin-top: 30px; width: 80%; border-color: var(--error); color: var(--error);" onclick="location.reload()">Reboot System</button>
+        <div class="dash-card" onclick="openCameraView('verify')">
+            <h3>Verify Access</h3>
+            <p>Scan your face to mathematically match against stored records.</p>
+        </div>
+        <button class="btn-secondary" onclick="clearIdentity()">Clear Stored Identity</button>
     </div>
 
-    <div class="viewport">
-        <video id="videoElement" autoplay playsinline></video>
-        <div id="reticle" class="reticle"></div>
-        <div id="livenessInstruction" class="liveness-instruction">Position face in frame</div>
+    <div id="cameraView" class="view-section">
+        <div class="viewport">
+            <video id="videoElement" autoplay playsinline></video>
+            <canvas id="overlayCanvas"></canvas>
+            <div id="reticle" class="reticle"></div>
+        </div>
+        <div class="controls">
+            <div id="statusText" style="text-align: center; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted);">Position face in frame</div>
+            <button id="actionBtn" class="btn-auth" onclick="executeBiometricAction()">Capture & Process</button>
+            <button class="btn-secondary" onclick="closeCameraView()">Cancel / Back to Menu</button>
+        </div>
     </div>
-
-    <div class="controls">
-        <button id="actionBtn" class="btn-auth"></button>
-    </div>
-
-    <canvas id="canvasElement"></canvas>
 </div>
 
 <script>
-    // --- SECURE CONFIGURATION ---
+    // --- SYSTEM CONFIGURATION ---
     const CONFIG = {
         targetLat: 24.507573,
         targetLon: 81.298352,
         maxRadiusMeters: 50,
-        expectedTimezone: 'Asia/Kolkata', // Anti-VPN heuristic
-        livenessCheckTime: 2500 // ms
+        modelsUrl: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model'
     };
 
-    // --- DOM ELEMENTS ---
     const UI = {
         overlay: document.getElementById('auditOverlay'),
         logs: document.getElementById('auditLogs'),
+        spinner: document.getElementById('auditSpinner'),
         retryBtn: document.getElementById('retryBtn'),
-        video: document.getElementById('videoElement'),
-        reticle: document.getElementById('reticle'),
-        instruction: document.getElementById('livenessInstruction'),
-        actionBtn: document.getElementById('actionBtn'),
         zoneBadge: document.getElementById('zoneBadge'),
-        canvas: document.getElementById('canvasElement')
+        dashView: document.getElementById('dashboardView'),
+        camView: document.getElementById('cameraView'),
+        video: document.getElementById('videoElement'),
+        canvas: document.getElementById('overlayCanvas'),
+        reticle: document.getElementById('reticle'),
+        statusText: document.getElementById('statusText'),
+        actionBtn: document.getElementById('actionBtn')
     };
 
     let stream = null;
-    let isRegistered = localStorage.getItem('secureBiometricHash') !== null;
+    let currentMode = ''; // 'register' or 'verify'
 
-    // --- BOOT SEQUENCE ---
+    // --- INITIALIZATION ---
     window.onload = async () => {
-        await sleep(500);
-        runSecurityAudits();
-    };
+        try {
+            await runSecurityAudits();
+            await loadAIModels();
+            
+            // Success, reveal dashboard
+            UI.overlay.style.opacity = 0;
+            setTimeout(() => { 
+                UI.overlay.style.display = 'none'; 
+                UI.dashView.classList.add('active');
+            }, 300);
 
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        } catch (err) {
+            UI.spinner.style.display = 'none';
+            UI.retryBtn.style.display = 'block';
+            UI.retryBtn.innerText = err.message || "System Failure";
+        }
+    };
 
     function appendLog(text, status, isError = false) {
         const div = document.createElement('div');
@@ -243,64 +202,28 @@
         UI.logs.appendChild(div);
     }
 
-    // --- SECURITY & ANTI-FRAUD AUDITS ---
+    // --- 1. SECURITY & GEOFENCING ---
     async function runSecurityAudits() {
-        try {
-            // 1. Secure Context Check (HTTPS/Localhost)
-            appendLog('Secure Context Verification', 'OK');
-            if (!window.isSecureContext) throw new Error("Insecure connection detected.");
-            await sleep(600);
-
-            // 2. VPN/Proxy Heuristic (Timezone vs Expected GPS Zone)
-            const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            if (userTZ !== CONFIG.expectedTimezone) {
-                console.warn(`Timezone mismatch. Expected ${CONFIG.expectedTimezone}, got ${userTZ}. Possible VPN.`);
-                // We won't block purely on this as travelers exist, but we log it for the "backend"
-                appendLog('Network Routing Audit', 'WARN', true);
-            } else {
-                appendLog('Network Routing Audit', 'OK');
-            }
-            await sleep(600);
-
-            // 3. Geolocation Check
-            appendLog('Acquiring GPS Uplink', '...');
-            await verifyLocation();
-
-        } catch (error) {
-            appendLog('SYSTEM HALTED', 'FAIL', true);
-            UI.retryBtn.style.display = 'block';
-            UI.retryBtn.innerText = error.message.substring(0, 25);
-        }
-    }
-
-    // --- GEOFENCING ---
-    function verifyLocation() {
+        appendLog('Location Uplink', '...');
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) return reject(new Error("Hardware unsupported"));
 
             navigator.geolocation.getCurrentPosition(
-                async (pos) => {
+                (pos) => {
                     const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, CONFIG.targetLat, CONFIG.targetLon);
-                    
-                    // Replace the "..." log with result
-                    UI.logs.lastChild.remove();
+                    UI.logs.lastChild.innerHTML = `<span>Location Uplink</span><span class="log-status">[${Math.round(dist)}m]</span>`;
                     
                     if (dist <= CONFIG.maxRadiusMeters) {
-                        appendLog(`Geofence (${Math.round(dist)}m)`, 'LOCKED');
-                        UI.zoneBadge.innerText = `SECURE ZONE: ${Math.round(dist)}m`;
+                        UI.zoneBadge.innerText = `SECURE ZONE`;
                         UI.zoneBadge.style.color = "var(--success)";
                         UI.zoneBadge.style.borderColor = "var(--success)";
-                        await sleep(800);
-                        
-                        // Proceed to Camera
-                        startSecureCamera();
                         resolve();
                     } else {
-                        reject(new Error(`Out of Bounds (${Math.round(dist)}m)`));
+                        reject(new Error(`Out of Bounds (${Math.round(dist)}m away)`));
                     }
                 },
                 (err) => reject(new Error("GPS Access Denied")),
-                { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         });
     }
@@ -313,134 +236,137 @@
         return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
 
-    // --- HARDWARE & ANTI-SPOOFING CAMERA INIT ---
-    async function startSecureCamera() {
+    // --- 2. LOAD AI MODELS ---
+    async function loadAIModels() {
+        appendLog('Downloading AI Models', 'Wait...');
         try {
-            // Requesting high res to prevent low-res video injection
-            stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, 
-                audio: false 
-            });
-
-            // Anti-Virtual Camera Heuristic
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const videoDevices = devices.filter(d => d.kind === 'videoinput');
-            const virtualKeywords = ['virtual', 'obs', 'snap', 'manycam'];
-            
-            const isSuspicious = videoDevices.some(d => 
-                virtualKeywords.some(kw => d.label.toLowerCase().includes(kw))
-            );
-
-            if (isSuspicious) {
-                console.warn("Virtual camera software detected. In production, enforce native hardware only.");
-                // For this demo, we allow it but log it.
-            }
-
-            UI.video.srcObject = stream;
-            UI.video.style.opacity = 1;
-            
-            // Clear overlay
-            UI.overlay.style.opacity = 0;
-            setTimeout(() => { 
-                UI.overlay.style.display = 'none'; 
-                setupBiometricUI();
-            }, 500);
-
-        } catch (err) {
-            UI.logs.innerHTML = "";
-            appendLog('Camera Intercept Failed', 'ERR', true);
-            UI.retryBtn.style.display = 'block';
+            await faceapi.nets.ssdMobilenetv1.loadFromUri(CONFIG.modelsUrl);
+            await faceapi.nets.faceLandmark68Net.loadFromUri(CONFIG.modelsUrl);
+            await faceapi.nets.faceRecognitionNet.loadFromUri(CONFIG.modelsUrl);
+            UI.logs.lastChild.innerHTML = `<span>AI Neural Nets</span><span class="log-status">[LOADED]</span>`;
+        } catch (e) {
+            console.error(e);
+            throw new Error("Failed to load AI Models. Network blocked?");
         }
     }
 
-    // --- LIVENESS & UI STATE MACHINE ---
-    function setupBiometricUI() {
-        UI.reticle.style.display = 'block';
-        UI.instruction.style.display = 'block';
-        UI.actionBtn.style.display = 'block';
-
-        if (isRegistered) {
-            UI.actionBtn.innerText = "Initiate Verification";
-            UI.actionBtn.onclick = () => runLivenessChallenge('verify');
-        } else {
-            UI.actionBtn.innerText = "Register Biometrics";
-            UI.actionBtn.onclick = () => runLivenessChallenge('register');
-        }
-    }
-
-    async function runLivenessChallenge(mode) {
-        UI.actionBtn.disabled = true;
-        UI.reticle.classList.add('active');
+    // --- 3. UI ROUTING & CAMERA HANDLING ---
+    async function openCameraView(mode) {
+        currentMode = mode;
+        UI.dashView.classList.remove('active');
+        UI.camView.classList.add('active');
         
-        // Simulated Liveness workflow (Depth/Motion check)
-        const instructions = [
-            "Analyzing Depth Map...",
-            "Please blink slowly...",
-            "Hold steady..."
-        ];
+        UI.actionBtn.innerText = mode === 'register' ? 'Extract & Register Face' : 'Scan & Verify Identity';
+        UI.actionBtn.disabled = false;
+        UI.statusText.innerText = "Initializing Camera...";
+        UI.reticle.style.borderColor = "rgba(255, 255, 255, 0.4)";
 
-        for (let text of instructions) {
-            UI.instruction.innerText = text;
-            await sleep(CONFIG.livenessCheckTime / instructions.length);
-        }
-
-        const frameData = captureEncryptedFrame();
-
-        if (mode === 'register') {
-            localStorage.setItem('secureBiometricHash', frameData);
-            triggerSuccess("Identity Bound to Device");
-            isRegistered = true;
-        } else {
-            // Simulated Match
-            const stored = localStorage.getItem('secureBiometricHash');
-            if (stored) { // In reality, compare vectors on backend
-                triggerSuccess("Authentication Confirmed");
-            } else {
-                UI.instruction.innerText = "Match Failed. No Record.";
-                UI.instruction.style.color = "var(--error)";
-                UI.actionBtn.disabled = false;
-                UI.actionBtn.innerText = "Retry Verification";
-                UI.reticle.classList.remove('active');
-            }
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+            UI.video.srcObject = stream;
+            
+            UI.video.onloadedmetadata = () => {
+                UI.canvas.width = UI.video.videoWidth;
+                UI.canvas.height = UI.video.videoHeight;
+                faceapi.matchDimensions(UI.canvas, UI.video);
+                UI.statusText.innerText = "Ready. Position face inside the outline.";
+            };
+        } catch (err) {
+            alert("Camera access denied or unavailable.");
+            closeCameraView();
         }
     }
 
-    function captureEncryptedFrame() {
-        UI.canvas.width = UI.video.videoWidth;
-        UI.canvas.height = UI.video.videoHeight;
+    function closeCameraView() {
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        UI.camView.classList.remove('active');
+        UI.dashView.classList.add('active');
         const ctx = UI.canvas.getContext('2d');
-        ctx.translate(UI.canvas.width, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(UI.video, 0, 0, UI.canvas.width, UI.canvas.height);
-        // Returning base64. In prod, this would be encrypted before transmission.
-        return UI.canvas.toDataURL('image/jpeg', 0.8);
+        ctx.clearRect(0, 0, UI.canvas.width, UI.canvas.height);
+    }
+
+    function clearIdentity() {
+        if(confirm("Delete your saved biometric data permanently?")) {
+            localStorage.removeItem('userFaceDescriptor');
+            alert("Identity cleared.");
+        }
+    }
+
+    // --- 4. CORE BIOMETRIC MATCHING LOGIC ---
+    async function executeBiometricAction() {
+        UI.actionBtn.disabled = true;
+        UI.statusText.innerText = "Analyzing Neural Vectors... Hold Still";
+        UI.reticle.style.borderColor = var(--primary);
+
+        // 1. Detect Face and Extract Descriptor (128-point Float32Array)
+        const detection = await faceapi.detectSingleFace(UI.video)
+                                       .withFaceLandmarks()
+                                       .withFaceDescriptor();
+
+        if (!detection) {
+            UI.statusText.innerText = "Error: No face detected. Try better lighting.";
+            UI.statusText.style.color = "var(--error)";
+            UI.actionBtn.disabled = false;
+            UI.reticle.style.borderColor = "var(--error)";
+            setTimeout(() => { UI.statusText.style.color = "var(--text-muted)"; }, 3000);
+            return;
+        }
+
+        // Draw detection box on canvas for visual feedback
+        const resizedResults = faceapi.resizeResults(detection, UI.video);
+        const ctx = UI.canvas.getContext('2d');
+        ctx.clearRect(0, 0, UI.canvas.width, UI.canvas.height);
+        faceapi.draw.drawDetections(UI.canvas, resizedResults);
+
+        const descriptor = Array.from(detection.descriptor); // Convert to standard array for saving
+
+        if (currentMode === 'register') {
+            // REGISTRATION
+            localStorage.setItem('userFaceDescriptor', JSON.stringify(descriptor));
+            triggerSuccess("Registration Complete! Identity Bound.");
+        } 
+        else if (currentMode === 'verify') {
+            // VERIFICATION
+            const storedData = localStorage.getItem('userFaceDescriptor');
+            if (!storedData) {
+                alert("No identity registered on this device. Please register first.");
+                closeCameraView();
+                return;
+            }
+
+            // Convert stored array back to Float32Array
+            const storedDescriptor = new Float32Array(JSON.parse(storedData));
+            
+            // Calculate Euclidean distance (Lower distance = closer match. Threshold is usually 0.6)
+            const distance = faceapi.euclideanDistance(storedDescriptor, detection.descriptor);
+            console.log(`Match Distance: ${distance}`); // For debugging
+
+            if (distance < 0.55) {
+                triggerSuccess(`Match Confirmed! (Confidence: ${((1 - distance)*100).toFixed(1)}%)`);
+            } else {
+                UI.statusText.innerText = `Access Denied. Face does not match. (Dist: ${distance.toFixed(2)})`;
+                UI.statusText.style.color = "var(--error)";
+                UI.reticle.style.borderColor = "var(--error)";
+                UI.actionBtn.disabled = false;
+                setTimeout(() => { UI.statusText.style.color = "var(--text-muted)"; }, 4000);
+            }
+        }
     }
 
     function triggerSuccess(msg) {
-        UI.reticle.classList.remove('active');
-        UI.reticle.classList.add('success');
-        UI.instruction.innerText = msg;
-        UI.instruction.style.color = "var(--success)";
-        UI.instruction.style.borderColor = "var(--success)";
-        
+        UI.statusText.innerText = msg;
+        UI.statusText.style.color = "var(--success)";
+        UI.reticle.style.borderColor = "var(--success)";
         UI.actionBtn.style.background = "var(--success)";
         UI.actionBtn.style.color = "#000";
-        UI.actionBtn.style.borderColor = "var(--success)";
-        UI.actionBtn.innerText = "ACCESS GRANTED";
-        UI.actionBtn.style.boxShadow = "0 0 20px rgba(0,230,118,0.5)";
+        UI.actionBtn.innerText = "SUCCESS";
 
-        // Optional: Reset UI after 3 seconds for demo purposes
         setTimeout(() => {
-            UI.reticle.classList.remove('success');
-            UI.instruction.style.color = "";
-            UI.instruction.style.borderColor = "";
-            UI.actionBtn.style.background = "";
-            UI.actionBtn.style.color = "";
-            UI.actionBtn.style.borderColor = "";
-            UI.actionBtn.style.boxShadow = "";
-            UI.actionBtn.disabled = false;
-            setupBiometricUI();
-        }, 4000);
+            UI.statusText.style.color = "var(--text-muted)";
+            UI.actionBtn.style.background = "transparent";
+            UI.actionBtn.style.color = "var(--primary)";
+            closeCameraView();
+        }, 3000);
     }
 </script>
 
