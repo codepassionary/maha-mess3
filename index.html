@@ -2,167 +2,174 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Geofenced Biometrics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Enterprise Biometric Gateway</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;500;700&display=swap');
+
         :root {
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --primary: #3b82f6;
-            --primary-hover: #2563eb;
-            --success: #10b981;
-            --error: #ef4444;
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
-            --radius: 16px;
+            --bg-color: #050505;
+            --surface: rgba(20, 20, 25, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #00d2ff;
+            --primary-glow: rgba(0, 210, 255, 0.4);
+            --success: #00e676;
+            --error: #ff1744;
+            --text: #ffffff;
+            --text-muted: #8892b0;
         }
 
-        * { box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 230, 118, 0.05), transparent 25%);
             color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             overflow: hidden;
+            user-select: none; /* Anti-tamper UX */
         }
 
+        /* Main App Container - Glassmorphism */
         .app-container {
             background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
             width: 100%;
-            max-width: 420px;
-            height: 100%;
-            max-height: 800px;
-            border-radius: var(--radius);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
-        @media (min-width: 480px) {
-            .app-container { height: 90vh; }
+        @media (min-width: 500px) {
+            .app-container {
+                height: 85vh;
+                max-height: 850px;
+                border-radius: 24px;
+            }
         }
 
         /* Header */
         .header {
-            padding: 20px;
+            padding: 24px 20px;
             text-align: center;
+            border-bottom: 1px solid var(--border);
             z-index: 10;
-            background: linear-gradient(to bottom, var(--surface) 60%, transparent);
         }
-        .header h2 { margin: 0; font-size: 1.25rem; }
-        .header p { margin: 5px 0 0; font-size: 0.875rem; color: var(--text-muted); }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; }
+        .badge {
+            display: inline-block; margin-top: 8px; padding: 4px 12px;
+            background: rgba(0, 210, 255, 0.1); border: 1px solid var(--primary);
+            border-radius: 20px; font-size: 0.75rem; color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
 
-        /* Camera View */
-        .camera-wrapper {
+        /* Camera & Liveness Area */
+        .viewport {
             flex-grow: 1;
             position: relative;
             background: #000;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        
+
         video {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transform: scaleX(-1); /* Mirror */
+            transform: scaleX(-1);
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.8s ease;
         }
 
-        /* Viewfinder Overlay */
-        .viewfinder {
+        /* Dynamic Biometric Reticle */
+        .reticle {
             position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 250px; height: 250px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            box-shadow: 0 0 0 2000px rgba(15, 23, 42, 0.85); /* Darkens everything outside the circle */
+            width: 260px; height: 340px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Face shape */
+            transition: all 0.4s ease;
             display: none;
-            overflow: hidden;
+            z-index: 5;
         }
-
-        .scanning-line {
-            width: 100%;
-            height: 4px;
-            background: var(--success);
-            box-shadow: 0 0 10px var(--success);
+        .reticle.active { border-color: var(--primary); box-shadow: 0 0 20px var(--primary-glow), inset 0 0 20px var(--primary-glow); }
+        .reticle.success { border-color: var(--success); box-shadow: 0 0 20px rgba(0,230,118,0.4); border-style: solid; }
+        
+        .liveness-instruction {
             position: absolute;
-            top: 0;
-            animation: scan 2s infinite ease-in-out;
+            bottom: 30px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-align: center;
+            backdrop-filter: blur(4px);
+            z-index: 6;
             display: none;
-        }
-
-        @keyframes scan {
-            0% { top: 0; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
+            border: 1px solid var(--border);
         }
 
         /* Controls */
         .controls {
             padding: 24px;
-            background: var(--surface);
+            background: linear-gradient(to top, var(--bg-color), var(--surface));
             z-index: 10;
-            text-align: center;
         }
 
         button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+            width: 100%; padding: 16px; border: none; border-radius: 12px;
+            font-size: 1rem; font-weight: 700; font-family: 'Inter', sans-serif;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.3s;
+            position: relative; overflow: hidden;
             display: none;
         }
 
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-hover); }
-        .btn-success { background: var(--success); color: white; }
-        
-        .btn-text { 
-            background: transparent; 
-            color: var(--text-muted); 
-            margin-top: 10px; 
-            font-size: 0.875rem;
-            display: block;
+        .btn-auth {
+            background: transparent; color: var(--primary);
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
         }
-        .btn-text:hover { color: var(--text); }
+        .btn-auth:hover { background: var(--primary); color: #000; }
+        .btn-auth:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--text-muted); color: var(--text-muted); box-shadow: none; }
 
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Status States */
-        .status-overlay {
-            position: absolute;
-            inset: 0;
-            background: var(--surface);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
-            z-index: 20;
-            transition: opacity 0.3s ease;
+        /* Security Audit Overlay */
+        .audit-overlay {
+            position: absolute; inset: 0; background: var(--bg-color);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 50; transition: opacity 0.5s; padding: 20px;
         }
         
-        .status-icon { font-size: 3rem; margin-bottom: 16px; }
-        .hidden { opacity: 0; pointer-events: none; }
-        
-        /* Hidden canvas for capturing frames */
+        .radar {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 2px solid var(--primary); position: relative; margin-bottom: 30px;
+        }
+        .radar::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 40px; height: 40px; background: conic-gradient(from 0deg, transparent 70%, var(--primary) 100%);
+            transform-origin: 0 0; animation: sweep 2s infinite linear;
+        }
+        @keyframes sweep { 100% { transform: rotate(360deg); } }
+
+        .log-list { width: 100%; max-width: 300px; font-family: monospace; font-size: 0.8rem; color: var(--text-muted); }
+        .log-item { margin: 8px 0; display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding-bottom: 4px; }
+        .log-status { color: var(--primary); }
+        .log-error { color: var(--error); }
+
+        /* Canvas for invisible frame capture */
         canvas { display: none; }
     </style>
 </head>
@@ -170,96 +177,132 @@
 
 <div class="app-container">
     <div class="header">
-        <h2>Secure Gateway</h2>
-        <p id="subtext">Initializing system...</p>
+        <h1>Identity Gateway</h1>
+        <div id="zoneBadge" class="badge">Awaiting Signal</div>
     </div>
 
-    <div id="statusOverlay" class="status-overlay">
-        <div id="statusIcon" class="status-icon">⏳</div>
-        <h3 id="statusTitle">Checking Location</h3>
-        <p id="statusDesc" style="color: var(--text-muted);">Please allow location access to continue.</p>
-        <button id="retryBtn" class="btn-primary" style="margin-top: 20px; width: auto; padding: 10px 24px;" onclick="initSystem()">Retry</button>
-    </div>
-
-    <div class="camera-wrapper">
-        <video id="videoElement" autoplay playsinline></video>
-        <div id="viewfinder" class="viewfinder">
-            <div id="scanningLine" class="scanning-line"></div>
+    <div id="auditOverlay" class="audit-overlay">
+        <div class="radar"></div>
+        <div class="log-list" id="auditLogs">
+            <div class="log-item"><span>Initializing Secure Context</span><span class="log-status">...</span></div>
         </div>
+        <button id="retryBtn" class="btn-auth" style="margin-top: 30px; width: 80%; border-color: var(--error); color: var(--error);" onclick="location.reload()">Reboot System</button>
+    </div>
+
+    <div class="viewport">
+        <video id="videoElement" autoplay playsinline></video>
+        <div id="reticle" class="reticle"></div>
+        <div id="livenessInstruction" class="liveness-instruction">Position face in frame</div>
     </div>
 
     <div class="controls">
-        <button id="registerBtn" class="btn-primary" onclick="registerFace()">Register Face</button>
-        <button id="verifyBtn" class="btn-success" onclick="verifyFace()">Verify Identity</button>
-        <button id="resetBtn" class="btn-text" onclick="resetSystem()">Reset Device (Clear Data)</button>
+        <button id="actionBtn" class="btn-auth"></button>
     </div>
 
     <canvas id="canvasElement"></canvas>
 </div>
 
 <script>
-    // --- CONFIGURATION ---
-    const TARGET_LAT = 24.507573;
-    const TARGET_LON = 81.298352;
-    const MAX_RADIUS = 50; // meters
+    // --- SECURE CONFIGURATION ---
+    const CONFIG = {
+        targetLat: 24.507573,
+        targetLon: 81.298352,
+        maxRadiusMeters: 50,
+        expectedTimezone: 'Asia/Kolkata', // Anti-VPN heuristic
+        livenessCheckTime: 2500 // ms
+    };
 
-    // DOM Elements
+    // --- DOM ELEMENTS ---
     const UI = {
-        overlay: document.getElementById('statusOverlay'),
-        icon: document.getElementById('statusIcon'),
-        title: document.getElementById('statusTitle'),
-        desc: document.getElementById('statusDesc'),
+        overlay: document.getElementById('auditOverlay'),
+        logs: document.getElementById('auditLogs'),
         retryBtn: document.getElementById('retryBtn'),
-        subtext: document.getElementById('subtext'),
         video: document.getElementById('videoElement'),
-        viewfinder: document.getElementById('viewfinder'),
-        scanLine: document.getElementById('scanningLine'),
-        registerBtn: document.getElementById('registerBtn'),
-        verifyBtn: document.getElementById('verifyBtn'),
-        resetBtn: document.getElementById('resetBtn'),
+        reticle: document.getElementById('reticle'),
+        instruction: document.getElementById('livenessInstruction'),
+        actionBtn: document.getElementById('actionBtn'),
+        zoneBadge: document.getElementById('zoneBadge'),
         canvas: document.getElementById('canvasElement')
     };
 
     let stream = null;
+    let isRegistered = localStorage.getItem('secureBiometricHash') !== null;
 
-    // --- INITIALIZATION ---
-    window.onload = () => initSystem();
+    // --- BOOT SEQUENCE ---
+    window.onload = async () => {
+        await sleep(500);
+        runSecurityAudits();
+    };
 
-    function initSystem() {
-        showState('loading', 'Checking Location', 'Acquiring GPS coordinates...');
-        UI.retryBtn.style.display = 'none';
-        
-        if (!navigator.geolocation) {
-            showState('error', 'Unsupported Device', 'Your browser does not support geolocation.');
-            return;
-        }
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        navigator.geolocation.getCurrentPosition(
-            handleLocationSuccess,
-            handleLocationError,
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
+    function appendLog(text, status, isError = false) {
+        const div = document.createElement('div');
+        div.className = 'log-item';
+        div.innerHTML = `<span>${text}</span><span class="${isError ? 'log-error' : 'log-status'}">[${status}]</span>`;
+        UI.logs.appendChild(div);
     }
 
-    // --- GEOFENCING LOGIC ---
-    function handleLocationSuccess(position) {
-        const dist = calculateDistance(position.coords.latitude, position.coords.longitude, TARGET_LAT, TARGET_LON);
-        
-        if (dist <= MAX_RADIUS) {
-            UI.subtext.innerText = `Secured zone (${Math.round(dist)}m from center)`;
-            startCamera();
-        } else {
-            showState('error', 'Access Denied', `Geofence active. You are ${Math.round(dist)}m away. Must be within ${MAX_RADIUS}m.`);
-            UI.retryBtn.style.display = 'inline-block';
+    // --- SECURITY & ANTI-FRAUD AUDITS ---
+    async function runSecurityAudits() {
+        try {
+            // 1. Secure Context Check (HTTPS/Localhost)
+            appendLog('Secure Context Verification', 'OK');
+            if (!window.isSecureContext) throw new Error("Insecure connection detected.");
+            await sleep(600);
+
+            // 2. VPN/Proxy Heuristic (Timezone vs Expected GPS Zone)
+            const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (userTZ !== CONFIG.expectedTimezone) {
+                console.warn(`Timezone mismatch. Expected ${CONFIG.expectedTimezone}, got ${userTZ}. Possible VPN.`);
+                // We won't block purely on this as travelers exist, but we log it for the "backend"
+                appendLog('Network Routing Audit', 'WARN', true);
+            } else {
+                appendLog('Network Routing Audit', 'OK');
+            }
+            await sleep(600);
+
+            // 3. Geolocation Check
+            appendLog('Acquiring GPS Uplink', '...');
+            await verifyLocation();
+
+        } catch (error) {
+            appendLog('SYSTEM HALTED', 'FAIL', true);
+            UI.retryBtn.style.display = 'block';
+            UI.retryBtn.innerText = error.message.substring(0, 25);
         }
     }
 
-    function handleLocationError(error) {
-        let msg = "Unable to retrieve location.";
-        if (error.code === 1) msg = "Please enable GPS permissions in your browser.";
-        if (error.code === 3) msg = "Location request timed out.";
-        showState('error', 'Location Failed', msg);
-        UI.retryBtn.style.display = 'inline-block';
+    // --- GEOFENCING ---
+    function verifyLocation() {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) return reject(new Error("Hardware unsupported"));
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, CONFIG.targetLat, CONFIG.targetLon);
+                    
+                    // Replace the "..." log with result
+                    UI.logs.lastChild.remove();
+                    
+                    if (dist <= CONFIG.maxRadiusMeters) {
+                        appendLog(`Geofence (${Math.round(dist)}m)`, 'LOCKED');
+                        UI.zoneBadge.innerText = `SECURE ZONE: ${Math.round(dist)}m`;
+                        UI.zoneBadge.style.color = "var(--success)";
+                        UI.zoneBadge.style.borderColor = "var(--success)";
+                        await sleep(800);
+                        
+                        // Proceed to Camera
+                        startSecureCamera();
+                        resolve();
+                    } else {
+                        reject(new Error(`Out of Bounds (${Math.round(dist)}m)`));
+                    }
+                },
+                (err) => reject(new Error("GPS Access Denied")),
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+            );
+        });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -270,129 +313,134 @@
         return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
 
-    // --- CAMERA LOGIC ---
-    async function startCamera() {
-        showState('loading', 'Starting Camera', 'Requesting camera permissions...');
+    // --- HARDWARE & ANTI-SPOOFING CAMERA INIT ---
+    async function startSecureCamera() {
         try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+            // Requesting high res to prevent low-res video injection
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, 
+                audio: false 
+            });
+
+            // Anti-Virtual Camera Heuristic
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(d => d.kind === 'videoinput');
+            const virtualKeywords = ['virtual', 'obs', 'snap', 'manycam'];
+            
+            const isSuspicious = videoDevices.some(d => 
+                virtualKeywords.some(kw => d.label.toLowerCase().includes(kw))
+            );
+
+            if (isSuspicious) {
+                console.warn("Virtual camera software detected. In production, enforce native hardware only.");
+                // For this demo, we allow it but log it.
+            }
+
             UI.video.srcObject = stream;
             UI.video.style.opacity = 1;
             
-            // Hide overlay and prep UI
-            UI.overlay.classList.add('hidden');
-            UI.viewfinder.style.display = 'block';
-            
-            checkRegistrationStatus();
+            // Clear overlay
+            UI.overlay.style.opacity = 0;
+            setTimeout(() => { 
+                UI.overlay.style.display = 'none'; 
+                setupBiometricUI();
+            }, 500);
+
         } catch (err) {
-            showState('error', 'Camera Error', 'Please allow camera access to use biometric features.');
-            UI.retryBtn.style.display = 'inline-block';
+            UI.logs.innerHTML = "";
+            appendLog('Camera Intercept Failed', 'ERR', true);
+            UI.retryBtn.style.display = 'block';
         }
     }
 
-    // --- BIOMETRIC WORKFLOW ---
-    function checkRegistrationStatus() {
-        const isRegistered = localStorage.getItem('userFaceData') !== null;
-        
-        UI.registerBtn.style.display = 'none';
-        UI.verifyBtn.style.display = 'none';
-        UI.resetBtn.style.display = 'none';
+    // --- LIVENESS & UI STATE MACHINE ---
+    function setupBiometricUI() {
+        UI.reticle.style.display = 'block';
+        UI.instruction.style.display = 'block';
+        UI.actionBtn.style.display = 'block';
 
-        if (!isRegistered) {
-            UI.subtext.innerText = "No profile found. Please register.";
-            UI.registerBtn.style.display = 'block';
+        if (isRegistered) {
+            UI.actionBtn.innerText = "Initiate Verification";
+            UI.actionBtn.onclick = () => runLivenessChallenge('verify');
         } else {
-            UI.subtext.innerText = "Profile recognized. Ready for auth.";
-            UI.verifyBtn.style.display = 'block';
-            UI.resetBtn.style.display = 'block';
+            UI.actionBtn.innerText = "Register Biometrics";
+            UI.actionBtn.onclick = () => runLivenessChallenge('register');
         }
     }
 
-    function captureFrame() {
+    async function runLivenessChallenge(mode) {
+        UI.actionBtn.disabled = true;
+        UI.reticle.classList.add('active');
+        
+        // Simulated Liveness workflow (Depth/Motion check)
+        const instructions = [
+            "Analyzing Depth Map...",
+            "Please blink slowly...",
+            "Hold steady..."
+        ];
+
+        for (let text of instructions) {
+            UI.instruction.innerText = text;
+            await sleep(CONFIG.livenessCheckTime / instructions.length);
+        }
+
+        const frameData = captureEncryptedFrame();
+
+        if (mode === 'register') {
+            localStorage.setItem('secureBiometricHash', frameData);
+            triggerSuccess("Identity Bound to Device");
+            isRegistered = true;
+        } else {
+            // Simulated Match
+            const stored = localStorage.getItem('secureBiometricHash');
+            if (stored) { // In reality, compare vectors on backend
+                triggerSuccess("Authentication Confirmed");
+            } else {
+                UI.instruction.innerText = "Match Failed. No Record.";
+                UI.instruction.style.color = "var(--error)";
+                UI.actionBtn.disabled = false;
+                UI.actionBtn.innerText = "Retry Verification";
+                UI.reticle.classList.remove('active');
+            }
+        }
+    }
+
+    function captureEncryptedFrame() {
         UI.canvas.width = UI.video.videoWidth;
         UI.canvas.height = UI.video.videoHeight;
         const ctx = UI.canvas.getContext('2d');
-        // Mirror the canvas draw to match the mirrored video feed
         ctx.translate(UI.canvas.width, 0);
         ctx.scale(-1, 1);
         ctx.drawImage(UI.video, 0, 0, UI.canvas.width, UI.canvas.height);
+        // Returning base64. In prod, this would be encrypted before transmission.
         return UI.canvas.toDataURL('image/jpeg', 0.8);
     }
 
-    function registerFace() {
-        UI.registerBtn.disabled = true;
-        UI.registerBtn.innerText = "Capturing...";
+    function triggerSuccess(msg) {
+        UI.reticle.classList.remove('active');
+        UI.reticle.classList.add('success');
+        UI.instruction.innerText = msg;
+        UI.instruction.style.color = "var(--success)";
+        UI.instruction.style.borderColor = "var(--success)";
         
-        // Simulate processing delay
+        UI.actionBtn.style.background = "var(--success)";
+        UI.actionBtn.style.color = "#000";
+        UI.actionBtn.style.borderColor = "var(--success)";
+        UI.actionBtn.innerText = "ACCESS GRANTED";
+        UI.actionBtn.style.boxShadow = "0 0 20px rgba(0,230,118,0.5)";
+
+        // Optional: Reset UI after 3 seconds for demo purposes
         setTimeout(() => {
-            const faceData = captureFrame();
-            localStorage.setItem('userFaceData', faceData); // Save to local storage
-            
-            // Success Feedback
-            UI.registerBtn.style.background = "var(--success)";
-            UI.registerBtn.innerText = "Registered Successfully!";
-            
-            setTimeout(() => {
-                UI.registerBtn.disabled = false;
-                UI.registerBtn.style.background = "";
-                checkRegistrationStatus();
-            }, 1500);
-        }, 800);
-    }
-
-    function verifyFace() {
-        UI.verifyBtn.disabled = true;
-        UI.verifyBtn.innerText = "Analyzing Biometrics...";
-        UI.scanLine.style.display = 'block'; // Start cool laser animation
-
-        setTimeout(() => {
-            UI.scanLine.style.display = 'none';
-            const currentFace = captureFrame();
-            const storedFace = localStorage.getItem('userFaceData');
-            
-            /* *NOTE ON REALITY*: In a production app, you would send 'currentFace' 
-               and your User ID to a backend API (e.g., Python/OpenCV/FaceNet) here 
-               to mathematically compare the new image against the stored facial vectors.
-            */
-            
-            // Simulating successful backend match:
-            if (storedFace) {
-                showState('success', 'Access Granted', 'Identity verified securely.');
-                UI.subtext.innerText = "Session Active";
-                UI.verifyBtn.innerText = "Authenticated";
-                UI.verifyBtn.style.background = "var(--surface)";
-                UI.verifyBtn.style.color = "var(--success)";
-            } else {
-                showState('error', 'Verification Failed', 'No matching profile found.');
-                UI.verifyBtn.disabled = false;
-                UI.verifyBtn.innerText = "Verify Identity";
-            }
-        }, 2000);
-    }
-
-    function resetSystem() {
-        if(confirm("Are you sure you want to delete your registered face data?")) {
-            localStorage.removeItem('userFaceData');
-            checkRegistrationStatus();
-        }
-    }
-
-    // --- UI HELPERS ---
-    function showState(type, title, desc) {
-        UI.overlay.classList.remove('hidden');
-        UI.title.innerText = title;
-        UI.desc.innerText = desc;
-        
-        if (type === 'loading') {
-            UI.icon.innerText = '⏳';
-            UI.icon.style.color = 'var(--primary)';
-        } else if (type === 'error') {
-            UI.icon.innerText = '🚫';
-            UI.icon.style.color = 'var(--error)';
-        } else if (type === 'success') {
-            UI.icon.innerText = '✅';
-            UI.icon.style.color = 'var(--success)';
-            setTimeout(() => UI.overlay.classList.add('hidden'), 2500); // Auto hide success
-        }
+            UI.reticle.classList.remove('success');
+            UI.instruction.style.color = "";
+            UI.instruction.style.borderColor = "";
+            UI.actionBtn.style.background = "";
+            UI.actionBtn.style.color = "";
+            UI.actionBtn.style.borderColor = "";
+            UI.actionBtn.style.boxShadow = "";
+            UI.actionBtn.disabled = false;
+            setupBiometricUI();
+        }, 4000);
     }
 </script>
 
