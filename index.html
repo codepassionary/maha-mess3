@@ -2,446 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aegis Biometric Gateway</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Biometric Gateway</title>
     <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap');
-
-        :root {
-            --bg-base: #09090b;
-            --surface: rgba(24, 24, 27, 0.7);
-            --surface-hover: rgba(39, 39, 42, 0.9);
-            --border: rgba(255, 255, 255, 0.08);
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.5);
-            --success: #10b981;
-            --error: #ef4444;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-base);
-            background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 50%);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            user-select: none;
-        }
-
-        /* App Window */
-        .app-window {
-            width: 100%;
-            max-width: 440px;
-            height: 100vh;
-            background: var(--surface);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        @media (min-width: 480px) {
-            .app-window {
-                height: 90vh;
-                max-height: 850px;
-                border-radius: 24px;
-            }
-        }
-
-        /* Header */
-        .header {
-            padding: 24px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            background: linear-gradient(180deg, rgba(24,24,27,0.8) 0%, transparent 100%);
-            z-index: 10;
-        }
-        .header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; letter-spacing: 1px; }
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
-            padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 500;
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border); transition: all 0.3s;
-        }
-
-        /* Screens */
-        .screen { display: none; flex-direction: column; flex-grow: 1; height: 100%; animation: fadeIn 0.4s ease; }
-        .screen.active { display: flex; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Loader Overlay */
-        .loader-screen { justify-content: center; align-items: center; text-align: center; padding: 30px; }
-        .spinner {
-            width: 48px; height: 48px; border: 3px solid rgba(59, 130, 246, 0.2);
-            border-top-color: var(--primary); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 24px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .log-box { font-family: monospace; font-size: 0.8rem; color: var(--text-muted); text-align: left; width: 100%; margin-top: 20px; }
-        .log-box p { margin: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); padding-bottom: 4px; display: flex; justify-content: space-between; }
-
-        /* Dashboard */
-        .dashboard { padding: 30px 24px; justify-content: center; gap: 16px; }
-        .card {
-            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
-            border-radius: 16px; padding: 24px; cursor: pointer; transition: all 0.2s ease;
-        }
-        .card:hover { background: var(--surface-hover); border-color: var(--primary); transform: translateY(-2px); }
-        .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; margin-bottom: 8px; color: var(--primary); }
-        .card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
-
-        /* Camera View */
-        .camera-container {
-            position: relative; flex-grow: 1; background: #000; overflow: hidden;
-            display: flex; justify-content: center; align-items: center;
-        }
-        video, canvas {
-            position: absolute; width: 100%; height: 100%; object-fit: cover;
-            transform: scaleX(-1); /* Mirror effect */
-        }
-        canvas { z-index: 2; pointer-events: none; }
-        
-        .overlay-ui { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
-        
-        .face-guide {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 250px; height: 320px; border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 40% 40% 50% 50%; box-shadow: 0 0 0 2000px rgba(0,0,0,0.6);
-            transition: border-color 0.3s; overflow: hidden;
-        }
-        
-        .laser {
-            width: 100%; height: 2px; background: var(--primary);
-            box-shadow: 0 0 10px var(--primary-glow); position: absolute; top: 0;
-            animation: scan 2.5s infinite ease-in-out; display: none;
-        }
-        @keyframes scan { 0%, 100% { top: 0; opacity: 0; } 10%, 90% { opacity: 1; } 50% { top: 100%; } }
-
-        /* Controls */
-        .controls { padding: 24px; background: var(--bg-base); z-index: 10; text-align: center; border-top: 1px solid var(--border); }
-        .status-text { font-size: 0.9rem; font-weight: 500; margin-bottom: 16px; min-height: 20px; transition: color 0.3s; }
-        
-        button {
-            width: 100%; padding: 14px; border-radius: 12px; font-family: 'Space Grotesk', sans-serif;
-            font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none;
-        }
-        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px var(--primary-glow); }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-primary:disabled { background: #334155; color: #94a3b8; box-shadow: none; cursor: not-allowed; }
-        .btn-ghost { background: transparent; color: var(--text-muted); margin-top: 12px; }
-        .btn-ghost:hover { color: var(--text-main); }
+        :root { --bg: #09090b; --primary: #3b82f6; --success: #10b981; --error: #ef4444; --text: #f8fafc; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { width: 90%; max-width: 400px; padding: 20px; text-align: center; border: 1px solid #27272a; border-radius: 16px; background: #18181b; }
+        video { width: 100%; border-radius: 8px; transform: scaleX(-1); }
+        button { width: 100%; padding: 12px; margin-top: 10px; cursor: pointer; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="app-window">
-    <div class="header">
-        <h1>AEGIS SYSTEM</h1>
-        <div id="statusBadge" class="status-badge">
-            <span id="badgeDot" style="color: var(--primary);">●</span> 
-            <span id="badgeText">Initializing</span>
-        </div>
-    </div>
-
-    <div id="loaderScreen" class="screen active loader-screen">
-        <div id="spinner" class="spinner"></div>
-        <h3 id="loaderTitle" style="font-family: 'Space Grotesk', sans-serif;">System Boot</h3>
-        <div class="log-box" id="logBox"></div>
-        <button id="retryBtn" class="btn-primary" style="display: none; margin-top: 24px;" onclick="location.reload()">Reboot Protocol</button>
-    </div>
-
-    <div id="dashScreen" class="screen dashboard">
-        <div class="card" onclick="openScanner('register')">
-            <h3>Register Biometrics</h3>
-            <p>Enroll a new facial identity. This will overwrite any existing profile securely stored on this device.</p>
-        </div>
-        <div class="card" onclick="openScanner('verify')">
-            <h3>Verify Identity</h3>
-            <p>Authenticate against the local secure enclave using mathematical facial matching.</p>
-        </div>
-        <button class="btn-ghost" onclick="clearData()">Purge Stored Identity</button>
-    </div>
-
-    <div id="camScreen" class="screen">
-        <div class="camera-container">
-            <video id="videoElement" autoplay playsinline muted></video>
-            <canvas id="overlayCanvas"></canvas>
-            <div class="overlay-ui">
-                <div id="faceGuide" class="face-guide">
-                    <div id="scannerLaser" class="laser"></div>
-                </div>
-            </div>
-        </div>
-        <div class="controls">
-            <div id="scanStatusText" class="status-text">Calibrating optics...</div>
-            <button id="actionBtn" class="btn-primary" onclick="executeScan()">Initiate Scan</button>
-            <button class="btn-ghost" onclick="closeScanner()">Abort</button>
-        </div>
+<div class="box" id="ui">
+    <h2 id="title">Biometric Gateway</h2>
+    <video id="video" autoplay playsinline muted></video>
+    <div id="status">Loading AI Engine...</div>
+    <div id="controls">
+        <button onclick="run('register')">Register Identity</button>
+        <button onclick="run('verify')">Verify Identity</button>
     </div>
 </div>
 
 <script>
-    // --- CORE CONFIGURATION ---
-    const CFG = {
-        lat: 24.507573,
-        lon: 81.298352,
-        radius: 50, // meters
-        modelUri: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model',
-        matchThreshold: 0.50 // Stricter match for better security
-    };
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+    const CFG = { modelUri: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model' };
 
-    // --- DOM REFERENCES ---
-    const UI = {
-        badgeText: document.getElementById('badgeText'),
-        badgeDot: document.getElementById('badgeDot'),
-        screens: {
-            loader: document.getElementById('loaderScreen'),
-            dash: document.getElementById('dashScreen'),
-            cam: document.getElementById('camScreen')
-        },
-        logs: document.getElementById('logBox'),
-        loaderTitle: document.getElementById('loaderTitle'),
-        spinner: document.getElementById('spinner'),
-        retryBtn: document.getElementById('retryBtn'),
-        video: document.getElementById('videoElement'),
-        canvas: document.getElementById('overlayCanvas'),
-        guide: document.getElementById('faceGuide'),
-        laser: document.getElementById('scannerLaser'),
-        statusText: document.getElementById('scanStatusText'),
-        actionBtn: document.getElementById('actionBtn')
-    };
-
-    let activeStream = null;
-    let scanMode = null; // 'register' or 'verify'
-
-    // --- BOOT SEQUENCE ---
-    window.onload = async () => {
-        try {
-            logMsg("Auditing location parameters...");
-            await verifyGeofence();
-            
-            logMsg("Fetching neural networks...");
-            await loadAI();
-            
-            // Boot Success
-            switchScreen('dash');
-            updateBadge('Secure Zone Locked', 'var(--success)');
-        } catch (error) {
-            handleFatalError(error.message);
-        }
-    };
-
-    // --- 1. GEOFENCING ---
-    function verifyGeofence() {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) return reject(new Error("GPS Hardware Not Found"));
-
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    const dist = calcDist(pos.coords.latitude, pos.coords.longitude, CFG.lat, CFG.lon);
-                    logMsg(`GPS Uplink Established. Distance: ${Math.round(dist)}m`, true);
-                    
-                    if (dist <= CFG.radius) resolve();
-                    else reject(new Error(`Access Denied: Out of bounds (${Math.round(dist)}m)`));
-                },
-                (err) => reject(new Error("Location Permission Denied")),
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
-        });
-    }
-
-    // Haversine implementation
-    function calcDist(lat1, lon1, lat2, lon2) {
-        const R = 6371e3;
-        const p1 = lat1 * Math.PI/180, p2 = lat2 * Math.PI/180;
-        const dp = (lat2-lat1) * Math.PI/180, dl = (lon2-lon1) * Math.PI/180;
-        const a = Math.sin(dp/2)**2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2)**2;
-        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-
-    // --- 2. AI MODEL LOADING ---
-    async function loadAI() {
+    async function init() {
         try {
             await Promise.all([
-                faceapi.nets.ssdMobilenetv1.loadFromUri(CFG.modelUri),
+                faceapi.nets.tinyFaceDetector.loadFromUri(CFG.modelUri),
                 faceapi.nets.faceLandmark68Net.loadFromUri(CFG.modelUri),
                 faceapi.nets.faceRecognitionNet.loadFromUri(CFG.modelUri)
             ]);
-            logMsg("Neural Nets initialized.", true);
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            status.innerText = "System Ready";
         } catch (e) {
-            throw new Error("AI Load Failed (Check network/firewall)");
+            status.innerText = "Error: Check Camera/Network";
         }
     }
 
-    // --- 3. UI STATE MANAGEMENT ---
-    function switchScreen(targetName) {
-        Object.values(UI.screens).forEach(screen => screen.classList.remove('active'));
-        UI.screens[targetName].classList.add('active');
-    }
-
-    function updateBadge(text, color) {
-        UI.badgeText.innerText = text;
-        UI.badgeDot.style.color = color;
-    }
-
-    function logMsg(text, isSuccess = false) {
-        const p = document.createElement('p');
-        p.innerHTML = `<span>${text}</span> <span style="color: ${isSuccess ? 'var(--success)' : 'var(--primary)'}">[${isSuccess ? 'OK' : '...'}]</span>`;
-        UI.logs.appendChild(p);
-    }
-
-    function handleFatalError(msg) {
-        UI.spinner.style.display = 'none';
-        UI.loaderTitle.innerText = "System Halted";
-        UI.loaderTitle.style.color = "var(--error)";
-        logMsg(msg);
-        UI.logs.lastChild.querySelector('span:last-child').style.color = 'var(--error)';
-        UI.retryBtn.style.display = 'block';
-        updateBadge('Lockdown Active', 'var(--error)');
-    }
-
-    function clearData() {
-        if(confirm("Confirm deletion of device identity vectors?")) {
-            localStorage.removeItem('aegisBiometricKey');
-            alert("Local identity purged.");
-        }
-    }
-
-    // --- 4. CAMERA HANDLING ---
-    async function openScanner(mode) {
-        scanMode = mode;
-        switchScreen('cam');
-        
-        UI.actionBtn.innerText = mode === 'register' ? 'Extract Vector' : 'Verify Match';
-        UI.actionBtn.disabled = false;
-        UI.statusText.innerText = "Connecting optics...";
-        UI.statusText.style.color = "var(--text-main)";
-        UI.guide.style.borderColor = "rgba(255,255,255,0.3)";
-        UI.laser.style.display = 'none';
-
+    async function run(mode) {
+        status.innerText = "Analyzing...";
         try {
-            activeStream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 } }, 
-                audio: false 
-            });
-            UI.video.srcObject = activeStream;
-            
-            UI.video.onloadedmetadata = () => {
-                UI.canvas.width = UI.video.videoWidth;
-                UI.canvas.height = UI.video.videoHeight;
-                faceapi.matchDimensions(UI.canvas, UI.video);
-                UI.statusText.innerText = "Align face within the secure bounds.";
-            };
-        } catch (err) {
-            alert("Camera access denied or hardware missing.");
-            closeScanner();
+            const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224 });
+            const result = await faceapi.detectSingleFace(video, options).withFaceLandmarks().withFaceDescriptor();
+
+            if (!result) return status.innerText = "No face detected.";
+
+            if (mode === 'register') {
+                localStorage.setItem('bio', JSON.stringify(Array.from(result.descriptor)));
+                status.innerText = "Identity Registered!";
+            } else {
+                const stored = localStorage.getItem('bio');
+                if (!stored) return status.innerText = "No identity found.";
+                const dist = faceapi.euclideanDistance(new Float32Array(JSON.parse(stored)), result.descriptor);
+                status.innerText = dist < 0.6 ? "Access Granted" : "Access Denied";
+                status.style.color = dist < 0.6 ? "var(--success)" : "var(--error)";
+            }
+        } catch (e) {
+            status.innerText = "Engine Error. Try again.";
         }
     }
 
-    function closeScanner() {
-        if (activeStream) activeStream.getTracks().forEach(t => t.stop());
-        const ctx = UI.canvas.getContext('2d');
-        ctx.clearRect(0, 0, UI.canvas.width, UI.canvas.height);
-        switchScreen('dash');
-    }
-
-    // --- 5. BIOMETRIC LOGIC ---
-    async function executeScan() {
-        UI.actionBtn.disabled = true;
-        UI.statusText.innerText = "Processing multidimensional vectors...";
-        UI.guide.style.borderColor = "var(--primary)";
-        UI.laser.style.display = 'block';
-
-        // Wait a beat for UI to update and user to settle
-        await new Promise(r => setTimeout(r, 800));
-
-        try {
-            const detection = await faceapi.detectSingleFace(UI.video).withFaceLandmarks().withFaceDescriptor();
-            
-            const ctx = UI.canvas.getContext('2d');
-            ctx.clearRect(0, 0, UI.canvas.width, UI.canvas.height);
-
-            if (!detection) {
-                failScan("No face detected. Ensure proper lighting.");
-                return;
-            }
-
-            // Draw bounding box for visual feedback
-            const resized = faceapi.resizeResults(detection, UI.video);
-            faceapi.draw.drawDetections(UI.canvas, resized);
-
-            const vector = Array.from(detection.descriptor);
-
-            if (scanMode === 'register') {
-                localStorage.setItem('aegisBiometricKey', JSON.stringify(vector));
-                passScan("Identity Bound Successfully.");
-            } 
-            else if (scanMode === 'verify') {
-                const storedHex = localStorage.getItem('aegisBiometricKey');
-                if (!storedHex) {
-                    failScan("No identity found. Register first.");
-                    return;
-                }
-
-                const storedVector = new Float32Array(JSON.parse(storedHex));
-                const distance = faceapi.euclideanDistance(storedVector, detection.descriptor);
-
-                if (distance < CFG.matchThreshold) {
-                    passScan(`Authentication Confirmed. (Score: ${distance.toFixed(2)})`);
-                } else {
-                    failScan(`Identity Mismatch. (Score: ${distance.toFixed(2)})`);
-                }
-            }
-        } catch (err) {
-            failScan("Analysis engine error.");
-        }
-    }
-
-    function passScan(msg) {
-        UI.laser.style.display = 'none';
-        UI.statusText.innerText = msg;
-        UI.statusText.style.color = "var(--success)";
-        UI.guide.style.borderColor = "var(--success)";
-        UI.actionBtn.style.background = "var(--success)";
-        UI.actionBtn.innerText = "GRANTED";
-
-        setTimeout(() => { resetScanUI(); closeScanner(); }, 2500);
-    }
-
-    function failScan(msg) {
-        UI.laser.style.display = 'none';
-        UI.statusText.innerText = msg;
-        UI.statusText.style.color = "var(--error)";
-        UI.guide.style.borderColor = "var(--error)";
-        UI.actionBtn.disabled = false;
-        UI.actionBtn.innerText = "Retry Scan";
-        
-        setTimeout(() => {
-            UI.statusText.style.color = "var(--text-main)";
-            UI.guide.style.borderColor = "rgba(255,255,255,0.3)";
-            const ctx = UI.canvas.getContext('2d');
-            ctx.clearRect(0, 0, UI.canvas.width, UI.canvas.height);
-        }, 3000);
-    }
-
-    function resetScanUI() {
-        UI.actionBtn.style.background = "";
-        UI.statusText.style.color = "var(--text-main)";
-        UI.guide.style.borderColor = "rgba(255,255,255,0.3)";
-        UI.actionBtn.disabled = false;
-    }
+    init();
 </script>
-
 </body>
 </html>
