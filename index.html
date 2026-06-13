@@ -1,75 +1,1002 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Biometric Gateway</title>
-    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.js"></script>
-    <style>
-        :root { --bg: #09090b; --primary: #3b82f6; --success: #10b981; --error: #ef4444; --text: #f8fafc; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { width: 90%; max-width: 400px; padding: 20px; text-align: center; border: 1px solid #27272a; border-radius: 16px; background: #18181b; }
-        video { width: 100%; border-radius: 8px; transform: scaleX(-1); }
-        button { width: 100%; padding: 12px; margin-top: 10px; cursor: pointer; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; }
-        .hidden { display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FaceID Attendance — Geofenced Biometric System</title>
+
+<!-- face-api.js from CDN -->
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<style>
+  /* ── Design tokens ──────────────────────────────────────────── */
+  :root {
+    --bg:       #09090f;
+    --surface:  #13131f;
+    --card:     #1a1a2e;
+    --border:   #2a2a45;
+    --accent:   #4f8ef7;
+    --accent2:  #7c5cbf;
+    --green:    #22c55e;
+    --red:      #ef4444;
+    --amber:    #f59e0b;
+    --text:     #e8e8f0;
+    --muted:    #7070a0;
+    --radius:   14px;
+    --font:     'Inter', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ─────────────────────────────────────────────────── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 1.1rem; letter-spacing: .3px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+  .geo-badge {
+    display: flex; align-items: center; gap: 6px;
+    font-size: .78rem; color: var(--muted);
+    background: var(--card); border: 1px solid var(--border);
+    padding: 5px 11px; border-radius: 20px;
+  }
+  .geo-dot { width:8px; height:8px; border-radius:50%; background:var(--amber); animation: pulse 2s infinite; }
+  .geo-dot.ok { background: var(--green); }
+  .geo-dot.fail { background: var(--red); animation: none; }
+
+  /* ── Tabs ───────────────────────────────────────────────────── */
+  .tabs {
+    display: flex; gap: 4px;
+    padding: 16px 24px 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .tab {
+    padding: 10px 20px; border-radius: var(--radius) var(--radius) 0 0;
+    border: 1px solid transparent; border-bottom: none;
+    cursor: pointer; font-size: .9rem; font-weight: 500;
+    color: var(--muted); background: transparent;
+    transition: all .2s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    background: var(--bg); border-color: var(--border);
+    color: var(--accent);
+  }
+
+  /* ── Main layout ─────────────────────────────────────────────── */
+  main { flex: 1; padding: 28px 24px; max-width: 980px; margin: 0 auto; width: 100%; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Cards ──────────────────────────────────────────────────── */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px;
+  }
+  .card-title {
+    font-size: 1rem; font-weight: 600; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* ── Video/canvas wrapper ───────────────────────────────────── */
+  .cam-wrap {
+    position: relative; border-radius: 12px; overflow: hidden;
+    background: #000; aspect-ratio: 4/3;
+    border: 2px solid var(--border);
+  }
+  .cam-wrap video, .cam-wrap canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .cam-wrap canvas { pointer-events: none; }
+
+  /* scan ring */
+  .scan-ring {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .scan-ring svg { width: 55%; height: 55%; opacity: .5; }
+
+  /* corner brackets */
+  .bracket {
+    position: absolute; width: 36px; height: 36px;
+    border-color: var(--accent); border-style: solid;
+    border-width: 0; transition: border-color .3s;
+  }
+  .bracket.tl { top:12px; left:12px; border-top-width:3px; border-left-width:3px; border-radius:4px 0 0 0; }
+  .bracket.tr { top:12px; right:12px; border-top-width:3px; border-right-width:3px; border-radius:0 4px 0 0; }
+  .bracket.bl { bottom:12px; left:12px; border-bottom-width:3px; border-left-width:3px; border-radius:0 0 0 4px; }
+  .bracket.br { bottom:12px; right:12px; border-bottom-width:3px; border-right-width:3px; border-radius:0 0 4px 0; }
+
+  /* ── Status banner ──────────────────────────────────────────── */
+  .status-banner {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 10px; margin-bottom: 16px;
+    font-size: .88rem; font-weight: 500;
+    border: 1px solid;
+  }
+  .status-banner.info  { background:#1a2744; border-color:#2a4080; color:#93b8ff; }
+  .status-banner.ok    { background:#0f2e1a; border-color:#1a5c30; color:#4ade80; }
+  .status-banner.warn  { background:#2a1f00; border-color:#5a4000; color:#fbbf24; }
+  .status-banner.error { background:#2d0f0f; border-color:#5c1f1f; color:#fca5a5; }
+  .status-banner .icon { font-size:1.1rem; flex-shrink:0; }
+
+  /* ── Buttons ────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px 22px; border-radius: 10px; font-size: .92rem;
+    font-weight: 600; cursor: pointer; border: none; transition: all .2s;
+    font-family: var(--font);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+  .btn-ghost {
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--border); }
+  .btn-danger { background:#7f1d1d; color:#fca5a5; }
+  .btn-danger:hover { background:#991b1b; }
+  .btn-sm { padding: 7px 14px; font-size: .82rem; }
+
+  /* ── Input / Form ───────────────────────────────────────────── */
+  .form-group { margin-bottom: 16px; }
+  label { display: block; font-size: .83rem; color: var(--muted); margin-bottom: 6px; }
+  input[type=text], input[type=number], select {
+    width: 100%; padding: 10px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 9px;
+    color: var(--text); font-size: .9rem; font-family: var(--font);
+    outline: none; transition: border-color .2s;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+
+  /* ── Progress bar ───────────────────────────────────────────── */
+  .progress-wrap { background: var(--surface); border-radius: 99px; height: 7px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 99px; transition: width .4s; background: linear-gradient(90deg,var(--accent),var(--accent2)); }
+
+  /* ── Attendance list ────────────────────────────────────────── */
+  .att-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+  .att-table th { text-align:left; color:var(--muted); font-weight:500; padding:8px 12px; border-bottom:1px solid var(--border); font-size:.8rem; text-transform:uppercase; letter-spacing:.5px; }
+  .att-table td { padding:11px 12px; border-bottom:1px solid var(--border); }
+  .att-table tr:last-child td { border-bottom:none; }
+  .att-table tr:hover td { background: rgba(255,255,255,.02); }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 99px; font-size: .78rem; font-weight:600;
+  }
+  .badge-green { background:#052e16; color:#4ade80; }
+  .badge-red   { background:#450a0a; color:#f87171; }
+
+  /* ── Face gallery ───────────────────────────────────────────── */
+  .face-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); gap: 14px; }
+  .face-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden; text-align: center;
+    padding-bottom: 12px;
+  }
+  .face-card img, .face-card canvas { width:100%; aspect-ratio:1; object-fit:cover; }
+  .face-card .name { font-size:.8rem; font-weight:600; margin-top:8px; }
+  .face-card .dept { font-size:.72rem; color:var(--muted); }
+  .face-card .del-btn { margin-top:8px; }
+
+  /* ── Stats row ──────────────────────────────────────────────── */
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .stat-num { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: .78rem; color: var(--muted); }
+
+  /* ── Loader spinner ─────────────────────────────────────────── */
+  .spin {
+    width:20px; height:20px; border:3px solid rgba(255,255,255,.15);
+    border-top-color:var(--accent); border-radius:50%;
+    animation: spin .7s linear infinite; display:inline-block;
+  }
+
+  /* ── Toast ──────────────────────────────────────────────────── */
+  #toast-container {
+    position: fixed; bottom: 24px; right: 24px;
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+  }
+  .toast {
+    padding: 12px 18px; border-radius: 10px; font-size: .88rem; font-weight: 500;
+    max-width: 320px; animation: slideIn .3s ease;
+    border: 1px solid;
+  }
+  .toast.ok    { background:#0f2e1a; border-color:#1a5c30; color:#4ade80; }
+  .toast.error { background:#2d0f0f; border-color:#5c1f1f; color:#fca5a5; }
+  .toast.info  { background:#1a2744; border-color:#2a4080; color:#93b8ff; }
+
+  /* ── Modal ──────────────────────────────────────────────────── */
+  .modal-bg {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.7);
+    z-index:200; align-items:center; justify-content:center;
+  }
+  .modal-bg.open { display:flex; }
+  .modal {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:18px; padding:28px; max-width:420px; width:90%;
+    animation: fadeUp .25s ease;
+  }
+  .modal h3 { font-size:1.1rem; margin-bottom:8px; }
+  .modal p { color:var(--muted); font-size:.88rem; margin-bottom:20px; }
+
+  /* ── Animations ─────────────────────────────────────────────── */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes spin   { to { transform:rotate(360deg) } }
+  @keyframes slideIn { from{transform:translateX(40px);opacity:0} to{transform:none;opacity:1} }
+  @keyframes fadeUp  { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+  @keyframes scanLine {
+    0%  { top:15%; } 50% { top:75%; } 100% { top:15%; }
+  }
+  .scan-line {
+    position:absolute; left:10%; width:80%; height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);
+    animation: scanLine 2.5s ease-in-out infinite;
+    pointer-events:none;
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────── */
+  @media(max-width:680px) {
+    .grid2 { grid-template-columns:1fr; }
+    .stats-row { grid-template-columns:1fr 1fr; }
+    main { padding:16px; }
+    .tabs { padding:12px 12px 0; overflow-x:auto; gap:2px; }
+    .tab { padding:8px 14px; font-size:.82rem; white-space:nowrap; }
+  }
+  @media(max-width:420px) {
+    .stats-row { grid-template-columns:1fr; }
+  }
+
+  /* ── Cap bar ─────────────────────────────────────────────────── */
+  .section-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .section-title { font-size:1.1rem; font-weight:700; }
+  .section-sub  { font-size:.8rem; color:var(--muted); margin-top:2px; }
+</style>
 </head>
 <body>
 
-<div class="box" id="ui">
-    <h2 id="title">Biometric Gateway</h2>
-    <video id="video" autoplay playsinline muted></video>
-    <div id="status">Loading AI Engine...</div>
-    <div id="controls">
-        <button onclick="run('register')">Register Identity</button>
-        <button onclick="run('verify')">Verify Identity</button>
+<!-- ══════ HEADER ══════════════════════════════════════════════ -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🪪</div>
+    FaceAttend
+  </div>
+  <div class="geo-badge">
+    <div class="geo-dot" id="geoDot"></div>
+    <span id="geoLabel">Checking location…</span>
+  </div>
+</header>
+
+<!-- ══════ TABS ════════════════════════════════════════════════ -->
+<div class="tabs">
+  <button class="tab active" onclick="showPage('attend')">✔ Mark Attendance</button>
+  <button class="tab" onclick="showPage('register')">＋ Register Face</button>
+  <button class="tab" onclick="showPage('records')">📋 Records</button>
+  <button class="tab" onclick="showPage('manage')">👥 Manage Users</button>
+</div>
+
+<!-- ══════ MAIN ════════════════════════════════════════════════ -->
+<main>
+
+  <!-- ────── PAGE: MARK ATTENDANCE ────────────────────────────── -->
+  <div class="page active" id="page-attend">
+    <div id="attGeoBlock">
+      <div class="status-banner warn" id="attGeoMsg">
+        <span class="icon">📍</span>
+        <span id="attGeoText">Fetching your location…</span>
+      </div>
     </div>
+
+    <div class="grid2">
+      <!-- Camera -->
+      <div class="card">
+        <div class="card-title">🎥 Face Scanner</div>
+        <div class="cam-wrap" id="attendCamWrap">
+          <video id="attendVideo" autoplay muted playsinline></video>
+          <canvas id="attendCanvas"></canvas>
+          <div class="scan-ring">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="100" r="90" stroke="#4f8ef7" stroke-width="2" stroke-dasharray="8 6"/>
+            </svg>
+          </div>
+          <div class="scan-line" id="attendScanLine" style="display:none"></div>
+          <div class="bracket tl"></div><div class="bracket tr"></div>
+          <div class="bracket bl"></div><div class="bracket br"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button class="btn btn-primary" id="startAttendBtn" onclick="startAttendance()" style="flex:1">
+            Start Camera
+          </button>
+          <button class="btn btn-ghost" id="stopAttendBtn" onclick="stopAttendance()" style="display:none;flex:1">
+            Stop
+          </button>
+        </div>
+        <div style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-bottom:5px">
+            <span>Model ready</span><span id="modelReadyPct">0%</span>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" id="modelProgressBar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- Result panel -->
+      <div class="card">
+        <div class="card-title">🪪 Identity Result</div>
+        <div id="identityResult" style="text-align:center;padding:20px 0;">
+          <div style="font-size:3rem;margin-bottom:12px">🔍</div>
+          <div style="color:var(--muted);font-size:.9rem">Start the camera to begin face recognition</div>
+        </div>
+        <div id="attendanceMsg" style="margin-top:16px"></div>
+        <div style="margin-top:20px">
+          <div class="card-title" style="margin-bottom:10px;font-size:.9rem">Recent Today</div>
+          <div id="recentList" style="display:flex;flex-direction:column;gap:8px;font-size:.85rem;color:var(--muted)">
+            No records yet today.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── PAGE: REGISTER ────────────────────────────────────── -->
+  <div class="page" id="page-register">
+    <div class="grid2">
+      <!-- Camera capture -->
+      <div class="card">
+        <div class="card-title">📸 Capture Face</div>
+        <div class="cam-wrap" id="regCamWrap">
+          <video id="regVideo" autoplay muted playsinline></video>
+          <canvas id="regCanvas"></canvas>
+          <div class="scan-line" id="regScanLine" style="display:none"></div>
+          <div class="bracket tl"></div><div class="bracket tr"></div>
+          <div class="bracket bl"></div><div class="bracket br"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="startRegBtn" onclick="startRegCamera()" style="flex:1">Open Camera</button>
+          <button class="btn btn-primary" id="captureBtn" onclick="captureFrame()" style="flex:1" disabled>Capture Frame</button>
+        </div>
+        <div id="capturePreviewWrap" style="display:none;margin-top:14px">
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:6px">Captured preview</div>
+          <canvas id="capturePreview" style="width:100%;border-radius:10px;border:1px solid var(--border)"></canvas>
+          <div id="faceQuality" style="margin-top:8px;font-size:.83rem"></div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="card">
+        <div class="card-title">📝 User Details</div>
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="regName" placeholder="e.g. Arjun Sharma">
+        </div>
+        <div class="form-group">
+          <label>Employee / Student ID *</label>
+          <input type="text" id="regId" placeholder="e.g. EMP-0042">
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" id="regDept" placeholder="e.g. Engineering">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="regRole">
+            <option value="Employee">Employee</option>
+            <option value="Student">Student</option>
+            <option value="Visitor">Visitor</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div id="regStatus" style="margin-bottom:14px"></div>
+        <button class="btn btn-primary" id="registerBtn" onclick="registerUser()" style="width:100%" disabled>
+          Register Face
+        </button>
+        <p style="font-size:.78rem;color:var(--muted);margin-top:10px;line-height:1.5">
+          Tip: Position your face in good lighting, centered in the frame. The system captures the face descriptor from the captured image.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── PAGE: RECORDS ─────────────────────────────────────── -->
+  <div class="page" id="page-records">
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Entries</div></div>
+      <div class="stat-card"><div class="stat-num" id="statToday">0</div><div class="stat-label">Today</div></div>
+      <div class="stat-card"><div class="stat-num" id="statUsers">0</div><div class="stat-label">Registered Faces</div></div>
+    </div>
+    <div class="card">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Attendance Records</div>
+          <div class="section-sub">All attendance marked via face recognition</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmClearRecords()">🗑 Clear</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="att-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Name</th><th>ID</th><th>Department</th>
+              <th>Date</th><th>Time</th><th>Confidence</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody">
+            <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">No records yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── PAGE: MANAGE USERS ────────────────────────────────── -->
+  <div class="page" id="page-manage">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Registered Faces</div>
+        <div class="section-sub">Manage enrolled biometric profiles</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="confirmClearAll()">🗑 Clear All</button>
+    </div>
+    <div id="faceGallery" class="face-grid">
+      <div style="color:var(--muted);font-size:.88rem;grid-column:1/-1">No faces registered yet.</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════ TOAST CONTAINER ════════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ══════ CONFIRM MODAL ══════════════════════════════════════ -->
+<div class="modal-bg" id="confirmModal">
+  <div class="modal">
+    <h3 id="modalTitle">Confirm action</h3>
+    <p id="modalMsg">Are you sure?</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="modalConfirmBtn">Confirm</button>
+    </div>
+  </div>
 </div>
 
 <script>
-    const video = document.getElementById('video');
-    const status = document.getElementById('status');
-    const CFG = { modelUri: 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model' };
+// ══════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════
+const GEO_LAT   = 24.507573;
+const GEO_LNG   = 81.298352;
+const GEO_RANGE = 50; // metres
+const MATCH_THRESHOLD = 0.50; // lower = stricter
+const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
 
-    async function init() {
-        try {
-            await Promise.all([
-                faceapi.nets.tinyFaceDetector.loadFromUri(CFG.modelUri),
-                faceapi.nets.faceLandmark68Net.loadFromUri(CFG.modelUri),
-                faceapi.nets.faceRecognitionNet.loadFromUri(CFG.modelUri)
-            ]);
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            status.innerText = "System Ready";
-        } catch (e) {
-            status.innerText = "Error: Check Camera/Network";
-        }
-    }
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let modelsLoaded  = false;
+let userInRange   = false;
+let attendStream  = null;
+let regStream     = null;
+let attendLoop    = null;
+let capturedDesc  = null; // Float32Array
+let capturedImg   = null; // data-url
 
-    async function run(mode) {
-        status.innerText = "Analyzing...";
-        try {
-            const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224 });
-            const result = await faceapi.detectSingleFace(video, options).withFaceLandmarks().withFaceDescriptor();
+const DB = {
+  get users()   { return JSON.parse(localStorage.getItem('fa_users')   || '[]'); },
+  set users(v)  { localStorage.setItem('fa_users',   JSON.stringify(v)); },
+  get records() { return JSON.parse(localStorage.getItem('fa_records') || '[]'); },
+  set records(v){ localStorage.setItem('fa_records', JSON.stringify(v)); },
+};
 
-            if (!result) return status.innerText = "No face detected.";
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+window.addEventListener('load', async () => {
+  loadModels();
+  startGeoWatch();
+  refreshGallery();
+  refreshRecords();
+});
 
-            if (mode === 'register') {
-                localStorage.setItem('bio', JSON.stringify(Array.from(result.descriptor)));
-                status.innerText = "Identity Registered!";
-            } else {
-                const stored = localStorage.getItem('bio');
-                if (!stored) return status.innerText = "No identity found.";
-                const dist = faceapi.euclideanDistance(new Float32Array(JSON.parse(stored)), result.descriptor);
-                status.innerText = dist < 0.6 ? "Access Granted" : "Access Denied";
-                status.style.color = dist < 0.6 ? "var(--success)" : "var(--error)";
-            }
-        } catch (e) {
-            status.innerText = "Engine Error. Try again.";
-        }
-    }
+// ══════════════════════════════════════════════════════════════
+// MODELS
+// ══════════════════════════════════════════════════════════════
+async function loadModels() {
+  const bar   = document.getElementById('modelProgressBar');
+  const pct   = document.getElementById('modelReadyPct');
+  const steps = [
+    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+    faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
+    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+  ];
+  let done = 0;
+  for (const s of steps) {
+    await s;
+    done++;
+    const p = Math.round((done/steps.length)*100);
+    bar.style.width = p+'%';
+    pct.textContent = p+'%';
+  }
+  modelsLoaded = true;
+  toast('Face models loaded — ready to scan', 'ok');
+}
 
-    init();
+// ══════════════════════════════════════════════════════════════
+// GEOFENCE
+// ══════════════════════════════════════════════════════════════
+function haversine(lat1,lng1,lat2,lng2) {
+  const R=6371000, r=Math.PI/180;
+  const dLat=(lat2-lat1)*r, dLng=(lng2-lng1)*r;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+
+function startGeoWatch() {
+  if (!navigator.geolocation) {
+    updateGeoUI(false, 'Geolocation not supported by this browser'); return;
+  }
+  navigator.geolocation.watchPosition(
+    pos => {
+      const dist = haversine(pos.coords.latitude, pos.coords.longitude, GEO_LAT, GEO_LNG);
+      const inR  = dist <= GEO_RANGE;
+      userInRange = inR;
+      updateGeoUI(inR, inR
+        ? `Within range — ${Math.round(dist)}m from checkpoint`
+        : `Out of range — ${Math.round(dist)}m away (limit ${GEO_RANGE}m)`);
+    },
+    err => {
+      userInRange = false;
+      const msgs = {1:'Location permission denied — please allow access',2:'Location unavailable',3:'Location request timed out'};
+      updateGeoUI(false, msgs[err.code] || 'Location error');
+    },
+    { enableHighAccuracy:true, maximumAge:5000, timeout:10000 }
+  );
+}
+
+function updateGeoUI(ok, msg) {
+  const dot   = document.getElementById('geoDot');
+  const label = document.getElementById('geoLabel');
+  const attMsg= document.getElementById('attGeoMsg');
+  const attTxt= document.getElementById('attGeoText');
+
+  dot.className   = 'geo-dot ' + (ok ? 'ok' : 'fail');
+  label.textContent = ok ? 'In range' : 'Out of range';
+
+  if (ok) {
+    attMsg.className = 'status-banner ok';
+    attMsg.innerHTML = `<span class="icon">✅</span><span>${msg}</span>`;
+  } else {
+    attMsg.className = 'status-banner error';
+    attMsg.innerHTML = `<span class="icon">🚫</span><span>${msg}</span>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PAGES / TABS
+// ══════════════════════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'records') refreshRecords();
+  if (id === 'manage')  refreshGallery();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ATTENDANCE CAMERA
+// ══════════════════════════════════════════════════════════════
+async function startAttendance() {
+  if (!modelsLoaded) { toast('Models still loading, please wait…','info'); return; }
+  if (!userInRange)  { toast('You are outside the geofence — move to the designated area','error'); return; }
+
+  try {
+    attendStream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:'user',width:640,height:480} });
+    const video  = document.getElementById('attendVideo');
+    video.srcObject = attendStream;
+    await video.play();
+    document.getElementById('startAttendBtn').style.display='none';
+    document.getElementById('stopAttendBtn').style.display='flex';
+    document.getElementById('attendScanLine').style.display='block';
+    runAttendanceLoop();
+  } catch(e) {
+    handleCamError(e, 'attendance');
+  }
+}
+
+function stopAttendance() {
+  if (attendStream) { attendStream.getTracks().forEach(t=>t.stop()); attendStream=null; }
+  clearTimeout(attendLoop);
+  document.getElementById('startAttendBtn').style.display='flex';
+  document.getElementById('stopAttendBtn').style.display='none';
+  document.getElementById('attendScanLine').style.display='none';
+  const ctx = document.getElementById('attendCanvas').getContext('2d');
+  ctx.clearRect(0,0,9999,9999);
+}
+
+async function runAttendanceLoop() {
+  const video  = document.getElementById('attendVideo');
+  const canvas = document.getElementById('attendCanvas');
+  if (!attendStream || video.readyState < 2) { attendLoop=setTimeout(runAttendanceLoop,200); return; }
+
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const opts = new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:.5});
+  const detections = await faceapi
+    .detectAllFaces(video, opts)
+    .withFaceLandmarks(true)
+    .withFaceDescriptors();
+
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if (detections.length > 0) {
+    faceapi.draw.drawDetections(canvas, faceapi.resizeResults(detections,{width:canvas.width,height:canvas.height}));
+    const det = detections[0];
+    const result = matchFace(det.descriptor);
+    renderIdentityResult(result, det);
+  } else {
+    renderIdentityResult(null, null);
+  }
+
+  attendLoop = setTimeout(runAttendanceLoop, 600);
+}
+
+function matchFace(descriptor) {
+  const users = DB.users;
+  if (!users.length) return null;
+  let best = null, bestDist = Infinity;
+  for (const u of users) {
+    const stored = new Float32Array(Object.values(u.descriptor));
+    const dist   = faceapi.euclideanDistance(descriptor, stored);
+    if (dist < bestDist) { bestDist=dist; best=u; }
+  }
+  return bestDist < MATCH_THRESHOLD ? { user:best, distance:bestDist } : null;
+}
+
+const recentlyMarked = new Set();
+
+function renderIdentityResult(match, detection) {
+  const box = document.getElementById('identityResult');
+  const msg = document.getElementById('attendanceMsg');
+
+  if (!detection) {
+    box.innerHTML = `<div style="font-size:3rem;margin-bottom:10px">👤</div><div style="color:var(--muted);font-size:.9rem">No face detected — look directly at the camera</div>`;
+    msg.innerHTML = '';
+    return;
+  }
+
+  if (!match) {
+    box.innerHTML = `
+      <div style="font-size:3rem;margin-bottom:10px">❓</div>
+      <div style="font-weight:700;font-size:1.1rem;color:#f87171">Unknown Face</div>
+      <div style="color:var(--muted);font-size:.85rem;margin-top:6px">No match found in the database.<br>Please register first.</div>`;
+    msg.innerHTML = `<div class="status-banner error"><span class="icon">⚠</span> Face not recognised. Go to <b>Register Face</b> to enrol.</div>`;
+    return;
+  }
+
+  const u  = match.user;
+  const cf = Math.round((1-match.distance)*100);
+
+  box.innerHTML = `
+    <div style="font-size:3rem;margin-bottom:10px">✅</div>
+    <div style="font-weight:700;font-size:1.15rem;color:var(--green)">${u.name}</div>
+    <div style="color:var(--muted);font-size:.85rem;margin-top:4px">${u.id} · ${u.dept||'—'} · ${u.role}</div>
+    <div style="margin-top:10px;font-size:.82rem;color:var(--muted)">Confidence <b style="color:var(--green)">${cf}%</b></div>`;
+
+  const key = u.id + '_' + new Date().toDateString();
+  if (!recentlyMarked.has(key)) {
+    recentlyMarked.add(key);
+    markAttendance(u, cf);
+    msg.innerHTML = `<div class="status-banner ok"><span class="icon">🎉</span> Attendance marked for <b>${u.name}</b> at ${timeStr()}</div>`;
+    setTimeout(()=>{msg.innerHTML='';},5000);
+  } else {
+    msg.innerHTML = `<div class="status-banner info"><span class="icon">ℹ</span> Already marked attendance for <b>${u.name}</b> today.</div>`;
+  }
+}
+
+function markAttendance(user, confidence) {
+  const now  = new Date();
+  const rec  = {
+    id: Date.now(), name:user.name, empId:user.id,
+    dept:user.dept||'—', role:user.role,
+    date: now.toLocaleDateString('en-IN'),
+    time: timeStr(),
+    confidence, status:'Present'
+  };
+  const recs = DB.records;
+  recs.unshift(rec);
+  DB.records = recs;
+  refreshRecentList();
+  toast(`✅ ${user.name} — attendance marked`, 'ok');
+}
+
+function refreshRecentList() {
+  const today = new Date().toLocaleDateString('en-IN');
+  const list  = DB.records.filter(r=>r.date===today).slice(0,5);
+  const el    = document.getElementById('recentList');
+  if (!list.length) { el.innerHTML='<span style="color:var(--muted)">No records yet today.</span>'; return; }
+  el.innerHTML = list.map(r=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);padding:8px 12px;border-radius:8px;border:1px solid var(--border)">
+      <div>
+        <div style="font-weight:600;font-size:.85rem">${r.name}</div>
+        <div style="color:var(--muted);font-size:.76rem">${r.empId}</div>
+      </div>
+      <div style="font-size:.8rem;color:var(--green)">${r.time}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// REGISTER CAMERA
+// ══════════════════════════════════════════════════════════════
+async function startRegCamera() {
+  try {
+    regStream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:'user',width:640,height:480} });
+    const video = document.getElementById('regVideo');
+    video.srcObject = regStream;
+    await video.play();
+    document.getElementById('captureBtn').disabled = false;
+    document.getElementById('startRegBtn').textContent = '🔁 Restart Camera';
+    document.getElementById('regScanLine').style.display = 'block';
+  } catch(e) {
+    handleCamError(e,'registration');
+  }
+}
+
+async function captureFrame() {
+  if (!modelsLoaded) { toast('Models still loading…','info'); return; }
+  const video   = document.getElementById('regVideo');
+  const preview = document.getElementById('capturePreview');
+  if (video.readyState < 2) { toast('Camera not ready yet','warn'); return; }
+
+  // Draw frame
+  preview.width  = video.videoWidth;
+  preview.height = video.videoHeight;
+  preview.getContext('2d').drawImage(video,0,0);
+  document.getElementById('capturePreviewWrap').style.display = 'block';
+
+  const qEl = document.getElementById('faceQuality');
+  qEl.innerHTML = '<span class="spin"></span> Analysing face…';
+
+  const opts  = new faceapi.TinyFaceDetectorOptions({inputSize:416,scoreThreshold:.4});
+  const detection = await faceapi
+    .detectSingleFace(preview, opts)
+    .withFaceLandmarks(true)
+    .withFaceDescriptor();
+
+  if (!detection) {
+    capturedDesc = null; capturedImg = null;
+    document.getElementById('registerBtn').disabled = true;
+    qEl.innerHTML = `<div class="status-banner error" style="margin-top:8px"><span class="icon">❌</span> No face detected. Ensure good lighting, face the camera directly, and try again.</div>`;
+    return;
+  }
+
+  capturedDesc = detection.descriptor;
+  capturedImg  = preview.toDataURL('image/jpeg',.85);
+
+  // Draw bounding box on preview
+  const ctx = preview.getContext('2d');
+  ctx.drawImage(video,0,0);
+  const box = detection.detection.box;
+  ctx.strokeStyle = '#22c55e'; ctx.lineWidth=3;
+  ctx.strokeRect(box.x,box.y,box.width,box.height);
+
+  const score = Math.round(detection.detection.score*100);
+  qEl.innerHTML = `<div class="status-banner ok" style="margin-top:8px"><span class="icon">✅</span> Face captured — confidence ${score}%. Fill in the details and click Register.</div>`;
+  document.getElementById('registerBtn').disabled = false;
+}
+
+async function registerUser() {
+  const name = document.getElementById('regName').value.trim();
+  const id   = document.getElementById('regId').value.trim();
+  const dept = document.getElementById('regDept').value.trim();
+  const role = document.getElementById('regRole').value;
+
+  if (!name||!id) { showRegStatus('error','Name and ID are required.'); return; }
+  if (!capturedDesc) { showRegStatus('error','Please capture a face first.'); return; }
+
+  const users = DB.users;
+  if (users.find(u=>u.id===id)) { showRegStatus('error',`ID "${id}" is already registered.`); return; }
+
+  showRegStatus('info','<span class="spin"></span> Registering…');
+
+  // Convert descriptor to plain object for JSON storage
+  const desc = {};
+  capturedDesc.forEach((v,i)=>{ desc[i]=v; });
+
+  users.push({ name, id, dept, role, descriptor:desc, image:capturedImg, registeredAt: new Date().toISOString() });
+  DB.users = users;
+
+  showRegStatus('ok', `✅ ${name} registered successfully!`);
+  toast(`${name} enrolled in the system`, 'ok');
+
+  // Reset form
+  document.getElementById('regName').value='';
+  document.getElementById('regId').value='';
+  document.getElementById('regDept').value='';
+  capturedDesc=null; capturedImg=null;
+  document.getElementById('capturePreviewWrap').style.display='none';
+  document.getElementById('registerBtn').disabled=true;
+  refreshGallery();
+}
+
+function showRegStatus(type, msg) {
+  const el = document.getElementById('regStatus');
+  const map = {ok:'ok',error:'error',info:'info',warn:'warn'};
+  el.innerHTML = `<div class="status-banner ${map[type]||'info'}"><span>${msg}</span></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// RECORDS
+// ══════════════════════════════════════════════════════════════
+function refreshRecords() {
+  const recs  = DB.records;
+  const users = DB.users;
+  const today = new Date().toLocaleDateString('en-IN');
+
+  document.getElementById('statTotal').textContent = recs.length;
+  document.getElementById('statToday').textContent = recs.filter(r=>r.date===today).length;
+  document.getElementById('statUsers').textContent = users.length;
+
+  const tbody = document.getElementById('recordsBody');
+  if (!recs.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">No records yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = recs.map((r,i)=>`
+    <tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td><b>${r.name}</b></td>
+      <td style="color:var(--muted)">${r.empId}</td>
+      <td>${r.dept}</td>
+      <td>${r.date}</td>
+      <td>${r.time}</td>
+      <td><span style="color:var(--green)">${r.confidence}%</span></td>
+      <td><span class="badge badge-green">✔ ${r.status}</span></td>
+    </tr>`).join('');
+}
+
+function exportCSV() {
+  const recs = DB.records;
+  if (!recs.length) { toast('No records to export','info'); return; }
+  const hdr  = ['#','Name','ID','Department','Role','Date','Time','Confidence(%)','Status'];
+  const rows = recs.map((r,i)=>[i+1,r.name,r.empId,r.dept,r.role,r.date,r.time,r.confidence,r.status]);
+  const csv  = [hdr,...rows].map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a    = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `attendance_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('CSV exported','ok');
+}
+
+// ══════════════════════════════════════════════════════════════
+// MANAGE / GALLERY
+// ══════════════════════════════════════════════════════════════
+function refreshGallery() {
+  const users = DB.users;
+  const el    = document.getElementById('faceGallery');
+  if (!users.length) {
+    el.innerHTML='<div style="color:var(--muted);font-size:.88rem;grid-column:1/-1">No faces registered yet. Go to <b>Register Face</b> to enrol.</div>';
+    return;
+  }
+  el.innerHTML = users.map(u=>`
+    <div class="face-card">
+      ${u.image ? `<img src="${u.image}" alt="${u.name}">` : `<div style="aspect-ratio:1;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:2.5rem">👤</div>`}
+      <div class="name">${u.name}</div>
+      <div class="dept">${u.id} · ${u.role}</div>
+      <div class="del-btn">
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser('${u.id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function confirmDeleteUser(id) {
+  openModal('Delete User', `Remove this face from the system? This cannot be undone.`, ()=>{
+    const users = DB.users.filter(u=>u.id!==id);
+    DB.users = users;
+    refreshGallery();
+    toast('User removed','ok');
+  });
+}
+
+function confirmClearAll() {
+  openModal('Clear All Users', 'Delete ALL registered faces? This cannot be undone.', ()=>{
+    DB.users=[];
+    refreshGallery();
+    toast('All users cleared','ok');
+  });
+}
+
+function confirmClearRecords() {
+  openModal('Clear Records', 'Delete ALL attendance records? This cannot be undone.', ()=>{
+    DB.records=[];
+    refreshRecords();
+    toast('Records cleared','ok');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════════════════
+let _modalCallback = null;
+function openModal(title, msg, cb) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMsg').textContent   = msg;
+  _modalCallback = cb;
+  document.getElementById('confirmModal').classList.add('open');
+}
+function closeModal() { document.getElementById('confirmModal').classList.remove('open'); }
+document.getElementById('modalConfirmBtn').onclick = ()=>{ closeModal(); _modalCallback&&_modalCallback(); };
+
+// ══════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════
+function toast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>el.remove(), 3500);
+}
+
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
+function timeStr() {
+  return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function handleCamError(e, ctx) {
+  const map = {
+    NotAllowedError: 'Camera permission denied. Please allow camera access in browser settings.',
+    NotFoundError:   'No camera found. Please connect a camera and try again.',
+    NotReadableError:'Camera is in use by another application.',
+    OverconstrainedError:'Camera does not meet requirements. Try another camera.',
+  };
+  const msg = map[e.name] || `Camera error: ${e.message}`;
+  toast(msg, 'error');
+  const banner = ctx==='attendance' ? document.getElementById('attendanceMsg') : document.getElementById('regStatus');
+  if (banner) banner.innerHTML = `<div class="status-banner error"><span class="icon">🎥</span>${msg}</div>`;
+}
 </script>
 </body>
 </html>
