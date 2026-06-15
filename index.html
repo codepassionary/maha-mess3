@@ -1,1893 +1,324 @@
-cat > /mnt/user-data/outputs/faceattend-v3.html << 'ENDOFFILE'
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>FaceAttend — Biometric Attendance</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-<style>
-/* ═══════════════════════════════════════════════════════════
-   DESIGN TOKENS — Deep navy-slate, electric cyan accent
-   Signature: the animated biometric ring scanner
-═══════════════════════════════════════════════════════════ */
-:root{
-  /* Palette */
-  --ink:        #060810;
-  --surface:    #0b0d18;
-  --panel:      #0f1122;
-  --card:       #131629;
-  --card-hi:    #171b2e;
-  --line:       #1e2238;
-  --line2:      #252844;
-  --muted3:     #2e3250;
-  /* Accent */
-  --cyan:       #00d4ff;
-  --cyan-dim:   rgba(0,212,255,.12);
-  --cyan-glow:  rgba(0,212,255,.25);
-  --indigo:     #6366f1;
-  --indigo-dim: rgba(99,102,241,.15);
-  --emerald:    #10b981;
-  --emerald-dim:rgba(16,185,129,.12);
-  --rose:       #f43f5e;
-  --rose-dim:   rgba(244,63,94,.12);
-  --amber:      #f59e0b;
-  --amber-dim:  rgba(245,158,11,.12);
-  /* Text */
-  --t1: #f0f2ff;
-  --t2: #8b90b8;
-  --t3: #4e5278;
-  /* Typography */
-  --sans: 'Inter', system-ui, sans-serif;
-  --mono: 'JetBrains Mono', monospace;
-  /* Radii */
-  --r-sm:  6px;
-  --r:    12px;
-  --r-lg: 18px;
-  --r-xl: 24px;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VetTrack Luxe | Premier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
+            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
+            --text: #FFFFFF; --sub: #94A3B8;
+        }
 
-/* ── Reset & Base ─────────────────────────────────────── */
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--ink)}
-body{font-family:var(--sans);color:var(--t1);display:flex;flex-direction:column;position:relative}
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
+            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
+                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
+            background-attachment: fixed;
+        }
 
-/* ── Ambient background gradient ────────────────────── */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 60% 40% at 15% 0%,rgba(99,102,241,.07) 0%,transparent 70%),
-    radial-gradient(ellipse 50% 35% at 85% 100%,rgba(0,212,255,.05) 0%,transparent 65%);
-}
+        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
 
-/* ── Scrollable view container ───────────────────────── */
-#app{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative;z-index:1}
-.view{display:none;flex:1;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth}
-.view.active{display:flex;flex-direction:column}
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+        #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
+        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
+        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
 
-/* ═══════════════════════════════════════════════════════
-   HEADER
-═══════════════════════════════════════════════════════ */
-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;height:56px;background:rgba(11,13,24,.9);
-  backdrop-filter:blur(20px);border-bottom:1px solid var(--line);
-  position:relative;z-index:50;flex-shrink:0;
-}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-mark{
-  width:30px;height:30px;border-radius:8px;
-  background:linear-gradient(135deg,var(--indigo),var(--cyan));
-  display:flex;align-items:center;justify-content:center;
-  font-size:.95rem;flex-shrink:0;
-  box-shadow:0 0 16px rgba(99,102,241,.35);
-}
-.logo-text{font-size:.95rem;font-weight:700;letter-spacing:-.3px}
-.logo-text span{color:var(--cyan)}
+        .stat-card {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
+            padding: 30px; border-radius: 35px; margin-bottom: 30px;
+            box-shadow: 0 20px 40px -10px var(--p-glow);
+            position: relative; overflow: hidden;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
+        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
+        
+        .quick-log-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 14px; border-radius: 24px;
+            display: flex; flex-direction: column; align-items: center;
+            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
+            z-index: 2; min-width: 110px;
+        }
+        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
+        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
-.header-right{display:flex;align-items:center;gap:8px}
-.geo-chip{
-  display:flex;align-items:center;gap:6px;
-  padding:5px 12px;border-radius:99px;font-size:.72rem;font-weight:500;
-  background:var(--panel);border:1px solid var(--line2);cursor:default;
-  transition:border-color .3s;
-}
-.geo-chip.ok{border-color:rgba(16,185,129,.4);color:var(--emerald)}
-.geo-chip.err{border-color:rgba(244,63,94,.4);color:var(--rose)}
-.geo-chip.warn{border-color:rgba(245,158,11,.4);color:var(--amber)}
-.pulse-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
-.pulse-dot.anim{animation:pulseDot 1.8s ease infinite}
-@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+        .nav-pill { 
+            display: flex; align-items: center; background: var(--card); padding: 8px; 
+            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+        }
+        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
+        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
 
-/* ═══════════════════════════════════════════════════════
-   BOTTOM NAV
-═══════════════════════════════════════════════════════ */
-.bottom-nav{
-  display:flex;background:rgba(11,13,24,.95);
-  border-top:1px solid var(--line);flex-shrink:0;z-index:50;
-  backdrop-filter:blur(20px);padding-bottom:env(safe-area-inset-bottom,0);
-}
-.nav-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  gap:3px;padding:10px 4px 8px;background:none;border:none;
-  cursor:pointer;font-family:var(--sans);font-size:.65rem;font-weight:500;
-  color:var(--t3);transition:color .2s;letter-spacing:.3px;text-transform:uppercase;
-}
-.nav-btn .n-ico{font-size:1.15rem;line-height:1;transition:transform .2s}
-.nav-btn.active{color:var(--cyan)}
-.nav-btn.active .n-ico{transform:scale(1.1)}
-.nav-btn:hover:not(.active){color:var(--t2)}
+        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
 
-/* ═══════════════════════════════════════════════════════
-   LAYOUT UTILS
-═══════════════════════════════════════════════════════ */
-.inner{padding:20px;max-width:1000px;margin:0 auto;width:100%}
-.section-gap{height:16px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+        .day-item { 
+            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
+            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
+            border: 1px solid var(--surface); backdrop-filter: blur(10px);
+            user-select: none;
+        }
+        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
+        
+        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
+        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
 
-/* ═══════════════════════════════════════════════════════
-   CARDS
-═══════════════════════════════════════════════════════ */
-.card{
-  background:var(--card);border:1px solid var(--line);
-  border-radius:var(--r-lg);padding:20px;position:relative;overflow:hidden;
-}
-.card::before{
-  content:'';position:absolute;inset:0;border-radius:inherit;
-  background:linear-gradient(135deg,rgba(255,255,255,.025) 0%,transparent 60%);
-  pointer-events:none;
-}
-.card-title{
-  font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;
-  color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:7px;
-}
-.card-title-large{font-size:1.05rem;font-weight:700;color:var(--t1);margin-bottom:16px}
+        .item-pill { 
+            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
+        }
+        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
+        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
+        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
 
-/* Stat cards */
-.stat-card{
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);
-  padding:18px 16px;display:flex;flex-direction:column;gap:6px;
-}
-.stat-val{font-size:1.9rem;font-weight:700;line-height:1;letter-spacing:-1px}
-.stat-label{font-size:.72rem;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
-.stat-sub{font-size:.75rem;color:var(--t2);margin-top:2px}
-
-/* ═══════════════════════════════════════════════════════
-   BANNERS / ALERTS
-═══════════════════════════════════════════════════════ */
-.alert{
-  display:flex;align-items:flex-start;gap:10px;padding:12px 15px;
-  border-radius:var(--r);font-size:.83rem;line-height:1.5;border:1px solid;
-}
-.alert-ico{font-size:.95rem;flex-shrink:0;margin-top:1px}
-.alert-body{flex:1}
-.alert-body b{font-weight:600}
-.alert.info  {background:rgba(99,102,241,.1); border-color:rgba(99,102,241,.3); color:#a5b4fc}
-.alert.ok    {background:var(--emerald-dim);   border-color:rgba(16,185,129,.3); color:#6ee7b7}
-.alert.warn  {background:var(--amber-dim);     border-color:rgba(245,158,11,.3); color:#fcd34d}
-.alert.danger{background:var(--rose-dim);      border-color:rgba(244,63,94,.3);  color:#fda4af}
-
-/* ═══════════════════════════════════════════════════════
-   BUTTONS
-═══════════════════════════════════════════════════════ */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  padding:10px 20px;border-radius:var(--r);font-size:.85rem;font-weight:600;
-  cursor:pointer;border:none;transition:all .18s;font-family:var(--sans);
-  letter-spacing:-.1px;position:relative;overflow:hidden;
-}
-.btn:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
-.btn-primary{
-  background:linear-gradient(135deg,var(--indigo),var(--cyan));color:#fff;
-  box-shadow:0 4px 20px rgba(99,102,241,.25);
-}
-.btn-primary:hover{filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 6px 24px rgba(99,102,241,.35)}
-.btn-secondary{background:var(--card-hi);color:var(--t1);border:1px solid var(--line2)}
-.btn-secondary:hover{background:var(--muted3);border-color:var(--t3)}
-.btn-danger{background:var(--rose-dim);color:#fda4af;border:1px solid rgba(244,63,94,.3)}
-.btn-danger:hover{background:rgba(244,63,94,.2)}
-.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--line2)}
-.btn-ghost:hover{color:var(--t1);border-color:var(--t3)}
-.btn-sm{padding:7px 14px;font-size:.78rem}
-.btn-full{width:100%}
-.btn-icon{padding:8px;border-radius:var(--r-sm)}
-
-/* ═══════════════════════════════════════════════════════
-   FORM INPUTS
-═══════════════════════════════════════════════════════ */
-.form-group{margin-bottom:14px}
-.form-label{
-  display:block;font-size:.75rem;font-weight:500;color:var(--t3);
-  margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;
-}
-.form-input{
-  width:100%;padding:10px 14px;background:var(--surface);
-  border:1px solid var(--line2);border-radius:var(--r);
-  color:var(--t1);font-size:.88rem;font-family:var(--sans);
-  outline:none;transition:all .2s;
-}
-.form-input:focus{border-color:var(--cyan);background:rgba(0,212,255,.04);box-shadow:0 0 0 3px rgba(0,212,255,.1)}
-.form-input::placeholder{color:var(--t3)}
-select.form-input{cursor:pointer}
-select.form-input option{background:var(--panel)}
-
-/* ═══════════════════════════════════════════════════════
-   PROGRESS / BAR
-═══════════════════════════════════════════════════════ */
-.prog-track{background:var(--surface);border-radius:99px;overflow:hidden}
-.prog-bar{
-  height:100%;border-radius:99px;
-  transition:width .4s ease, background .4s ease;
-  background:linear-gradient(90deg,var(--indigo),var(--cyan));
-}
-.prog-bar.danger{background:linear-gradient(90deg,#c026d3,var(--rose))}
-.prog-bar.warn  {background:linear-gradient(90deg,var(--amber),#fb923c)}
-.prog-bar.ok    {background:linear-gradient(90deg,var(--emerald),#34d399)}
-
-/* ═══════════════════════════════════════════════════════
-   CAMERA / BIOMETRIC RING SCANNER  ← SIGNATURE ELEMENT
-═══════════════════════════════════════════════════════ */
-.scanner-wrap{
-  position:relative;width:100%;aspect-ratio:4/3;
-  background:#000;border-radius:var(--r-lg);overflow:hidden;
-  border:1px solid var(--line2);
-}
-.scanner-wrap video,.scanner-wrap canvas{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-}
-.scanner-wrap canvas{pointer-events:none}
-
-/* The biometric ring — rotates while scanning */
-.bio-ring{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  pointer-events:none;
-}
-.bio-ring svg{width:62%;height:62%}
-.ring-outer{animation:spinRing 6s linear infinite;transform-origin:50% 50%}
-.ring-inner{animation:spinRing 3.5s linear infinite reverse;transform-origin:50% 50%}
-@keyframes spinRing{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-
-/* Scan sweep line */
-.scan-sweep{
-  position:absolute;left:0;width:100%;height:3px;
-  background:linear-gradient(90deg,transparent 0%,rgba(0,212,255,.2) 20%,var(--cyan) 50%,rgba(0,212,255,.2) 80%,transparent 100%);
-  filter:blur(1px);pointer-events:none;display:none;
-}
-.scan-sweep.active{display:block;animation:sweep 2.6s ease-in-out infinite}
-@keyframes sweep{0%{top:12%}50%{top:82%}100%{top:12%}}
-
-/* Corner brackets */
-.cbracket{position:absolute;width:28px;height:28px;border-style:solid;border-color:var(--cyan);border-width:0;opacity:.7}
-.cbracket.tl{top:12px;left:12px;border-top-width:2px;border-left-width:2px;border-radius:3px 0 0 0}
-.cbracket.tr{top:12px;right:12px;border-top-width:2px;border-right-width:2px;border-radius:0 3px 0 0}
-.cbracket.bl{bottom:12px;left:12px;border-bottom-width:2px;border-left-width:2px;border-radius:0 0 0 3px}
-.cbracket.br{bottom:12px;right:12px;border-bottom-width:2px;border-right-width:2px;border-radius:0 0 3px 0}
-
-/* Status overlay on camera */
-.cam-status-overlay{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:10px 14px;background:linear-gradient(transparent,rgba(6,8,16,.85));
-  pointer-events:none;
-}
-.cam-status-text{font-size:.75rem;font-weight:500;display:flex;align-items:center;gap:6px}
-
-/* ═══════════════════════════════════════════════════════
-   LIVENESS CHALLENGE UI
-═══════════════════════════════════════════════════════ */
-.liveness-panel{
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;
-}
-.liveness-title{font-size:.78rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
-.challenge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.challenge-step{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  padding:10px 4px;border-radius:var(--r);background:var(--surface);
-  border:1px solid var(--line2);transition:all .3s;font-size:.7rem;color:var(--t3);
-  font-weight:500;text-align:center;
-}
-.challenge-step.active{border-color:var(--cyan);background:var(--cyan-dim);color:var(--cyan)}
-.challenge-step.done{border-color:rgba(16,185,129,.4);background:var(--emerald-dim);color:var(--emerald)}
-.challenge-step.fail{border-color:rgba(244,63,94,.4);background:var(--rose-dim);color:var(--rose)}
-.challenge-ico{font-size:1.4rem;line-height:1}
-
-.overall-liveness{margin-top:12px}
-.live-bar-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:.75rem}
-.live-bar-label{color:var(--t3);font-weight:500}
-.live-bar-val{font-family:var(--mono);font-weight:500}
-
-/* ═══════════════════════════════════════════════════════
-   IDENTITY RESULT CARD
-═══════════════════════════════════════════════════════ */
-.identity-card{text-align:center;padding:10px 0}
-.id-face{
-  width:72px;height:72px;border-radius:50%;object-fit:cover;
-  margin:0 auto 12px;display:block;border:2px solid var(--emerald);
-  box-shadow:0 0 0 4px var(--emerald-dim);
-}
-.id-ph{
-  width:72px;height:72px;border-radius:50%;background:var(--panel);
-  margin:0 auto 12px;display:flex;align-items:center;justify-content:center;
-  font-size:1.7rem;border:2px solid var(--line2);
-}
-.id-name{font-size:1.1rem;font-weight:700;line-height:1.2}
-.id-meta{font-size:.78rem;color:var(--t2);margin-top:4px}
-.id-badge{
-  display:inline-flex;align-items:center;gap:5px;margin-top:8px;
-  padding:4px 12px;border-radius:99px;font-size:.75rem;font-weight:600;
-}
-.id-badge.ok{background:var(--emerald-dim);color:var(--emerald);border:1px solid rgba(16,185,129,.3)}
-.id-badge.fail{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(244,63,94,.3)}
-.id-badge.warn{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
-
-/* ═══════════════════════════════════════════════════════
-   ATTENDANCE REGISTER TABLE
-═══════════════════════════════════════════════════════ */
-.register-scroll{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line)}
-.reg-table{border-collapse:collapse;width:100%;min-width:520px;font-size:.8rem}
-.reg-table thead th{
-  padding:10px 8px;color:var(--t3);font-weight:600;font-size:.7rem;
-  text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;
-  background:var(--panel);border-bottom:1px solid var(--line2);
-  position:sticky;top:0;z-index:2;
-}
-.reg-table thead th:first-child{border-radius:var(--r) 0 0 0}
-.reg-table thead th:last-child{border-radius:0 var(--r) 0 0}
-.reg-table tbody td{
-  padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle;
-}
-.reg-table tbody tr:last-child td{border-bottom:none}
-.reg-table tbody tr:hover td{background:rgba(255,255,255,.015)}
-
-.att-cell{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:26px;height:26px;border-radius:6px;font-size:.74rem;font-weight:700;
-  cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;
-}
-.att-cell:hover{transform:scale(1.2)}
-.att-P{background:var(--emerald-dim);color:var(--emerald);border:1px solid rgba(16,185,129,.3)}
-.att-A{background:var(--rose-dim);color:var(--rose);border:1px solid rgba(244,63,94,.3)}
-.att-blank{background:var(--panel);color:var(--t3);border:1px solid var(--line);cursor:default}
-.att-blank:hover{transform:none}
-
-/* ═══════════════════════════════════════════════════════
-   PROFILE VIEW
-═══════════════════════════════════════════════════════ */
-.profile-hero{
-  padding:32px 20px 24px;text-align:center;
-  background:linear-gradient(180deg,rgba(99,102,241,.08) 0%,transparent 100%);
-  border-bottom:1px solid var(--line);position:relative;
-}
-.profile-hero::after{
-  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:160px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);
-}
-.profile-avatar{
-  width:88px;height:88px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 14px;
-  border:2px solid var(--cyan);box-shadow:0 0 0 6px var(--cyan-dim),0 0 32px var(--cyan-glow);
-}
-.profile-avatar-ph{
-  width:88px;height:88px;border-radius:50%;background:var(--panel);display:flex;
-  align-items:center;justify-content:center;font-size:2rem;margin:0 auto 14px;
-  border:2px solid var(--indigo);box-shadow:0 0 0 6px var(--indigo-dim);
-}
-.profile-name{font-size:1.3rem;font-weight:700;letter-spacing:-.3px}
-.profile-role-badge{
-  display:inline-flex;align-items:center;gap:5px;margin-top:8px;
-  padding:3px 12px;border-radius:99px;font-size:.72rem;font-weight:600;
-  background:var(--indigo-dim);color:#a5b4fc;border:1px solid rgba(99,102,241,.3);
-}
-.device-badge{
-  display:inline-flex;align-items:center;gap:6px;margin-top:10px;
-  padding:4px 12px;border-radius:99px;font-size:.7rem;
-  background:var(--panel);border:1px solid var(--line2);color:var(--t3);
-  font-family:var(--mono);
-}
-
-/* ═══════════════════════════════════════════════════════
-   DEVICE LOCK SCREEN
-═══════════════════════════════════════════════════════ */
-#lockScreen{
-  position:fixed;inset:0;z-index:999;
-  background:var(--ink);display:none;
-  flex-direction:column;align-items:center;justify-content:center;
-  padding:32px;text-align:center;
-}
-#lockScreen.active{display:flex}
-.lock-icon-wrap{
-  width:80px;height:80px;border-radius:50%;margin:0 auto 20px;
-  background:var(--rose-dim);border:1px solid rgba(244,63,94,.3);
-  display:flex;align-items:center;justify-content:center;font-size:2.2rem;
-}
-.lock-title{font-size:1.4rem;font-weight:700;margin-bottom:10px;letter-spacing:-.3px}
-.lock-desc{font-size:.85rem;color:var(--t2);line-height:1.7;max-width:340px;margin:0 auto 24px}
-
-/* ═══════════════════════════════════════════════════════
-   MODAL
-═══════════════════════════════════════════════════════ */
-.modal-bg{
-  display:none;position:fixed;inset:0;background:rgba(6,8,16,.8);
-  z-index:500;align-items:center;justify-content:center;padding:20px;
-  backdrop-filter:blur(8px);
-}
-.modal-bg.open{display:flex}
-.modal{
-  background:var(--card);border:1px solid var(--line2);border-radius:var(--r-xl);
-  padding:24px;width:100%;max-width:400px;animation:modalIn .22s ease;
-}
-@keyframes modalIn{from{transform:scale(.96) translateY(8px);opacity:0}to{transform:none;opacity:1}}
-.modal-icon{font-size:2rem;margin-bottom:12px}
-.modal h3{font-size:1rem;font-weight:700;margin-bottom:8px}
-.modal p{font-size:.84rem;color:var(--t2);line-height:1.6;margin-bottom:20px}
-.modal-actions{display:flex;gap:10px;justify-content:flex-end}
-
-/* ═══════════════════════════════════════════════════════
-   TOOLTIP
-═══════════════════════════════════════════════════════ */
-#tooltip{
-  position:fixed;background:var(--card-hi);border:1px solid var(--line2);
-  border-radius:var(--r);padding:12px 14px;max-width:220px;
-  box-shadow:0 8px 40px rgba(0,0,0,.5);z-index:600;
-  animation:tooltipIn .15s ease;pointer-events:none;display:none;
-}
-@keyframes tooltipIn{from{transform:translateY(-4px);opacity:0}to{transform:none;opacity:1}}
-.tip-name{font-size:.88rem;font-weight:700;margin-bottom:2px}
-.tip-detail{font-size:.75rem;color:var(--t2);line-height:1.5}
-.tip-time{font-size:.8rem;font-weight:600;margin-top:4px}
-
-/* ═══════════════════════════════════════════════════════
-   TOASTS
-═══════════════════════════════════════════════════════ */
-#toastRoot{
-  position:fixed;bottom:70px;right:16px;
-  display:flex;flex-direction:column;gap:8px;z-index:700;pointer-events:none;
-}
-.toast{
-  padding:11px 15px;border-radius:var(--r);font-size:.82rem;font-weight:500;
-  max-width:290px;border:1px solid;animation:toastIn .25s ease;backdrop-filter:blur(10px);
-}
-@keyframes toastIn{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
-.toast.ok    {background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:#6ee7b7}
-.toast.err   {background:rgba(244,63,94,.15);border-color:rgba(244,63,94,.3);color:#fda4af}
-.toast.info  {background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.3);color:#a5b4fc}
-.toast.warn  {background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3);color:#fcd34d}
-
-/* ═══════════════════════════════════════════════════════
-   DIVIDER
-═══════════════════════════════════════════════════════ */
-.divider{height:1px;background:var(--line);margin:16px 0}
-
-/* ═══════════════════════════════════════════════════════
-   SPINNER
-═══════════════════════════════════════════════════════ */
-.spin{
-  width:16px;height:16px;flex-shrink:0;
-  border:2px solid rgba(255,255,255,.1);border-top-color:var(--cyan);
-  border-radius:50%;animation:spinAnim .65s linear infinite;display:inline-block;
-}
-@keyframes spinAnim{to{transform:rotate(360deg)}}
-
-/* ═══════════════════════════════════════════════════════
-   EMPTY STATE
-═══════════════════════════════════════════════════════ */
-.empty-state{
-  text-align:center;padding:40px 20px;color:var(--t3);
-}
-.empty-state .e-ico{font-size:2.5rem;margin-bottom:12px;opacity:.5}
-.empty-state .e-title{font-size:.9rem;font-weight:600;margin-bottom:6px;color:var(--t2)}
-.empty-state .e-desc{font-size:.8rem;line-height:1.6}
-
-/* ═══════════════════════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════════════════════ */
-@media(max-width:640px){
-  .g2{grid-template-columns:1fr}
-  .g3{grid-template-columns:1fr 1fr}
-  .g4{grid-template-columns:1fr 1fr}
-  .inner{padding:14px}
-  .challenge-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:380px){
-  .g3,.g4{grid-template-columns:1fr}
-}
-@media(min-width:900px){
-  .g2.scanner-layout{grid-template-columns:55% 1fr}
-}
-</style>
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
+        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
+        .sheet.up { transform: translateY(0); }
+        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
+        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
+        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
+        
+        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════════
-     DEVICE LOCK SCREEN
-══════════════════════════════════════════════════════════ -->
-<div id="lockScreen">
-  <div class="lock-icon-wrap">🔒</div>
-  <div class="lock-title">Device Not Authorised</div>
-  <p class="lock-desc" id="lockDesc">
-    This profile was registered on a different device.
-    Attendance can only be marked from your registered device.
-  </p>
-  <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
-    <button class="btn btn-secondary" onclick="showLockHelp()">What does this mean?</button>
-    <button class="btn btn-danger btn-sm" onclick="confirmResetDevice()">Reset device binding</button>
-  </div>
+<div id="welcomeScreen">
+    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
+    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     HEADER
-══════════════════════════════════════════════════════════ -->
-<div id="app">
-<header>
-  <div class="logo">
-    <div class="logo-mark">🪪</div>
-    <div class="logo-text">Face<span>Attend</span></div>
-  </div>
-  <div class="header-right">
-    <div class="geo-chip warn" id="geoChip">
-      <div class="pulse-dot anim" id="geoDot"></div>
-      <span id="geoLabel">Locating…</span>
+<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
+    <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
+        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
+        <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
+            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
+        </div>
+        <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
+        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
     </div>
-  </div>
-</header>
-
-<!-- ══════════════════════════════════════════════════════════
-     VIEW: MARK ATTENDANCE
-══════════════════════════════════════════════════════════ -->
-<div class="view active" id="view-attend">
-<div class="inner">
-
-  <div id="geoAlert" style="margin-bottom:14px">
-    <div class="alert warn" id="geoAlertBox">
-      <span class="alert-ico">📍</span>
-      <div class="alert-body"><span id="geoAlertTxt">Detecting your location…</span></div>
-    </div>
-  </div>
-
-  <div id="noRegAlert" style="display:none;margin-bottom:14px">
-    <div class="alert info">
-      <span class="alert-ico">ℹ️</span>
-      <div class="alert-body">No face registered on this device. Go to <b>Register</b> to enrol.</div>
-    </div>
-  </div>
-
-  <div class="g2 scanner-layout">
-    <!-- ── Scanner ─── -->
-    <div>
-      <div class="card" style="padding:14px">
-        <div class="card-title">
-          <span style="color:var(--cyan)">●</span> Live Scanner
-        </div>
-        <div class="scanner-wrap" id="attScanWrap">
-          <video id="attVid" autoplay muted playsinline></video>
-          <canvas id="attCvs"></canvas>
-          <!-- Bio ring SVG -->
-          <div class="bio-ring" id="bioRingWrap">
-            <svg viewBox="0 0 200 200" fill="none">
-              <g class="ring-outer">
-                <circle cx="100" cy="100" r="90" stroke="rgba(0,212,255,.2)" stroke-width="1"/>
-                <circle cx="100" cy="100" r="90" stroke="var(--cyan)" stroke-width="1.5"
-                  stroke-dasharray="30 10 10 10 5 10" stroke-linecap="round"/>
-                <circle cx="100" cy="10" r="3" fill="var(--cyan)" opacity=".8"/>
-              </g>
-              <g class="ring-inner">
-                <circle cx="100" cy="100" r="72" stroke="rgba(99,102,241,.25)" stroke-width="1"/>
-                <circle cx="100" cy="100" r="72" stroke="var(--indigo)" stroke-width="1"
-                  stroke-dasharray="15 20 5 15" stroke-linecap="round" opacity=".6"/>
-                <circle cx="100" cy="28" r="2.5" fill="var(--indigo)" opacity=".7"/>
-              </g>
-            </svg>
-          </div>
-          <div class="scan-sweep" id="attSweep"></div>
-          <div class="cbracket tl"></div><div class="cbracket tr"></div>
-          <div class="cbracket bl"></div><div class="cbracket br"></div>
-          <div class="cam-status-overlay">
-            <div class="cam-status-text" id="camStatusTxt">
-              <span class="spin" style="width:10px;height:10px;border-width:1.5px"></span>
-              <span style="color:var(--t2)">Initialising…</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Model progress -->
-        <div style="margin-top:12px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:.72rem;color:var(--t3);font-weight:500" id="modelLbl">Loading AI models…</span>
-            <span style="font-size:.72rem;font-family:var(--mono);color:var(--cyan)" id="modelPct">0%</span>
-          </div>
-          <div class="prog-track" style="height:4px"><div class="prog-bar" id="modelBar" style="width:0%"></div></div>
-        </div>
-
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn btn-primary btn-full" id="startBtn" onclick="startAttend()">
-            <span>Start Scan</span>
-          </button>
-          <button class="btn btn-secondary" id="stopBtn" style="display:none" onclick="stopAttend()">Stop</button>
-        </div>
-      </div>
-
-      <!-- Liveness panel -->
-      <div class="card" style="margin-top:12px">
-        <div class="liveness-title">Anti-Spoofing Challenge</div>
-        <div class="challenge-grid" id="challengeGrid">
-          <div class="challenge-step" id="ch-motion"><div class="challenge-ico">🎯</div>Face Present</div>
-          <div class="challenge-step" id="ch-blink"><div class="challenge-ico">👁️</div>Eye Area</div>
-          <div class="challenge-step" id="ch-depth"><div class="challenge-ico">📐</div>3D Depth</div>
-          <div class="challenge-step" id="ch-texture"><div class="challenge-ico">🔬</div>Texture</div>
-        </div>
-        <div class="overall-liveness" style="margin-top:12px">
-          <div class="live-bar-row">
-            <span class="live-bar-label">Liveness Score</span>
-            <span class="live-bar-val" id="liveScoreVal" style="color:var(--rose)">0%</span>
-          </div>
-          <div class="prog-track" style="height:6px">
-            <div class="prog-bar danger" id="liveBar" style="width:0%"></div>
-          </div>
-          <div style="font-size:.72rem;color:var(--t3);margin-top:5px" id="liveHint">
-            Start the scanner to begin liveness verification
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Result panel ─── -->
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <!-- Identity -->
-      <div class="card">
-        <div class="card-title">Identity Result</div>
-        <div id="identResult">
-          <div class="identity-card">
-            <div class="id-ph">🔍</div>
-            <div style="color:var(--t3);font-size:.84rem">Awaiting scan</div>
-          </div>
-        </div>
-        <div id="attendMsg" style="margin-top:10px"></div>
-      </div>
-
-      <!-- Today log -->
-      <div class="card">
-        <div class="card-title">Today's Log</div>
-        <div id="todayLog">
-          <div class="empty-state" style="padding:20px 10px">
-            <div class="e-ico">📋</div>
-            <div class="e-title">No entries yet</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     VIEW: REGISTER
-══════════════════════════════════════════════════════════ -->
-<div class="view" id="view-register">
-<div class="inner">
-
-  <div id="alreadyBanner" style="display:none;margin-bottom:14px">
-    <div class="alert ok">
-      <span class="alert-ico">✅</span>
-      <div class="alert-body" id="alreadyTxt">Face already registered on this device.</div>
+<div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
+    <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
+        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
+        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
+        <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
     </div>
-  </div>
+</div>
 
-  <div class="g2 scanner-layout">
-    <!-- Camera -->
-    <div class="card" style="padding:14px">
-      <div class="card-title">Capture Your Face</div>
-      <div class="scanner-wrap" id="regScanWrap">
-        <video id="regVid" autoplay muted playsinline></video>
-        <canvas id="regCvs" style="display:none"></canvas>
-        <div class="scan-sweep" id="regSweep"></div>
-        <div class="cbracket tl"></div><div class="cbracket tr"></div>
-        <div class="cbracket bl"></div><div class="cbracket br"></div>
-        <!-- Placeholder -->
-        <div id="regPlaceholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--panel);gap:8px">
-          <div style="font-size:2.5rem;opacity:.3">📷</div>
-          <div style="font-size:.8rem;color:var(--t3)">Open camera to begin</div>
+<div class="container">
+    <div class="header">
+        <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
+        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-left">
+            <div class="label">Total Bill</div>
+            <div class="total-val" id="totalValue">₹0</div>
+            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
         </div>
-      </div>
-
-      <!-- Capture preview -->
-      <div id="previewWrap" style="display:none;margin-top:12px">
-        <div style="font-size:.72rem;color:var(--t3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:500">Captured frame</div>
-        <canvas id="captPrev" style="width:100%;border-radius:var(--r);border:1px solid var(--line2)"></canvas>
-        <div id="captFeedback" style="margin-top:8px"></div>
-      </div>
-
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="btn btn-secondary" id="openCamBtn" onclick="openRegCam()" style="flex:1">Open Camera</button>
-        <button class="btn btn-primary" id="captureBtn" onclick="doCapture()" style="flex:1" disabled>Capture</button>
-      </div>
-
-      <!-- Anti-spoofing check display during capture -->
-      <div id="captureChecks" style="display:none;margin-top:12px">
-        <div style="font-size:.72rem;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;font-weight:500;margin-bottom:8px">Capture Checks</div>
-        <div style="display:flex;flex-direction:column;gap:5px" id="checkList"></div>
-      </div>
-    </div>
-
-    <!-- Form -->
-    <div class="card">
-      <div class="card-title">Your Details</div>
-      <div class="form-group">
-        <label class="form-label">Full Name *</label>
-        <input type="text" class="form-input" id="rName" placeholder="e.g. Arjun Sharma">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Employee / Student ID *</label>
-        <input type="text" class="form-input" id="rId" placeholder="e.g. EMP-042">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Department</label>
-        <input type="text" class="form-input" id="rDept" placeholder="e.g. Engineering">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Role</label>
-        <select class="form-input" id="rRole">
-          <option>Employee</option>
-          <option>Student</option>
-          <option>Visitor</option>
-          <option>Admin</option>
-        </select>
-      </div>
-
-      <div id="regFeedback" style="margin-bottom:14px"></div>
-      <button class="btn btn-primary btn-full" id="regBtn" onclick="registerFace()" disabled>Register Face</button>
-
-      <div style="margin-top:14px;padding:12px;background:var(--surface);border-radius:var(--r);border:1px solid var(--line)">
-        <div style="font-size:.72rem;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">How anti-spoofing works</div>
-        <div style="font-size:.76rem;color:var(--t2);line-height:1.7">
-          The system runs <b style="color:var(--t1)">4 simultaneous checks</b> to block photos and screen playback:
-          <br>• Landmark geometry variance (flat photo = uniform depth)
-          <br>• Eye region texture analysis (screens blur fine detail)
-          <br>• Face proportion asymmetry (printed faces are symmetric)
-          <br>• Pixel frequency analysis (photos have compression artifacts)
-          <br><br>All checks must pass before capture is accepted.
+        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
+            <i id="quickIcon">⚡</i>
+            <span id="quickText">Loading...</span>
         </div>
-      </div>
     </div>
-  </div>
-</div>
-</div>
 
-<!-- ══════════════════════════════════════════════════════════
-     VIEW: RECORDS
-══════════════════════════════════════════════════════════ -->
-<div class="view" id="view-records">
-<div class="inner">
-
-  <div class="g4" style="margin-bottom:16px">
-    <div class="stat-card"><div class="stat-val" id="sTot">0</div><div class="stat-label">Total</div></div>
-    <div class="stat-card"><div class="stat-val" id="sToday">0</div><div class="stat-label">Today</div></div>
-    <div class="stat-card"><div class="stat-val" id="sMonth">0</div><div class="stat-label">This Month</div></div>
-    <div class="stat-card"><div class="stat-val" id="sPct">—</div><div class="stat-label">Month %</div></div>
-  </div>
-
-  <div class="card" style="padding:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-      <div class="card-title-large">Attendance Register</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Export</button>
-        <button class="btn btn-danger btn-sm" onclick="openModal('🗑️','Clear all records?','All attendance history will be deleted permanently.',clearAllRecords)">Clear</button>
-      </div>
+    <div class="nav-pill">
+        <button onclick="changeMonth(-1)">‹</button>
+        <span id="monthLabel">Current</span>
+        <button onclick="changeMonth(1)">›</button>
     </div>
-    <div class="register-scroll" id="regTableWrap">
-      <div class="empty-state">
-        <div class="e-ico">📅</div>
-        <div class="e-title">No records yet</div>
-        <div class="e-desc">Mark attendance to see the register populate</div>
-      </div>
-    </div>
-    <div style="margin-top:10px;font-size:.72rem;color:var(--t3)">
-      Tap any <span style="background:var(--emerald-dim);padding:1px 5px;border-radius:3px;color:var(--emerald)">P</span>
-      or <span style="background:var(--rose-dim);padding:1px 5px;border-radius:3px;color:var(--rose)">A</span>
-      cell to see timing details.
-    </div>
-  </div>
+    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
 
-</div>
+    <div id="logsGrid"></div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     VIEW: PROFILE
-══════════════════════════════════════════════════════════ -->
-<div class="view" id="view-profile">
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  <div id="noProfileState" style="display:none">
-    <div class="inner">
-      <div class="empty-state" style="padding:60px 20px">
-        <div class="e-ico">👤</div>
-        <div class="e-title">No profile yet</div>
-        <div class="e-desc">Register your face to create a biometric profile on this device.</div>
-        <button class="btn btn-primary" style="margin-top:20px" onclick="switchView('register',1)">Register Now</button>
-      </div>
-    </div>
-  </div>
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
+        projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
+        messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
+    };
 
-  <div id="profileState" style="display:none">
-    <div class="profile-hero">
-      <div id="profAvatarEl"></div>
-      <div class="profile-name" id="profName">—</div>
-      <div style="font-size:.82rem;color:var(--t2);margin-top:4px" id="profIdLine">—</div>
-      <div class="profile-role-badge" id="profRoleBadge">—</div>
-      <div class="device-badge">🖥 <span id="profDevDisplay">—</span></div>
-    </div>
+    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
+    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
+    let config = { name: "", mealPrice: 50, waterPrice: 30 };
+    
+    // SCROLL GUARD VARIABLES
+    let longPressTimer;
+    let startY = 0;
+    let isScrolling = false;
 
-    <div class="inner">
-      <div class="g3" style="margin-bottom:14px" id="profStats"></div>
+    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
+    window.logout = () => signOut(auth).then(() => location.reload());
 
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-title">Device Binding</div>
-        <div style="font-size:.8rem;color:var(--t2);line-height:1.8">
-          <div>Fingerprint: <span style="font-family:var(--mono);font-size:.76rem;color:var(--t1)" id="profFp">—</span></div>
-          <div>Registered: <span style="color:var(--t1)" id="profRegDate">—</span></div>
-          <div style="margin-top:6px;padding:8px 10px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--line);font-size:.75rem;color:var(--t3)">
-            Attendance can only be marked from this exact device. If you change devices, you must re-register.
-          </div>
-        </div>
-      </div>
+    onAuthStateChanged(auth, async (u) => {
+        if (u) { 
+            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
+            document.getElementById('userPfp').src = u.photoURL;
+            const userDoc = await getDoc(doc(db, "users", u.uid));
+            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
+            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
+            document.getElementById('userLabel').innerText = config.name;
+            updateGreet(); syncData(); 
+        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
+    });
 
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-title">Recent Attendance</div>
-        <div id="profRecentList"></div>
-      </div>
-
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-secondary" onclick="switchView('records',2)" style="flex:1">View Full Records</button>
-        <button class="btn btn-danger" onclick="openModal('⚠️','Delete your profile?','This permanently removes your face data and all attendance records from this device.',deleteProfile)" style="flex:1">Delete Profile</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- ══ BOTTOM NAV ═══════════════════════════════════════════ -->
-<nav class="bottom-nav">
-  <button class="nav-btn active" id="nav0" onclick="switchView('attend',0)">
-    <span class="n-ico">✅</span>Attend
-  </button>
-  <button class="nav-btn" id="nav1" onclick="switchView('register',1)">
-    <span class="n-ico">➕</span>Register
-  </button>
-  <button class="nav-btn" id="nav2" onclick="switchView('records',2)">
-    <span class="n-ico">📋</span>Records
-  </button>
-  <button class="nav-btn" id="nav3" onclick="switchView('profile',3)">
-    <span class="n-ico">👤</span>Profile
-  </button>
-</nav>
-</div><!-- #app -->
-
-<!-- ══ MODAL ════════════════════════════════════════════════ -->
-<div class="modal-bg" id="modalBg">
-  <div class="modal">
-    <div class="modal-icon" id="mIco">⚠️</div>
-    <h3 id="mTitle">Confirm</h3>
-    <p id="mBody">Are you sure?</p>
-    <div class="modal-actions">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-danger btn-sm" id="mConfirm">Confirm</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ TOOLTIP ══════════════════════════════════════════════ -->
-<div id="tooltip"></div>
-
-<!-- ══ TOASTS ═══════════════════════════════════════════════ -->
-<div id="toastRoot"></div>
-
-<!-- ══════════════════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════════════════ -->
-<script>
-/* ═══════════════════════════════════════════════════════
-   CONFIG
-═══════════════════════════════════════════════════════ */
-const CFG = {
-  GEO_LAT:    24.507573,
-  GEO_LNG:    81.298352,
-  GEO_RANGE:  50,           // metres
-  MATCH_THR:  0.46,         // face recognition threshold (lower=stricter)
-  MODEL_URL:  'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/',
-  // Anti-spoofing thresholds
-  MIN_FACE_RATIO: 0.05,     // face must be at least 5% of frame area
-  MAX_FACE_RATIO: 0.72,
-  MIN_DET_SCORE:  0.60,     // minimum detection confidence
-  // Liveness
-  LIVE_WINDOW:    45,       // frames in rolling window
-  LIVE_MOTION_THR:1.8,      // min avg pixel movement per frame
-  LIVE_ASYM_THR:  0.012,    // min facial asymmetry (photos are too symmetric)
-  LIVE_REQUIRED:  65,       // % score needed to pass
-};
-
-/* ═══════════════════════════════════════════════════════
-   DEVICE FINGERPRINT
-═══════════════════════════════════════════════════════ */
-async function getDeviceId() {
-  let id = localStorage.getItem('fa_devid');
-  if (id) return id;
-  const raw = [
-    navigator.userAgent,
-    navigator.language,
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
-    `${screen.width}x${screen.height}x${screen.colorDepth}`,
-    navigator.hardwareConcurrency,
-    navigator.platform,
-    new Date().getTimezoneOffset(),
-  ].join('|');
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
-  id = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,32);
-  localStorage.setItem('fa_devid', id);
-  return id;
-}
-let DEVICE_ID = '';
-
-/* ═══════════════════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════════════════ */
-let modelsReady   = false;
-let inRange       = false;
-let geoActive     = false;
-let attStream     = null;
-let regStream     = null;
-let attLoopTimer  = null;
-let capturedDesc  = null;
-let capturedImg   = null;
-// Rolling frame history for liveness
-const frameHistory = [];  // {cx,cy,landmarks:[{x,y}...]}
-let livenessScore = 0;
-let lastMarkedKey = '';
-
-/* ═══════════════════════════════════════════════════════
-   DB
-═══════════════════════════════════════════════════════ */
-const DB = {
-  get user()     { try{ return JSON.parse(localStorage.getItem('fa_user')||'null') }catch{return null} },
-  set user(v)    { v ? localStorage.setItem('fa_user',JSON.stringify(v)) : localStorage.removeItem('fa_user') },
-  get records()  { try{ return JSON.parse(localStorage.getItem('fa_recs')||'[]') }catch{return []} },
-  set records(v) { localStorage.setItem('fa_recs', JSON.stringify(v)) },
-};
-
-/* ═══════════════════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════════════════ */
-window.addEventListener('load', async () => {
-  DEVICE_ID = await getDeviceId();
-  checkDeviceLock();
-  loadModels();
-  startGeoWatch();
-  refreshTodayLog();
-  checkAlreadyReg();
-});
-
-function checkDeviceLock() {
-  const u = DB.user;
-  if (!u) return;
-  if (u.deviceId && u.deviceId !== DEVICE_ID) {
-    const ls = document.getElementById('lockScreen');
-    document.getElementById('lockDesc').textContent =
-      `This profile belongs to device …${u.deviceId.slice(-8)}. ` +
-      `Open FaceAttend on that device, or reset the binding below to re-register here.`;
-    ls.classList.add('active');
-  }
-}
-
-/* ═══════════════════════════════════════════════════════
-   MODELS
-═══════════════════════════════════════════════════════ */
-async function loadModels() {
-  const bar = document.getElementById('modelBar');
-  const pct = document.getElementById('modelPct');
-  const lbl = document.getElementById('modelLbl');
-  try {
-    const nets = [
-      faceapi.nets.tinyFaceDetector.loadFromUri(CFG.MODEL_URL),
-      faceapi.nets.faceLandmark68TinyNet.loadFromUri(CFG.MODEL_URL),
-      faceapi.nets.faceRecognitionNet.loadFromUri(CFG.MODEL_URL),
-    ];
-    let done = 0;
-    for (const n of nets) {
-      await n; done++;
-      const p = Math.round((done/nets.length)*100);
-      bar.style.width = p+'%';
-      pct.textContent = p+'%';
+    function isCurrentMonth() {
+        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
     }
-    modelsReady = true;
-    lbl.textContent = 'AI ready ✓';
-    bar.className = 'prog-bar ok';
-    setCamStatus('Ready — tap Start Scan', 'var(--emerald)');
-    toast('Face AI loaded', 'ok');
-  } catch(e) {
-    lbl.textContent = 'Model load failed';
-    bar.className = 'prog-bar danger';
-    toast('Failed to load AI models. Check your internet connection.', 'err');
-  }
-}
 
-/* ═══════════════════════════════════════════════════════
-   GEO
-═══════════════════════════════════════════════════════ */
-function haversine(a,b,c,d){
-  const R=6371000,r=Math.PI/180;
-  const dLa=(c-a)*r,dLn=(d-b)*r;
-  const x=Math.sin(dLa/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(dLn/2)**2;
-  return 2*R*Math.asin(Math.sqrt(x));
-}
-
-let geoWatcher = null;
-let lastGeoOk  = null;
-function startGeoWatch() {
-  if (!navigator.geolocation) {
-    setGeoUI(false, 'Location not supported', true);
-    return;
-  }
-  geoWatcher = navigator.geolocation.watchPosition(
-    pos => {
-      geoActive = true;
-      const dist = haversine(pos.coords.latitude, pos.coords.longitude, CFG.GEO_LAT, CFG.GEO_LNG);
-      const ok = dist <= CFG.GEO_RANGE;
-      if (lastGeoOk === true && !ok) toast('⚠️ Moved out of geofence — attendance paused', 'warn');
-      if (lastGeoOk === false && ok) toast('✅ Back in range — attendance resumed', 'ok');
-      lastGeoOk = ok;
-      inRange = ok;
-      setGeoUI(ok, ok
-        ? `In range · ${Math.round(dist)}m`
-        : `Out of range · ${Math.round(dist)}m (max ${CFG.GEO_RANGE}m)`
-      );
-    },
-    err => {
-      const wasOk = inRange;
-      inRange = false; geoActive = false;
-      if (wasOk) toast('📍 Location lost — turn on GPS to continue', 'warn');
-      const msgs = {
-        1: 'Location denied — allow in browser settings',
-        2: 'GPS signal lost — please enable location',
-        3: 'Location timed out — retrying…',
-      };
-      setGeoUI(false, msgs[err.code] || 'Location unavailable', true);
-    },
-    { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
-  );
-}
-
-function setGeoUI(ok, msg, isErr=false) {
-  const chip = document.getElementById('geoChip');
-  const dot  = document.getElementById('geoDot');
-  const lbl  = document.getElementById('geoLabel');
-  const box  = document.getElementById('geoAlertBox');
-  chip.className = 'geo-chip ' + (ok ? 'ok' : isErr ? 'err' : 'warn');
-  dot.className  = 'pulse-dot' + (ok ? ' anim' : '');
-  lbl.textContent = ok ? 'In range' : 'Out of range';
-  if (ok) {
-    box.className = 'alert ok';
-    box.innerHTML = `<span class="alert-ico">✅</span><div class="alert-body">${msg}</div>`;
-  } else {
-    box.className = 'alert ' + (isErr ? 'danger' : 'warn');
-    box.innerHTML = `<span class="alert-ico">📍</span><div class="alert-body"><b>${msg}</b>${isErr?' — enable location services to mark attendance':''}</div>`;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════
-   VIEWS
-═══════════════════════════════════════════════════════ */
-const VIEWS = ['attend','register','records','profile'];
-function switchView(name, idx) {
-  VIEWS.forEach((v,i) => {
-    document.getElementById('view-'+v).classList.toggle('active', v===name);
-    document.getElementById('nav'+i).classList.toggle('active', i===idx);
-  });
-  if (name==='records') buildRegisterTable();
-  if (name==='profile') buildProfile();
-  if (name==='register') checkAlreadyReg();
-}
-
-/* ═══════════════════════════════════════════════════════
-   ANTI-SPOOFING UTILITIES
-   Multiple independent signals — ALL required to pass
-═══════════════════════════════════════════════════════ */
-
-/**
- * Check 1 — Landmark geometry variance
- * A flat photo has very uniform depth gradient across landmarks.
- * A real face in 3D has irregular variance due to pose and curvature.
- * We compute the standard deviation of inter-landmark distances.
- */
-function checkLandmarkDepthVariance(landmarks) {
-  const pts = landmarks.positions;
-  const dists = [];
-  // Sample non-adjacent landmark pairs (jaw <-> eyebrow, etc.)
-  const pairs = [[0,16],[1,15],[2,14],[3,13],[4,12],[17,26],[18,25],[19,24],[27,8],[30,8]];
-  for (const [a,b] of pairs) {
-    if (!pts[a]||!pts[b]) continue;
-    dists.push(Math.hypot(pts[a].x-pts[b].x, pts[a].y-pts[b].y));
-  }
-  if (dists.length < 4) return 0;
-  const mean = dists.reduce((s,v)=>s+v,0)/dists.length;
-  const variance = dists.reduce((s,v)=>s+(v-mean)**2,0)/dists.length;
-  // Real faces have variance > ~8; flat photos have < 5
-  return Math.min(Math.sqrt(variance) / 14, 1);
-}
-
-/**
- * Check 2 — Facial asymmetry
- * Human faces are naturally slightly asymmetric. Photos/graphics
- * tend to be more perfectly mirrored or have extreme symmetry.
- */
-function checkFacialAsymmetry(landmarks) {
-  const pts = landmarks.positions;
-  // Compare left vs right eye height relative to nose tip
-  const noseTip = pts[30];
-  if (!noseTip || !pts[36] || !pts[45]) return 0;
-  const leftEyeY  = (pts[37].y+pts[38].y+pts[40].y+pts[41].y)/4;
-  const rightEyeY = (pts[43].y+pts[44].y+pts[46].y+pts[47].y)/4;
-  const leftEyeX  = (pts[36].x+pts[39].x)/2;
-  const rightEyeX = (pts[42].x+pts[45].x)/2;
-  const noseCenterX = noseTip.x;
-  const lDist = Math.abs(leftEyeX - noseCenterX);
-  const rDist = Math.abs(rightEyeX - noseCenterX);
-  const asymX = Math.abs(lDist - rDist) / Math.max(lDist, rDist, 1);
-  const asymY = Math.abs(leftEyeY - rightEyeY) / (Math.abs(leftEyeY - noseTip.y) + 1);
-  // Any natural asymmetry > threshold = likely real
-  const combined = (asymX * 0.6 + asymY * 0.4);
-  return Math.min(combined / 0.08, 1);
-}
-
-/**
- * Check 3 — Eye region pixel texture entropy
- * Screens/prints of eyes have lower high-frequency texture.
- * We sample the eye region pixel variance from the canvas.
- */
-function checkEyeTexture(canvas, landmarks) {
-  try {
-    const pts = landmarks.positions;
-    if (!pts[36] || !pts[45]) return 0.5; // fallback if can't check
-    const ctx = canvas.getContext('2d');
-    // Left eye bounding box
-    const ex = Math.max(0, pts[36].x - 6);
-    const ey = Math.max(0, pts[37].y - 6);
-    const ew = Math.abs(pts[39].x - pts[36].x) + 12;
-    const eh = 20;
-    if (ew < 4 || eh < 4) return 0.5;
-    const data = ctx.getImageData(ex, ey, Math.min(ew,canvas.width-ex), Math.min(eh,canvas.height-ey)).data;
-    // Compute local variance of luminance
-    const lums = [];
-    for (let i=0;i<data.length;i+=4) {
-      lums.push(0.299*data[i]+0.587*data[i+1]+0.114*data[i+2]);
+    function updateGreet() {
+        const h = new Date().getHours();
+        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : "Good Evening 🌇";
     }
-    const mean = lums.reduce((a,b)=>a+b,0)/lums.length;
-    const variance = lums.reduce((s,v)=>s+(v-mean)**2,0)/lums.length;
-    // Real eye texture: variance > 60; printed/screen: < 30
-    return Math.min(Math.sqrt(variance) / 55, 1);
-  } catch { return 0.5; }
-}
 
-/**
- * Check 4 — Motion across frames (temporal liveness)
- * Verifies the video is live. Measures face center movement and
- * landmark jitter across rolling window.
- * A photo held still = 0 motion; real person = natural micro-movement.
- */
-function computeMotionScore() {
-  if (frameHistory.length < 6) return 0;
-  let totalMotion = 0;
-  for (let i=1; i<frameHistory.length; i++) {
-    const prev = frameHistory[i-1];
-    const curr = frameHistory[i];
-    totalMotion += Math.hypot(curr.cx - prev.cx, curr.cy - prev.cy);
-    // Also measure landmark jitter on nose tip and eye corners
-    if (prev.landmarks && curr.landmarks) {
-      const keyPts = [30, 36, 45, 48, 54]; // nose, eye corners, mouth corners
-      for (const k of keyPts) {
-        if (prev.landmarks[k] && curr.landmarks[k]) {
-          totalMotion += Math.hypot(
-            curr.landmarks[k].x - prev.landmarks[k].x,
-            curr.landmarks[k].y - prev.landmarks[k].y
-          ) * 0.3;
+    function syncData() {
+        onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
+            logs = d.data() || {}; renderGrid();
+        });
+    }
+
+    window.quickLog = async () => {
+        if (!isCurrentMonth()) return;
+        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
+        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
+        if(obj[type] === 1) return;
+        obj[type] = 1;
+        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
+    };
+
+    function renderGrid() {
+        const current = isCurrentMonth();
+        document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
+        document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
+        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+        
+        const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
+        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+
+        const type = todayDate.getHours() < 16 ? 'l' : 'd';
+        const isMarked = logs[todayDate.getDate()] && logs[todayDate.getDate()][type] === 1;
+        
+        if (current) {
+            document.getElementById('quickIcon').innerText = isMarked ? '✅' : '⚡';
+            document.getElementById('quickText').innerText = isMarked ? 'Marked' : `Mark ${type==='l'?'Lunch':'Dinner'}`;
+            if(isMarked) document.getElementById('quickBtn').classList.add('done');
+            else document.getElementById('quickBtn').classList.remove('done');
+        } else {
+            document.getElementById('quickIcon').innerText = '🔒';
+            document.getElementById('quickText').innerText = 'Locked';
         }
-      }
+
+        for (let i = 1; i <= daysCount; i++) {
+            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
+            const card = document.createElement('div');
+            card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
+            
+            if (current) {
+                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
+                card.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                    isScrolling = false;
+                    longPressTimer = setTimeout(() => {
+                        if (!isScrolling) openNote(i);
+                    }, 650);
+                }, { passive: true });
+
+                card.addEventListener('touchmove', (e) => {
+                    let moveY = e.touches[0].clientY;
+                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
+                        isScrolling = true;
+                        clearTimeout(longPressTimer);
+                    }
+                }, { passive: true });
+
+                card.addEventListener('touchend', () => {
+                    clearTimeout(longPressTimer);
+                });
+            }
+
+            card.innerHTML = `
+                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
+                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
+                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
+                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
+                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
+            `;
+            grid.appendChild(card);
+        }
+        calculate();
     }
-  }
-  const avgMotion = totalMotion / (frameHistory.length - 1);
-  // Natural live motion: avg 1.5-8px/frame; frozen photo: < 0.3px
-  return Math.min(avgMotion / CFG.LIVE_MOTION_THR / 2.5, 1);
-}
 
-/* Combined liveness score from all signals */
-function computeLiveness(canvas, det) {
-  const lm  = det.landmarks;
-  const box = det.detection.box;
-  const pts = lm.positions;
-
-  // Push to rolling history
-  frameHistory.push({
-    cx: box.x + box.width/2,
-    cy: box.y + box.height/2,
-    landmarks: pts,
-  });
-  if (frameHistory.length > CFG.LIVE_WINDOW) frameHistory.shift();
-
-  const s1 = checkLandmarkDepthVariance(lm);  // geometry
-  const s2 = checkFacialAsymmetry(lm);         // asymmetry
-  const s3 = checkEyeTexture(canvas, lm);      // texture
-  const s4 = computeMotionScore();              // temporal motion
-
-  // Weighted combination — motion and texture are most reliable
-  const combined = s1*0.20 + s2*0.20 + s3*0.25 + s4*0.35;
-  return { score: combined, s1, s2, s3, s4 };
-}
-
-function updateLivenessUI(result, detScore) {
-  const pct = Math.round(result.score * 100);
-  livenessScore = pct;
-
-  const bar  = document.getElementById('liveBar');
-  const val  = document.getElementById('liveScoreVal');
-  const hint = document.getElementById('liveHint');
-
-  bar.style.width = pct+'%';
-  if      (pct < 35) { bar.className='prog-bar danger'; val.style.color='var(--rose)'; }
-  else if (pct < 65) { bar.className='prog-bar warn';   val.style.color='var(--amber)'; }
-  else               { bar.className='prog-bar ok';     val.style.color='var(--emerald)'; }
-  val.textContent = pct+'%';
-
-  // Update challenge steps
-  setChallenge('ch-motion',  result.s4 > 0.3,  result.s4 > 0.7, 'Face Present',   '🎯');
-  setChallenge('ch-blink',   result.s3 > 0.35, result.s3 > 0.65, 'Eye Area',      '👁️');
-  setChallenge('ch-depth',   result.s1 > 0.3,  result.s1 > 0.6, '3D Depth',       '📐');
-  setChallenge('ch-texture', result.s2 > 0.25, result.s2 > 0.55, 'Asymmetry',     '🔬');
-
-  if      (pct >= CFG.LIVE_REQUIRED) hint.textContent = 'Liveness verified ✓';
-  else if (pct >= 40) hint.textContent = 'Keep your face visible — move slightly';
-  else if (frameHistory.length < 10) hint.textContent = 'Analysing… hold still for 2 seconds';
-  else hint.textContent = 'Low liveness — ensure you\'re using a live camera, not a photo';
-}
-
-function setChallenge(id, started, done, label, ico) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.className = 'challenge-step' + (done ? ' done' : started ? ' active' : '');
-  el.innerHTML = `<div class="challenge-ico">${ico}</div>${label}`;
-}
-
-function resetLiveness() {
-  frameHistory.length = 0;
-  livenessScore = 0;
-  ['ch-motion','ch-blink','ch-depth','ch-texture'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.className = 'challenge-step';
-  });
-  const bar = document.getElementById('liveBar');
-  bar.style.width = '0%';
-  bar.className = 'prog-bar danger';
-  document.getElementById('liveScoreVal').textContent = '0%';
-  document.getElementById('liveHint').textContent = 'Start the scanner to begin liveness verification';
-}
-
-/* ═══════════════════════════════════════════════════════
-   ATTENDANCE SCANNER
-═══════════════════════════════════════════════════════ */
-async function startAttend() {
-  if (!modelsReady)   { toast('AI models still loading — please wait', 'warn'); return; }
-  if (!inRange)       { toast('You are outside the attendance zone', 'err'); return; }
-  if (!DB.user)       { toast('No face registered. Enrol first.', 'warn'); return; }
-
-  try {
-    attStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode:'user', width:{ideal:640}, height:{ideal:480} }
-    });
-    const vid = document.getElementById('attVid');
-    vid.srcObject = attStream;
-    await new Promise((res,rej) => { vid.onloadedmetadata=res; vid.onerror=rej; });
-    await vid.play();
-    document.getElementById('startBtn').style.display = 'none';
-    document.getElementById('stopBtn').style.display  = 'inline-flex';
-    document.getElementById('attSweep').classList.add('active');
-    resetLiveness();
-    setCamStatus('Scanning…', 'var(--cyan)');
-    runAttLoop();
-  } catch(e) { handleCamErr(e, 'attend'); }
-}
-
-function stopAttend() {
-  if (attStream) { attStream.getTracks().forEach(t=>t.stop()); attStream=null; }
-  clearTimeout(attLoopTimer);
-  document.getElementById('startBtn').style.display = 'inline-flex';
-  document.getElementById('stopBtn').style.display  = 'none';
-  document.getElementById('attSweep').classList.remove('active');
-  const ctx = document.getElementById('attCvs').getContext('2d');
-  ctx.clearRect(0,0,9999,9999);
-  resetLiveness();
-  setCamStatus('Stopped', 'var(--t3)');
-  setIdentResult('idle');
-}
-
-async function runAttLoop() {
-  if (!attStream) return;
-  const vid = document.getElementById('attVid');
-  const cvs = document.getElementById('attCvs');
-  if (vid.readyState < 2) { attLoopTimer = setTimeout(runAttLoop, 200); return; }
-
-  cvs.width = vid.videoWidth;
-  cvs.height = vid.videoHeight;
-
-  const opts = new faceapi.TinyFaceDetectorOptions({ inputSize:320, scoreThreshold:.42 });
-  let dets;
-  try {
-    dets = await faceapi.detectAllFaces(vid, opts).withFaceLandmarks(true).withFaceDescriptors();
-  } catch { attLoopTimer = setTimeout(runAttLoop, 500); return; }
-
-  const ctx = cvs.getContext('2d');
-  ctx.clearRect(0,0, cvs.width, cvs.height);
-
-  if (!dets || !dets.length) {
-    resetLiveness();
-    setIdentResult('no-face');
-    setCamStatus('No face detected', 'var(--t3)');
-    attLoopTimer = setTimeout(runAttLoop, 400);
-    return;
-  }
-
-  const det = dets[0];
-  // Draw detection box
-  const resized = faceapi.resizeResults([det], {width:cvs.width, height:cvs.height});
-  const box = resized[0].detection.box;
-  drawBox(ctx, box, livenessScore >= CFG.LIVE_REQUIRED ? 'var(--emerald)' : 'var(--cyan)');
-
-  // Live computation on the canvas (needs actual pixel data)
-  const lRes = computeLiveness(cvs, det);
-  updateLivenessUI(lRes, det.detection.score);
-
-  // Geo check
-  if (!inRange) {
-    setIdentResult('geo-fail');
-    setCamStatus('Out of geofence', 'var(--rose)');
-    attLoopTimer = setTimeout(runAttLoop, 700);
-    return;
-  }
-
-  // Liveness gate
-  if (livenessScore < CFG.LIVE_REQUIRED) {
-    setIdentResult('liveness-fail', livenessScore);
-    setCamStatus(`Liveness: ${livenessScore}% — need ${CFG.LIVE_REQUIRED}%`, 'var(--amber)');
-    attLoopTimer = setTimeout(runAttLoop, 500);
-    return;
-  }
-
-  // Face match
-  const match = matchFace(det.descriptor);
-  if (!match) {
-    setIdentResult('unknown');
-    setCamStatus('Face not recognised', 'var(--rose)');
-    attLoopTimer = setTimeout(runAttLoop, 600);
-    return;
-  }
-
-  const cf = Math.round((1 - match.distance) * 100);
-  setIdentResult('matched', match.user, cf);
-  setCamStatus(`Identified: ${match.user.name} · ${cf}%`, 'var(--emerald)');
-
-  const key = match.user.id + '_' + new Date().toDateString();
-  if (lastMarkedKey !== key) {
-    lastMarkedKey = key;
-    doMarkAttendance(match.user, cf);
-  }
-
-  attLoopTimer = setTimeout(runAttLoop, 700);
-}
-
-function drawBox(ctx, box, color) {
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 8;
-  ctx.strokeRect(box.x, box.y, box.width, box.height);
-  ctx.shadowBlur = 0;
-}
-
-function matchFace(desc) {
-  const u = DB.user;
-  if (!u) return null;
-  try {
-    const stored = new Float32Array(Object.values(u.descriptor));
-    const dist   = faceapi.euclideanDistance(desc, stored);
-    return dist < CFG.MATCH_THR ? { user:u, distance:dist } : null;
-  } catch { return null; }
-}
-
-function setCamStatus(msg, color='var(--t2)') {
-  document.getElementById('camStatusTxt').innerHTML =
-    `<span style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>
-     <span style="color:${color}">${msg}</span>`;
-}
-
-function setIdentResult(mode, data, cf) {
-  const box = document.getElementById('identResult');
-  const msg = document.getElementById('attendMsg');
-  if (mode === 'matched' && data) {
-    const av = data.image
-      ? `<img class="id-face" src="${data.image}" alt="${data.name}">`
-      : `<div class="id-ph">✅</div>`;
-    box.innerHTML = `<div class="identity-card">
-      ${av}
-      <div class="id-name">${data.name}</div>
-      <div class="id-meta">${data.id} · ${data.dept||'—'} · ${data.role}</div>
-      <div class="id-badge ok">✓ ${cf}% match</div>
-    </div>`;
-    return;
-  }
-  const states = {
-    'idle':          ['🔍','var(--t3)','Awaiting scan',''],
-    'no-face':       ['👤','var(--t3)','No face in frame','Look directly at the camera'],
-    'liveness-fail': ['🔄','var(--amber)','Liveness check…',`Score ${data||0}% — move your face slightly`],
-    'geo-fail':      ['📍','var(--rose)','Outside geofence','Move to the designated area'],
-    'unknown':       ['❓','var(--rose)','Face not recognised','Your face does not match any registered profile'],
-  };
-  const [ico,color,title,sub] = states[mode] || states['idle'];
-  box.innerHTML = `<div class="identity-card">
-    <div class="id-ph" style="border-color:${color}">${ico}</div>
-    <div class="id-name" style="color:${color}">${title}</div>
-    ${sub ? `<div class="id-meta" style="margin-top:6px">${sub}</div>`:''}
-  </div>`;
-  msg.innerHTML = '';
-}
-
-function doMarkAttendance(u, cf) {
-  const now = new Date();
-  const rec = {
-    id: Date.now(),
-    empId: u.id, name: u.name, dept: u.dept||'—', role: u.role,
-    date: now.toLocaleDateString('en-IN'),
-    isoDate: now.toISOString().slice(0,10),
-    time: now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
-    ts: now.getTime(),
-    confidence: cf,
-    status: 'Present',
-  };
-  const recs = DB.records;
-  recs.unshift(rec);
-  DB.records = recs;
-  refreshTodayLog();
-  document.getElementById('attendMsg').innerHTML =
-    `<div class="alert ok"><span class="alert-ico">🎉</span><div class="alert-body">Attendance marked at <b>${rec.time}</b></div></div>`;
-  setTimeout(() => { document.getElementById('attendMsg').innerHTML=''; }, 5000);
-  toast(`✅ ${u.name} — ${rec.time}`, 'ok');
-}
-
-function refreshTodayLog() {
-  const today = new Date().toLocaleDateString('en-IN');
-  const list  = DB.records.filter(r=>r.date===today).slice(0,5);
-  const el    = document.getElementById('todayLog');
-  if (!list.length) {
-    el.innerHTML = `<div class="empty-state" style="padding:16px 10px"><div class="e-ico">📋</div><div class="e-title">No entries yet</div></div>`;
-    return;
-  }
-  el.innerHTML = list.map(r => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;background:var(--surface);border-radius:var(--r-sm);border:1px solid var(--line);margin-bottom:6px">
-      <div>
-        <div style="font-size:.82rem;font-weight:600">${r.name}</div>
-        <div style="font-size:.72rem;color:var(--t3)">${r.empId}</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:.78rem;color:var(--emerald);font-weight:600">${r.time}</div>
-        <div style="font-size:.68rem;color:var(--t3)">${r.confidence}%</div>
-      </div>
-    </div>`).join('');
-}
-
-/* ═══════════════════════════════════════════════════════
-   REGISTER
-═══════════════════════════════════════════════════════ */
-function checkAlreadyReg() {
-  const u = DB.user;
-  const b = document.getElementById('alreadyBanner');
-  const t = document.getElementById('alreadyTxt');
-  const btn = document.getElementById('regBtn');
-  if (u) {
-    b.style.display = 'block';
-    t.innerHTML = `<b>${u.name}</b> (${u.id}) is registered on this device. Go to Profile to manage or delete.`;
-    btn.textContent = 'Update Registration';
-  } else {
-    b.style.display = 'none';
-  }
-  document.getElementById('noRegAlert').style.display = u ? 'none' : 'block';
-}
-
-async function openRegCam() {
-  if (regStream) regStream.getTracks().forEach(t=>t.stop());
-  document.getElementById('regPlaceholder').style.display = 'none';
-  try {
-    regStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode:'user', width:{ideal:640}, height:{ideal:480} }
-    });
-    const vid = document.getElementById('regVid');
-    vid.srcObject = regStream;
-    await new Promise((res,rej)=>{vid.onloadedmetadata=res; vid.onerror=rej;});
-    await vid.play();
-    document.getElementById('captureBtn').disabled = false;
-    document.getElementById('openCamBtn').textContent = '🔄 Restart';
-    document.getElementById('regSweep').classList.add('active');
-  } catch(e) { handleCamErr(e, 'register'); }
-}
-
-async function doCapture() {
-  if (!modelsReady) { toast('AI still loading…', 'warn'); return; }
-  const vid     = document.getElementById('regVid');
-  const preview = document.getElementById('captPrev');
-  if (vid.readyState < 2) { toast('Camera not ready', 'warn'); return; }
-
-  preview.width  = vid.videoWidth;
-  preview.height = vid.videoHeight;
-  const pCtx = preview.getContext('2d');
-  pCtx.drawImage(vid, 0, 0);
-  document.getElementById('previewWrap').style.display = 'block';
-  document.getElementById('captureChecks').style.display = 'block';
-  document.getElementById('captFeedback').innerHTML = `<div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--t2)"><span class="spin"></span> Running anti-spoofing checks…</div>`;
-
-  const opts = new faceapi.TinyFaceDetectorOptions({ inputSize:416, scoreThreshold:.40 });
-  let det;
-  try {
-    det = await faceapi.detectSingleFace(preview,opts).withFaceLandmarks(true).withFaceDescriptor();
-  } catch(e) {
-    document.getElementById('captFeedback').innerHTML = renderAlert('danger','⚠️',`Detection error: ${e.message}`);
-    return;
-  }
-
-  // ── Spoof check series ───────────────────────────────────
-  const checks = [];
-
-  // Check 0: face found?
-  if (!det) {
-    renderCaptureChecks([
-      {label:'Face detected',    pass:false, detail:'No face found in frame'},
-      {label:'Detection quality',pass:false, detail:'Capture failed'},
-      {label:'Face size',        pass:false, detail:'N/A'},
-      {label:'Anti-spoofing',    pass:false, detail:'N/A'},
-    ]);
-    document.getElementById('captFeedback').innerHTML = renderAlert('danger','❌',
-      'No face detected.<br><b>Fix:</b> Face the camera directly in good front lighting. Remove glasses if needed.');
-    capturedDesc = null;
-    document.getElementById('regBtn').disabled = true;
-    return;
-  }
-
-  const score = det.detection.score;
-  const box   = det.detection.box;
-  const frameArea = preview.width * preview.height;
-  const faceRatio = (box.width * box.height) / frameArea;
-
-  checks.push({ label:'Face detected',     pass: score > 0,    detail:`Detection confidence: ${Math.round(score*100)}%` });
-  checks.push({ label:'Detection quality', pass: score >= CFG.MIN_DET_SCORE, detail: score >= CFG.MIN_DET_SCORE ? `${Math.round(score*100)}% ✓` : `${Math.round(score*100)}% — needs ≥${Math.round(CFG.MIN_DET_SCORE*100)}%` });
-  checks.push({ label:'Face size',
-    pass: faceRatio >= CFG.MIN_FACE_RATIO && faceRatio <= CFG.MAX_FACE_RATIO,
-    detail: faceRatio < CFG.MIN_FACE_RATIO ? 'Too small — move closer'
-          : faceRatio > CFG.MAX_FACE_RATIO ? 'Too close — step back'
-          : `${Math.round(faceRatio*100)}% of frame ✓`,
-  });
-
-  // Anti-spoofing on the STATIC captured frame (no motion possible — heavier weight on geometry & texture)
-  const lm  = det.landmarks;
-  const s1  = checkLandmarkDepthVariance(lm);
-  const s2  = checkFacialAsymmetry(lm);
-  const s3  = checkEyeTexture(preview, lm);
-  // For registration we can't check motion, so we weight the others more
-  const spoofScore = s1 * 0.35 + s2 * 0.30 + s3 * 0.35;
-  const spoofPct   = Math.round(spoofScore * 100);
-  const spoofPass  = spoofPct >= 28; // lower threshold since no motion signal
-
-  checks.push({ label:'Spoof analysis',
-    pass: spoofPass,
-    detail: spoofPass
-      ? `Real face indicators: geometry ${Math.round(s1*100)}%, asymmetry ${Math.round(s2*100)}%, texture ${Math.round(s3*100)}%`
-      : `Possible flat image detected. Scores: ${Math.round(s1*100)}% / ${Math.round(s2*100)}% / ${Math.round(s3*100)}%`,
-  });
-
-  renderCaptureChecks(checks);
-
-  // Draw bbox on preview
-  const ctx = preview.getContext('2d');
-  ctx.drawImage(vid, 0, 0); // re-draw fresh
-  const allPassed = checks.every(c=>c.pass);
-  ctx.strokeStyle = allPassed ? '#10b981' : '#f43f5e';
-  ctx.lineWidth = 3; ctx.shadowColor = ctx.strokeStyle; ctx.shadowBlur = 10;
-  ctx.strokeRect(box.x, box.y, box.width, box.height);
-  ctx.shadowBlur = 0;
-
-  if (!allPassed) {
-    const failed = checks.filter(c=>!c.pass).map(c=>c.detail).join('<br>');
-    document.getElementById('captFeedback').innerHTML = renderAlert('danger','🚫',
-      `Capture rejected:<br>${failed}`);
-    capturedDesc = null;
-    capturedImg  = null;
-    document.getElementById('regBtn').disabled = true;
-    return;
-  }
-
-  capturedDesc = det.descriptor;
-  capturedImg  = preview.toDataURL('image/jpeg', .88);
-  document.getElementById('captFeedback').innerHTML = renderAlert('ok','✅',
-    `Face captured (${Math.round(score*100)}% quality). Fill in details and register.`);
-  document.getElementById('regBtn').disabled = false;
-}
-
-function renderCaptureChecks(checks) {
-  const el = document.getElementById('checkList');
-  el.innerHTML = checks.map(c => `
-    <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;background:var(--surface);border-radius:var(--r-sm);border:1px solid ${c.pass?'rgba(16,185,129,.2)':'rgba(244,63,94,.2)'}">
-      <span style="font-size:.85rem;flex-shrink:0;margin-top:1px">${c.pass?'✅':'❌'}</span>
-      <div>
-        <div style="font-size:.78rem;font-weight:600;color:${c.pass?'var(--emerald)':'var(--rose)'}">${c.label}</div>
-        <div style="font-size:.72rem;color:var(--t3);margin-top:1px">${c.detail}</div>
-      </div>
-    </div>`).join('');
-}
-
-function renderAlert(type, ico, msg) {
-  return `<div class="alert ${type}"><span class="alert-ico">${ico}</span><div class="alert-body">${msg}</div></div>`;
-}
-
-async function registerFace() {
-  const name = document.getElementById('rName').value.trim();
-  const id   = document.getElementById('rId').value.trim();
-  const dept = document.getElementById('rDept').value.trim();
-  const role = document.getElementById('rRole').value;
-
-  if (!name || !id) { showRegFb('danger','⚠️','Name and ID are required.'); return; }
-  if (!capturedDesc) { showRegFb('danger','⚠️','Capture and verify your face first.'); return; }
-
-  showRegFb('info','<span class="spin"></span>','Registering…');
-
-  const desc = {};
-  capturedDesc.forEach((v,i) => { desc[i]=v; });
-
-  DB.user = { name, id, dept, role, descriptor:desc, image:capturedImg, deviceId:DEVICE_ID, registeredAt:new Date().toISOString() };
-
-  showRegFb('ok','✅',`${name} registered. Device binding set.`);
-  toast(`${name} enrolled`, 'ok');
-
-  document.getElementById('rName').value = '';
-  document.getElementById('rId').value   = '';
-  document.getElementById('rDept').value = '';
-  capturedDesc = null; capturedImg = null;
-  document.getElementById('previewWrap').style.display  = 'none';
-  document.getElementById('captureChecks').style.display = 'none';
-  document.getElementById('regBtn').disabled = true;
-  checkAlreadyReg();
-}
-
-function showRegFb(type, ico, msg) {
-  document.getElementById('regFeedback').innerHTML = renderAlert(type, ico, msg);
-}
-
-/* ═══════════════════════════════════════════════════════
-   RECORDS — SCHOOL REGISTER TABLE
-═══════════════════════════════════════════════════════ */
-function buildRegisterTable() {
-  const recs  = DB.records;
-  const today = new Date().toLocaleDateString('en-IN');
-  const thisM = new Date().toISOString().slice(0,7);
-  const mRecs = recs.filter(r => r.isoDate && r.isoDate.startsWith(thisM));
-  const dim   = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
-  const pct   = dim > 0 ? Math.round((mRecs.length / dim) * 100) : 0;
-
-  document.getElementById('sTot').textContent   = recs.length;
-  document.getElementById('sToday').textContent = recs.filter(r=>r.date===today).length;
-  document.getElementById('sMonth').textContent = mRecs.length;
-  document.getElementById('sPct').textContent   = pct+'%';
-
-  const wrap = document.getElementById('regTableWrap');
-
-  if (!recs.length) {
-    wrap.innerHTML = `<div class="empty-state"><div class="e-ico">📅</div><div class="e-title">No records yet</div><div class="e-desc">Mark attendance to see the register</div></div>`;
-    return;
-  }
-
-  // All unique ISO dates sorted desc, show last 20
-  const allDates = [...new Set(recs.map(r=>r.isoDate||''))].filter(Boolean).sort().reverse().slice(0,20);
-  const visDates = allDates.slice(0,16);
-  // Unique users
-  const users = [...new Map(recs.map(r=>[r.empId,{empId:r.empId,name:r.name}])).values()];
-
-  const thDates = visDates.map(d => {
-    const obj = new Date(d+'T00:00:00');
-    const day = obj.toLocaleDateString('en-IN',{weekday:'short'}).slice(0,2);
-    const num = obj.getDate();
-    return `<th style="text-align:center;min-width:32px"><div style="font-size:.65rem">${day}</div><div>${num}</div></th>`;
-  }).join('');
-
-  const thead = `<tr><th style="text-align:left;min-width:120px">Name</th><th style="text-align:left">ID</th>${thDates}<th style="text-align:center">Total</th></tr>`;
-
-  const today8601 = new Date().toISOString().slice(0,10);
-  const tbody = users.map(usr => {
-    const cells = visDates.map(d => {
-      const rec = recs.find(r=>r.empId===usr.empId&&(r.isoDate===d));
-      if (rec) {
-        return `<td style="text-align:center"><button class="att-cell att-P" onclick="showTooltip(event,'${rec.id}')">P</button></td>`;
-      }
-      const isPast = d < today8601;
-      return `<td style="text-align:center"><button class="att-cell ${isPast?'att-A':'att-blank'}" ${isPast?`onclick="showTooltip(event,null,'${d}','${usr.name}')"`:''} >${isPast?'A':'—'}</button></td>`;
-    }).join('');
-    const total = recs.filter(r=>r.empId===usr.empId).length;
-    return `<tr>
-      <td><span style="font-weight:600;font-size:.82rem">${usr.name}</span></td>
-      <td><span style="font-family:var(--mono);font-size:.72rem;color:var(--t3)">${usr.empId}</span></td>
-      ${cells}
-      <td style="text-align:center"><span class="att-cell att-P" style="cursor:default">${total}</span></td>
-    </tr>`;
-  }).join('');
-
-  wrap.innerHTML = `<table class="reg-table"><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
-}
-
-function showTooltip(evt, recId, dateStr, name) {
-  const tip = document.getElementById('tooltip');
-  let html = '';
-  if (recId) {
-    const r = DB.records.find(x=>String(x.id)===String(recId));
-    if (!r) return;
-    html = `<div class="tip-name">${r.name}</div>
-      <div class="tip-detail">${r.empId} · ${r.dept} · ${r.role}</div>
-      <div class="tip-time" style="color:var(--emerald)">✅ Present · ${r.time}</div>
-      <div class="tip-detail" style="margin-top:3px">${r.date} · ${r.confidence}% confidence</div>`;
-  } else {
-    const dLabel = dateStr ? new Date(dateStr+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-    html = `<div class="tip-name">${name||'—'}</div>
-      <div class="tip-time" style="color:var(--rose)">❌ Absent</div>
-      <div class="tip-detail" style="margin-top:3px">${dLabel}</div>`;
-  }
-  tip.innerHTML = html;
-  tip.style.display = 'block';
-  const r = evt.currentTarget.getBoundingClientRect();
-  let l = r.left + window.scrollX, t = r.bottom + window.scrollY + 6;
-  if (l + 230 > window.innerWidth) l = window.innerWidth - 240;
-  if (t + 140 > window.innerHeight) t = r.top + window.scrollY - 146;
-  tip.style.left = l+'px'; tip.style.top = t+'px';
-  const hide = (e) => {
-    if (!tip.contains(e.target)) { tip.style.display='none'; document.removeEventListener('click',hide); }
-  };
-  setTimeout(()=>document.addEventListener('click',hide),10);
-}
-
-function clearAllRecords() { DB.records=[]; buildRegisterTable(); refreshTodayLog(); toast('Records cleared','ok'); }
-
-function exportCSV() {
-  const recs = DB.records;
-  if (!recs.length) { toast('No records to export','info'); return; }
-  const hdr  = ['Name','ID','Department','Role','Date','Time','Confidence%','Status'];
-  const rows = recs.map(r=>[r.name,r.empId,r.dept,r.role,r.date,r.time,r.confidence,r.status]);
-  const csv  = [hdr,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download = `attendance_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  toast('CSV exported','ok');
-}
-
-/* ═══════════════════════════════════════════════════════
-   PROFILE
-═══════════════════════════════════════════════════════ */
-function buildProfile() {
-  const u = DB.user;
-  document.getElementById('noProfileState').style.display = u ? 'none' : 'block';
-  document.getElementById('profileState').style.display   = u ? 'block' : 'none';
-  if (!u) return;
-
-  document.getElementById('profAvatarEl').innerHTML = u.image
-    ? `<img class="profile-avatar" src="${u.image}" alt="${u.name}">`
-    : `<div class="profile-avatar-ph">👤</div>`;
-
-  document.getElementById('profName').textContent = u.name;
-  document.getElementById('profIdLine').textContent = `${u.id}${u.dept ? ' · ' + u.dept : ''}`;
-  document.getElementById('profRoleBadge').textContent = u.role;
-  document.getElementById('profDevDisplay').textContent = DEVICE_ID.slice(0,8)+'…'+DEVICE_ID.slice(-6);
-  document.getElementById('profFp').textContent = u.deviceId ? u.deviceId.slice(0,12)+'…' : 'legacy';
-  document.getElementById('profRegDate').textContent = new Date(u.registeredAt).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
-
-  const recs  = DB.records.filter(r=>r.empId===u.id);
-  const today = new Date().toLocaleDateString('en-IN');
-  const thisM = new Date().toISOString().slice(0,7);
-  const mRecs = recs.filter(r=>r.isoDate&&r.isoDate.startsWith(thisM));
-  document.getElementById('profStats').innerHTML = `
-    <div class="stat-card"><div class="stat-val">${recs.length}</div><div class="stat-label">Total</div></div>
-    <div class="stat-card"><div class="stat-val">${recs.filter(r=>r.date===today).length}</div><div class="stat-label">Today</div></div>
-    <div class="stat-card"><div class="stat-val">${mRecs.length}</div><div class="stat-label">Month</div></div>
-  `;
-
-  const recent = recs.slice(0,10);
-  document.getElementById('profRecentList').innerHTML = recent.length
-    ? recent.map(r=>`
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)">
-        <div>
-          <div style="font-size:.82rem;color:var(--t2)">${r.date}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="att-cell att-P" style="cursor:default">P</span>
-          <span style="font-size:.78rem;color:var(--emerald);font-weight:600">${r.time}</span>
-          <span style="font-size:.7rem;color:var(--t3)">${r.confidence}%</span>
-        </div>
-      </div>`).join('')
-    : `<div class="empty-state" style="padding:20px 0"><div class="e-desc">No records yet</div></div>`;
-}
-
-function deleteProfile() {
-  DB.user = null; DB.records = [];
-  localStorage.removeItem('fa_devid');
-  toast('Profile deleted','ok');
-  buildProfile(); checkAlreadyReg(); refreshTodayLog();
-}
-
-/* ═══════════════════════════════════════════════════════
-   DEVICE LOCK
-═══════════════════════════════════════════════════════ */
-function showLockHelp() {
-  toast('Your biometric profile is bound to the device you registered on. Use that device, or tap "Reset device binding" to start fresh.','info');
-}
-function confirmResetDevice() {
-  openModal('🔓','Reset device binding?',
-    'This permanently deletes your profile and records so you can re-register on this device.',
-    () => {
-      DB.user = null; DB.records = [];
-      localStorage.removeItem('fa_devid');
-      document.getElementById('lockScreen').classList.remove('active');
-      getDeviceId().then(id => { DEVICE_ID = id; });
-      toast('Reset complete — please register again','ok');
+    window.toggle = async (day, type) => {
+        if (!isCurrentMonth()) return;
+        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
+        obj[type] = obj[type] ? 0 : 1;
+        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
+    };
+
+    window.openNote = (day) => {
+        activeDayId = day;
+        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
+        document.getElementById('noteInput').value = logs[day]?.n || "";
+        document.getElementById('noteOverlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
+    };
+    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
+    window.saveNote = async () => {
+        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
+        obj.n = document.getElementById('noteInput').value;
+        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
+        closeNote();
+    };
+
+    window.openSettings = () => {
+        document.getElementById('setUserName').value = config.name;
+        document.getElementById('setMealPrice').value = config.mealPrice;
+        document.getElementById('setWaterPrice').value = config.waterPrice;
+        document.getElementById('settingsOverlay').style.display = 'flex';
+        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
+    };
+    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
+    window.saveSettings = async () => {
+        config.name = document.getElementById('setUserName').value;
+        config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
+        config.waterPrice = parseInt(document.getElementById('setWaterPrice').value);
+        await setDoc(doc(db, "users", user.uid), config, { merge: true });
+        document.getElementById('userLabel').innerText = config.name;
+        calculate(); closeSettings();
+    };
+
+    function calculate() {
+        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
+        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
+        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
     }
-  );
-}
 
-/* ═══════════════════════════════════════════════════════
-   MODAL
-═══════════════════════════════════════════════════════ */
-let _mCb = null;
-function openModal(ico, title, body, cb) {
-  document.getElementById('mIco').textContent   = ico;
-  document.getElementById('mTitle').textContent = title;
-  document.getElementById('mBody').textContent  = body;
-  _mCb = cb;
-  document.getElementById('modalBg').classList.add('open');
-}
-function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
-document.getElementById('mConfirm').onclick = () => { closeModal(); _mCb && _mCb(); };
-
-/* ═══════════════════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════════════════ */
-function toast(msg, type='info') {
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.textContent = msg;
-  document.getElementById('toastRoot').appendChild(el);
-  setTimeout(() => el.remove(), 3800);
-}
-
-/* ═══════════════════════════════════════════════════════
-   CAMERA ERROR HANDLER
-═══════════════════════════════════════════════════════ */
-function handleCamErr(e, ctx) {
-  const fixes = {
-    NotAllowedError:      'Permission denied — go to browser Settings → Site Settings → Camera and allow access.',
-    NotFoundError:        'No camera found — connect a camera or use a device with a webcam.',
-    NotReadableError:     'Camera is in use by another app — close other tabs or apps using the camera.',
-    OverconstrainedError: 'Camera does not support the required settings. Try a different camera.',
-    AbortError:           'Camera access interrupted. Try again.',
-  };
-  const msg = fixes[e.name] || `Camera error (${e.name}): ${e.message || 'unknown'}`;
-  toast(msg, 'err');
-  if (ctx === 'attend') {
-    setCamStatus('Camera error', 'var(--rose)');
-    document.getElementById('attendMsg').innerHTML = renderAlert('danger','🎥',msg);
-  } else {
-    document.getElementById('regFeedback').innerHTML = renderAlert('danger','🎥',msg);
-    document.getElementById('regPlaceholder').style.display = 'flex';
-    document.getElementById('regPlaceholder').innerHTML = `<div style="font-size:1.8rem;opacity:.5">📷</div><div style="font-size:.76rem;color:var(--rose);text-align:center;padding:0 14px;line-height:1.5">${msg}</div>`;
-  }
-}
+    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
 </script>
 </body>
 </html>
-ENDOFFILE
-echo "Done: $(wc -c < /mnt/user-data/outputs/faceattend-v3.html) bytes"
