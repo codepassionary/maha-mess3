@@ -1,1333 +1,742 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SM-7 // Station Master Control Panel</title>
-<style>
-:root{
-  --bg:#070a0f;
-  --panel:#0e1520;
-  --panel2:#141d2b;
-  --line:#243042;
-  --line-soft:#1b2531;
-  --text:#cdd8e3;
-  --text-dim:#5f7185;
-  --text-bright:#eef4fa;
-  --teal:#2dd9c8;
-  --teal-dim:#0f5e57;
-  --green:#39e06a;
-  --green-dim:#1a5c30;
-  --red:#ff4d4d;
-  --red-dim:#5c1f1f;
-  --amber:#ffb238;
-  --amber-dim:#5c4318;
-  --grey:#4a5a6c;
-  --mono:'JetBrains Mono','Roboto Mono',ui-monospace,Consolas,monospace;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Student Event Portal</title>
+    <!-- Include QRCode Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Base Variables */
+        :root {
+            --bg-base: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* Default Theme (Neutral/Blue) */
+            --primary: #0f172a;
+            --primary-hover: #1e293b;
+            --primary-light: #f1f5f9;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+        }
 
-*{box-sizing:border-box;}
-html,body{
-  margin:0;padding:0;background:var(--bg);color:var(--text);
-  font-family:var(--mono);
-  height:100%;
-  overflow-x:hidden;
-}
+        /* Campus Specific Themes */
+        body[data-theme="Rewa"] {
+            --primary: #059669; /* Emerald Green */
+            --primary-hover: #047857;
+            --primary-light: #ecfdf5;
+        }
+        body[data-theme="Jabalpur"] {
+            --primary: #0284c7; /* Ocean Blue */
+            --primary-hover: #0369a1;
+            --primary-light: #f0f9ff;
+        }
+        body[data-theme="Mhow"] {
+            --primary: #be123c; /* Crimson Red */
+            --primary-hover: #9f1239;
+            --primary-light: #fff1f2;
+        }
 
-::-webkit-scrollbar{width:8px;height:8px;}
-::-webkit-scrollbar-track{background:var(--panel);}
-::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
+        
+        body {
+            background-color: var(--bg-base); color: var(--text-main);
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; padding: 20px; overflow-x: hidden; transition: background-color 0.5s ease;
+        }
 
-button{font-family:var(--mono);cursor:pointer;}
+        h1, h2, h3 { letter-spacing: -0.01em; color: var(--primary); }
+        .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 6px; line-height: 1.5; }
 
-.app{
-  display:grid;
-  grid-template-rows:auto 1fr;
-  min-height:100vh;
-  background:
-    radial-gradient(ellipse at 50% -10%, #0d1726 0%, transparent 60%),
-    var(--bg);
-}
+        /* Navigation Stepper */
+        .stepper {
+            display: flex; justify-content: center; align-items: center;
+            width: 100%; max-width: 800px; margin-bottom: 30px; gap: 8px; flex-wrap: wrap;
+        }
+        .step {
+            display: flex; align-items: center; gap: 8px; color: var(--text-muted);
+            font-weight: 600; font-size: 0.85rem; opacity: 0.6; transition: all 0.3s ease;
+        }
+        .step.active { opacity: 1; color: var(--primary); }
+        .step-circle {
+            width: 26px; height: 26px; border-radius: 50%; background: var(--border);
+            display: flex; justify-content: center; align-items: center; color: white; font-size: 0.75rem;
+        }
+        .step.active .step-circle { background: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); }
+        .step-line { height: 2px; width: 30px; background: var(--border); }
+        .step.active + .step-line { background: var(--primary); }
 
-/* ===== TOP BAR ===== */
-.topbar{
-  display:flex;align-items:center;gap:18px;
-  padding:10px 16px;
-  background:linear-gradient(180deg,#0c1320,#0a0f18);
-  border-bottom:1px solid var(--line);
-  flex-wrap:wrap;
-}
-.brand{
-  display:flex;align-items:center;gap:10px;
-  padding-right:16px;border-right:1px solid var(--line-soft);
-}
-.brand .dot{
-  width:10px;height:10px;border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 8px var(--green);
-  animation:pulse 2s infinite;
-}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-.brand h1{
-  font-size:13px;letter-spacing:.12em;margin:0;color:var(--text-bright);
-  font-weight:700;text-transform:uppercase;
-}
-.brand small{display:block;font-size:9.5px;color:var(--text-dim);letter-spacing:.08em;margin-top:2px;}
+        /* Layout & Cards */
+        .app-wrapper { width: 100%; max-width: 800px; position: relative; }
+        .view-card {
+            background: var(--bg-card); border-radius: 16px; padding: 35px;
+            box-shadow: var(--shadow-md); border: 1px solid var(--border);
+            display: none; opacity: 0; transform: translateY(15px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .view-card.active { display: block; opacity: 1; transform: translateY(0); }
 
-.clock-block{
-  display:flex;flex-direction:column;align-items:flex-start;
-  padding:0 16px;border-right:1px solid var(--line-soft);
-}
-.clock-block .label{font-size:8.5px;color:var(--text-dim);letter-spacing:.12em;}
-.clock-block .val{font-size:18px;color:var(--teal);letter-spacing:.05em;font-weight:600;}
+        /* Forms */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+        label { font-size: 0.875rem; font-weight: 600; color: #334155; }
+        
+        input, select {
+            padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px;
+            font-size: 0.95rem; background: #f8fafc; transition: all 0.2s; outline: none;
+        }
+        input:focus, select:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        input:disabled, select:disabled { opacity: 0.7; cursor: not-allowed; background: #e2e8f0; color: #475569; }
 
-.statgrid{
-  display:flex;gap:14px;flex:1;flex-wrap:wrap;
-}
-.statpill{
-  display:flex;flex-direction:column;
-  background:var(--panel);border:1px solid var(--line-soft);
-  border-radius:4px;padding:5px 10px;min-width:78px;
-}
-.statpill .label{font-size:8px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;}
-.statpill .val{font-size:14px;color:var(--text-bright);font-weight:600;}
-.statpill.warn .val{color:var(--amber);}
-.statpill.bad .val{color:var(--red);}
-.statpill.good .val{color:var(--green);}
+        .file-drop {
+            border: 2px dashed var(--border); border-radius: 10px; padding: 20px;
+            text-align: center; background: #f8fafc; cursor: pointer; position: relative; transition: all 0.2s;
+        }
+        .file-drop.disabled { pointer-events: none; opacity: 0.6; background: #e2e8f0; }
+        .file-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
-.topctrls{display:flex;gap:8px;align-items:center;}
-.btn{
-  background:var(--panel2);border:1px solid var(--line);color:var(--text);
-  border-radius:4px;padding:7px 12px;font-size:11px;letter-spacing:.05em;
-  transition:.15s;display:flex;align-items:center;gap:6px;
-}
-.btn:hover{border-color:var(--teal);color:var(--teal);}
-.btn.active{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
-.btn.danger:hover{border-color:var(--red);color:var(--red);}
-.speedctrl{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;}
-.speedctrl span{font-size:9px;color:var(--text-dim);letter-spacing:.08em;}
-.speedctrl input[type=range]{width:70px;accent-color:var(--teal);}
+        /* Buttons */
+        .btn {
+            background: var(--primary); color: white; border: none; padding: 12px 24px;
+            border-radius: 10px; font-weight: 600; font-size: 1rem; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+        }
+        .btn:hover { filter: brightness(1.1); box-shadow: var(--shadow-sm); }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: var(--bg-base); border-color: var(--text-muted); }
 
-/* ===== MAIN LAYOUT ===== */
-.main{
-  display:grid;
-  grid-template-columns:1fr 300px;
-  gap:10px;padding:10px;
-  min-height:0;
-}
-@media (max-width:980px){
-  .main{grid-template-columns:1fr;}
-}
+        .action-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
+        
+        /* Security Alert Banner */
+        .security-banner {
+            background: #fffbeb; border: 1px solid #fde68a; padding: 12px 16px;
+            border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; color: #92400e;
+            display: none; align-items: center; gap: 10px; line-height: 1.4;
+        }
 
-.boardwrap{
-  display:flex;flex-direction:column;gap:10px;min-width:0;
-}
+        /* -------------------------------------------
+           SECURE DIGITAL ID CARD
+           ------------------------------------------- */
+        .credential-wrapper { display: flex; justify-content: center; padding: 20px 0; }
+        .digital-badge {
+            width: 100%; max-width: 360px; background: var(--bg-card); border-radius: 16px;
+            box-shadow: var(--shadow-lg); border: 2px solid var(--primary); overflow: hidden; position: relative;
+        }
+        
+        /* Security Feature 1: Guilloche / Watermark Pattern */
+        .digital-badge::before {
+            content: 'AUTHENTIC DOCUMENT'; position: absolute; top: 0; left: -50%; width: 200%; height: 200%;
+            font-size: 4rem; font-weight: 900; color: var(--primary); opacity: 0.03;
+            transform: rotate(-35deg); pointer-events: none; z-index: 1; white-space: nowrap;
+            background-image: radial-gradient(var(--primary) 1px, transparent 1px); background-size: 20px 20px;
+        }
+        
+        /* Security Feature 2: Microprinting Border */
+        .microprint {
+            position: absolute; inset: 0; pointer-events: none; z-index: 5;
+            border: 1px solid transparent; overflow: hidden; opacity: 0.2;
+            font-size: 4px; line-height: 1; word-break: break-all; color: var(--primary);
+        }
 
-.panel{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:6px;
-  overflow:hidden;
-}
-.panel-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 12px;border-bottom:1px solid var(--line-soft);
-  background:var(--panel2);
-}
-.panel-head h2{
-  font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--text-dim);margin:0;font-weight:700;
-}
-.panel-head .sub{font-size:9.5px;color:var(--text-dim);}
+        /* Security Feature 3: Holographic Foil Simulator */
+        .hologram-seal {
+            position: absolute; bottom: 15px; right: 15px; width: 45px; height: 45px;
+            border-radius: 50%; z-index: 4; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            animation: holoShift 4s infinite alternate linear;
+            border: 2px dashed rgba(255,255,255,0.8);
+            display: flex; justify-content: center; align-items: center; font-size: 8px; font-weight: bold; color: white; text-align: center;
+        }
+        @keyframes holoShift {
+            0% { filter: hue-rotate(0deg) contrast(1.2); }
+            100% { filter: hue-rotate(45deg) contrast(1.5); }
+        }
 
-/* ===== TRACK BOARD ===== */
-.boardstage{
-  position:relative;
-  width:100%;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 23px, #ffffff05 23px 24px),
-    repeating-linear-gradient(90deg, transparent 0 23px, #ffffff05 23px 24px),
-    #0a0f18;
-  min-height:420px;
-}
-.boardstage svg{display:block;width:100%;height:auto;}
+        .badge-header { padding: 15px; text-align: center; background: var(--primary); color: white; position: relative; z-index: 2; }
+        .badge-header h4 { color: white; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        
+        .badge-content { display: flex; flex-direction: column; align-items: center; padding: 25px 20px; position: relative; z-index: 2; background: rgba(255,255,255,0.85); backdrop-filter: blur(2px); }
+        .badge-photo {
+            width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--primary);
+            box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 15px; background: white;
+        }
+        .badge-photo img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .badge-name { font-size: 1.4rem; font-weight: 800; text-align: center; margin-bottom: 4px; color: var(--text-main); }
+        .badge-role { font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .qr-container { background: white; padding: 8px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
+        
+        .badge-uid {
+            background: var(--primary-light); padding: 8px 20px; border-radius: 6px;
+            font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; color: var(--primary); border: 1px dashed var(--primary);
+        }
 
-.trackline{
-  fill:none;
-  stroke:#26344a;
-  stroke-width:7;
-  stroke-linecap:round;
-}
-.trackline.bed{
-  stroke:#1a2433;
-  stroke-width:11;
-}
-.tie{stroke:#202c3d;stroke-width:1.4;opacity:.55;}
+        /* Itinerary & Receipts */
+        .category-card { border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; background: white; }
+        .category-card h3 { font-size: 1.05rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .category-icon { width: 20px; height: 20px; fill: currentColor; color: var(--primary); }
+        
+        .chip-group { display: flex; flex-wrap: wrap; gap: 10px; }
+        .event-chip {
+            background: var(--bg-base); border: 1px solid var(--border); padding: 8px 16px;
+            border-radius: 20px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .event-chip:hover { border-color: var(--primary); }
+        .event-chip.selected { background: var(--primary); color: white; border-color: var(--primary); }
 
-.occupied{
-  stroke:var(--teal) !important;
-  filter:drop-shadow(0 0 5px rgba(45,217,200,.85));
-}
-.locked{
-  stroke:#3a4a60 !important;
-}
+        .receipt-card { border: 1px solid var(--border); background: white; padding: 30px; border-radius: 16px; }
+        .receipt-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.95rem; }
 
-.platform{
-  fill:#161f2c;stroke:#2c3a4d;stroke-width:1;
-}
-.platform-label{
-  fill:var(--text-dim);font-size:10px;font-family:var(--mono);letter-spacing:.05em;
-}
+        /* Secure Verification Modal */
+        .secure-modal-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .secure-modal {
+            background: white; width: 90%; max-width: 420px; padding: 30px; border-radius: 16px;
+            text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .loader-ring {
+            width: 60px; height: 60px; border: 4px solid var(--border); border-top-color: var(--primary);
+            border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .timer-display { font-size: 2.5rem; font-family: monospace; font-weight: bold; color: var(--primary); margin: 15px 0; }
+        .progress-bar { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 1s linear; }
 
-.signal-grp{cursor:pointer;}
-.signal-pole{stroke:#3a4654;stroke-width:2;}
-.signal-head{
-  stroke:#06090d;stroke-width:1.4;
-}
-.signal-lamp-red{fill:var(--grey);}
-.signal-lamp-green{fill:var(--grey);}
-.signal-lamp-amber{fill:var(--grey);}
-.signal-lamp-red.on{fill:var(--red);filter:drop-shadow(0 0 5px var(--red));}
-.signal-lamp-green.on{fill:var(--green);filter:drop-shadow(0 0 5px var(--green));}
-.signal-lamp-amber.on{fill:var(--amber);filter:drop-shadow(0 0 4px var(--amber));}
-.signal-id{
-  fill:var(--text-dim);font-size:9px;font-family:var(--mono);
-}
+        /* Toasts */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: #1e293b; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; box-shadow: var(--shadow-md); animation: slideIn 0.3s ease forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-.point-grp{cursor:pointer;}
-.point-marker{
-  fill:var(--panel2);stroke:var(--line);stroke-width:1.5;
-}
-.point-marker.normal{stroke:var(--green);}
-.point-marker.reverse{stroke:var(--amber);}
-.point-marker.locked{stroke:var(--red);}
-.point-label{
-  fill:var(--text-bright);font-size:9px;font-weight:700;text-anchor:middle;font-family:var(--mono);
-}
-
-.train-grp{transition:none;}
-.train-body{
-  rx:3;
-  stroke:#06090d;stroke-width:1.2;
-}
-.train-label{
-  fill:#06090d;font-size:9px;font-weight:700;text-anchor:middle;font-family:var(--mono);
-  pointer-events:none;
-}
-.train-glow{filter:drop-shadow(0 0 4px rgba(0,0,0,.5));}
-
-.boardstage .legend{
-  position:absolute;bottom:8px;left:10px;
-  display:flex;gap:14px;flex-wrap:wrap;
-  background:rgba(10,15,24,.7);
-  padding:6px 10px;border-radius:4px;border:1px solid var(--line-soft);
-  font-size:9px;color:var(--text-dim);
-}
-.legend .lg-item{display:flex;align-items:center;gap:5px;}
-.legend .sw{width:10px;height:10px;border-radius:2px;display:inline-block;}
-
-/* tooltip */
-.tooltip{
-  position:absolute;pointer-events:none;
-  background:#0c1320;border:1px solid var(--teal);
-  color:var(--text-bright);font-size:10.5px;
-  padding:6px 9px;border-radius:4px;
-  display:none;z-index:50;line-height:1.5;
-  box-shadow:0 4px 14px rgba(0,0,0,.5);
-  white-space:nowrap;
-}
-
-/* ===== EVENT LOG ===== */
-.log-body{
-  height:150px;overflow-y:auto;
-  padding:8px 10px;font-size:11px;line-height:1.65;
-}
-.log-line{display:flex;gap:8px;margin-bottom:2px;}
-.log-time{color:var(--text-dim);flex-shrink:0;}
-.log-tag{flex-shrink:0;font-weight:700;width:62px;}
-.log-tag.ARR{color:var(--green);}
-.log-tag.DEP{color:var(--teal);}
-.log-tag.SIG{color:var(--amber);}
-.log-tag.PT{color:#8fb4ff;}
-.log-tag.DLY{color:var(--red);}
-.log-tag.SYS{color:var(--text-dim);}
-.log-msg{color:var(--text);}
-
-/* ===== SIDEBAR ===== */
-.sidebar{display:flex;flex-direction:column;gap:10px;min-width:0;}
-.sidebar .panel-body{padding:8px;}
-
-.train-card{
-  background:var(--panel2);
-  border:1px solid var(--line-soft);
-  border-radius:5px;
-  padding:8px 10px;
-  margin-bottom:7px;
-  font-size:11px;
-}
-.train-card:last-child{margin-bottom:0;}
-.tc-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
-.tc-id{font-weight:700;color:var(--text-bright);font-size:12px;}
-.tc-status{
-  font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;
-  padding:2px 6px;border-radius:3px;font-weight:700;
-}
-.tc-status.ontime{background:var(--green-dim);color:var(--green);}
-.tc-status.delayed{background:var(--red-dim);color:var(--red);}
-.tc-status.early{background:var(--teal-dim);color:var(--teal);}
-.tc-status.waiting{background:var(--amber-dim);color:var(--amber);}
-.tc-status.boarding{background:#1a3a5c;color:#6fb0ff;}
-.tc-status.cleared{background:#222e3d;color:var(--text-dim);}
-.tc-row{display:flex;justify-content:space-between;color:var(--text-dim);font-size:10px;margin-top:2px;}
-.tc-row span:last-child{color:var(--text);}
-.tc-bar{height:3px;background:var(--line-soft);border-radius:2px;margin-top:6px;overflow:hidden;}
-.tc-bar-fill{height:100%;background:var(--teal);width:0%;transition:width .4s linear;}
-
-.emptylist{color:var(--text-dim);font-size:11px;text-align:center;padding:18px 4px;}
-
-/* control strip */
-.ctrlstrip{
-  display:flex;flex-wrap:wrap;gap:8px;padding:10px;
-}
-.ctrlgroup{
-  display:flex;flex-direction:column;gap:5px;
-  background:var(--panel2);border:1px solid var(--line-soft);
-  border-radius:5px;padding:7px 9px;flex:1;min-width:120px;
-}
-.ctrlgroup .cg-title{font-size:8.5px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;}
-.cg-buttons{display:flex;gap:5px;}
-.minibtn{
-  flex:1;background:var(--panel);border:1px solid var(--line);color:var(--text-dim);
-  border-radius:3px;padding:5px 4px;font-size:9.5px;letter-spacing:.04em;
-}
-.minibtn.on{background:var(--green-dim);color:var(--green);border-color:var(--green);}
-.minibtn.warn-on{background:var(--amber-dim);color:var(--amber);border-color:var(--amber);}
-.minibtn:hover{border-color:var(--teal);}
-
-footer.note{
-  text-align:center;color:var(--text-dim);font-size:9.5px;padding:8px;letter-spacing:.04em;
-}
-</style>
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .action-bar { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .stepper { display: none; } 
+        }
+    </style>
 </head>
 <body>
 
-<div class="app">
-
-  <!-- ============ TOP BAR ============ -->
-  <div class="topbar">
-    <div class="brand">
-      <span class="dot"></span>
-      <div>
-        <h1>SM-7 Control Desk</h1>
-        <small>Junction Station &mdash; Block Section 14</small>
-      </div>
+    <!-- Stepper Navigation -->
+    <div class="stepper" id="stepper">
+        <div class="step active" id="step-nav-1"><div class="step-circle">1</div> Profile</div>
+        <div class="step-line"></div>
+        <div class="step" id="step-nav-2"><div class="step-circle">2</div> Credentials</div>
+        <div class="step-line"></div>
+        <div class="step" id="step-nav-3"><div class="step-circle">3</div> Itinerary</div>
+        <div class="step-line"></div>
+        <div class="step" id="step-nav-4"><div class="step-circle">4</div> Ledger</div>
     </div>
 
-    <div class="clock-block">
-      <span class="label">SIM TIME</span>
-      <span class="val" id="clockVal">06:00:00</span>
-    </div>
+    <div class="app-wrapper">
 
-    <div class="statgrid">
-      <div class="statpill"><span class="label">Trains in area</span><span class="val" id="statActive">0</span></div>
-      <div class="statpill good"><span class="label">On time</span><span class="val" id="statOntime">0</span></div>
-      <div class="statpill warn"><span class="label">Delayed</span><span class="val" id="statDelayed">0</span></div>
-      <div class="statpill"><span class="label">Cleared today</span><span class="val" id="statCleared">0</span></div>
-      <div class="statpill"><span class="label">Avg delay</span><span class="val" id="statAvgDelay">0m</span></div>
-    </div>
+        <!-- STAGE 1: Registration / Profile Form -->
+        <div class="view-card active" id="stage-1">
+            <div class="action-bar" id="profileActionBar" style="display: none;">
+                <div>
+                    <h2>Academic Profile</h2>
+                    <p class="subtitle" style="margin-top:0;">Your verified credentials.</p>
+                </div>
+                <button id="btnRequestEdit" class="btn btn-outline" style="width: auto; padding: 8px 16px; font-size: 0.85rem;">Request Edit Access</button>
+            </div>
 
-    <div class="topctrls">
-      <div class="speedctrl">
-        <span>SPEED</span>
-        <input type="range" id="speedRange" min="0.5" max="6" step="0.5" value="2">
-        <span id="speedVal">2x</span>
-      </div>
-      <button class="btn active" id="btnPause">⏸ Pause</button>
-      <button class="btn" id="btnAuto">🤖 Auto-route: ON</button>
-      <button class="btn danger" id="btnIncident">⚠ Inject incident</button>
-    </div>
-  </div>
+            <h2 id="regTitle">Delegate Registration</h2>
+            <p class="subtitle" id="regSubtitle">Enter your details to configure your profile. Device binding will be applied.</p>
 
-  <!-- ============ MAIN GRID ============ -->
-  <div class="main">
+            <div class="security-banner" id="securityBanner">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+                <span id="bannerText">Profile is locked. Modifications can only be requested within 24 hours of initial registration.</span>
+            </div>
+            
+            <form id="registrationForm" class="form-grid">
+                <div class="form-group full">
+                    <label>Full Legal Name</label>
+                    <input type="text" id="regName" required placeholder="e.g. Aman Verma">
+                </div>
 
-    <div class="boardwrap">
-      <div class="panel">
-        <div class="panel-head">
-          <h2>Track diagram &mdash; bird's eye interlocking view</h2>
-          <span class="sub" id="boardSub">click signals / points to operate</span>
+                <div class="form-group full">
+                    <label>Campus Allocation</label>
+                    <select id="regCollege" required onchange="updateTheme(this.value)">
+                        <option value="">-- Select Assigned Campus --</option>
+                        <option value="Rewa">College of Veterinary Science and Animal Husbandry, Rewa</option>
+                        <option value="Jabalpur">College of Veterinary Science and Animal Husbandry, Jabalpur</option>
+                        <option value="Mhow">College of Veterinary Science and Animal Husbandry, Mhow</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Academic Standing</label>
+                    <select id="regYear" required>
+                        <option value="">-- Select --</option>
+                        <option value="1st Year">1st Year</option>
+                        <option value="2nd Year">2nd Year</option>
+                        <option value="3rd Year">3rd Year</option>
+                        <option value="4th Year">4th Year</option>
+                        <option value="Internship">Internship</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender Category</label>
+                    <select id="regGender" required>
+                        <option value="">-- Select --</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Verified Date of Birth</label>
+                    <input type="date" id="regDob" required>
+                </div>
+
+                <div class="form-group">
+                    <label>University Roll Number</label>
+                    <input type="text" id="regRoll" required pattern="^[R|V|B|r|v|b]\/[V|v|B|b|R|r]\/[B|b|R|r|V|v]\/\d+\/\d+$" placeholder="R/V/B/NUMBER/YEAR" style="text-transform: uppercase;">
+                </div>
+
+                <div class="form-group full">
+                    <label>Primary Contact</label>
+                    <input type="tel" id="regMobile" required pattern="[0-9]{10}" placeholder="10-digit number">
+                </div>
+
+                <div class="form-group full">
+                    <label>Biometric Photograph</label>
+                    <div class="file-drop" id="fileDropZone">
+                        <span id="fileText">📁 Tap to upload high-resolution photo</span>
+                        <input type="file" id="regPhoto" accept="image/jpeg, image/png">
+                    </div>
+                </div>
+
+                <div class="form-group full" style="margin-top: 15px;">
+                    <button type="submit" class="btn" id="submitRegBtn">Initialize Secure Credentials</button>
+                    <button type="button" class="btn btn-outline" id="btnCancelEdit" style="display: none; margin-top: 10px;">Return to Dashboard</button>
+                </div>
+            </form>
         </div>
-        <div class="boardstage" id="boardStage">
-          <!-- SVG injected by JS -->
-          <div class="legend">
-            <span class="lg-item"><span class="sw" style="background:var(--teal)"></span>Train present</span>
-            <span class="lg-item"><span class="sw" style="background:var(--green)"></span>Signal clear</span>
-            <span class="lg-item"><span class="sw" style="background:var(--red)"></span>Signal danger</span>
-            <span class="lg-item"><span class="sw" style="background:var(--amber)"></span>Caution / point reverse</span>
-          </div>
-          <div class="tooltip" id="tooltip"></div>
-        </div>
-      </div>
 
-      <div class="panel">
-        <div class="panel-head">
-          <h2>Control log</h2>
-          <span class="sub">live signalling &amp; movement events</span>
-        </div>
-        <div class="log-body" id="logBody"></div>
-      </div>
+        <!-- STAGE 2: Digital Credentials -->
+        <div class="view-card" id="stage-2">
+            <div class="action-bar">
+                <div>
+                    <h2>Digital Authenticator</h2>
+                    <p class="subtitle" style="margin-top:0;">Your secure environment token.</p>
+                </div>
+                <button class="btn btn-outline" onclick="openProfileView()" style="width:auto; padding: 8px 16px;">🔍 View Profile</button>
+            </div>
 
-      <div class="panel">
-        <div class="panel-head"><h2>Interlocking controls</h2><span class="sub">manual override</span></div>
-        <div class="ctrlstrip" id="ctrlStrip"></div>
-      </div>
+            <div class="credential-wrapper">
+                <div class="digital-badge" id="idBadge">
+                    <!-- Microprinting string generated by JS -->
+                    <div class="microprint" id="microprintText"></div>
+                    <div class="hologram-seal">VERIFIED</div>
+                    
+                    <div class="badge-header">
+                        <h4 id="badgeCollege">Veterinary Campus</h4>
+                    </div>
+                    <div class="badge-content">
+                        <div class="badge-photo"><img id="badgeImg" src="" alt="Student"></div>
+                        <div class="badge-name" id="badgeName">Name</div>
+                        <div class="badge-role" id="badgeRole">Academic Year</div>
+                        <div class="qr-container" id="qrcode"></div>
+                        <div class="badge-uid" id="badgeUid">####</div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btnProceedEvents" class="btn" style="margin-top: 20px;">Curate Event Itinerary ➔</button>
+        </div>
+
+        <!-- STAGE 3: Itinerary Selection -->
+        <div class="view-card" id="stage-3">
+            <div class="action-bar">
+                <div>
+                    <h2>Itinerary Matrix</h2>
+                    <p class="subtitle" style="margin-top:0;">Allocate your participation limits.</p>
+                </div>
+                <button class="btn btn-outline" onclick="navigate('stage-2', 2)" style="width:auto; padding: 8px 16px;">Back</button>
+            </div>
+            
+            <div style="text-align: right; margin-bottom: 15px; font-weight: 600; color: var(--primary);">
+                Allocation: <span id="capacityCount">0</span> / 5
+            </div>
+
+            <div class="category-card">
+                <h3><svg class="category-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg> Athletics Division</h3>
+                <div class="chip-group" data-category="sports">
+                    <div class="event-chip">Cricket</div><div class="event-chip">Football</div>
+                    <div class="event-chip">Volleyball</div><div class="event-chip">Athletics</div><div class="event-chip">Badminton</div>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <h3><svg class="category-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c2.12 0 4.07-.74 5.61-1.97l-1.2-1.61C15.17 18.41 13.65 19 12 19c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7c0 1.65-.59 3.17-1.58 4.41l1.61 1.2C21.26 16.07 22 14.12 22 12c0-4.97-4.03-9-9-9z"/></svg> Cultural Symposia</h3>
+                <div class="chip-group" data-category="cultural">
+                    <div class="event-chip">Solo Singing</div><div class="event-chip">Group Dance</div>
+                    <div class="event-chip">Drama/Skit</div><div class="event-chip">Painting</div>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <h3><svg class="category-icon" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg> Academic Panels</h3>
+                <div class="chip-group" data-category="academic">
+                    <div class="event-chip">Quiz Competition</div><div class="event-chip">Debate</div>
+                    <div class="event-chip">Poster Presentation</div><div class="event-chip">Essay Writing</div>
+                </div>
+            </div>
+
+            <button id="btnConfirmSelection" class="btn" style="margin-top: 15px;">Seal Commitments</button>
+        </div>
+
+        <!-- STAGE 4: Ledger / Dashboard -->
+        <div class="view-card" id="stage-4">
+            <div class="action-bar">
+                <div>
+                    <h2>Immutable Ledger</h2>
+                    <p class="subtitle" style="margin-top:0;">Your finalized digital receipt.</p>
+                </div>
+                <button class="btn btn-outline" onclick="openProfileView()" style="width:auto; padding: 8px 16px;">⚙️ Manage Profile</button>
+            </div>
+
+            <div class="receipt-card">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; color:var(--success);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    <h3 style="margin:0;">Participation Recorded</h3>
+                </div>
+
+                <div class="receipt-row"><strong>Delegate:</strong> <span id="recName"></span></div>
+                <div class="receipt-row"><strong>Authenticator ID:</strong> <span id="recUid" style="font-family: monospace; font-weight: bold; color: var(--primary);"></span></div>
+                <div class="receipt-row"><strong>Assigned Campus:</strong> <span id="recCollege"></span></div>
+                
+                <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border);">
+                    <strong>Allocated Events:</strong>
+                    <ul id="recEvents" style="margin-top: 12px; margin-left: 20px; color: var(--text-muted); line-height: 1.8;"></ul>
+                </div>
+            </div>
+            
+            <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-top: 25px;">
+                Secure device binding is active. Offline access granted.
+            </p>
+        </div>
+
     </div>
 
-    <div class="sidebar">
-      <div class="panel">
-        <div class="panel-head"><h2>Approaching</h2><span class="sub" id="apprCount">0</span></div>
-        <div class="panel-body" id="apprList"><div class="emptylist">No trains approaching</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><h2>At station</h2><span class="sub" id="atCount">0</span></div>
-        <div class="panel-body" id="atList"><div class="emptylist">Platforms clear</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><h2>Departed / next up</h2><span class="sub" id="nextCount">0</span></div>
-        <div class="panel-body" id="nextList"><div class="emptylist">No schedule loaded</div></div>
-      </div>
+    <!-- Modals & Overlays -->
+    <div id="toast-container"></div>
+
+    <div class="secure-modal-overlay" id="secureVerificationModal">
+        <div class="secure-modal">
+            <div class="loader-ring"></div>
+            <h3 style="margin-bottom: 10px;">Secure Environment Verification</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;" id="verifStatusText">Establishing cryptographic handshake...</p>
+            
+            <div class="timer-display" id="verifTimer">60s</div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="verifProgress"></div>
+            </div>
+            <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 15px;">Please do not close or refresh this terminal during authorization.</p>
+        </div>
     </div>
-
-  </div>
-
-  <footer class="note">Simulated station interlocking &mdash; for demonstration only. Not connected to any real railway system.</footer>
-</div>
 
 <script>
-(function(){
-"use strict";
+    // --- State Management ---
+    let DB = {
+        name: '', college: '', year: '', gender: '', dob: '', roll: '', mobile: '',
+        photo: '', uid: '', selectedEvents: [], registrationTimestamp: null, editUnlockExpire: null
+    };
 
-/* =========================================================================
-   GEOMETRY: bird's-eye double-track mainline with a 4-platform station loop
-   ViewBox units. Two through lines (UP / DOWN) bypass the station;
-   four platform loops branch off via points and rejoin.
-   ========================================================================= */
+    let qrCodeInstance = null;
+    const EDIT_LIMIT_MS = 24 * 60 * 60 * 1000; // 24 Hours
 
-const VB_W = 1400, VB_H = 460;
+    // --- Init ---
+    window.onload = function() {
+        const savedData = localStorage.getItem('studentEventProfile');
+        if (savedData) {
+            DB = JSON.parse(savedData);
+            if(DB.college) updateTheme(DB.college);
+            
+            // Re-apply if edit unlock is currently active
+            if(DB.editUnlockExpire && Date.now() < DB.editUnlockExpire) {
+                showToast('Edit mode is currently unlocked.', 'success');
+            } else {
+                DB.editUnlockExpire = null; // reset if expired
+            }
 
-// Main through lines (express bypass), y-levels
-const UP_THROUGH_Y   = 120;  // trains moving left->right "UP" direction visually top
-const DN_THROUGH_Y   = 340;  // trains moving right->left "DOWN" direction bottom
-
-// Platform loop y-levels (between the through lines)
-const PLAT = [
-  { id:"P1", y:170, side:"up"  },
-  { id:"P2", y:215, side:"up"  },
-  { id:"P3", y:245, side:"down"},
-  { id:"P4", y:290, side:"down"}
-];
-
-const X_LEFT = 40, X_RIGHT = 1360;
-// Throat zones where points live
-const X_ENTRY_W = 260;   // west throat point cluster center x-range
-const X_ENTRY_E = 1140;  // east throat point cluster
-
-/* Build path "d" strings for each track segment as smooth polylines.
-   We define key x-stations for entry/exit curves. */
-function curve(x1,y1,x2,y2,x3,y3,x4,y4){
-  return `M ${x1} ${y1} C ${x2} ${y2}, ${x3} ${y3}, ${x4} ${y4}`;
-}
-
-// THROUGH lines (full length, always exist, may have a "through" state)
-const SEG = {};
-
-SEG.UP_THROUGH = { d:`M ${X_LEFT} ${UP_THROUGH_Y} L ${X_RIGHT} ${UP_THROUGH_Y}`, len:X_RIGHT-X_LEFT };
-SEG.DN_THROUGH = { d:`M ${X_RIGHT} ${DN_THROUGH_Y} L ${X_LEFT} ${DN_THROUGH_Y}`, len:X_RIGHT-X_LEFT };
-
-// West throat: branch from UP_THROUGH down into each platform; branch from DN_THROUGH up into platforms (for arrivals coming from west on down line variety)
-// We create simple S-curve connectors from a common branch x to platform y, then a straight platform run, then a rejoin S-curve on the east throat.
-const BRANCH_W_X = 300;   // x where branch leaves through line (west)
-const PLAT_START_X = 380;
-const PLAT_END_X   = 1020;
-const BRANCH_E_X = 1100;  // x where branch rejoins through line (east)
-
-PLAT.forEach(p=>{
-  const fromY = p.side==="up" ? UP_THROUGH_Y : DN_THROUGH_Y;
-  // entry branch (west) : from through line at BRANCH_W_X,fromY curving to PLAT_START_X,p.y
-  SEG["IN_"+p.id] = {
-    d: curve(BRANCH_W_X, fromY, BRANCH_W_X+60, fromY, PLAT_START_X-60, p.y, PLAT_START_X, p.y),
-    len: 230
-  };
-  // platform straight run
-  SEG["PLAT_"+p.id] = {
-    d: `M ${PLAT_START_X} ${p.y} L ${PLAT_END_X} ${p.y}`,
-    len: PLAT_END_X-PLAT_START_X
-  };
-  // exit branch (east) rejoin to through line
-  SEG["OUT_"+p.id] = {
-    d: curve(PLAT_END_X, p.y, PLAT_END_X+60, p.y, BRANCH_E_X-60, fromY, BRANCH_E_X, fromY),
-    len:230
-  };
-});
-
-/* Full route definitions: ordered list of segment keys a train travels,
-   from spawn off-screen-west to off-screen-east (or reverse). */
-const ROUTES = {
-  // through trains that don't stop
-  THRU_UP:   ["UP_THROUGH"],
-  THRU_DN:   ["DN_THROUGH"],
-};
-PLAT.forEach(p=>{
-  ROUTES["VIA_"+p.id] = ["IN_"+p.id, "PLAT_"+p.id, "OUT_"+p.id];
-});
-
-/* Precompute point objects (the switches). Each point sits at a branch
-   junction and has NORMAL (through) / REVERSE (diverging) state. */
-const POINTS = [
-  { id:"PT-W1", x:BRANCH_W_X, y:UP_THROUGH_Y, controls:["P1","P2"], track:"UP" },
-  { id:"PT-W2", x:BRANCH_W_X, y:DN_THROUGH_Y, controls:["P3","P4"], track:"DN" },
-  { id:"PT-E1", x:BRANCH_E_X, y:UP_THROUGH_Y, controls:["P1","P2"], track:"UP" },
-  { id:"PT-E2", x:BRANCH_E_X, y:DN_THROUGH_Y, controls:["P3","P4"], track:"DN" },
-];
-
-/* Signals: positioned just before each junction / platform exit.
-   type: 'home' (entry to station area) or 'starter' (departure) */
-const SIGNALS = [
-  { id:"S-A1", x:BRANCH_W_X-40, y:UP_THROUGH_Y-26, dir:"E", guards:["IN_P1","IN_P2","UP_THROUGH"], type:"home" },
-  { id:"S-A2", x:BRANCH_W_X-40, y:DN_THROUGH_Y+26, dir:"E", guards:["IN_P3","IN_P4","DN_THROUGH"], type:"home" },
-  { id:"S-B1", x:BRANCH_E_X+40, y:UP_THROUGH_Y-26, dir:"W", guards:["OUT_P1","OUT_P2","UP_THROUGH"], type:"home", reverse:true },
-  { id:"S-B2", x:BRANCH_E_X+40, y:DN_THROUGH_Y+26, dir:"W", guards:["OUT_P3","OUT_P4","DN_THROUGH"], type:"home", reverse:true },
-];
-PLAT.forEach(p=>{
-  SIGNALS.push({ id:"ST-"+p.id, x:PLAT_END_X+15, y:p.y-14, dir:"E", guards:["OUT_"+p.id], type:"starter", platform:p.id });
-});
-
-/* =========================================================================
-   SIMULATION STATE
-   ========================================================================= */
-
-const state = {
-  simSeconds: 6*3600,      // start at 06:00:00
-  speed: 2,
-  paused: false,
-  autoRoute: true,
-  trains: [],              // active trains
-  schedule: [],            // upcoming spawns
-  log: [],
-  cleared: 0,
-  delaySum: 0,
-  delayCount: 0,
-  pointState: {},          // id -> 'N' or 'R'
-  pointLocked: {},         // id -> bool (locked because occupied)
-  signalState: {},         // id -> 'red'|'green'|'amber'
-  signalAuto: {},          // id -> bool, true = system controlled
-  occupied: {},            // segKey -> trainId currently occupying
-  platformOcc: {},         // platform id -> trainId or null
-  nextTrainNum: 100,
-  incidentUntil: 0,
-};
-
-POINTS.forEach(p=> { state.pointState[p.id]='N'; state.pointLocked[p.id]=false; });
-SIGNALS.forEach(s=> { state.signalState[s.id]='red'; state.signalAuto[s.id]=true; });
-PLAT.forEach(p=> state.platformOcc[p.id]=null);
-
-const TRAIN_TYPES = [
-  { code:"EXP", name:"Express",   color:"#2dd9c8", speedPxS:46, dwell:0,  throughOnly:true },
-  { code:"SF",  name:"Superfast", color:"#ff7a59", speedPxS:52, dwell:0,  throughOnly:true },
-  { code:"PSG", name:"Passenger", color:"#ffd23f", speedPxS:34, dwell:55, throughOnly:false },
-  { code:"LCL", name:"Local",     color:"#6fb0ff", speedPxS:28, dwell:40, throughOnly:false },
-  { code:"FRT", name:"Freight",   color:"#8e8e8e", speedPxS:20, dwell:90, throughOnly:false },
-];
-
-function fmtClock(sec){
-  sec = Math.floor(sec);
-  const h = Math.floor(sec/3600)%24;
-  const m = Math.floor((sec%3600)/60);
-  const s = sec%60;
-  return [h,m,s].map(v=>String(v).padStart(2,"0")).join(":");
-}
-function fmtHM(sec){
-  sec = Math.floor(sec);
-  const h = Math.floor(sec/3600)%24;
-  const m = Math.floor((sec%3600)/60);
-  return [h,m].map(v=>String(v).padStart(2,"0")).join(":");
-}
-
-function logEvent(tag, msg){
-  state.log.unshift({ t: fmtClock(state.simSeconds), tag, msg });
-  if(state.log.length>200) state.log.pop();
-  renderLog();
-}
-
-/* =========================================================================
-   SCHEDULE GENERATOR — randomly create trains across the day
-   ========================================================================= */
-function genId(){
-  state.nextTrainNum += Math.floor(Math.random()*7)+3;
-  return state.nextTrainNum;
-}
-
-function scheduleNextArrivals(){
-  // keep a rolling schedule: always have next 6 trains queued
-  while(state.schedule.length < 6){
-    const last = state.schedule.length ? state.schedule[state.schedule.length-1].sched : state.simSeconds+20;
-    const gap = 70 + Math.random()*150; // seconds between scheduled arrivals
-    const type = TRAIN_TYPES[Math.floor(Math.random()*TRAIN_TYPES.length)];
-    const dir = Math.random()<0.5 ? "E" : "W"; // travel direction
-    let platform = null;
-    let routeKey;
-    if(type.throughOnly || Math.random()<0.22){
-      routeKey = dir==="E" ? "THRU_UP" : "THRU_DN";
-    } else {
-      const candidates = dir==="E" ? ["P1","P2"] : ["P3","P4"];
-      platform = candidates[Math.floor(Math.random()*candidates.length)];
-      routeKey = "VIA_"+platform;
-    }
-    const num = (dir==="E"?"E":"W")+genId();
-    state.schedule.push({
-      id:num, type, dir, routeKey, platform,
-      sched: last+gap,
-    });
-  }
-}
-
-/* =========================================================================
-   TRAIN OBJECT
-   route = array of segment keys; we travel them in order (or reversed if dir W)
-   ========================================================================= */
-function spawnTrain(item){
-  let segs = ROUTES[item.routeKey].slice();
-  if(item.dir==="W") segs = segs.slice().reverse(); // reverse order of traversal
-  const reversedGeometry = item.dir==="W";
-
-  const t = {
-    id: item.id,
-    typeCode: item.type.code,
-    typeName: item.type.name,
-    color: item.type.color,
-    speedPxS: item.type.speedPxS * (0.85+Math.random()*0.3),
-    dwellBase: item.type.dwell,
-    dir: item.dir,
-    platform: item.platform,
-    segs,
-    segIndex: 0,
-    segT: 0,             // 0..1 progress along current seg (in geometry direction)
-    reversedGeometry,
-    scheduledArrival: item.sched,
-    actualDelaySec: 0,
-    status: "approaching", // approaching, waiting_signal, in_section, boarding, departing, cleared
-    dwellRemaining: 0,
-    awardedSignal: null,
-    totalLen: 0,
-    distTravelled: 0,
-    el: null,
-    bornAt: state.simSeconds,
-    note: "",
-  };
-  segs.forEach(k=> t.totalLen += SEG[k].len);
-  state.trains.push(t);
-  createTrainEl(t);
-  logEvent("SYS", `Train ${t.id} (${t.typeName}) on approach, ETA ${fmtHM(item.sched)}`);
-}
-
-/* =========================================================================
-   INTERLOCKING LOGIC
-   ========================================================================= */
-
-function segOccupiedByOther(segKey, exceptId){
-  const occ = state.occupied[segKey];
-  return occ && occ!==exceptId;
-}
-
-function platformOfSeg(segKey){
-  const m = segKey.match(/_(P\d)$/);
-  return m? m[1]: null;
-}
-
-// determine required point throw for a seg (N or R) -- our geometry: branch segs require specific point alignment per platform pair
-function requiredPointAlignment(segKey){
-  const plat = platformOfSeg(segKey);
-  if(!plat) return null;
-  // For W1/E1 controlling P1,P2: P1=>N, P2=>R.  For W2/E2 controlling P3,P4: P3=>N,P4=>R
-  if(plat==="P1"||plat==="P3") return "N";
-  return "R";
-}
-
-function pointsGatingSeg(segKey){
-  const plat = platformOfSeg(segKey);
-  if(!plat) return [];
-  return POINTS.filter(p=> p.controls.includes(plat) &&
-    ((segKey.startsWith("IN_")&&p.x===BRANCH_W_X) || (segKey.startsWith("OUT_")&&p.x===BRANCH_E_X)));
-}
-
-function canEnterSeg(segKey, trainId){
-  if(segOccupiedByOther(segKey, trainId)) return false;
-  const gating = pointsGatingSeg(segKey);
-  for(const p of gating){
-    if(state.pointState[p.id] !== requiredPointAlignment(segKey)) return false;
-  }
-  return true;
-}
-
-function guardSignalFor(segKey){
-  return SIGNALS.find(s=> s.guards.includes(segKey));
-}
-
-/* Auto-interlocking tick: align points + set signals based on next train needs,
-   never moving a point that's occupied or about to be occupied within caution distance. */
-function autoInterlock(){
-  // Lock points whose segs currently occupied
-  POINTS.forEach(p=>{
-    const relatedSegs = Object.keys(SEG).filter(k=> pointsGatingSeg(k).some(g=>g.id===p.id));
-    state.pointLocked[p.id] = relatedSegs.some(k=> !!state.occupied[k]);
-  });
-
-  if(!state.autoRoute) { applySignalsFromPoints(); return; }
-
-  // For each train waiting at a home signal, try to align points in its favor
-  state.trains.forEach(t=>{
-    if(t.status!=="waiting_signal") return;
-    const nextSegKey = t.segs[t.segIndex];
-    const gating = pointsGatingSeg(nextSegKey);
-    gating.forEach(p=>{
-      if(state.pointLocked[p.id]) return;
-      const needed = requiredPointAlignment(nextSegKey);
-      if(state.pointState[p.id] !== needed){
-        const prev = state.pointState[p.id];
-        state.pointState[p.id] = needed;
-        logEvent("PT", `${p.id} thrown ${prev}→${needed} (auto, for ${t.id})`);
-      }
-    });
-  });
-
-  applySignalsFromPoints();
-}
-
-function applySignalsFromPoints(){
-  SIGNALS.forEach(s=>{
-    if(!state.signalAuto[s.id]) return; // manual override holds
-    // a home/starter signal clears if ANY of its guarded segs has a waiting train that may proceed
-    let clear = false;
-    for(const segKey of s.guards){
-      const waitingTrain = state.trains.find(t=> t.status==="waiting_signal" && t.segs[t.segIndex]===segKey);
-      if(waitingTrain && canEnterSeg(segKey, waitingTrain.id)){ clear = true; break; }
-    }
-    state.signalState[s.id] = clear ? "green" : "red";
-  });
-}
-
-/* =========================================================================
-   TRAIN MOVEMENT TICK
-   ========================================================================= */
-function tickTrains(dt){
-  state.trains.forEach(t=>{
-    if(t.status==="cleared") return;
-
-    if(t.status==="boarding"){
-      t.dwellRemaining -= dt;
-      if(t.dwellRemaining<=0){
-        t.status="waiting_signal"; // ready to depart, needs starter signal
-      }
-      return;
-    }
-
-    if(t.status==="approaching" || t.status==="waiting_signal" || t.status==="in_section"){
-      const segKey = t.segs[t.segIndex];
-      const seg = SEG[segKey];
-
-      if(t.status!=="in_section"){
-        // check if allowed to enter this seg
-        if(canEnterSeg(segKey, t.id)){
-          state.occupied[segKey] = t.id;
-          t.status="in_section";
+            if(DB.selectedEvents && DB.selectedEvents.length > 0) {
+                renderSummary();
+            } else {
+                buildDigitalCredential();
+            }
         } else {
-          if(t.status==="approaching") t.status="waiting_signal";
-          return; // blocked, wait
+            document.getElementById('regPhoto').setAttribute('required', 'true');
         }
-      }
+    };
 
-      // move along seg
-      const distStep = t.speedPxS*dt;
-      t.distTravelled += distStep;
-      t.segT += distStep/seg.len;
-
-      if(t.segT>=1){
-        // finished this segment
-        delete state.occupied[segKey];
-        t.segT=0;
-        t.segIndex++;
-
-        if(t.segIndex>=t.segs.length){
-          // train has fully left the layout
-          finishTrain(t);
-          return;
-        }
-        // if this was a platform arrival, start dwell
-        const justFinishedPlatform = segKey.startsWith("IN_");
-        if(justFinishedPlatform){
-          const plat = platformOfSeg(segKey);
-          arriveAtPlatform(t, plat);
-        }
-      }
-    }
-  });
-
-  // remove cleared trains from array after small delay (for fade)
-  state.trains = state.trains.filter(t=> t.status!=="cleared" || (state.simSeconds - t.clearedAt) < 1.2);
-}
-
-function arriveAtPlatform(t, plat){
-  state.platformOcc[plat] = t.id;
-  t.status="boarding";
-  const dwellJitter = t.dwellBase * (0.7+Math.random()*0.8);
-  t.dwellRemaining = dwellJitter;
-  const delay = state.simSeconds - t.scheduledArrival;
-  t.actualDelaySec = delay;
-  let tag = "ARR";
-  let desc;
-  if(delay > 60){ desc = `Train ${t.id} arrived ${plat} — DELAYED ${Math.round(delay/60)}m`; tag="DLY"; }
-  else if(delay < -45){ desc = `Train ${t.id} arrived ${plat} — early`; }
-  else { desc = `Train ${t.id} arrived ${plat} — on time`; }
-  logEvent(tag, desc);
-  state.delaySum += Math.max(0,delay);
-  state.delayCount++;
-}
-
-function finishTrain(t){
-  if(t.platform) state.platformOcc[t.platform]=null;
-  t.status="cleared";
-  t.clearedAt = state.simSeconds;
-  state.cleared++;
-  const note = t.platform ? `departed ${t.platform}, cleared section` : "passed through, cleared section";
-  logEvent("DEP", `Train ${t.id} ${note}`);
-  removeTrainEl(t);
-}
-
-/* =========================================================================
-   RANDOM EVENTS / INCIDENTS
-   ========================================================================= */
-function maybeRandomDelay(){
-  if(Math.random()<0.002 && state.trains.length){
-    const candidates = state.trains.filter(t=> t.status==="in_section" || t.status==="approaching");
-    if(candidates.length){
-      const t = candidates[Math.floor(Math.random()*candidates.length)];
-      const slow = 0.4;
-      t.speedPxS *= slow;
-      logEvent("DLY", `Signal caution applied to ${t.id} — reduced speed (track circuit check)`);
-      setTimeout(()=>{ t.speedPxS /= slow; }, 8000/state.speed);
-    }
-  }
-}
-
-function injectIncident(){
-  if(!state.trains.length){ logEvent("SYS","No trains in area to affect."); return; }
-  const t = state.trains[Math.floor(Math.random()*state.trains.length)];
-  if(t.status==="boarding"){
-    t.dwellRemaining += 90;
-    logEvent("DLY", `Incident: signal fault — ${t.id} held at platform extra 90s`);
-  } else {
-    t.speedPxS *= 0.3;
-    logEvent("DLY", `Incident: emergency brake test — ${t.id} slowed sharply`);
-    setTimeout(()=>{ t.speedPxS /= 0.3; }, 12000/state.speed);
-  }
-}
-
-/* =========================================================================
-   SVG RENDERING — static layout
-   ========================================================================= */
-const svgNS = "http://www.w3.org/2000/svg";
-let svgEl;
-
-function buildSVG(){
-  const stage = document.getElementById("boardStage");
-  svgEl = document.createElementNS(svgNS,"svg");
-  svgEl.setAttribute("viewBox", `0 0 ${VB_W} ${VB_H}`);
-  svgEl.setAttribute("preserveAspectRatio","xMidYMid meet");
-  stage.insertBefore(svgEl, stage.firstChild);
-
-  const defs = document.createElementNS(svgNS,"defs");
-  svgEl.appendChild(defs);
-
-  // background station label band
-  addLabel(VB_W/2, 26, "JUNCTION STATION — BIRD'S-EYE INTERLOCKING DIAGRAM", "16px", "var(--text-dim)", "600");
-
-  // direction arrows / through line labels
-  addLabel(70, UP_THROUGH_Y-32, "UP THROUGH  ►", "10px", "#3d4f63", "600");
-  addLabel(70, DN_THROUGH_Y+40, "◄  DOWN THROUGH", "10px", "#3d4f63", "600");
-
-  // Draw bed (ballast) first for all segs, then rail line on top
-  Object.keys(SEG).forEach(k=>{
-    drawTrackPath(SEG[k].d, true);
-  });
-  Object.keys(SEG).forEach(k=>{
-    const el = drawTrackPath(SEG[k].d, false);
-    SEG[k].el = el;
-  });
-
-  // platforms (visual slabs behind platform track)
-  PLAT.forEach(p=>{
-    const rect = document.createElementNS(svgNS,"rect");
-    rect.setAttribute("x", PLAT_START_X-10);
-    rect.setAttribute("y", p.y - (p.side==="up"? 22: -8));
-    rect.setAttribute("width", PLAT_END_X-PLAT_START_X+20);
-    rect.setAttribute("height", 14);
-    rect.setAttribute("class","platform");
-    rect.setAttribute("rx",2);
-    svgEl.insertBefore(rect, svgEl.querySelector('[data-seg]')); // behind tracks where possible
-    const lbl = document.createElementNS(svgNS,"text");
-    lbl.setAttribute("x", PLAT_START_X-22);
-    lbl.setAttribute("y", p.y+4);
-    lbl.setAttribute("class","platform-label");
-    lbl.setAttribute("text-anchor","end");
-    lbl.textContent = "PLAT "+p.id.slice(1);
-    svgEl.appendChild(lbl);
-  });
-
-  // Points
-  POINTS.forEach(p=>{
-    const g = document.createElementNS(svgNS,"g");
-    g.setAttribute("class","point-grp");
-    g.dataset.point = p.id;
-    const c = document.createElementNS(svgNS,"circle");
-    c.setAttribute("cx",p.x); c.setAttribute("cy",p.y); c.setAttribute("r",11);
-    c.setAttribute("class","point-marker normal");
-    const t = document.createElementNS(svgNS,"text");
-    t.setAttribute("x",p.x); t.setAttribute("y",p.y - 16);
-    t.setAttribute("class","point-label");
-    t.textContent = p.id;
-    g.appendChild(c); g.appendChild(t);
-    g.addEventListener("click", ()=> togglePoint(p.id));
-    g.addEventListener("mouseenter", (e)=> showTip(e, pointTipText(p.id)));
-    g.addEventListener("mousemove", (e)=> moveTip(e));
-    g.addEventListener("mouseleave", hideTip);
-    svgEl.appendChild(g);
-  });
-
-  // Signals
-  SIGNALS.forEach(s=>{
-    const g = document.createElementNS(svgNS,"g");
-    g.setAttribute("class","signal-grp");
-    g.dataset.signal = s.id;
-    const poleH = 30;
-    const pole = document.createElementNS(svgNS,"line");
-    pole.setAttribute("x1", s.x); pole.setAttribute("y1", s.y);
-    pole.setAttribute("x2", s.x); pole.setAttribute("y2", s.y + (s.reverse?poleH:-poleH));
-    pole.setAttribute("class","signal-pole");
-    g.appendChild(pole);
-
-    const headY = s.y + (s.reverse?poleH:-poleH);
-    const head = document.createElementNS(svgNS,"rect");
-    head.setAttribute("x", s.x-7); head.setAttribute("y", headY-9);
-    head.setAttribute("width",14); head.setAttribute("height",18);
-    head.setAttribute("rx",2);
-    head.setAttribute("fill","#0c1118");
-    head.setAttribute("class","signal-head");
-    g.appendChild(head);
-
-    const lampR = document.createElementNS(svgNS,"circle");
-    lampR.setAttribute("cx",s.x); lampR.setAttribute("cy",headY-4); lampR.setAttribute("r",3.4);
-    lampR.setAttribute("class","signal-lamp-red");
-    g.appendChild(lampR);
-    const lampG = document.createElementNS(svgNS,"circle");
-    lampG.setAttribute("cx",s.x); lampG.setAttribute("cy",headY+4); lampG.setAttribute("r",3.4);
-    lampG.setAttribute("class","signal-lamp-green");
-    g.appendChild(lampG);
-
-    const idt = document.createElementNS(svgNS,"text");
-    idt.setAttribute("x", s.x); idt.setAttribute("y", s.reverse? headY+22 : headY-14);
-    idt.setAttribute("class","signal-id");
-    idt.setAttribute("text-anchor","middle");
-    idt.textContent = s.id;
-    g.appendChild(idt);
-
-    g.lampR = lampR; g.lampG = lampG;
-    g.addEventListener("click", ()=> toggleSignalOverride(s.id));
-    g.addEventListener("mouseenter", (e)=> showTip(e, signalTipText(s.id)));
-    g.addEventListener("mousemove", (e)=> moveTip(e));
-    g.addEventListener("mouseleave", hideTip);
-    svgEl.appendChild(g);
-    s._lampR = lampR; s._lampG = lampG;
-  });
-}
-
-function drawTrackPath(d, bed){
-  const p = document.createElementNS(svgNS,"path");
-  p.setAttribute("d", d);
-  p.setAttribute("class", bed? "trackline bed" : "trackline");
-  if(!bed) p.dataset.seg = "1";
-  svgEl.appendChild(p);
-  return p;
-}
-
-function addLabel(x,y,text,size,color,weight){
-  const t = document.createElementNS(svgNS,"text");
-  t.setAttribute("x",x); t.setAttribute("y",y);
-  t.setAttribute("text-anchor","middle");
-  t.setAttribute("font-size",size);
-  t.setAttribute("fill",color);
-  t.setAttribute("font-weight",weight||"400");
-  t.setAttribute("font-family","var(--mono)");
-  t.setAttribute("letter-spacing","0.08em");
-  t.textContent = text;
-  svgEl.appendChild(t);
-}
-
-/* update visual states each frame */
-function renderBoard(){
-  // tracks occupied highlight
-  Object.keys(SEG).forEach(k=>{
-    const el = SEG[k].el;
-    if(state.occupied[k]) el.classList.add("occupied");
-    else el.classList.remove("occupied");
-  });
-
-  POINTS.forEach(p=>{
-    const g = svgEl.querySelector(`[data-point="${p.id}"]`);
-    if(!g) return;
-    const c = g.querySelector("circle");
-    c.classList.remove("normal","reverse","locked");
-    if(state.pointLocked[p.id]) c.classList.add("locked");
-    else c.classList.add(state.pointState[p.id]==="N" ? "normal":"reverse");
-  });
-
-  SIGNALS.forEach(s=>{
-    const state_ = state.signalState[s.id];
-    s._lampR.classList.toggle("on", state_==="red");
-    s._lampG.classList.toggle("on", state_!=="red");
-  });
-
-  renderTrains();
-}
-
-/* =========================================================================
-   TRAIN VISUAL ELEMENTS
-   ========================================================================= */
-function createTrainEl(t){
-  const g = document.createElementNS(svgNS,"g");
-  g.setAttribute("class","train-grp train-glow");
-  const body = document.createElementNS(svgNS,"rect");
-  body.setAttribute("class","train-body");
-  body.setAttribute("width", 30);
-  body.setAttribute("height", 12);
-  body.setAttribute("fill", t.color);
-  const label = document.createElementNS(svgNS,"text");
-  label.setAttribute("class","train-label");
-  label.textContent = t.id;
-  g.appendChild(body); g.appendChild(label);
-  g.addEventListener("mouseenter",(e)=> showTip(e, trainTipText(t)));
-  g.addEventListener("mousemove",(e)=> moveTip(e));
-  g.addEventListener("mouseleave", hideTip);
-  svgEl.appendChild(g);
-  t.el = g; t.bodyEl = body; t.labelEl = label;
-}
-function removeTrainEl(t){
-  if(t.el && t.el.parentNode){
-    t.el.style.opacity="0";
-    setTimeout(()=>{ if(t.el && t.el.parentNode) t.el.parentNode.removeChild(t.el); }, 500);
-  }
-}
-
-function pointOnPath(pathEl, t01){
-  const len = pathEl.getTotalLength();
-  return pathEl.getPointAtLength(len*Math.max(0,Math.min(1,t01)));
-}
-
-function renderTrains(){
-  state.trains.forEach(t=>{
-    if(!t.el) return;
-    if(t.status==="cleared"){ return; }
-    const segKey = t.segs[t.segIndex];
-    if(!segKey) return;
-    const seg = SEG[segKey];
-    let progress = t.segT;
-    if(t.reversedGeometry) progress = 1-progress;
-    const pt = pointOnPath(seg.el, progress);
-    // approximate tangent for rotation
-    const pt2 = pointOnPath(seg.el, Math.min(1,Math.max(0,progress + (t.reversedGeometry? -0.01:0.01))));
-    let angle = Math.atan2(pt2.y-pt.y, pt2.x-pt.x)*180/Math.PI;
-    if(t.reversedGeometry) angle += 180;
-    t.el.setAttribute("transform", `translate(${pt.x},${pt.y}) rotate(${angle})`);
-    t.bodyEl.setAttribute("x", -15); t.bodyEl.setAttribute("y", -6);
-    t.labelEl.setAttribute("transform", `rotate(${-angle})`);
-    t.labelEl.setAttribute("x",0); t.labelEl.setAttribute("y",3);
-
-    // status color flicker for waiting
-    t.bodyEl.style.opacity = (t.status==="waiting_signal") ? (0.55+0.45*Math.sin(state.simSeconds*6)) : 1;
-  });
-}
-
-/* =========================================================================
-   TOOLTIPS
-   ========================================================================= */
-const tooltipEl = ()=> document.getElementById("tooltip");
-function showTip(e, text){
-  const tip = tooltipEl();
-  tip.innerHTML = text;
-  tip.style.display = "block";
-  moveTip(e);
-}
-function moveTip(e){
-  const tip = tooltipEl();
-  const stage = document.getElementById("boardStage");
-  const rect = stage.getBoundingClientRect();
-  let x = e.clientX - rect.left + 14;
-  let y = e.clientY - rect.top + 10;
-  tip.style.left = x+"px";
-  tip.style.top = y+"px";
-}
-function hideTip(){ tooltipEl().style.display="none"; }
-
-function pointTipText(id){
-  const p = POINTS.find(x=>x.id===id);
-  return `<b>${id}</b><br>State: ${state.pointState[id]==="N"?"Normal (through)":"Reverse (diverging)"}<br>Locked: ${state.pointLocked[id]?"yes — occupied":"no"}<br>Controls: ${p.controls.join(", ")}<br><i>click to toggle manually</i>`;
-}
-function signalTipText(id){
-  const s = SIGNALS.find(x=>x.id===id);
-  return `<b>${id}</b> (${s.type})<br>Aspect: ${state.signalState[id].toUpperCase()}<br>Mode: ${state.signalAuto[id]?"AUTO":"MANUAL HOLD"}<br><i>click to toggle manual hold</i>`;
-}
-function trainTipText(t){
-  const delayTxt = t.actualDelaySec>60? `+${Math.round(t.actualDelaySec/60)}m late` : t.actualDelaySec<-45? `${Math.round(-t.actualDelaySec/60)}m early` : "on time";
-  return `<b>${t.id}</b> — ${t.typeName}<br>Status: ${t.status.replace("_"," ")}<br>${t.platform? "Platform: "+t.platform+"<br>":""}Sched: ${fmtHM(t.scheduledArrival)} (${delayTxt})`;
-}
-
-/* =========================================================================
-   MANUAL CONTROLS
-   ========================================================================= */
-function togglePoint(id){
-  if(state.pointLocked[id]){
-    logEvent("PT", `${id} interlocked — cannot move while track section occupied`);
-    flashDenied(id,"point");
-    return;
-  }
-  state.pointState[id] = state.pointState[id]==="N" ? "R" : "N";
-  logEvent("PT", `${id} manually set to ${state.pointState[id]==="N"?"NORMAL":"REVERSE"}`);
-}
-
-function toggleSignalOverride(id){
-  if(state.signalAuto[id]){
-    state.signalAuto[id]=false;
-    state.signalState[id]="red";
-    logEvent("SIG", `${id} placed under MANUAL HOLD (red)`);
-  } else {
-    state.signalAuto[id]=true;
-    logEvent("SIG", `${id} returned to AUTOMATIC control`);
-  }
-}
-
-function flashDenied(id, kind){
-  const sel = kind==="point" ? `[data-point="${id}"] circle` : `[data-signal="${id}"]`;
-  const el = svgEl.querySelector(sel);
-  if(!el) return;
-  el.style.transition="none";
-  el.setAttribute("stroke", "var(--red)");
-  setTimeout(()=>{ el.style.transition=""; }, 260);
-}
-
-/* =========================================================================
-   CONTROL STRIP (point & signal quick toggles) + SIDEBAR RENDER
-   ========================================================================= */
-function buildCtrlStrip(){
-  const strip = document.getElementById("ctrlStrip");
-  strip.innerHTML="";
-
-  const pg = document.createElement("div");
-  pg.className="ctrlgroup";
-  pg.innerHTML = `<div class="cg-title">Points</div>`;
-  const pb = document.createElement("div"); pb.className="cg-buttons"; pb.style.flexWrap="wrap";
-  POINTS.forEach(p=>{
-    const b = document.createElement("button");
-    b.className="minibtn"; b.id="pbtn-"+p.id;
-    b.textContent=p.id;
-    b.addEventListener("click", ()=> togglePoint(p.id));
-    pb.appendChild(b);
-  });
-  pg.appendChild(pb); strip.appendChild(pg);
-
-  const sg = document.createElement("div");
-  sg.className="ctrlgroup";
-  sg.innerHTML = `<div class="cg-title">Signals (manual hold)</div>`;
-  const sb = document.createElement("div"); sb.className="cg-buttons"; sb.style.flexWrap="wrap";
-  SIGNALS.forEach(s=>{
-    const b = document.createElement("button");
-    b.className="minibtn"; b.id="sbtn-"+s.id;
-    b.textContent=s.id;
-    b.addEventListener("click", ()=> toggleSignalOverride(s.id));
-    sb.appendChild(b);
-  });
-  sg.appendChild(sb); strip.appendChild(sg);
-}
-
-function updateCtrlStrip(){
-  POINTS.forEach(p=>{
-    const b = document.getElementById("pbtn-"+p.id);
-    if(!b) return;
-    b.classList.toggle("on", state.pointState[p.id]==="R");
-    b.style.opacity = state.pointLocked[p.id] ? .45 : 1;
-  });
-  SIGNALS.forEach(s=>{
-    const b = document.getElementById("sbtn-"+s.id);
-    if(!b) return;
-    b.classList.toggle("warn-on", !state.signalAuto[s.id]);
-  });
-}
-
-/* =========================================================================
-   SIDEBAR LISTS
-   ========================================================================= */
-function renderSidebar(){
-  const isDeparting = t=> t.platform && t.segs[t.segIndex] && t.segs[t.segIndex].startsWith("OUT_");
-  const appr = state.trains.filter(t=> t.status!=="boarding" && !isDeparting(t) && t.status!=="cleared");
-  const at = state.trains.filter(t=> t.status==="boarding");
-  const departing = state.trains.filter(t=> isDeparting(t));
-
-  document.getElementById("apprCount").textContent = appr.length+" inbound";
-  document.getElementById("atCount").textContent = at.length+" at platform";
-  document.getElementById("nextCount").textContent = departing.length+" departing";
-
-  fillList("apprList", appr, t=>{
-    const eta = Math.max(0, Math.round((t.scheduledArrival - state.simSeconds)/60));
-    return cardHTML(t, `ETA ~${eta}m`, t.status==="waiting_signal"?"waiting":"ontime");
-  }, "No trains approaching");
-
-  fillList("atList", at, t=>{
-    const remain = Math.max(0,Math.round(t.dwellRemaining));
-    return cardHTML(t, `Boarding · ${remain}s`, "boarding");
-  }, "Platforms clear");
-
-  fillList("nextList", departing, t=>{
-    return cardHTML(t, `Clearing throat`, delayClass(t));
-  }, "No trains departing");
-}
-
-function delayClass(t){
-  if(t.actualDelaySec>60) return "delayed";
-  if(t.actualDelaySec<-45) return "early";
-  return "ontime";
-}
-function delayLabel(t){
-  if(t.actualDelaySec>60) return `+${Math.round(t.actualDelaySec/60)}m`;
-  if(t.actualDelaySec<-45) return `${Math.round(-t.actualDelaySec/60)}m early`;
-  return "on time";
-}
-
-function cardHTML(t, line2, statusClass){
-  const pct = t.status==="boarding" ? Math.max(0,Math.min(100, 100*(1-t.dwellRemaining/(t.dwellBase||1)))) :
-              Math.min(100, Math.round((t.segIndex+t.segT)/t.segs.length*100));
-  return `<div class="train-card">
-    <div class="tc-top"><span class="tc-id">${t.id}</span><span class="tc-status ${statusClass}">${statusClass}</span></div>
-    <div class="tc-row"><span>Type</span><span>${t.typeName}</span></div>
-    <div class="tc-row"><span>${t.platform?"Platform":"Route"}</span><span>${t.platform||(t.dir==="E"?"Up through":"Down through")}</span></div>
-    <div class="tc-row"><span>${line2}</span><span>${delayLabel(t)}</span></div>
-    <div class="tc-bar"><div class="tc-bar-fill" style="width:${pct}%"></div></div>
-  </div>`;
-}
-
-function fillList(id, arr, fn, emptyTxt){
-  const el = document.getElementById(id);
-  if(!arr.length){ el.innerHTML = `<div class="emptylist">${emptyTxt}</div>`; return; }
-  el.innerHTML = arr.map(fn).join("");
-}
-
-/* =========================================================================
-   LOG RENDER
-   ========================================================================= */
-function renderLog(){
-  const el = document.getElementById("logBody");
-  el.innerHTML = state.log.slice(0,60).map(l=>
-    `<div class="log-line"><span class="log-time">${l.t}</span><span class="log-tag ${l.tag}">${l.tag}</span><span class="log-msg">${l.msg}</span></div>`
-  ).join("");
-}
-
-/* =========================================================================
-   TOP STATS
-   ========================================================================= */
-function renderStats(){
-  document.getElementById("clockVal").textContent = fmtClock(state.simSeconds);
-  document.getElementById("statActive").textContent = state.trains.filter(t=>t.status!=="cleared").length;
-  const ontime = state.trains.filter(t=> (t.status==="boarding"||t.status==="waiting_signal") && Math.abs(t.actualDelaySec||0)<=60).length;
-  const delayed = state.trains.filter(t=> (t.actualDelaySec||0)>60).length;
-  document.getElementById("statOntime").textContent = ontime;
-  document.getElementById("statDelayed").textContent = delayed;
-  document.getElementById("statCleared").textContent = state.cleared;
-  const avg = state.delayCount? Math.round((state.delaySum/state.delayCount)/60*10)/10 : 0;
-  document.getElementById("statAvgDelay").textContent = avg+"m";
-}
-
-/* =========================================================================
-   MAIN LOOP
-   ========================================================================= */
-let lastTs = null;
-function loop(ts){
-  if(lastTs===null) lastTs=ts;
-  const rawDt = Math.min(0.25, (ts-lastTs)/1000);
-  lastTs = ts;
-
-  if(!state.paused){
-    const dt = rawDt * state.speed;
-    state.simSeconds += dt;
-
-    scheduleNextArrivals();
-    // spawn due trains within lead window
-    for(let i=state.schedule.length-1;i>=0;i--){
-      const item = state.schedule[i];
-      const lead = 95; // seconds of approach visibility before sched arrival
-      if(item.sched - lead <= state.simSeconds){
-        spawnTrain(item);
-        state.schedule.splice(i,1);
-      }
+    // --- Utilities ---
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.borderLeft = `4px solid ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#0ea5e9'}`;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
     }
 
-    autoInterlock();
-    tickTrains(dt);
-    maybeRandomDelay();
-  }
+    function navigate(stageId, stepNum = null) {
+        document.querySelectorAll('.view-card').forEach(c => c.classList.remove('active'));
+        document.getElementById(stageId).classList.add('active');
+        if(stepNum && window.innerWidth > 600) {
+            document.getElementById('stepper').style.display = 'flex';
+            document.querySelectorAll('.step').forEach((s, idx) => {
+                if(idx < stepNum) s.classList.add('active'); else s.classList.remove('active');
+            });
+        }
+    }
 
-  renderBoard();
-  renderStats();
-  renderSidebar();
-  updateCtrlStrip();
+    function updateTheme(collegeVal) {
+        if(collegeVal) document.body.setAttribute('data-theme', collegeVal);
+    }
 
-  requestAnimationFrame(loop);
-}
+    function saveToDevice() { localStorage.setItem('studentEventProfile', JSON.stringify(DB)); }
 
-/* =========================================================================
-   UI WIRING
-   ========================================================================= */
-function wireUI(){
-  document.getElementById("btnPause").addEventListener("click", function(){
-    state.paused = !state.paused;
-    this.classList.toggle("active", !state.paused);
-    this.textContent = state.paused? "▶ Resume" : "⏸ Pause";
-    logEvent("SYS", state.paused? "Simulation paused by station master" : "Simulation resumed");
-  });
-  document.getElementById("btnAuto").addEventListener("click", function(){
-    state.autoRoute = !state.autoRoute;
-    this.classList.toggle("active", state.autoRoute);
-    this.textContent = "🤖 Auto-route: "+(state.autoRoute?"ON":"OFF");
-    logEvent("SYS", "Auto-routing "+(state.autoRoute?"enabled":"disabled — manual interlocking required"));
-  });
-  document.getElementById("btnIncident").addEventListener("click", injectIncident);
-  const speedRange = document.getElementById("speedRange");
-  speedRange.addEventListener("input", function(){
-    state.speed = parseFloat(this.value);
-    document.getElementById("speedVal").textContent = state.speed+"x";
-  });
-}
+    // --- Stage 1 Logic (Forms & Edit Flow) ---
+    document.getElementById('regPhoto').addEventListener('change', function(e) {
+        if(this.files[0]) document.getElementById('fileText').innerText = "✅ Image Scanned: " + this.files[0].name;
+    });
 
-/* =========================================================================
-   INIT
-   ========================================================================= */
-function init(){
-  buildSVG();
-  buildCtrlStrip();
-  wireUI();
-  logEvent("SYS","Station master console online. Interlocking initialised — all signals at danger.");
-  scheduleNextArrivals();
-  requestAnimationFrame(loop);
-}
-init();
+    function openProfileView() {
+        navigate('stage-1', 1);
+        
+        // Fill form
+        document.getElementById('regName').value = DB.name;
+        document.getElementById('regCollege').value = DB.college;
+        document.getElementById('regYear').value = DB.year;
+        document.getElementById('regGender').value = DB.gender;
+        document.getElementById('regDob').value = DB.dob;
+        document.getElementById('regRoll').value = DB.roll;
+        document.getElementById('regMobile').value = DB.mobile;
 
-})();
+        document.getElementById('regTitle').style.display = 'none';
+        document.getElementById('regSubtitle').style.display = 'none';
+        document.getElementById('profileActionBar').style.display = 'flex';
+        document.getElementById('btnCancelEdit').style.display = 'inline-flex';
+
+        // Check Unlock State
+        if (DB.editUnlockExpire && Date.now() < DB.editUnlockExpire) {
+            enableFormInputs();
+        } else {
+            disableFormInputs();
+            checkEditEligibility();
+        }
+    }
+
+    function disableFormInputs() {
+        const fields = ['regName', 'regCollege', 'regYear', 'regGender', 'regDob', 'regRoll', 'regMobile', 'regPhoto'];
+        fields.forEach(id => document.getElementById(id).disabled = true);
+        document.getElementById('fileDropZone').classList.add('disabled');
+        document.getElementById('submitRegBtn').style.display = 'none';
+    }
+
+    function enableFormInputs() {
+        const fields = ['regName', 'regCollege', 'regYear', 'regGender', 'regDob', 'regRoll', 'regMobile', 'regPhoto'];
+        fields.forEach(id => document.getElementById(id).disabled = false);
+        document.getElementById('fileDropZone').classList.remove('disabled');
+        document.getElementById('submitRegBtn').style.display = 'inline-flex';
+        document.getElementById('submitRegBtn').innerText = "Commit Profile Updates";
+        document.getElementById('securityBanner').style.display = 'none';
+        document.getElementById('btnRequestEdit').style.display = 'none';
+    }
+
+    function checkEditEligibility() {
+        const banner = document.getElementById('securityBanner');
+        const btn = document.getElementById('btnRequestEdit');
+        const timeSinceReg = Date.now() - DB.registrationTimestamp;
+
+        if (timeSinceReg < EDIT_LIMIT_MS) {
+            banner.style.display = 'none';
+            btn.style.display = 'block';
+            btn.innerText = "Request Edit Access";
+            btn.disabled = false;
+        } else {
+            banner.style.display = 'flex';
+            document.getElementById('bannerText').innerText = "Modification window expired. Edits are only permitted within 24 hours of initialization.";
+            btn.style.display = 'none';
+        }
+    }
+
+    document.getElementById('btnCancelEdit').addEventListener('click', () => {
+        if(DB.selectedEvents.length > 0) renderSummary();
+        else buildDigitalCredential();
+    });
+
+    // --- 60 Second Verification Simulation ---
+    document.getElementById('btnRequestEdit').addEventListener('click', function() {
+        document.getElementById('secureVerificationModal').style.display = 'flex';
+        
+        let timeLeft = 60;
+        const timerDisplay = document.getElementById('verifTimer');
+        const progressBar = document.getElementById('verifProgress');
+        const statusText = document.getElementById('verifStatusText');
+        
+        timerDisplay.innerText = timeLeft + 's';
+        progressBar.style.width = '0%';
+
+        const texts = ["Establishing cryptographic handshake...", "Authenticating device signature...", "Verifying ledger timestamps...", "Awaiting administrative automated approval..."];
+        
+        const interval = setInterval(() => {
+            timeLeft--;
+            timerDisplay.innerText = timeLeft + 's';
+            progressBar.style.width = ((60 - timeLeft) / 60 * 100) + '%';
+            
+            if(timeLeft % 15 === 0 && timeLeft > 0) {
+                statusText.innerText = texts[Math.floor((60 - timeLeft)/15)];
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                document.getElementById('secureVerificationModal').style.display = 'none';
+                showToast('Secure channel established. Edit access granted.', 'success');
+                DB.editUnlockExpire = Date.now() + (10 * 60 * 1000); // Give them 10 mins to edit
+                saveToDevice();
+                enableFormInputs();
+            }
+        }, 1000);
+    });
+
+    // --- Form Submission ---
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        DB.name = document.getElementById('regName').value;
+        DB.college = document.getElementById('regCollege').value;
+        updateTheme(DB.college);
+        DB.year = document.getElementById('regYear').value;
+        DB.gender = document.getElementById('regGender').value;
+        DB.dob = document.getElementById('regDob').value;
+        DB.roll = document.getElementById('regRoll').value.toUpperCase();
+        DB.mobile = document.getElementById('regMobile').value;
+        
+        if (!DB.uid) {
+            DB.uid = Math.floor(1000 + Math.random() * 9000).toString();
+            DB.registrationTimestamp = Date.now();
+        }
+
+        const file = document.getElementById('regPhoto').files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                DB.photo = evt.target.result;
+                finalizeRegistration();
+            };
+            reader.readAsDataURL(file);
+        } else {
+            finalizeRegistration();
+        }
+    });
+
+    function finalizeRegistration() {
+        DB.editUnlockExpire = null; // Lock again after save
+        saveToDevice();
+        showToast('Secure ledger updated successfully.', 'success');
+        buildDigitalCredential();
+    }
+
+    // --- Stage 2: Digital ID Generation ---
+    function buildDigitalCredential() {
+        document.getElementById('badgeName').innerText = DB.name;
+        // Roll No is explicitly omitted from the card display per instructions
+        document.getElementById('badgeRole').innerText = DB.year;
+        document.getElementById('badgeUid').innerText = "ID: " + DB.uid;
+        document.getElementById('badgeCollege').innerText = DB.college + " Campus";
+        document.getElementById('badgeImg').src = DB.photo;
+
+        // Generate Microprint pattern
+        const microString = `${DB.uid}-${DB.college.toUpperCase()}-AUTH-`.repeat(50);
+        document.getElementById('microprintText').innerText = microString;
+
+        // QR Code
+        const qrContainer = document.getElementById("qrcode");
+        qrContainer.innerHTML = ""; 
+        try {
+            qrCodeInstance = new QRCode(qrContainer, {
+                text: "SECURE_AUTH_UID:" + DB.uid,
+                width: 90, height: 90, colorDark : "#0f172a", colorLight : "#ffffff"
+            });
+        } catch(e) {
+            qrContainer.innerText = "[Offline Token: " + DB.uid + "]";
+        }
+
+        navigate('stage-2', 2);
+    }
+
+    document.getElementById('btnProceedEvents').addEventListener('click', () => {
+        if(DB.selectedEvents) {
+            document.querySelectorAll('.event-chip').forEach(chip => {
+                if(DB.selectedEvents.includes(chip.innerText)) chip.classList.add('selected');
+            });
+            document.getElementById('capacityCount').innerText = document.querySelectorAll('.event-chip.selected').length;
+        }
+        navigate('stage-3', 3);
+    });
+
+    // --- Stage 3: Event Selection Logic ---
+    document.querySelectorAll('.event-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            if(this.classList.contains('selected')) {
+                this.classList.remove('selected');
+            } else {
+                if(document.querySelectorAll('.event-chip.selected').length >= 5) {
+                    showToast('Allocation threshold reached (Max 5).', 'error'); return;
+                }
+                this.classList.add('selected');
+            }
+            document.getElementById('capacityCount').innerText = document.querySelectorAll('.event-chip.selected').length;
+        });
+    });
+
+    document.getElementById('btnConfirmSelection').addEventListener('click', function() {
+        const selected = document.querySelectorAll('.event-chip.selected');
+        if(selected.length === 0) { showToast('Protocol requires at least one event selection.', 'error'); return; }
+        
+        DB.selectedEvents = Array.from(selected).map(el => el.innerText);
+        saveToDevice();
+        renderSummary();
+    });
+
+    // --- Stage 4: Ledger Summary ---
+    function renderSummary() {
+        document.getElementById('recName').innerText = DB.name;
+        document.getElementById('recUid').innerText = DB.uid;
+        document.getElementById('recCollege').innerText = DB.college + " Campus";
+        
+        const list = document.getElementById('recEvents');
+        list.innerHTML = '';
+        DB.selectedEvents.forEach(ev => {
+            const li = document.createElement('li'); li.innerText = ev; list.appendChild(li);
+        });
+
+        navigate('stage-4', 4);
+    }
 </script>
 </body>
 </html>
+
+
+
+
+
