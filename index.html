@@ -1,324 +1,1333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Premier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        :root { 
-            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
-            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
-            --text: #FFFFFF; --sub: #94A3B8;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SM-7 // Station Master Control Panel</title>
+<style>
+:root{
+  --bg:#070a0f;
+  --panel:#0e1520;
+  --panel2:#141d2b;
+  --line:#243042;
+  --line-soft:#1b2531;
+  --text:#cdd8e3;
+  --text-dim:#5f7185;
+  --text-bright:#eef4fa;
+  --teal:#2dd9c8;
+  --teal-dim:#0f5e57;
+  --green:#39e06a;
+  --green-dim:#1a5c30;
+  --red:#ff4d4d;
+  --red-dim:#5c1f1f;
+  --amber:#ffb238;
+  --amber-dim:#5c4318;
+  --grey:#4a5a6c;
+  --mono:'JetBrains Mono','Roboto Mono',ui-monospace,Consolas,monospace;
+}
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
-            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
-                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
-            background-attachment: fixed;
-        }
+*{box-sizing:border-box;}
+html,body{
+  margin:0;padding:0;background:var(--bg);color:var(--text);
+  font-family:var(--mono);
+  height:100%;
+  overflow-x:hidden;
+}
 
-        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-track{background:var(--panel);}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
-        #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
-        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
-        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
+button{font-family:var(--mono);cursor:pointer;}
 
-        .stat-card {
-            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
-            padding: 30px; border-radius: 35px; margin-bottom: 30px;
-            box-shadow: 0 20px 40px -10px var(--p-glow);
-            position: relative; overflow: hidden;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
-        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
-        
-        .quick-log-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 14px; border-radius: 24px;
-            display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
-            z-index: 2; min-width: 110px;
-        }
-        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
-        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
+.app{
+  display:grid;
+  grid-template-rows:auto 1fr;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse at 50% -10%, #0d1726 0%, transparent 60%),
+    var(--bg);
+}
 
-        .nav-pill { 
-            display: flex; align-items: center; background: var(--card); padding: 8px; 
-            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
-            backdrop-filter: blur(10px);
-        }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
-        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
+/* ===== TOP BAR ===== */
+.topbar{
+  display:flex;align-items:center;gap:18px;
+  padding:10px 16px;
+  background:linear-gradient(180deg,#0c1320,#0a0f18);
+  border-bottom:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.brand{
+  display:flex;align-items:center;gap:10px;
+  padding-right:16px;border-right:1px solid var(--line-soft);
+}
+.brand .dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.brand h1{
+  font-size:13px;letter-spacing:.12em;margin:0;color:var(--text-bright);
+  font-weight:700;text-transform:uppercase;
+}
+.brand small{display:block;font-size:9.5px;color:var(--text-dim);letter-spacing:.08em;margin-top:2px;}
 
-        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
+.clock-block{
+  display:flex;flex-direction:column;align-items:flex-start;
+  padding:0 16px;border-right:1px solid var(--line-soft);
+}
+.clock-block .label{font-size:8.5px;color:var(--text-dim);letter-spacing:.12em;}
+.clock-block .val{font-size:18px;color:var(--teal);letter-spacing:.05em;font-weight:600;}
 
-        .day-item { 
-            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
-            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
-            border: 1px solid var(--surface); backdrop-filter: blur(10px);
-            user-select: none;
-        }
-        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
-        
-        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
-        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
+.statgrid{
+  display:flex;gap:14px;flex:1;flex-wrap:wrap;
+}
+.statpill{
+  display:flex;flex-direction:column;
+  background:var(--panel);border:1px solid var(--line-soft);
+  border-radius:4px;padding:5px 10px;min-width:78px;
+}
+.statpill .label{font-size:8px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;}
+.statpill .val{font-size:14px;color:var(--text-bright);font-weight:600;}
+.statpill.warn .val{color:var(--amber);}
+.statpill.bad .val{color:var(--red);}
+.statpill.good .val{color:var(--green);}
 
-        .item-pill { 
-            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
-        }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
-        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
-        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
+.topctrls{display:flex;gap:8px;align-items:center;}
+.btn{
+  background:var(--panel2);border:1px solid var(--line);color:var(--text);
+  border-radius:4px;padding:7px 12px;font-size:11px;letter-spacing:.05em;
+  transition:.15s;display:flex;align-items:center;gap:6px;
+}
+.btn:hover{border-color:var(--teal);color:var(--teal);}
+.btn.active{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+.btn.danger:hover{border-color:var(--red);color:var(--red);}
+.speedctrl{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;}
+.speedctrl span{font-size:9px;color:var(--text-dim);letter-spacing:.08em;}
+.speedctrl input[type=range]{width:70px;accent-color:var(--teal);}
 
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
-        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
-        .sheet.up { transform: translateY(0); }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
-        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
-        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
-        
-        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    </style>
+/* ===== MAIN LAYOUT ===== */
+.main{
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:10px;padding:10px;
+  min-height:0;
+}
+@media (max-width:980px){
+  .main{grid-template-columns:1fr;}
+}
+
+.boardwrap{
+  display:flex;flex-direction:column;gap:10px;min-width:0;
+}
+
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:6px;
+  overflow:hidden;
+}
+.panel-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;border-bottom:1px solid var(--line-soft);
+  background:var(--panel2);
+}
+.panel-head h2{
+  font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-dim);margin:0;font-weight:700;
+}
+.panel-head .sub{font-size:9.5px;color:var(--text-dim);}
+
+/* ===== TRACK BOARD ===== */
+.boardstage{
+  position:relative;
+  width:100%;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 23px, #ffffff05 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, #ffffff05 23px 24px),
+    #0a0f18;
+  min-height:420px;
+}
+.boardstage svg{display:block;width:100%;height:auto;}
+
+.trackline{
+  fill:none;
+  stroke:#26344a;
+  stroke-width:7;
+  stroke-linecap:round;
+}
+.trackline.bed{
+  stroke:#1a2433;
+  stroke-width:11;
+}
+.tie{stroke:#202c3d;stroke-width:1.4;opacity:.55;}
+
+.occupied{
+  stroke:var(--teal) !important;
+  filter:drop-shadow(0 0 5px rgba(45,217,200,.85));
+}
+.locked{
+  stroke:#3a4a60 !important;
+}
+
+.platform{
+  fill:#161f2c;stroke:#2c3a4d;stroke-width:1;
+}
+.platform-label{
+  fill:var(--text-dim);font-size:10px;font-family:var(--mono);letter-spacing:.05em;
+}
+
+.signal-grp{cursor:pointer;}
+.signal-pole{stroke:#3a4654;stroke-width:2;}
+.signal-head{
+  stroke:#06090d;stroke-width:1.4;
+}
+.signal-lamp-red{fill:var(--grey);}
+.signal-lamp-green{fill:var(--grey);}
+.signal-lamp-amber{fill:var(--grey);}
+.signal-lamp-red.on{fill:var(--red);filter:drop-shadow(0 0 5px var(--red));}
+.signal-lamp-green.on{fill:var(--green);filter:drop-shadow(0 0 5px var(--green));}
+.signal-lamp-amber.on{fill:var(--amber);filter:drop-shadow(0 0 4px var(--amber));}
+.signal-id{
+  fill:var(--text-dim);font-size:9px;font-family:var(--mono);
+}
+
+.point-grp{cursor:pointer;}
+.point-marker{
+  fill:var(--panel2);stroke:var(--line);stroke-width:1.5;
+}
+.point-marker.normal{stroke:var(--green);}
+.point-marker.reverse{stroke:var(--amber);}
+.point-marker.locked{stroke:var(--red);}
+.point-label{
+  fill:var(--text-bright);font-size:9px;font-weight:700;text-anchor:middle;font-family:var(--mono);
+}
+
+.train-grp{transition:none;}
+.train-body{
+  rx:3;
+  stroke:#06090d;stroke-width:1.2;
+}
+.train-label{
+  fill:#06090d;font-size:9px;font-weight:700;text-anchor:middle;font-family:var(--mono);
+  pointer-events:none;
+}
+.train-glow{filter:drop-shadow(0 0 4px rgba(0,0,0,.5));}
+
+.boardstage .legend{
+  position:absolute;bottom:8px;left:10px;
+  display:flex;gap:14px;flex-wrap:wrap;
+  background:rgba(10,15,24,.7);
+  padding:6px 10px;border-radius:4px;border:1px solid var(--line-soft);
+  font-size:9px;color:var(--text-dim);
+}
+.legend .lg-item{display:flex;align-items:center;gap:5px;}
+.legend .sw{width:10px;height:10px;border-radius:2px;display:inline-block;}
+
+/* tooltip */
+.tooltip{
+  position:absolute;pointer-events:none;
+  background:#0c1320;border:1px solid var(--teal);
+  color:var(--text-bright);font-size:10.5px;
+  padding:6px 9px;border-radius:4px;
+  display:none;z-index:50;line-height:1.5;
+  box-shadow:0 4px 14px rgba(0,0,0,.5);
+  white-space:nowrap;
+}
+
+/* ===== EVENT LOG ===== */
+.log-body{
+  height:150px;overflow-y:auto;
+  padding:8px 10px;font-size:11px;line-height:1.65;
+}
+.log-line{display:flex;gap:8px;margin-bottom:2px;}
+.log-time{color:var(--text-dim);flex-shrink:0;}
+.log-tag{flex-shrink:0;font-weight:700;width:62px;}
+.log-tag.ARR{color:var(--green);}
+.log-tag.DEP{color:var(--teal);}
+.log-tag.SIG{color:var(--amber);}
+.log-tag.PT{color:#8fb4ff;}
+.log-tag.DLY{color:var(--red);}
+.log-tag.SYS{color:var(--text-dim);}
+.log-msg{color:var(--text);}
+
+/* ===== SIDEBAR ===== */
+.sidebar{display:flex;flex-direction:column;gap:10px;min-width:0;}
+.sidebar .panel-body{padding:8px;}
+
+.train-card{
+  background:var(--panel2);
+  border:1px solid var(--line-soft);
+  border-radius:5px;
+  padding:8px 10px;
+  margin-bottom:7px;
+  font-size:11px;
+}
+.train-card:last-child{margin-bottom:0;}
+.tc-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
+.tc-id{font-weight:700;color:var(--text-bright);font-size:12px;}
+.tc-status{
+  font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 6px;border-radius:3px;font-weight:700;
+}
+.tc-status.ontime{background:var(--green-dim);color:var(--green);}
+.tc-status.delayed{background:var(--red-dim);color:var(--red);}
+.tc-status.early{background:var(--teal-dim);color:var(--teal);}
+.tc-status.waiting{background:var(--amber-dim);color:var(--amber);}
+.tc-status.boarding{background:#1a3a5c;color:#6fb0ff;}
+.tc-status.cleared{background:#222e3d;color:var(--text-dim);}
+.tc-row{display:flex;justify-content:space-between;color:var(--text-dim);font-size:10px;margin-top:2px;}
+.tc-row span:last-child{color:var(--text);}
+.tc-bar{height:3px;background:var(--line-soft);border-radius:2px;margin-top:6px;overflow:hidden;}
+.tc-bar-fill{height:100%;background:var(--teal);width:0%;transition:width .4s linear;}
+
+.emptylist{color:var(--text-dim);font-size:11px;text-align:center;padding:18px 4px;}
+
+/* control strip */
+.ctrlstrip{
+  display:flex;flex-wrap:wrap;gap:8px;padding:10px;
+}
+.ctrlgroup{
+  display:flex;flex-direction:column;gap:5px;
+  background:var(--panel2);border:1px solid var(--line-soft);
+  border-radius:5px;padding:7px 9px;flex:1;min-width:120px;
+}
+.ctrlgroup .cg-title{font-size:8.5px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;}
+.cg-buttons{display:flex;gap:5px;}
+.minibtn{
+  flex:1;background:var(--panel);border:1px solid var(--line);color:var(--text-dim);
+  border-radius:3px;padding:5px 4px;font-size:9.5px;letter-spacing:.04em;
+}
+.minibtn.on{background:var(--green-dim);color:var(--green);border-color:var(--green);}
+.minibtn.warn-on{background:var(--amber-dim);color:var(--amber);border-color:var(--amber);}
+.minibtn:hover{border-color:var(--teal);}
+
+footer.note{
+  text-align:center;color:var(--text-dim);font-size:9.5px;padding:8px;letter-spacing:.04em;
+}
+</style>
 </head>
 <body>
 
-<div id="welcomeScreen">
-    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
-    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
-</div>
+<div class="app">
 
-<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
-    <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
-        <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
-            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
+  <!-- ============ TOP BAR ============ -->
+  <div class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <div>
+        <h1>SM-7 Control Desk</h1>
+        <small>Junction Station &mdash; Block Section 14</small>
+      </div>
+    </div>
+
+    <div class="clock-block">
+      <span class="label">SIM TIME</span>
+      <span class="val" id="clockVal">06:00:00</span>
+    </div>
+
+    <div class="statgrid">
+      <div class="statpill"><span class="label">Trains in area</span><span class="val" id="statActive">0</span></div>
+      <div class="statpill good"><span class="label">On time</span><span class="val" id="statOntime">0</span></div>
+      <div class="statpill warn"><span class="label">Delayed</span><span class="val" id="statDelayed">0</span></div>
+      <div class="statpill"><span class="label">Cleared today</span><span class="val" id="statCleared">0</span></div>
+      <div class="statpill"><span class="label">Avg delay</span><span class="val" id="statAvgDelay">0m</span></div>
+    </div>
+
+    <div class="topctrls">
+      <div class="speedctrl">
+        <span>SPEED</span>
+        <input type="range" id="speedRange" min="0.5" max="6" step="0.5" value="2">
+        <span id="speedVal">2x</span>
+      </div>
+      <button class="btn active" id="btnPause">⏸ Pause</button>
+      <button class="btn" id="btnAuto">🤖 Auto-route: ON</button>
+      <button class="btn danger" id="btnIncident">⚠ Inject incident</button>
+    </div>
+  </div>
+
+  <!-- ============ MAIN GRID ============ -->
+  <div class="main">
+
+    <div class="boardwrap">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Track diagram &mdash; bird's eye interlocking view</h2>
+          <span class="sub" id="boardSub">click signals / points to operate</span>
         </div>
-        <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
-    </div>
-</div>
-
-<div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
-    <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
-        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
-        <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
-    </div>
-</div>
-
-<div class="container">
-    <div class="header">
-        <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
-        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-left">
-            <div class="label">Total Bill</div>
-            <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
+        <div class="boardstage" id="boardStage">
+          <!-- SVG injected by JS -->
+          <div class="legend">
+            <span class="lg-item"><span class="sw" style="background:var(--teal)"></span>Train present</span>
+            <span class="lg-item"><span class="sw" style="background:var(--green)"></span>Signal clear</span>
+            <span class="lg-item"><span class="sw" style="background:var(--red)"></span>Signal danger</span>
+            <span class="lg-item"><span class="sw" style="background:var(--amber)"></span>Caution / point reverse</span>
+          </div>
+          <div class="tooltip" id="tooltip"></div>
         </div>
-        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
-            <i id="quickIcon">⚡</i>
-            <span id="quickText">Loading...</span>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Control log</h2>
+          <span class="sub">live signalling &amp; movement events</span>
         </div>
+        <div class="log-body" id="logBody"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Interlocking controls</h2><span class="sub">manual override</span></div>
+        <div class="ctrlstrip" id="ctrlStrip"></div>
+      </div>
     </div>
 
-    <div class="nav-pill">
-        <button onclick="changeMonth(-1)">‹</button>
-        <span id="monthLabel">Current</span>
-        <button onclick="changeMonth(1)">›</button>
+    <div class="sidebar">
+      <div class="panel">
+        <div class="panel-head"><h2>Approaching</h2><span class="sub" id="apprCount">0</span></div>
+        <div class="panel-body" id="apprList"><div class="emptylist">No trains approaching</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>At station</h2><span class="sub" id="atCount">0</span></div>
+        <div class="panel-body" id="atList"><div class="emptylist">Platforms clear</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Departed / next up</h2><span class="sub" id="nextCount">0</span></div>
+        <div class="panel-body" id="nextList"><div class="emptylist">No schedule loaded</div></div>
+      </div>
     </div>
-    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
 
-    <div id="logsGrid"></div>
+  </div>
+
+  <footer class="note">Simulated station interlocking &mdash; for demonstration only. Not connected to any real railway system.</footer>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script>
+(function(){
+"use strict";
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
-        projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
-        messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
-    };
+/* =========================================================================
+   GEOMETRY: bird's-eye double-track mainline with a 4-platform station loop
+   ViewBox units. Two through lines (UP / DOWN) bypass the station;
+   four platform loops branch off via points and rejoin.
+   ========================================================================= */
 
-    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
-    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
-    let config = { name: "", mealPrice: 50, waterPrice: 30 };
-    
-    // SCROLL GUARD VARIABLES
-    let longPressTimer;
-    let startY = 0;
-    let isScrolling = false;
+const VB_W = 1400, VB_H = 460;
 
-    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
-    window.logout = () => signOut(auth).then(() => location.reload());
+// Main through lines (express bypass), y-levels
+const UP_THROUGH_Y   = 120;  // trains moving left->right "UP" direction visually top
+const DN_THROUGH_Y   = 340;  // trains moving right->left "DOWN" direction bottom
 
-    onAuthStateChanged(auth, async (u) => {
-        if (u) { 
-            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
-            document.getElementById('userPfp').src = u.photoURL;
-            const userDoc = await getDoc(doc(db, "users", u.uid));
-            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
-            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
-            document.getElementById('userLabel').innerText = config.name;
-            updateGreet(); syncData(); 
-        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
+// Platform loop y-levels (between the through lines)
+const PLAT = [
+  { id:"P1", y:170, side:"up"  },
+  { id:"P2", y:215, side:"up"  },
+  { id:"P3", y:245, side:"down"},
+  { id:"P4", y:290, side:"down"}
+];
+
+const X_LEFT = 40, X_RIGHT = 1360;
+// Throat zones where points live
+const X_ENTRY_W = 260;   // west throat point cluster center x-range
+const X_ENTRY_E = 1140;  // east throat point cluster
+
+/* Build path "d" strings for each track segment as smooth polylines.
+   We define key x-stations for entry/exit curves. */
+function curve(x1,y1,x2,y2,x3,y3,x4,y4){
+  return `M ${x1} ${y1} C ${x2} ${y2}, ${x3} ${y3}, ${x4} ${y4}`;
+}
+
+// THROUGH lines (full length, always exist, may have a "through" state)
+const SEG = {};
+
+SEG.UP_THROUGH = { d:`M ${X_LEFT} ${UP_THROUGH_Y} L ${X_RIGHT} ${UP_THROUGH_Y}`, len:X_RIGHT-X_LEFT };
+SEG.DN_THROUGH = { d:`M ${X_RIGHT} ${DN_THROUGH_Y} L ${X_LEFT} ${DN_THROUGH_Y}`, len:X_RIGHT-X_LEFT };
+
+// West throat: branch from UP_THROUGH down into each platform; branch from DN_THROUGH up into platforms (for arrivals coming from west on down line variety)
+// We create simple S-curve connectors from a common branch x to platform y, then a straight platform run, then a rejoin S-curve on the east throat.
+const BRANCH_W_X = 300;   // x where branch leaves through line (west)
+const PLAT_START_X = 380;
+const PLAT_END_X   = 1020;
+const BRANCH_E_X = 1100;  // x where branch rejoins through line (east)
+
+PLAT.forEach(p=>{
+  const fromY = p.side==="up" ? UP_THROUGH_Y : DN_THROUGH_Y;
+  // entry branch (west) : from through line at BRANCH_W_X,fromY curving to PLAT_START_X,p.y
+  SEG["IN_"+p.id] = {
+    d: curve(BRANCH_W_X, fromY, BRANCH_W_X+60, fromY, PLAT_START_X-60, p.y, PLAT_START_X, p.y),
+    len: 230
+  };
+  // platform straight run
+  SEG["PLAT_"+p.id] = {
+    d: `M ${PLAT_START_X} ${p.y} L ${PLAT_END_X} ${p.y}`,
+    len: PLAT_END_X-PLAT_START_X
+  };
+  // exit branch (east) rejoin to through line
+  SEG["OUT_"+p.id] = {
+    d: curve(PLAT_END_X, p.y, PLAT_END_X+60, p.y, BRANCH_E_X-60, fromY, BRANCH_E_X, fromY),
+    len:230
+  };
+});
+
+/* Full route definitions: ordered list of segment keys a train travels,
+   from spawn off-screen-west to off-screen-east (or reverse). */
+const ROUTES = {
+  // through trains that don't stop
+  THRU_UP:   ["UP_THROUGH"],
+  THRU_DN:   ["DN_THROUGH"],
+};
+PLAT.forEach(p=>{
+  ROUTES["VIA_"+p.id] = ["IN_"+p.id, "PLAT_"+p.id, "OUT_"+p.id];
+});
+
+/* Precompute point objects (the switches). Each point sits at a branch
+   junction and has NORMAL (through) / REVERSE (diverging) state. */
+const POINTS = [
+  { id:"PT-W1", x:BRANCH_W_X, y:UP_THROUGH_Y, controls:["P1","P2"], track:"UP" },
+  { id:"PT-W2", x:BRANCH_W_X, y:DN_THROUGH_Y, controls:["P3","P4"], track:"DN" },
+  { id:"PT-E1", x:BRANCH_E_X, y:UP_THROUGH_Y, controls:["P1","P2"], track:"UP" },
+  { id:"PT-E2", x:BRANCH_E_X, y:DN_THROUGH_Y, controls:["P3","P4"], track:"DN" },
+];
+
+/* Signals: positioned just before each junction / platform exit.
+   type: 'home' (entry to station area) or 'starter' (departure) */
+const SIGNALS = [
+  { id:"S-A1", x:BRANCH_W_X-40, y:UP_THROUGH_Y-26, dir:"E", guards:["IN_P1","IN_P2","UP_THROUGH"], type:"home" },
+  { id:"S-A2", x:BRANCH_W_X-40, y:DN_THROUGH_Y+26, dir:"E", guards:["IN_P3","IN_P4","DN_THROUGH"], type:"home" },
+  { id:"S-B1", x:BRANCH_E_X+40, y:UP_THROUGH_Y-26, dir:"W", guards:["OUT_P1","OUT_P2","UP_THROUGH"], type:"home", reverse:true },
+  { id:"S-B2", x:BRANCH_E_X+40, y:DN_THROUGH_Y+26, dir:"W", guards:["OUT_P3","OUT_P4","DN_THROUGH"], type:"home", reverse:true },
+];
+PLAT.forEach(p=>{
+  SIGNALS.push({ id:"ST-"+p.id, x:PLAT_END_X+15, y:p.y-14, dir:"E", guards:["OUT_"+p.id], type:"starter", platform:p.id });
+});
+
+/* =========================================================================
+   SIMULATION STATE
+   ========================================================================= */
+
+const state = {
+  simSeconds: 6*3600,      // start at 06:00:00
+  speed: 2,
+  paused: false,
+  autoRoute: true,
+  trains: [],              // active trains
+  schedule: [],            // upcoming spawns
+  log: [],
+  cleared: 0,
+  delaySum: 0,
+  delayCount: 0,
+  pointState: {},          // id -> 'N' or 'R'
+  pointLocked: {},         // id -> bool (locked because occupied)
+  signalState: {},         // id -> 'red'|'green'|'amber'
+  signalAuto: {},          // id -> bool, true = system controlled
+  occupied: {},            // segKey -> trainId currently occupying
+  platformOcc: {},         // platform id -> trainId or null
+  nextTrainNum: 100,
+  incidentUntil: 0,
+};
+
+POINTS.forEach(p=> { state.pointState[p.id]='N'; state.pointLocked[p.id]=false; });
+SIGNALS.forEach(s=> { state.signalState[s.id]='red'; state.signalAuto[s.id]=true; });
+PLAT.forEach(p=> state.platformOcc[p.id]=null);
+
+const TRAIN_TYPES = [
+  { code:"EXP", name:"Express",   color:"#2dd9c8", speedPxS:46, dwell:0,  throughOnly:true },
+  { code:"SF",  name:"Superfast", color:"#ff7a59", speedPxS:52, dwell:0,  throughOnly:true },
+  { code:"PSG", name:"Passenger", color:"#ffd23f", speedPxS:34, dwell:55, throughOnly:false },
+  { code:"LCL", name:"Local",     color:"#6fb0ff", speedPxS:28, dwell:40, throughOnly:false },
+  { code:"FRT", name:"Freight",   color:"#8e8e8e", speedPxS:20, dwell:90, throughOnly:false },
+];
+
+function fmtClock(sec){
+  sec = Math.floor(sec);
+  const h = Math.floor(sec/3600)%24;
+  const m = Math.floor((sec%3600)/60);
+  const s = sec%60;
+  return [h,m,s].map(v=>String(v).padStart(2,"0")).join(":");
+}
+function fmtHM(sec){
+  sec = Math.floor(sec);
+  const h = Math.floor(sec/3600)%24;
+  const m = Math.floor((sec%3600)/60);
+  return [h,m].map(v=>String(v).padStart(2,"0")).join(":");
+}
+
+function logEvent(tag, msg){
+  state.log.unshift({ t: fmtClock(state.simSeconds), tag, msg });
+  if(state.log.length>200) state.log.pop();
+  renderLog();
+}
+
+/* =========================================================================
+   SCHEDULE GENERATOR — randomly create trains across the day
+   ========================================================================= */
+function genId(){
+  state.nextTrainNum += Math.floor(Math.random()*7)+3;
+  return state.nextTrainNum;
+}
+
+function scheduleNextArrivals(){
+  // keep a rolling schedule: always have next 6 trains queued
+  while(state.schedule.length < 6){
+    const last = state.schedule.length ? state.schedule[state.schedule.length-1].sched : state.simSeconds+20;
+    const gap = 70 + Math.random()*150; // seconds between scheduled arrivals
+    const type = TRAIN_TYPES[Math.floor(Math.random()*TRAIN_TYPES.length)];
+    const dir = Math.random()<0.5 ? "E" : "W"; // travel direction
+    let platform = null;
+    let routeKey;
+    if(type.throughOnly || Math.random()<0.22){
+      routeKey = dir==="E" ? "THRU_UP" : "THRU_DN";
+    } else {
+      const candidates = dir==="E" ? ["P1","P2"] : ["P3","P4"];
+      platform = candidates[Math.floor(Math.random()*candidates.length)];
+      routeKey = "VIA_"+platform;
+    }
+    const num = (dir==="E"?"E":"W")+genId();
+    state.schedule.push({
+      id:num, type, dir, routeKey, platform,
+      sched: last+gap,
     });
+  }
+}
 
-    function isCurrentMonth() {
-        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
+/* =========================================================================
+   TRAIN OBJECT
+   route = array of segment keys; we travel them in order (or reversed if dir W)
+   ========================================================================= */
+function spawnTrain(item){
+  let segs = ROUTES[item.routeKey].slice();
+  if(item.dir==="W") segs = segs.slice().reverse(); // reverse order of traversal
+  const reversedGeometry = item.dir==="W";
+
+  const t = {
+    id: item.id,
+    typeCode: item.type.code,
+    typeName: item.type.name,
+    color: item.type.color,
+    speedPxS: item.type.speedPxS * (0.85+Math.random()*0.3),
+    dwellBase: item.type.dwell,
+    dir: item.dir,
+    platform: item.platform,
+    segs,
+    segIndex: 0,
+    segT: 0,             // 0..1 progress along current seg (in geometry direction)
+    reversedGeometry,
+    scheduledArrival: item.sched,
+    actualDelaySec: 0,
+    status: "approaching", // approaching, waiting_signal, in_section, boarding, departing, cleared
+    dwellRemaining: 0,
+    awardedSignal: null,
+    totalLen: 0,
+    distTravelled: 0,
+    el: null,
+    bornAt: state.simSeconds,
+    note: "",
+  };
+  segs.forEach(k=> t.totalLen += SEG[k].len);
+  state.trains.push(t);
+  createTrainEl(t);
+  logEvent("SYS", `Train ${t.id} (${t.typeName}) on approach, ETA ${fmtHM(item.sched)}`);
+}
+
+/* =========================================================================
+   INTERLOCKING LOGIC
+   ========================================================================= */
+
+function segOccupiedByOther(segKey, exceptId){
+  const occ = state.occupied[segKey];
+  return occ && occ!==exceptId;
+}
+
+function platformOfSeg(segKey){
+  const m = segKey.match(/_(P\d)$/);
+  return m? m[1]: null;
+}
+
+// determine required point throw for a seg (N or R) -- our geometry: branch segs require specific point alignment per platform pair
+function requiredPointAlignment(segKey){
+  const plat = platformOfSeg(segKey);
+  if(!plat) return null;
+  // For W1/E1 controlling P1,P2: P1=>N, P2=>R.  For W2/E2 controlling P3,P4: P3=>N,P4=>R
+  if(plat==="P1"||plat==="P3") return "N";
+  return "R";
+}
+
+function pointsGatingSeg(segKey){
+  const plat = platformOfSeg(segKey);
+  if(!plat) return [];
+  return POINTS.filter(p=> p.controls.includes(plat) &&
+    ((segKey.startsWith("IN_")&&p.x===BRANCH_W_X) || (segKey.startsWith("OUT_")&&p.x===BRANCH_E_X)));
+}
+
+function canEnterSeg(segKey, trainId){
+  if(segOccupiedByOther(segKey, trainId)) return false;
+  const gating = pointsGatingSeg(segKey);
+  for(const p of gating){
+    if(state.pointState[p.id] !== requiredPointAlignment(segKey)) return false;
+  }
+  return true;
+}
+
+function guardSignalFor(segKey){
+  return SIGNALS.find(s=> s.guards.includes(segKey));
+}
+
+/* Auto-interlocking tick: align points + set signals based on next train needs,
+   never moving a point that's occupied or about to be occupied within caution distance. */
+function autoInterlock(){
+  // Lock points whose segs currently occupied
+  POINTS.forEach(p=>{
+    const relatedSegs = Object.keys(SEG).filter(k=> pointsGatingSeg(k).some(g=>g.id===p.id));
+    state.pointLocked[p.id] = relatedSegs.some(k=> !!state.occupied[k]);
+  });
+
+  if(!state.autoRoute) { applySignalsFromPoints(); return; }
+
+  // For each train waiting at a home signal, try to align points in its favor
+  state.trains.forEach(t=>{
+    if(t.status!=="waiting_signal") return;
+    const nextSegKey = t.segs[t.segIndex];
+    const gating = pointsGatingSeg(nextSegKey);
+    gating.forEach(p=>{
+      if(state.pointLocked[p.id]) return;
+      const needed = requiredPointAlignment(nextSegKey);
+      if(state.pointState[p.id] !== needed){
+        const prev = state.pointState[p.id];
+        state.pointState[p.id] = needed;
+        logEvent("PT", `${p.id} thrown ${prev}→${needed} (auto, for ${t.id})`);
+      }
+    });
+  });
+
+  applySignalsFromPoints();
+}
+
+function applySignalsFromPoints(){
+  SIGNALS.forEach(s=>{
+    if(!state.signalAuto[s.id]) return; // manual override holds
+    // a home/starter signal clears if ANY of its guarded segs has a waiting train that may proceed
+    let clear = false;
+    for(const segKey of s.guards){
+      const waitingTrain = state.trains.find(t=> t.status==="waiting_signal" && t.segs[t.segIndex]===segKey);
+      if(waitingTrain && canEnterSeg(segKey, waitingTrain.id)){ clear = true; break; }
+    }
+    state.signalState[s.id] = clear ? "green" : "red";
+  });
+}
+
+/* =========================================================================
+   TRAIN MOVEMENT TICK
+   ========================================================================= */
+function tickTrains(dt){
+  state.trains.forEach(t=>{
+    if(t.status==="cleared") return;
+
+    if(t.status==="boarding"){
+      t.dwellRemaining -= dt;
+      if(t.dwellRemaining<=0){
+        t.status="waiting_signal"; // ready to depart, needs starter signal
+      }
+      return;
     }
 
-    function updateGreet() {
-        const h = new Date().getHours();
-        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : "Good Evening 🌇";
-    }
+    if(t.status==="approaching" || t.status==="waiting_signal" || t.status==="in_section"){
+      const segKey = t.segs[t.segIndex];
+      const seg = SEG[segKey];
 
-    function syncData() {
-        onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
-            logs = d.data() || {}; renderGrid();
-        });
-    }
-
-    window.quickLog = async () => {
-        if (!isCurrentMonth()) return;
-        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        if(obj[type] === 1) return;
-        obj[type] = 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
-
-    function renderGrid() {
-        const current = isCurrentMonth();
-        document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
-        document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
-        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-        
-        const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
-        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-
-        const type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const isMarked = logs[todayDate.getDate()] && logs[todayDate.getDate()][type] === 1;
-        
-        if (current) {
-            document.getElementById('quickIcon').innerText = isMarked ? '✅' : '⚡';
-            document.getElementById('quickText').innerText = isMarked ? 'Marked' : `Mark ${type==='l'?'Lunch':'Dinner'}`;
-            if(isMarked) document.getElementById('quickBtn').classList.add('done');
-            else document.getElementById('quickBtn').classList.remove('done');
+      if(t.status!=="in_section"){
+        // check if allowed to enter this seg
+        if(canEnterSeg(segKey, t.id)){
+          state.occupied[segKey] = t.id;
+          t.status="in_section";
         } else {
-            document.getElementById('quickIcon').innerText = '🔒';
-            document.getElementById('quickText').innerText = 'Locked';
+          if(t.status==="approaching") t.status="waiting_signal";
+          return; // blocked, wait
         }
+      }
 
-        for (let i = 1; i <= daysCount; i++) {
-            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
-            const card = document.createElement('div');
-            card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
-            
-            if (current) {
-                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
-                card.addEventListener('touchstart', (e) => {
-                    startY = e.touches[0].clientY;
-                    isScrolling = false;
-                    longPressTimer = setTimeout(() => {
-                        if (!isScrolling) openNote(i);
-                    }, 650);
-                }, { passive: true });
+      // move along seg
+      const distStep = t.speedPxS*dt;
+      t.distTravelled += distStep;
+      t.segT += distStep/seg.len;
 
-                card.addEventListener('touchmove', (e) => {
-                    let moveY = e.touches[0].clientY;
-                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
-                        isScrolling = true;
-                        clearTimeout(longPressTimer);
-                    }
-                }, { passive: true });
+      if(t.segT>=1){
+        // finished this segment
+        delete state.occupied[segKey];
+        t.segT=0;
+        t.segIndex++;
 
-                card.addEventListener('touchend', () => {
-                    clearTimeout(longPressTimer);
-                });
-            }
-
-            card.innerHTML = `
-                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
-                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
-                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
-                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
-                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
-            `;
-            grid.appendChild(card);
+        if(t.segIndex>=t.segs.length){
+          // train has fully left the layout
+          finishTrain(t);
+          return;
         }
-        calculate();
+        // if this was a platform arrival, start dwell
+        const justFinishedPlatform = segKey.startsWith("IN_");
+        if(justFinishedPlatform){
+          const plat = platformOfSeg(segKey);
+          arriveAtPlatform(t, plat);
+        }
+      }
+    }
+  });
+
+  // remove cleared trains from array after small delay (for fade)
+  state.trains = state.trains.filter(t=> t.status!=="cleared" || (state.simSeconds - t.clearedAt) < 1.2);
+}
+
+function arriveAtPlatform(t, plat){
+  state.platformOcc[plat] = t.id;
+  t.status="boarding";
+  const dwellJitter = t.dwellBase * (0.7+Math.random()*0.8);
+  t.dwellRemaining = dwellJitter;
+  const delay = state.simSeconds - t.scheduledArrival;
+  t.actualDelaySec = delay;
+  let tag = "ARR";
+  let desc;
+  if(delay > 60){ desc = `Train ${t.id} arrived ${plat} — DELAYED ${Math.round(delay/60)}m`; tag="DLY"; }
+  else if(delay < -45){ desc = `Train ${t.id} arrived ${plat} — early`; }
+  else { desc = `Train ${t.id} arrived ${plat} — on time`; }
+  logEvent(tag, desc);
+  state.delaySum += Math.max(0,delay);
+  state.delayCount++;
+}
+
+function finishTrain(t){
+  if(t.platform) state.platformOcc[t.platform]=null;
+  t.status="cleared";
+  t.clearedAt = state.simSeconds;
+  state.cleared++;
+  const note = t.platform ? `departed ${t.platform}, cleared section` : "passed through, cleared section";
+  logEvent("DEP", `Train ${t.id} ${note}`);
+  removeTrainEl(t);
+}
+
+/* =========================================================================
+   RANDOM EVENTS / INCIDENTS
+   ========================================================================= */
+function maybeRandomDelay(){
+  if(Math.random()<0.002 && state.trains.length){
+    const candidates = state.trains.filter(t=> t.status==="in_section" || t.status==="approaching");
+    if(candidates.length){
+      const t = candidates[Math.floor(Math.random()*candidates.length)];
+      const slow = 0.4;
+      t.speedPxS *= slow;
+      logEvent("DLY", `Signal caution applied to ${t.id} — reduced speed (track circuit check)`);
+      setTimeout(()=>{ t.speedPxS /= slow; }, 8000/state.speed);
+    }
+  }
+}
+
+function injectIncident(){
+  if(!state.trains.length){ logEvent("SYS","No trains in area to affect."); return; }
+  const t = state.trains[Math.floor(Math.random()*state.trains.length)];
+  if(t.status==="boarding"){
+    t.dwellRemaining += 90;
+    logEvent("DLY", `Incident: signal fault — ${t.id} held at platform extra 90s`);
+  } else {
+    t.speedPxS *= 0.3;
+    logEvent("DLY", `Incident: emergency brake test — ${t.id} slowed sharply`);
+    setTimeout(()=>{ t.speedPxS /= 0.3; }, 12000/state.speed);
+  }
+}
+
+/* =========================================================================
+   SVG RENDERING — static layout
+   ========================================================================= */
+const svgNS = "http://www.w3.org/2000/svg";
+let svgEl;
+
+function buildSVG(){
+  const stage = document.getElementById("boardStage");
+  svgEl = document.createElementNS(svgNS,"svg");
+  svgEl.setAttribute("viewBox", `0 0 ${VB_W} ${VB_H}`);
+  svgEl.setAttribute("preserveAspectRatio","xMidYMid meet");
+  stage.insertBefore(svgEl, stage.firstChild);
+
+  const defs = document.createElementNS(svgNS,"defs");
+  svgEl.appendChild(defs);
+
+  // background station label band
+  addLabel(VB_W/2, 26, "JUNCTION STATION — BIRD'S-EYE INTERLOCKING DIAGRAM", "16px", "var(--text-dim)", "600");
+
+  // direction arrows / through line labels
+  addLabel(70, UP_THROUGH_Y-32, "UP THROUGH  ►", "10px", "#3d4f63", "600");
+  addLabel(70, DN_THROUGH_Y+40, "◄  DOWN THROUGH", "10px", "#3d4f63", "600");
+
+  // Draw bed (ballast) first for all segs, then rail line on top
+  Object.keys(SEG).forEach(k=>{
+    drawTrackPath(SEG[k].d, true);
+  });
+  Object.keys(SEG).forEach(k=>{
+    const el = drawTrackPath(SEG[k].d, false);
+    SEG[k].el = el;
+  });
+
+  // platforms (visual slabs behind platform track)
+  PLAT.forEach(p=>{
+    const rect = document.createElementNS(svgNS,"rect");
+    rect.setAttribute("x", PLAT_START_X-10);
+    rect.setAttribute("y", p.y - (p.side==="up"? 22: -8));
+    rect.setAttribute("width", PLAT_END_X-PLAT_START_X+20);
+    rect.setAttribute("height", 14);
+    rect.setAttribute("class","platform");
+    rect.setAttribute("rx",2);
+    svgEl.insertBefore(rect, svgEl.querySelector('[data-seg]')); // behind tracks where possible
+    const lbl = document.createElementNS(svgNS,"text");
+    lbl.setAttribute("x", PLAT_START_X-22);
+    lbl.setAttribute("y", p.y+4);
+    lbl.setAttribute("class","platform-label");
+    lbl.setAttribute("text-anchor","end");
+    lbl.textContent = "PLAT "+p.id.slice(1);
+    svgEl.appendChild(lbl);
+  });
+
+  // Points
+  POINTS.forEach(p=>{
+    const g = document.createElementNS(svgNS,"g");
+    g.setAttribute("class","point-grp");
+    g.dataset.point = p.id;
+    const c = document.createElementNS(svgNS,"circle");
+    c.setAttribute("cx",p.x); c.setAttribute("cy",p.y); c.setAttribute("r",11);
+    c.setAttribute("class","point-marker normal");
+    const t = document.createElementNS(svgNS,"text");
+    t.setAttribute("x",p.x); t.setAttribute("y",p.y - 16);
+    t.setAttribute("class","point-label");
+    t.textContent = p.id;
+    g.appendChild(c); g.appendChild(t);
+    g.addEventListener("click", ()=> togglePoint(p.id));
+    g.addEventListener("mouseenter", (e)=> showTip(e, pointTipText(p.id)));
+    g.addEventListener("mousemove", (e)=> moveTip(e));
+    g.addEventListener("mouseleave", hideTip);
+    svgEl.appendChild(g);
+  });
+
+  // Signals
+  SIGNALS.forEach(s=>{
+    const g = document.createElementNS(svgNS,"g");
+    g.setAttribute("class","signal-grp");
+    g.dataset.signal = s.id;
+    const poleH = 30;
+    const pole = document.createElementNS(svgNS,"line");
+    pole.setAttribute("x1", s.x); pole.setAttribute("y1", s.y);
+    pole.setAttribute("x2", s.x); pole.setAttribute("y2", s.y + (s.reverse?poleH:-poleH));
+    pole.setAttribute("class","signal-pole");
+    g.appendChild(pole);
+
+    const headY = s.y + (s.reverse?poleH:-poleH);
+    const head = document.createElementNS(svgNS,"rect");
+    head.setAttribute("x", s.x-7); head.setAttribute("y", headY-9);
+    head.setAttribute("width",14); head.setAttribute("height",18);
+    head.setAttribute("rx",2);
+    head.setAttribute("fill","#0c1118");
+    head.setAttribute("class","signal-head");
+    g.appendChild(head);
+
+    const lampR = document.createElementNS(svgNS,"circle");
+    lampR.setAttribute("cx",s.x); lampR.setAttribute("cy",headY-4); lampR.setAttribute("r",3.4);
+    lampR.setAttribute("class","signal-lamp-red");
+    g.appendChild(lampR);
+    const lampG = document.createElementNS(svgNS,"circle");
+    lampG.setAttribute("cx",s.x); lampG.setAttribute("cy",headY+4); lampG.setAttribute("r",3.4);
+    lampG.setAttribute("class","signal-lamp-green");
+    g.appendChild(lampG);
+
+    const idt = document.createElementNS(svgNS,"text");
+    idt.setAttribute("x", s.x); idt.setAttribute("y", s.reverse? headY+22 : headY-14);
+    idt.setAttribute("class","signal-id");
+    idt.setAttribute("text-anchor","middle");
+    idt.textContent = s.id;
+    g.appendChild(idt);
+
+    g.lampR = lampR; g.lampG = lampG;
+    g.addEventListener("click", ()=> toggleSignalOverride(s.id));
+    g.addEventListener("mouseenter", (e)=> showTip(e, signalTipText(s.id)));
+    g.addEventListener("mousemove", (e)=> moveTip(e));
+    g.addEventListener("mouseleave", hideTip);
+    svgEl.appendChild(g);
+    s._lampR = lampR; s._lampG = lampG;
+  });
+}
+
+function drawTrackPath(d, bed){
+  const p = document.createElementNS(svgNS,"path");
+  p.setAttribute("d", d);
+  p.setAttribute("class", bed? "trackline bed" : "trackline");
+  if(!bed) p.dataset.seg = "1";
+  svgEl.appendChild(p);
+  return p;
+}
+
+function addLabel(x,y,text,size,color,weight){
+  const t = document.createElementNS(svgNS,"text");
+  t.setAttribute("x",x); t.setAttribute("y",y);
+  t.setAttribute("text-anchor","middle");
+  t.setAttribute("font-size",size);
+  t.setAttribute("fill",color);
+  t.setAttribute("font-weight",weight||"400");
+  t.setAttribute("font-family","var(--mono)");
+  t.setAttribute("letter-spacing","0.08em");
+  t.textContent = text;
+  svgEl.appendChild(t);
+}
+
+/* update visual states each frame */
+function renderBoard(){
+  // tracks occupied highlight
+  Object.keys(SEG).forEach(k=>{
+    const el = SEG[k].el;
+    if(state.occupied[k]) el.classList.add("occupied");
+    else el.classList.remove("occupied");
+  });
+
+  POINTS.forEach(p=>{
+    const g = svgEl.querySelector(`[data-point="${p.id}"]`);
+    if(!g) return;
+    const c = g.querySelector("circle");
+    c.classList.remove("normal","reverse","locked");
+    if(state.pointLocked[p.id]) c.classList.add("locked");
+    else c.classList.add(state.pointState[p.id]==="N" ? "normal":"reverse");
+  });
+
+  SIGNALS.forEach(s=>{
+    const state_ = state.signalState[s.id];
+    s._lampR.classList.toggle("on", state_==="red");
+    s._lampG.classList.toggle("on", state_!=="red");
+  });
+
+  renderTrains();
+}
+
+/* =========================================================================
+   TRAIN VISUAL ELEMENTS
+   ========================================================================= */
+function createTrainEl(t){
+  const g = document.createElementNS(svgNS,"g");
+  g.setAttribute("class","train-grp train-glow");
+  const body = document.createElementNS(svgNS,"rect");
+  body.setAttribute("class","train-body");
+  body.setAttribute("width", 30);
+  body.setAttribute("height", 12);
+  body.setAttribute("fill", t.color);
+  const label = document.createElementNS(svgNS,"text");
+  label.setAttribute("class","train-label");
+  label.textContent = t.id;
+  g.appendChild(body); g.appendChild(label);
+  g.addEventListener("mouseenter",(e)=> showTip(e, trainTipText(t)));
+  g.addEventListener("mousemove",(e)=> moveTip(e));
+  g.addEventListener("mouseleave", hideTip);
+  svgEl.appendChild(g);
+  t.el = g; t.bodyEl = body; t.labelEl = label;
+}
+function removeTrainEl(t){
+  if(t.el && t.el.parentNode){
+    t.el.style.opacity="0";
+    setTimeout(()=>{ if(t.el && t.el.parentNode) t.el.parentNode.removeChild(t.el); }, 500);
+  }
+}
+
+function pointOnPath(pathEl, t01){
+  const len = pathEl.getTotalLength();
+  return pathEl.getPointAtLength(len*Math.max(0,Math.min(1,t01)));
+}
+
+function renderTrains(){
+  state.trains.forEach(t=>{
+    if(!t.el) return;
+    if(t.status==="cleared"){ return; }
+    const segKey = t.segs[t.segIndex];
+    if(!segKey) return;
+    const seg = SEG[segKey];
+    let progress = t.segT;
+    if(t.reversedGeometry) progress = 1-progress;
+    const pt = pointOnPath(seg.el, progress);
+    // approximate tangent for rotation
+    const pt2 = pointOnPath(seg.el, Math.min(1,Math.max(0,progress + (t.reversedGeometry? -0.01:0.01))));
+    let angle = Math.atan2(pt2.y-pt.y, pt2.x-pt.x)*180/Math.PI;
+    if(t.reversedGeometry) angle += 180;
+    t.el.setAttribute("transform", `translate(${pt.x},${pt.y}) rotate(${angle})`);
+    t.bodyEl.setAttribute("x", -15); t.bodyEl.setAttribute("y", -6);
+    t.labelEl.setAttribute("transform", `rotate(${-angle})`);
+    t.labelEl.setAttribute("x",0); t.labelEl.setAttribute("y",3);
+
+    // status color flicker for waiting
+    t.bodyEl.style.opacity = (t.status==="waiting_signal") ? (0.55+0.45*Math.sin(state.simSeconds*6)) : 1;
+  });
+}
+
+/* =========================================================================
+   TOOLTIPS
+   ========================================================================= */
+const tooltipEl = ()=> document.getElementById("tooltip");
+function showTip(e, text){
+  const tip = tooltipEl();
+  tip.innerHTML = text;
+  tip.style.display = "block";
+  moveTip(e);
+}
+function moveTip(e){
+  const tip = tooltipEl();
+  const stage = document.getElementById("boardStage");
+  const rect = stage.getBoundingClientRect();
+  let x = e.clientX - rect.left + 14;
+  let y = e.clientY - rect.top + 10;
+  tip.style.left = x+"px";
+  tip.style.top = y+"px";
+}
+function hideTip(){ tooltipEl().style.display="none"; }
+
+function pointTipText(id){
+  const p = POINTS.find(x=>x.id===id);
+  return `<b>${id}</b><br>State: ${state.pointState[id]==="N"?"Normal (through)":"Reverse (diverging)"}<br>Locked: ${state.pointLocked[id]?"yes — occupied":"no"}<br>Controls: ${p.controls.join(", ")}<br><i>click to toggle manually</i>`;
+}
+function signalTipText(id){
+  const s = SIGNALS.find(x=>x.id===id);
+  return `<b>${id}</b> (${s.type})<br>Aspect: ${state.signalState[id].toUpperCase()}<br>Mode: ${state.signalAuto[id]?"AUTO":"MANUAL HOLD"}<br><i>click to toggle manual hold</i>`;
+}
+function trainTipText(t){
+  const delayTxt = t.actualDelaySec>60? `+${Math.round(t.actualDelaySec/60)}m late` : t.actualDelaySec<-45? `${Math.round(-t.actualDelaySec/60)}m early` : "on time";
+  return `<b>${t.id}</b> — ${t.typeName}<br>Status: ${t.status.replace("_"," ")}<br>${t.platform? "Platform: "+t.platform+"<br>":""}Sched: ${fmtHM(t.scheduledArrival)} (${delayTxt})`;
+}
+
+/* =========================================================================
+   MANUAL CONTROLS
+   ========================================================================= */
+function togglePoint(id){
+  if(state.pointLocked[id]){
+    logEvent("PT", `${id} interlocked — cannot move while track section occupied`);
+    flashDenied(id,"point");
+    return;
+  }
+  state.pointState[id] = state.pointState[id]==="N" ? "R" : "N";
+  logEvent("PT", `${id} manually set to ${state.pointState[id]==="N"?"NORMAL":"REVERSE"}`);
+}
+
+function toggleSignalOverride(id){
+  if(state.signalAuto[id]){
+    state.signalAuto[id]=false;
+    state.signalState[id]="red";
+    logEvent("SIG", `${id} placed under MANUAL HOLD (red)`);
+  } else {
+    state.signalAuto[id]=true;
+    logEvent("SIG", `${id} returned to AUTOMATIC control`);
+  }
+}
+
+function flashDenied(id, kind){
+  const sel = kind==="point" ? `[data-point="${id}"] circle` : `[data-signal="${id}"]`;
+  const el = svgEl.querySelector(sel);
+  if(!el) return;
+  el.style.transition="none";
+  el.setAttribute("stroke", "var(--red)");
+  setTimeout(()=>{ el.style.transition=""; }, 260);
+}
+
+/* =========================================================================
+   CONTROL STRIP (point & signal quick toggles) + SIDEBAR RENDER
+   ========================================================================= */
+function buildCtrlStrip(){
+  const strip = document.getElementById("ctrlStrip");
+  strip.innerHTML="";
+
+  const pg = document.createElement("div");
+  pg.className="ctrlgroup";
+  pg.innerHTML = `<div class="cg-title">Points</div>`;
+  const pb = document.createElement("div"); pb.className="cg-buttons"; pb.style.flexWrap="wrap";
+  POINTS.forEach(p=>{
+    const b = document.createElement("button");
+    b.className="minibtn"; b.id="pbtn-"+p.id;
+    b.textContent=p.id;
+    b.addEventListener("click", ()=> togglePoint(p.id));
+    pb.appendChild(b);
+  });
+  pg.appendChild(pb); strip.appendChild(pg);
+
+  const sg = document.createElement("div");
+  sg.className="ctrlgroup";
+  sg.innerHTML = `<div class="cg-title">Signals (manual hold)</div>`;
+  const sb = document.createElement("div"); sb.className="cg-buttons"; sb.style.flexWrap="wrap";
+  SIGNALS.forEach(s=>{
+    const b = document.createElement("button");
+    b.className="minibtn"; b.id="sbtn-"+s.id;
+    b.textContent=s.id;
+    b.addEventListener("click", ()=> toggleSignalOverride(s.id));
+    sb.appendChild(b);
+  });
+  sg.appendChild(sb); strip.appendChild(sg);
+}
+
+function updateCtrlStrip(){
+  POINTS.forEach(p=>{
+    const b = document.getElementById("pbtn-"+p.id);
+    if(!b) return;
+    b.classList.toggle("on", state.pointState[p.id]==="R");
+    b.style.opacity = state.pointLocked[p.id] ? .45 : 1;
+  });
+  SIGNALS.forEach(s=>{
+    const b = document.getElementById("sbtn-"+s.id);
+    if(!b) return;
+    b.classList.toggle("warn-on", !state.signalAuto[s.id]);
+  });
+}
+
+/* =========================================================================
+   SIDEBAR LISTS
+   ========================================================================= */
+function renderSidebar(){
+  const isDeparting = t=> t.platform && t.segs[t.segIndex] && t.segs[t.segIndex].startsWith("OUT_");
+  const appr = state.trains.filter(t=> t.status!=="boarding" && !isDeparting(t) && t.status!=="cleared");
+  const at = state.trains.filter(t=> t.status==="boarding");
+  const departing = state.trains.filter(t=> isDeparting(t));
+
+  document.getElementById("apprCount").textContent = appr.length+" inbound";
+  document.getElementById("atCount").textContent = at.length+" at platform";
+  document.getElementById("nextCount").textContent = departing.length+" departing";
+
+  fillList("apprList", appr, t=>{
+    const eta = Math.max(0, Math.round((t.scheduledArrival - state.simSeconds)/60));
+    return cardHTML(t, `ETA ~${eta}m`, t.status==="waiting_signal"?"waiting":"ontime");
+  }, "No trains approaching");
+
+  fillList("atList", at, t=>{
+    const remain = Math.max(0,Math.round(t.dwellRemaining));
+    return cardHTML(t, `Boarding · ${remain}s`, "boarding");
+  }, "Platforms clear");
+
+  fillList("nextList", departing, t=>{
+    return cardHTML(t, `Clearing throat`, delayClass(t));
+  }, "No trains departing");
+}
+
+function delayClass(t){
+  if(t.actualDelaySec>60) return "delayed";
+  if(t.actualDelaySec<-45) return "early";
+  return "ontime";
+}
+function delayLabel(t){
+  if(t.actualDelaySec>60) return `+${Math.round(t.actualDelaySec/60)}m`;
+  if(t.actualDelaySec<-45) return `${Math.round(-t.actualDelaySec/60)}m early`;
+  return "on time";
+}
+
+function cardHTML(t, line2, statusClass){
+  const pct = t.status==="boarding" ? Math.max(0,Math.min(100, 100*(1-t.dwellRemaining/(t.dwellBase||1)))) :
+              Math.min(100, Math.round((t.segIndex+t.segT)/t.segs.length*100));
+  return `<div class="train-card">
+    <div class="tc-top"><span class="tc-id">${t.id}</span><span class="tc-status ${statusClass}">${statusClass}</span></div>
+    <div class="tc-row"><span>Type</span><span>${t.typeName}</span></div>
+    <div class="tc-row"><span>${t.platform?"Platform":"Route"}</span><span>${t.platform||(t.dir==="E"?"Up through":"Down through")}</span></div>
+    <div class="tc-row"><span>${line2}</span><span>${delayLabel(t)}</span></div>
+    <div class="tc-bar"><div class="tc-bar-fill" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+function fillList(id, arr, fn, emptyTxt){
+  const el = document.getElementById(id);
+  if(!arr.length){ el.innerHTML = `<div class="emptylist">${emptyTxt}</div>`; return; }
+  el.innerHTML = arr.map(fn).join("");
+}
+
+/* =========================================================================
+   LOG RENDER
+   ========================================================================= */
+function renderLog(){
+  const el = document.getElementById("logBody");
+  el.innerHTML = state.log.slice(0,60).map(l=>
+    `<div class="log-line"><span class="log-time">${l.t}</span><span class="log-tag ${l.tag}">${l.tag}</span><span class="log-msg">${l.msg}</span></div>`
+  ).join("");
+}
+
+/* =========================================================================
+   TOP STATS
+   ========================================================================= */
+function renderStats(){
+  document.getElementById("clockVal").textContent = fmtClock(state.simSeconds);
+  document.getElementById("statActive").textContent = state.trains.filter(t=>t.status!=="cleared").length;
+  const ontime = state.trains.filter(t=> (t.status==="boarding"||t.status==="waiting_signal") && Math.abs(t.actualDelaySec||0)<=60).length;
+  const delayed = state.trains.filter(t=> (t.actualDelaySec||0)>60).length;
+  document.getElementById("statOntime").textContent = ontime;
+  document.getElementById("statDelayed").textContent = delayed;
+  document.getElementById("statCleared").textContent = state.cleared;
+  const avg = state.delayCount? Math.round((state.delaySum/state.delayCount)/60*10)/10 : 0;
+  document.getElementById("statAvgDelay").textContent = avg+"m";
+}
+
+/* =========================================================================
+   MAIN LOOP
+   ========================================================================= */
+let lastTs = null;
+function loop(ts){
+  if(lastTs===null) lastTs=ts;
+  const rawDt = Math.min(0.25, (ts-lastTs)/1000);
+  lastTs = ts;
+
+  if(!state.paused){
+    const dt = rawDt * state.speed;
+    state.simSeconds += dt;
+
+    scheduleNextArrivals();
+    // spawn due trains within lead window
+    for(let i=state.schedule.length-1;i>=0;i--){
+      const item = state.schedule[i];
+      const lead = 95; // seconds of approach visibility before sched arrival
+      if(item.sched - lead <= state.simSeconds){
+        spawnTrain(item);
+        state.schedule.splice(i,1);
+      }
     }
 
-    window.toggle = async (day, type) => {
-        if (!isCurrentMonth()) return;
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        obj[type] = obj[type] ? 0 : 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
+    autoInterlock();
+    tickTrains(dt);
+    maybeRandomDelay();
+  }
 
-    window.openNote = (day) => {
-        activeDayId = day;
-        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
-        document.getElementById('noteInput').value = logs[day]?.n || "";
-        document.getElementById('noteOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
-    };
-    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
-    window.saveNote = async () => {
-        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
-        obj.n = document.getElementById('noteInput').value;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
-        closeNote();
-    };
+  renderBoard();
+  renderStats();
+  renderSidebar();
+  updateCtrlStrip();
 
-    window.openSettings = () => {
-        document.getElementById('setUserName').value = config.name;
-        document.getElementById('setMealPrice').value = config.mealPrice;
-        document.getElementById('setWaterPrice').value = config.waterPrice;
-        document.getElementById('settingsOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
-    };
-    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
-    window.saveSettings = async () => {
-        config.name = document.getElementById('setUserName').value;
-        config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
-        config.waterPrice = parseInt(document.getElementById('setWaterPrice').value);
-        await setDoc(doc(db, "users", user.uid), config, { merge: true });
-        document.getElementById('userLabel').innerText = config.name;
-        calculate(); closeSettings();
-    };
+  requestAnimationFrame(loop);
+}
 
-    function calculate() {
-        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
-        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
-    }
+/* =========================================================================
+   UI WIRING
+   ========================================================================= */
+function wireUI(){
+  document.getElementById("btnPause").addEventListener("click", function(){
+    state.paused = !state.paused;
+    this.classList.toggle("active", !state.paused);
+    this.textContent = state.paused? "▶ Resume" : "⏸ Pause";
+    logEvent("SYS", state.paused? "Simulation paused by station master" : "Simulation resumed");
+  });
+  document.getElementById("btnAuto").addEventListener("click", function(){
+    state.autoRoute = !state.autoRoute;
+    this.classList.toggle("active", state.autoRoute);
+    this.textContent = "🤖 Auto-route: "+(state.autoRoute?"ON":"OFF");
+    logEvent("SYS", "Auto-routing "+(state.autoRoute?"enabled":"disabled — manual interlocking required"));
+  });
+  document.getElementById("btnIncident").addEventListener("click", injectIncident);
+  const speedRange = document.getElementById("speedRange");
+  speedRange.addEventListener("input", function(){
+    state.speed = parseFloat(this.value);
+    document.getElementById("speedVal").textContent = state.speed+"x";
+  });
+}
 
-    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
+/* =========================================================================
+   INIT
+   ========================================================================= */
+function init(){
+  buildSVG();
+  buildCtrlStrip();
+  wireUI();
+  logEvent("SYS","Station master console online. Interlocking initialised — all signals at danger.");
+  scheduleNextArrivals();
+  requestAnimationFrame(loop);
+}
+init();
+
+})();
 </script>
 </body>
 </html>
