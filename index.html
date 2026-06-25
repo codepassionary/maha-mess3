@@ -4,34 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Grand Farewell Celebration</title>
+    <meta name="description" content="Invitation to the Grand Farewell Celebration and Cake Cutting Ceremony in honor of Dr. Upendra Singh Narwaria Sir.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;500;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-    .panel {
-    position: relative;
-    width: 100%;
-    max-width: 1100px;
-    min-height: calc(100vh - 80px);
-    border-radius: 24px; /* Smoother corners */
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px); /* Increased blur for better depth */
-    -webkit-backdrop-filter: blur(15px);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-    /* Prevent text selection */
-    body {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
         :root {
             --void: #020204;
             --void-warm: #1e1503;
@@ -53,7 +30,7 @@
             width: 100%;
             min-height: 100vh;
             overflow-x: hidden;
-            overflow-y: auto; /* Allows scrolling on tiny devices */
+            overflow-y: auto;
             background: var(--void);
             font-family: 'Montserrat', sans-serif;
             color: var(--ivory);
@@ -70,7 +47,6 @@
             padding: clamp(15px, 3vh, 40px) clamp(10px, 3vw, 30px);
         }
 
-        /* Fine vignette + film grain feel */
         .stage::before {
             content: "";
             position: fixed;
@@ -80,7 +56,6 @@
             z-index: 5;
         }
 
-        /* Fixed canvas so fireworks follow the screen if user scrolls */
         canvas#fxCanvas {
             position: fixed;
             inset: 0;
@@ -95,7 +70,7 @@
             position: relative;
             width: 100%;
             max-width: 1100px;
-            min-height: calc(100vh - clamp(30px, 6vh, 80px)); /* Adapts to viewport height */
+            min-height: calc(100vh - clamp(30px, 6vh, 80px));
             height: auto;
             border-radius: 18px;
             background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
@@ -108,7 +83,6 @@
             overflow: hidden;
         }
 
-        /* corner brackets */
         .corner {
             position: absolute;
             width: clamp(32px, 6vw, 64px);
@@ -175,8 +149,8 @@
             font-family: 'Cinzel Decorative', 'Cinzel', serif;
             font-weight: 900;
             text-transform: uppercase;
-            font-size: clamp(32px, 7vw, 108px);
-            line-height: 1.08;
+            font-size: clamp(32px, 7vw, 100px);
+            line-height: 1.1;
             letter-spacing: 2px;
             text-shadow: 0 0 30px rgba(212, 175, 55, 0.35), 0 4px 18px rgba(0, 0, 0, 0.8);
             max-width: 95%;
@@ -269,7 +243,7 @@
 
         .reveal-item {
             opacity: 0;
-            transform: translateZ(-60px) translateY(18px);
+            transform: translateY(18px);
             filter: blur(8px);
             animation: revealPop 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
@@ -277,7 +251,7 @@
         @keyframes revealPop {
             to {
                 opacity: 1;
-                transform: translateZ(0) translateY(0);
+                transform: translateY(0);
                 filter: blur(0);
             }
         }
@@ -299,8 +273,8 @@
             font-family: 'Cinzel Decorative', 'Cinzel', serif;
             font-weight: 900;
             text-transform: uppercase;
-            font-size: clamp(24px, 6vw, 76px);
-            line-height: 1.1;
+            font-size: clamp(24px, 6vw, 70px);
+            line-height: 1.15;
             letter-spacing: 1px;
             text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
             max-width: 95%;
@@ -398,7 +372,7 @@
             font-family: 'Cinzel Decorative', 'Cinzel', serif;
             font-weight: 900;
             text-transform: uppercase;
-            font-size: clamp(20px, 5vw, 58px);
+            font-size: clamp(20px, 5vw, 56px);
             letter-spacing: 2px;
             margin-top: 6px;
             animation: livePulse 1.6s ease-in-out infinite;
@@ -415,13 +389,20 @@
             }
         }
 
+        .footer-note {
+            font-size: clamp(9px, 1vw, 12px);
+            letter-spacing: 1.5px;
+            color: var(--ivory);
+            opacity: 0.55;
+            margin-top: clamp(10px, 2vh, 18px);
+        }
+
         /* Responsive specific tweaks */
         @media (max-width: 480px) {
             .matrix-cell.full { grid-column: 1 / -1; }
-            .matrix-cell { grid-column: 1 / -1; } /* Force full width on tiny screens */
+            .matrix-cell { grid-column: 1 / -1; }
         }
 
-        /* Adjust for landscape mobile (short screens) */
         @media (max-height: 600px) and (orientation: landscape) {
             #cover, #invitation {
                 padding: 20px;
@@ -436,10 +417,9 @@
 
         @media (prefers-reduced-motion: reduce) {
             .gold-text, .unveil-btn::before, #liveBanner { animation: none !important; }
-            .reveal-item { animation-duration: 0.01s !important; }
+            .reveal-item { animation-duration: 0.01s !important; opacity: 1; filter: none; transform: none; }
         }
 
-        /* focus visibility */
         .unveil-btn:focus-visible {
             outline: 2px solid var(--gold-pale);
             outline-offset: 4px;
@@ -448,27 +428,26 @@
 </head>
 <body>
     <div class="stage">
-        <canvas id="fxCanvas"></canvas>
-        <div class="panel">
-            <!-- corner brackets -->
+        <canvas id="fxCanvas" aria-hidden="true"></canvas>
+        <main class="panel">
             <div class="corner tl"></div>
             <div class="corner tr"></div>
             <div class="corner bl"></div>
             <div class="corner br"></div>
 
             <!-- STAGE 1 -->
-            <div id="cover">
-                <div class="eyebrow">Requesting the Honor of Your Presence</div>
+            <section id="cover">
+                <p class="eyebrow">Requesting the Honor of Your Presence</p>
                 <h1 class="cover-title gold-text">The Grand<br>Farewell Celebration</h1>
-                <div class="ornament-rule"></div>
-                <button class="unveil-btn" id="unveilBtn">Unveil Invitation</button>
-            </div>
+                <div class="ornament-rule" aria-hidden="true"></div>
+                <button class="unveil-btn" id="unveilBtn" type="button">Unveil Invitation</button>
+            </section>
 
             <!-- STAGE 2 -->
-            <div id="invitation">
-                <div class="honoree-label reveal-item d1">In Honor Of</div>
+            <section id="invitation" aria-live="polite">
+                <p class="honoree-label reveal-item d1">In Honor Of</p>
                 <h2 class="honoree-name gold-text reveal-item d1">Dr. Upendra Singh<br>Narwaria Sir</h2>
-                <div class="dept reveal-item d2">Department of Livestock Production Management</div>
+                <p class="dept reveal-item d2">Department of Livestock Production Management</p>
 
                 <div class="matrix reveal-item d3">
                     <div class="matrix-cell full">
@@ -477,7 +456,7 @@
                     </div>
                     <div class="matrix-cell">
                         <div class="cell-label">Date &amp; Time</div>
-                        <div class="cell-value">26th June · 02:30 PM IST</div>
+                        <div class="cell-value">26th June &middot; 2:30 PM IST</div>
                     </div>
                     <div class="matrix-cell">
                         <div class="cell-label">Venue</div>
@@ -491,64 +470,76 @@
                     <div class="count-box"><div class="count-num gold-text" id="cdMins">00</div><div class="count-unit">Minutes</div></div>
                     <div class="count-box"><div class="count-num gold-text" id="cdSecs">00</div><div class="count-unit">Seconds</div></div>
                 </div>
-                <div id="liveBanner" class="gold-text">✨ Celebration Is Live ✨</div>
-            </div>
-        </div>
+                <div id="liveBanner" class="gold-text" role="status">&#10024; Celebration Is Live &#10024;</div>
+
+                <p class="footer-note reveal-item d4">With warm regards &mdash; the First Year Students</p>
+            </section>
+        </main>
     </div>
-    <div id="flash"></div>
+    <div id="flash" aria-hidden="true"></div>
 
     <script>
-        (function() {
+        (function () {
             "use strict";
 
             /* ===================== STAGE TRANSITION ===================== */
-            const unveilBtn = document.getElementById('unveilBtn');
-            const cover = document.getElementById('cover');
-            const invitation = document.getElementById('invitation');
-            const flash = document.getElementById('flash');
+            var unveilBtn = document.getElementById('unveilBtn');
+            var cover = document.getElementById('cover');
+            var invitation = document.getElementById('invitation');
+            var flash = document.getElementById('flash');
+            var hasUnveiled = false;
 
-            unveilBtn.addEventListener('click', function() {
+            unveilBtn.addEventListener('click', function () {
+                if (hasUnveiled) return;
+                hasUnveiled = true;
+
                 flash.classList.add('fire');
-                setTimeout(function() {
+                setTimeout(function () {
                     cover.style.display = 'none';
                     invitation.classList.add('show');
-                    burstParticles(220);
+                    burstParticles(180, undefined, undefined, GOLD_PALETTE);
                 }, 120);
-                setTimeout(function() {
+                setTimeout(function () {
                     flash.classList.remove('fire');
                 }, 900);
             });
 
             /* ===================== COUNTDOWN ===================== */
-            const TARGET = new Date('2026-06-26T02:30:00+05:30').getTime();
-            const elDays = document.getElementById('cdDays');
-            const elHours = document.getElementById('cdHours');
-            const elMins = document.getElementById('cdMins');
-            const elSecs = document.getElementById('cdSecs');
-            const countdownWrap = document.getElementById('countdownWrap');
-            const liveBanner = document.getElementById('liveBanner');
+            // Target: 26th June 2026, 2:30 PM IST (14:30, UTC+5:30)
+            var TARGET = new Date('2026-06-26T14:30:00+05:30').getTime();
+            var elDays = document.getElementById('cdDays');
+            var elHours = document.getElementById('cdHours');
+            var elMins = document.getElementById('cdMins');
+            var elSecs = document.getElementById('cdSecs');
+            var countdownWrap = document.getElementById('countdownWrap');
+            var liveBanner = document.getElementById('liveBanner');
 
-            let celebrationLive = false;
+            var celebrationLive = false;
+            var countdownTimer = null;
 
             function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
             function tickCountdown() {
-                const now = Date.now();
-                const diff = TARGET - now;
+                var now = Date.now();
+                var diff = TARGET - now;
                 if (diff <= 0) {
                     if (!celebrationLive) {
                         celebrationLive = true;
                         countdownWrap.style.display = 'none';
                         liveBanner.style.display = 'block';
                         climaxBoost();
+                        if (countdownTimer) {
+                            clearInterval(countdownTimer);
+                            countdownTimer = null;
+                        }
                     }
                     return;
                 }
-                const days = Math.floor(diff / 86400000);
-                const hours = Math.floor((diff % 86400000) / 3600000);
-                const mins = Math.floor((diff % 3600000) / 60000);
-                const secs = Math.floor((diff % 60000) / 1000);
-                
+                var days = Math.floor(diff / 86400000);
+                var hours = Math.floor((diff % 86400000) / 3600000);
+                var mins = Math.floor((diff % 3600000) / 60000);
+                var secs = Math.floor((diff % 60000) / 1000);
+
                 elDays.textContent = pad(days);
                 elHours.textContent = pad(hours);
                 elMins.textContent = pad(mins);
@@ -556,40 +547,41 @@
             }
 
             tickCountdown();
-            setInterval(tickCountdown, 1000);
+            countdownTimer = setInterval(tickCountdown, 1000);
 
             /* ===================== PARTICLE / FIREWORK ENGINE ===================== */
-            const canvas = document.getElementById('fxCanvas');
-            const ctx = canvas.getContext('2d');
-            let W, H, DPR;
+            var canvas = document.getElementById('fxCanvas');
+            var ctx = canvas.getContext('2d');
+            var W, H, DPR;
+            var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             function resize() {
                 DPR = window.devicePixelRatio || 1;
                 W = window.innerWidth;
                 H = window.innerHeight;
-                canvas.width = W * DPR;
-                canvas.height = H * DPR;
+                canvas.width = Math.max(1, Math.floor(W * DPR));
+                canvas.height = Math.max(1, Math.floor(H * DPR));
                 ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
             }
             resize();
             window.addEventListener('resize', resize);
 
-            const GRAVITY_BASE = 0.6;
-            const DRAG = 0.94;
-            let gravityScale = 1;
-            let spawnScale = 1;
-            let particles = [];
-            let shells = [];
+            var GRAVITY_BASE = 0.6;
+            var DRAG = 0.94;
+            var gravityScale = 1;
+            var spawnScale = 1;
+            var particles = [];
+            var shells = [];
 
-            const GOLD_PALETTE = ['#fcf6ba', '#d4af37', '#fff5cc', '#aa771c', '#f3ead2', '#e8c766'];
-            const FESTIVE_PALETTE = ['#fcf6ba', '#ff6b6b', '#6bd1ff', '#9affb0', '#d4af37', '#ffffff'];
+            var GOLD_PALETTE = ['#fcf6ba', '#d4af37', '#fff5cc', '#aa771c', '#f3ead2', '#e8c766'];
+            var FESTIVE_PALETTE = ['#fcf6ba', '#ff6b6b', '#6bd1ff', '#9affb0', '#d4af37', '#ffffff'];
 
             function rand(min, max) { return Math.random() * (max - min) + min; }
             function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
             function makeStreamerParticle(x, y, colorPalette) {
-                const angle = rand(0, Math.PI * 2);
-                const speed = rand(2, 9);
+                var angle = rand(0, Math.PI * 2);
+                var speed = rand(2, 9);
                 return {
                     x: x, y: y,
                     vx: Math.cos(angle) * speed,
@@ -603,31 +595,31 @@
             }
 
             function burstParticles(count, x, y, palette) {
-                x = x !== undefined ? x : W / 2;
-                y = y !== undefined ? y : H / 2;
+                x = (x === undefined) ? W / 2 : x;
+                y = (y === undefined) ? H / 2 : y;
                 palette = palette || GOLD_PALETTE;
-                for (let i = 0; i < count; i++) {
+                for (var i = 0; i < count; i++) {
                     particles.push(makeStreamerParticle(x, y, palette));
                 }
             }
 
             function spawnShell() {
-                const x = rand(W * 0.15, W * 0.85);
+                var x = rand(W * 0.15, W * 0.85);
                 shells.push({
                     x: x, y: H + 10,
                     targetY: rand(H * 0.15, H * 0.55),
-                    vy: rand(-9, -6.5) * gravityScale === 0 ? rand(-9, -6.5) : rand(-9, -6.5),
+                    vy: rand(-9, -6.5),
                     trail: [], exploded: false,
                     color: pick(FESTIVE_PALETTE)
                 });
             }
 
             function updateShells() {
-                for (let i = shells.length - 1; i >= 0; i--) {
-                    const s = shells[i];
+                for (var i = shells.length - 1; i >= 0; i--) {
+                    var s = shells[i];
                     s.trail.push({ x: s.x, y: s.y });
                     if (s.trail.length > 6) s.trail.shift();
-                    
+
                     s.y += s.vy;
                     if (s.y <= s.targetY && !s.exploded) {
                         s.exploded = true;
@@ -638,7 +630,7 @@
                         ctx.strokeStyle = s.color;
                         ctx.globalAlpha = 0.6;
                         ctx.lineWidth = 2;
-                        for (let t = 0; t < s.trail.length - 1; t++) {
+                        for (var t = 0; t < s.trail.length - 1; t++) {
                             ctx.moveTo(s.trail[t].x, s.trail[t].y);
                             ctx.lineTo(s.trail[t + 1].x, s.trail[t + 1].y);
                         }
@@ -649,8 +641,8 @@
             }
 
             function updateParticles() {
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    const p = particles[i];
+                for (var i = particles.length - 1; i >= 0; i--) {
+                    var p = particles[i];
                     p.vx *= DRAG;
                     p.vy *= DRAG;
                     p.vy += GRAVITY_BASE * gravityScale * 0.04;
@@ -668,7 +660,7 @@
                     ctx.translate(p.x, p.y);
                     ctx.rotate(p.rot);
                     ctx.fillStyle = p.color;
-                    
+
                     if (p.shape === 'rect') {
                         ctx.fillRect(-p.size / 2, -p.size * 1.4 / 2, p.size, p.size * 1.4);
                     } else {
@@ -690,36 +682,28 @@
                 updateParticles();
                 requestAnimationFrame(loop);
             }
-            requestAnimationFrame(loop);
 
-            let shellInterval = setInterval(function() {
-                if (Math.random() < 0.7) spawnShell();
-            }, 1100);
+            var shellInterval = null;
+
+            if (!reduceMotion) {
+                requestAnimationFrame(loop);
+                shellInterval = setInterval(function () {
+                    if (Math.random() < 0.7) spawnShell();
+                }, 1100);
+            }
 
             function climaxBoost() {
+                if (reduceMotion) return;
                 gravityScale = 1;
                 spawnScale = 5;
                 burstParticles(400, W / 2, H * 0.4, FESTIVE_PALETTE);
-                clearInterval(shellInterval);
-                shellInterval = setInterval(function() {
+                if (shellInterval) clearInterval(shellInterval);
+                shellInterval = setInterval(function () {
                     spawnShell();
                     if (Math.random() < 0.5) spawnShell();
                 }, 260);
             }
         })();
-// Disable right-click
-    document.addEventListener('contextmenu', event => event.preventDefault());
-
-    // Disable keyboard shortcuts
-    document.onkeydown = function (e) {
-        if (e.keyCode == 123 || // F12
-            (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) ||
-            (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) ||
-            (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0))) {
-            return false;
-        }
-    };
-        
     </script>
 </body>
 </html>
