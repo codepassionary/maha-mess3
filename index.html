@@ -8,6 +8,30 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;500;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+    .panel {
+    position: relative;
+    width: 100%;
+    max-width: 1100px;
+    min-height: calc(100vh - 80px);
+    border-radius: 24px; /* Smoother corners */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px); /* Increased blur for better depth */
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+    /* Prevent text selection */
+    body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
         :root {
             --void: #020204;
             --void-warm: #1e1503;
@@ -683,6 +707,19 @@
                 }, 260);
             }
         })();
+// Disable right-click
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Disable keyboard shortcuts
+    document.onkeydown = function (e) {
+        if (e.keyCode == 123 || // F12
+            (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) ||
+            (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) ||
+            (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0))) {
+            return false;
+        }
+    };
+        
     </script>
 </body>
 </html>
