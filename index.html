@@ -704,6 +704,41 @@
                 }, 260);
             }
         })();
+        /* ===================== STAGE TRANSITION ===================== */
+var unveilBtn = document.getElementById('unveilBtn');
+var cover = document.getElementById('cover');
+var invitation = document.getElementById('invitation');
+var flash = document.getElementById('flash');
+var hasUnveiled = false;
+
+unveilBtn.addEventListener('click', function () {
+    if (hasUnveiled) return;
+    hasUnveiled = true;
+
+    // --- REQUEST FULLSCREEN ---
+    var docEl = document.documentElement;
+    if (docEl.requestFullscreen) {
+        docEl.requestFullscreen().catch(function(err) {
+            console.log("Fullscreen blocked or failed:", err);
+        });
+    } else if (docEl.webkitRequestFullscreen) { /* Safari / iOS older */
+        docEl.webkitRequestFullscreen();
+    } else if (docEl.msRequestFullscreen) { /* IE11 */
+        docEl.msRequestFullscreen();
+    }
+    // --------------------------
+
+    flash.classList.add('fire');
+    setTimeout(function () {
+        cover.style.display = 'none';
+        invitation.classList.add('show');
+        burstParticles(180, undefined, undefined, GOLD_PALETTE);
+    }, 120);
+
+    setTimeout(function () {
+        flash.classList.remove('fire');
+    }, 900);
+});
     </script>
 </body>
 </html>
