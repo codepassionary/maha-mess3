@@ -1,325 +1,688 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Luxe | Premier</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Grand Farewell Celebration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;500;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
-            --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
-            --text: #FFFFFF; --sub: #94A3B8;
+        :root {
+            --void: #020204;
+            --void-warm: #1e1503;
+            --gold-deep: #aa771c;
+            --gold-bright: #fcf6ba;
+            --gold-mid: #d4af37;
+            --gold-pale: #fff5cc;
+            --ivory: #f3ead2;
+            --line: rgba(212, 175, 55, 0.35);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body { 
-            margin: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            padding-bottom: 40px; padding-top: env(safe-area-inset-top);
-            background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 40%),
-                              radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 40%);
-            background-attachment: fixed;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .container { max-width: 480px; margin: 0 auto; padding: 25px; }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
-        #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
-        .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
-        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
-
-        .stat-card {
-            background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
-            padding: 30px; border-radius: 35px; margin-bottom: 30px;
-            box-shadow: 0 20px 40px -10px var(--p-glow);
-            position: relative; overflow: hidden;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255,255,255,0.2);
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto; /* Allows scrolling on tiny devices */
+            background: var(--void);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--ivory);
         }
-        
-        .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
-        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
-        
-        .quick-log-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 14px; border-radius: 24px;
-            display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
-            z-index: 2; min-width: 110px;
+
+        .stage {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse 70% 60% at 50% 38%, var(--void-warm) 0%, rgba(30, 21, 3, 0.25) 45%, var(--void) 80%);
+            padding: clamp(15px, 3vh, 40px) clamp(10px, 3vw, 30px);
         }
-        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
-        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-        .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
-        .nav-pill { 
-            display: flex; align-items: center; background: var(--card); padding: 8px; 
-            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
-            backdrop-filter: blur(10px);
+        /* Fine vignette + film grain feel */
+        .stage::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 120% 120% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.65) 100%);
+            pointer-events: none;
+            z-index: 5;
         }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
-        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
 
-        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
-
-        .day-item { 
-            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
-            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
-            border: 1px solid var(--surface); backdrop-filter: blur(10px);
-            user-select: none;
+        /* Fixed canvas so fireworks follow the screen if user scrolls */
+        canvas#fxCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 20;
+            pointer-events: none;
         }
-        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
-        
-        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
-        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
 
-        .item-pill { 
-            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
+        /* ---------- GLASS PANEL ---------- */
+        .panel {
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            min-height: calc(100vh - clamp(30px, 6vh, 80px)); /* Adapts to viewport height */
+            height: auto;
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+            border: 1px solid var(--line);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.08), 0 40px 120px rgba(0, 0, 0, 0.65), inset 0 0 80px rgba(170, 119, 28, 0.06);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
-        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
-        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
 
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
-        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
-        .sheet.up { transform: translateY(0); }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
-        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
-        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
-        
-        #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* corner brackets */
+        .corner {
+            position: absolute;
+            width: clamp(32px, 6vw, 64px);
+            height: clamp(32px, 6vw, 64px);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .corner::before,
+        .corner::after {
+            content: "";
+            position: absolute;
+            background: linear-gradient(95deg, var(--gold-deep), var(--gold-bright), var(--gold-mid), var(--gold-pale), var(--gold-deep));
+            background-size: 300% 100%;
+        }
+
+        .corner::before { width: 100%; height: 2px; top: 0; left: 0; }
+        .corner::after { width: 2px; height: 100%; top: 0; left: 0; }
+
+        .corner.tl { top: clamp(12px, 3vw, 22px); left: clamp(12px, 3vw, 22px); }
+        .corner.tr { top: clamp(12px, 3vw, 22px); right: clamp(12px, 3vw, 22px); transform: scaleX(-1); }
+        .corner.bl { bottom: clamp(12px, 3vw, 22px); left: clamp(12px, 3vw, 22px); transform: scaleY(-1); }
+        .corner.br { bottom: clamp(12px, 3vw, 22px); right: clamp(12px, 3vw, 22px); transform: scale(-1, -1); }
+
+        .gold-text {
+            background: linear-gradient(95deg, var(--gold-deep), var(--gold-bright), var(--gold-mid), var(--gold-pale), var(--gold-deep));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: glintAnimation 6s linear infinite;
+        }
+
+        @keyframes glintAnimation {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        /* ================= STAGE 1 : COVER ================= */
+        #cover {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: clamp(15px, 3vh, 28px);
+            padding: clamp(30px, 6vw, 60px) clamp(20px, 4vw, 40px);
+            transition: opacity .4s ease;
+        }
+
+        .eyebrow {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: clamp(9px, 1.3vw, 15px);
+            letter-spacing: clamp(3px, 1vw, 6px);
+            text-transform: uppercase;
+            color: var(--gold-mid);
+            opacity: 0.85;
+            padding: 0 10px;
+        }
+
+        .cover-title {
+            font-family: 'Cinzel Decorative', 'Cinzel', serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: clamp(32px, 7vw, 108px);
+            line-height: 1.08;
+            letter-spacing: 2px;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.35), 0 4px 18px rgba(0, 0, 0, 0.8);
+            max-width: 95%;
+        }
+
+        .ornament-rule {
+            width: min(420px, 60vw);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-mid), transparent);
+        }
+
+        .unveil-btn {
+            margin-top: 10px;
+            padding: clamp(12px, 2vw, 18px) clamp(30px, 5vw, 52px);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: clamp(11px, 1.5vw, 17px);
+            letter-spacing: clamp(2px, 0.5vw, 4px);
+            text-transform: uppercase;
+            color: var(--gold-pale);
+            background: transparent;
+            border: 1.5px solid var(--gold-mid);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: color .35s ease, box-shadow .35s ease, transform .2s ease;
+            box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.0);
+        }
+
+        .unveil-btn:hover {
+            color: var(--void);
+            box-shadow: 0 0 36px rgba(212, 175, 55, 0.45);
+        }
+
+        .unveil-btn:active {
+            transform: scale(0.97);
+        }
+
+        .unveil-btn::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(95deg, var(--gold-deep), var(--gold-bright), var(--gold-mid), var(--gold-pale), var(--gold-deep));
+            background-size: 300% 100%;
+            animation: glintAnimation 5s linear infinite;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .35s ease;
+            z-index: -1;
+        }
+
+        .unveil-btn:hover::before { transform: scaleX(1); }
+
+        /* ================= FLASH OVERLAY ================= */
+        #flash {
+            position: fixed;
+            inset: 0;
+            background: #fffdf6;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #flash.fire {
+            opacity: 1;
+            animation: flashFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes flashFade {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* ================= STAGE 2 : INVITATION ================= */
+        #invitation {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: clamp(30px, 5vh, 60px) clamp(20px, 4vw, 40px);
+            gap: clamp(12px, 2.5vh, 20px);
+        }
+
+        #invitation.show {
+            display: flex;
+        }
+
+        .reveal-item {
+            opacity: 0;
+            transform: translateZ(-60px) translateY(18px);
+            filter: blur(8px);
+            animation: revealPop 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes revealPop {
+            to {
+                opacity: 1;
+                transform: translateZ(0) translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        .d1 { animation-delay: 0.2s; }
+        .d2 { animation-delay: 0.4s; }
+        .d3 { animation-delay: 0.6s; }
+        .d4 { animation-delay: 0.8s; }
+
+        .honoree-label {
+            font-size: clamp(10px, 1.2vw, 14px);
+            letter-spacing: clamp(3px, 0.8vw, 5px);
+            text-transform: uppercase;
+            color: var(--gold-mid);
+            font-weight: 500;
+        }
+
+        .honoree-name {
+            font-family: 'Cinzel Decorative', 'Cinzel', serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: clamp(24px, 6vw, 76px);
+            line-height: 1.1;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
+            max-width: 95%;
+        }
+
+        .dept {
+            font-family: 'Cinzel', serif;
+            font-weight: 500;
+            font-size: clamp(12px, 1.8vw, 24px);
+            color: var(--ivory);
+            opacity: 0.9;
+            letter-spacing: 1px;
+            margin-bottom: clamp(4px, 1vh, 8px);
+            max-width: 95%;
+            line-height: 1.4;
+        }
+
+        .matrix {
+            width: min(900px, 100%);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: clamp(10px, 1.5vw, 14px);
+            margin-top: 8px;
+        }
+
+        .matrix-cell {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: clamp(12px, 2vh, 18px);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        .matrix-cell.full {
+            grid-column: 1 / -1;
+            padding: clamp(14px, 2.5vh, 22px) clamp(12px, 2vw, 18px);
+        }
+
+        .cell-label {
+            font-size: clamp(8px, 1vw, 12px);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold-mid);
+            opacity: 0.85;
+            margin-bottom: 6px;
+        }
+
+        .cell-value {
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            font-size: clamp(14px, 2.2vw, 26px);
+            color: var(--ivory);
+        }
+
+        .cell-value.feature {
+            font-size: clamp(18px, 3vw, 34px);
+        }
+
+        /* ---------- COUNTDOWN ---------- */
+        .countdown-wrap {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: clamp(12px, 3vw, 28px);
+            margin-top: clamp(8px, 2vh, 16px);
+            width: 100%;
+        }
+
+        .count-box {
+            width: clamp(55px, 10vw, 108px);
+            text-align: center;
+        }
+
+        .count-num {
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            font-size: clamp(24px, 6vw, 64px);
+            line-height: 1;
+            text-shadow: 0 0 22px rgba(212, 175, 55, 0.4);
+        }
+
+        .count-unit {
+            font-size: clamp(7px, 1vw, 11px);
+            letter-spacing: clamp(1px, 0.5vw, 3px);
+            text-transform: uppercase;
+            color: var(--gold-mid);
+            opacity: 0.8;
+            margin-top: clamp(4px, 1vh, 6px);
+        }
+
+        /* ---------- LIVE BANNER ---------- */
+        #liveBanner {
+            display: none;
+            font-family: 'Cinzel Decorative', 'Cinzel', serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: clamp(20px, 5vw, 58px);
+            letter-spacing: 2px;
+            margin-top: 6px;
+            animation: livePulse 1.6s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% {
+                text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+                transform: scale(1);
+            }
+            50% {
+                text-shadow: 0 0 50px rgba(212, 175, 55, 0.85);
+                transform: scale(1.035);
+            }
+        }
+
+        /* Responsive specific tweaks */
+        @media (max-width: 480px) {
+            .matrix-cell.full { grid-column: 1 / -1; }
+            .matrix-cell { grid-column: 1 / -1; } /* Force full width on tiny screens */
+        }
+
+        /* Adjust for landscape mobile (short screens) */
+        @media (max-height: 600px) and (orientation: landscape) {
+            #cover, #invitation {
+                padding: 20px;
+                gap: 10px;
+            }
+            .honoree-name { font-size: clamp(20px, 5vh, 40px); }
+            .cover-title { font-size: clamp(28px, 8vh, 60px); }
+            .matrix-cell { padding: 8px 12px; }
+            .countdown-wrap { gap: 10px; margin-top: 5px; }
+            .count-num { font-size: 24px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .gold-text, .unveil-btn::before, #liveBanner { animation: none !important; }
+            .reveal-item { animation-duration: 0.01s !important; }
+        }
+
+        /* focus visibility */
+        .unveil-btn:focus-visible {
+            outline: 2px solid var(--gold-pale);
+            outline-offset: 4px;
+        }
     </style>
 </head>
 <body>
+    <div class="stage">
+        <canvas id="fxCanvas"></canvas>
+        <div class="panel">
+            <!-- corner brackets -->
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
 
-<div id="welcomeScreen">
-    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
-    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
-</div>
+            <!-- STAGE 1 -->
+            <div id="cover">
+                <div class="eyebrow">Requesting the Honor of Your Presence</div>
+                <h1 class="cover-title gold-text">The Grand<br>Farewell Celebration</h1>
+                <div class="ornament-rule"></div>
+                <button class="unveil-btn" id="unveilBtn">Unveil Invitation</button>
+            </div>
 
-<div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
-    <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
-        <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
-            <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
+            <!-- STAGE 2 -->
+            <div id="invitation">
+                <div class="honoree-label reveal-item d1">In Honor Of</div>
+                <h2 class="honoree-name gold-text reveal-item d1">Dr. Upendra Singh<br>Narwaria Sir</h2>
+                <div class="dept reveal-item d2">Department of Livestock Production Management</div>
+
+                <div class="matrix reveal-item d3">
+                    <div class="matrix-cell full">
+                        <div class="cell-label">Ceremonial Event</div>
+                        <div class="cell-value feature gold-text">Cake Cutting Ceremony</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="cell-label">Date &amp; Time</div>
+                        <div class="cell-value">26th June · 11:00 AM IST</div>
+                    </div>
+                    <div class="matrix-cell">
+                        <div class="cell-label">Venue</div>
+                        <div class="cell-value">First Year Classroom</div>
+                    </div>
+                </div>
+
+                <div class="countdown-wrap reveal-item d4" id="countdownWrap">
+                    <div class="count-box"><div class="count-num gold-text" id="cdDays">00</div><div class="count-unit">Days</div></div>
+                    <div class="count-box"><div class="count-num gold-text" id="cdHours">00</div><div class="count-unit">Hours</div></div>
+                    <div class="count-box"><div class="count-num gold-text" id="cdMins">00</div><div class="count-unit">Minutes</div></div>
+                    <div class="count-box"><div class="count-num gold-text" id="cdSecs">00</div><div class="count-unit">Seconds</div></div>
+                </div>
+                <div id="liveBanner" class="gold-text">✨ Celebration Is Live ✨</div>
+            </div>
         </div>
-        <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
     </div>
-</div>
+    <div id="flash"></div>
 
-<div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
-    <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
-        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
-        <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
-    </div>
-</div>
+    <script>
+        (function() {
+            "use strict";
 
-<div class="container">
-    <div class="header">
-        <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
-        <div class="pfp-wrap"><img id="userPfp" class="pfp" onclick="openSettings()"></div>
-    </div>
+            /* ===================== STAGE TRANSITION ===================== */
+            const unveilBtn = document.getElementById('unveilBtn');
+            const cover = document.getElementById('cover');
+            const invitation = document.getElementById('invitation');
+            const flash = document.getElementById('flash');
 
-    <div class="stat-card">
-        <div class="stat-left">
-            <div class="label">Total Bill</div>
-            <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
-        </div>
-        <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
-            <i id="quickIcon">⚡</i>
-            <span id="quickText">Loading...</span>
-        </div>
-    </div>
+            unveilBtn.addEventListener('click', function() {
+                flash.classList.add('fire');
+                setTimeout(function() {
+                    cover.style.display = 'none';
+                    invitation.classList.add('show');
+                    burstParticles(220);
+                }, 120);
+                setTimeout(function() {
+                    flash.classList.remove('fire');
+                }, 900);
+            });
 
-    <div class="nav-pill">
-        <button onclick="changeMonth(-1)">‹</button>
-        <span id="monthLabel">Current</span>
-        <button onclick="changeMonth(1)">›</button>
-    </div>
-    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
+            /* ===================== COUNTDOWN ===================== */
+            const TARGET = new Date('2026-06-26T11:00:00+05:30').getTime();
+            const elDays = document.getElementById('cdDays');
+            const elHours = document.getElementById('cdHours');
+            const elMins = document.getElementById('cdMins');
+            const elSecs = document.getElementById('cdSecs');
+            const countdownWrap = document.getElementById('countdownWrap');
+            const liveBanner = document.getElementById('liveBanner');
 
-    <div id="logsGrid"></div>
-</div>
+            let celebrationLive = false;
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+            function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
-    const firebaseConfig = { 
-        apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
-        projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
-        messagingSenderId: "591343582241", appId: "1:591343582241:web:9fc9761725ad7d9bb97760" 
-    };
-
-    const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
-    let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
-    let config = { name: "", mealPrice: 50, waterPrice: 30 };
-    
-    // SCROLL GUARD VARIABLES
-    let longPressTimer;
-    let startY = 0;
-    let isScrolling = false;
-
-    window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
-    window.logout = () => signOut(auth).then(() => location.reload());
-
-    onAuthStateChanged(auth, async (u) => {
-        if (u) { 
-            user = u; document.getElementById('welcomeScreen').style.display = 'none'; 
-            document.getElementById('userPfp').src = u.photoURL;
-            const userDoc = await getDoc(doc(db, "users", u.uid));
-            if (userDoc.exists()) config = { ...config, ...userDoc.data() };
-            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
-            document.getElementById('userLabel').innerText = config.name;
-            updateGreet(); syncData(); 
-        } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
-    });
-
-    function isCurrentMonth() {
-        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
-    }
-
-    function updateGreet() {
-        const h = new Date().getHours();
-        document.getElementById('greetLabel').innerText = h < 12 ? "Good Morning 🌅" : h < 17 ? "Good Afternoon ☀️" : "Good Evening 🌇";
-    }
-
-    function syncData() {
-        onSnapshot(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), (d) => {
-            logs = d.data() || {}; renderGrid();
-        });
-    }
-
-    window.quickLog = async () => {
-        if (!isCurrentMonth()) return;
-        const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        if(obj[type] === 1) return;
-        obj[type] = 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
-
-    function renderGrid() {
-        const current = isCurrentMonth();
-        document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
-        document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
-        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-        
-        const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
-        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-
-        const type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const isMarked = logs[todayDate.getDate()] && logs[todayDate.getDate()][type] === 1;
-        
-        if (current) {
-            document.getElementById('quickIcon').innerText = isMarked ? '✅' : '⚡';
-            document.getElementById('quickText').innerText = isMarked ? 'Marked' : `Mark ${type==='l'?'Lunch':'Dinner'}`;
-            if(isMarked) document.getElementById('quickBtn').classList.add('done');
-            else document.getElementById('quickBtn').classList.remove('done');
-        } else {
-            document.getElementById('quickIcon').innerText = '🔒';
-            document.getElementById('quickText').innerText = 'Locked';
-        }
-
-        for (let i = 1; i <= daysCount; i++) {
-            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
-            const card = document.createElement('div');
-            card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
-            
-            if (current) {
-                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
-                card.addEventListener('touchstart', (e) => {
-                    startY = e.touches[0].clientY;
-                    isScrolling = false;
-                    longPressTimer = setTimeout(() => {
-                        if (!isScrolling) openNote(i);
-                    }, 650);
-                }, { passive: true });
-
-                card.addEventListener('touchmove', (e) => {
-                    let moveY = e.touches[0].clientY;
-                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
-                        isScrolling = true;
-                        clearTimeout(longPressTimer);
+            function tickCountdown() {
+                const now = Date.now();
+                const diff = TARGET - now;
+                if (diff <= 0) {
+                    if (!celebrationLive) {
+                        celebrationLive = true;
+                        countdownWrap.style.display = 'none';
+                        liveBanner.style.display = 'block';
+                        climaxBoost();
                     }
-                }, { passive: true });
+                    return;
+                }
+                const days = Math.floor(diff / 86400000);
+                const hours = Math.floor((diff % 86400000) / 3600000);
+                const mins = Math.floor((diff % 3600000) / 60000);
+                const secs = Math.floor((diff % 60000) / 1000);
+                
+                elDays.textContent = pad(days);
+                elHours.textContent = pad(hours);
+                elMins.textContent = pad(mins);
+                elSecs.textContent = pad(secs);
+            }
 
-                card.addEventListener('touchend', () => {
-                    clearTimeout(longPressTimer);
+            tickCountdown();
+            setInterval(tickCountdown, 1000);
+
+            /* ===================== PARTICLE / FIREWORK ENGINE ===================== */
+            const canvas = document.getElementById('fxCanvas');
+            const ctx = canvas.getContext('2d');
+            let W, H, DPR;
+
+            function resize() {
+                DPR = window.devicePixelRatio || 1;
+                W = window.innerWidth;
+                H = window.innerHeight;
+                canvas.width = W * DPR;
+                canvas.height = H * DPR;
+                ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const GRAVITY_BASE = 0.6;
+            const DRAG = 0.94;
+            let gravityScale = 1;
+            let spawnScale = 1;
+            let particles = [];
+            let shells = [];
+
+            const GOLD_PALETTE = ['#fcf6ba', '#d4af37', '#fff5cc', '#aa771c', '#f3ead2', '#e8c766'];
+            const FESTIVE_PALETTE = ['#fcf6ba', '#ff6b6b', '#6bd1ff', '#9affb0', '#d4af37', '#ffffff'];
+
+            function rand(min, max) { return Math.random() * (max - min) + min; }
+            function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+            function makeStreamerParticle(x, y, colorPalette) {
+                const angle = rand(0, Math.PI * 2);
+                const speed = rand(2, 9);
+                return {
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - rand(0, 3),
+                    color: pick(colorPalette),
+                    shape: Math.random() < 0.5 ? 'rect' : 'diamond',
+                    size: rand(2.5, 5),
+                    life: 1, decay: rand(0.006, 0.014),
+                    rot: rand(0, Math.PI * 2), vr: rand(-0.2, 0.2)
+                };
+            }
+
+            function burstParticles(count, x, y, palette) {
+                x = x !== undefined ? x : W / 2;
+                y = y !== undefined ? y : H / 2;
+                palette = palette || GOLD_PALETTE;
+                for (let i = 0; i < count; i++) {
+                    particles.push(makeStreamerParticle(x, y, palette));
+                }
+            }
+
+            function spawnShell() {
+                const x = rand(W * 0.15, W * 0.85);
+                shells.push({
+                    x: x, y: H + 10,
+                    targetY: rand(H * 0.15, H * 0.55),
+                    vy: rand(-9, -6.5) * gravityScale === 0 ? rand(-9, -6.5) : rand(-9, -6.5),
+                    trail: [], exploded: false,
+                    color: pick(FESTIVE_PALETTE)
                 });
             }
 
-            card.innerHTML = `
-                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
-                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
-                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
-                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
-                ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
-            `;
-            grid.appendChild(card);
-        }
-        calculate();
-    }
+            function updateShells() {
+                for (let i = shells.length - 1; i >= 0; i--) {
+                    const s = shells[i];
+                    s.trail.push({ x: s.x, y: s.y });
+                    if (s.trail.length > 6) s.trail.shift();
+                    
+                    s.y += s.vy;
+                    if (s.y <= s.targetY && !s.exploded) {
+                        s.exploded = true;
+                        burstParticles(Math.floor(60 * spawnScale), s.x, s.y, FESTIVE_PALETTE);
+                        shells.splice(i, 1);
+                    } else {
+                        ctx.beginPath();
+                        ctx.strokeStyle = s.color;
+                        ctx.globalAlpha = 0.6;
+                        ctx.lineWidth = 2;
+                        for (let t = 0; t < s.trail.length - 1; t++) {
+                            ctx.moveTo(s.trail[t].x, s.trail[t].y);
+                            ctx.lineTo(s.trail[t + 1].x, s.trail[t + 1].y);
+                        }
+                        ctx.stroke();
+                        ctx.globalAlpha = 1;
+                    }
+                }
+            }
 
-    window.toggle = async (day, type) => {
-        if (!isCurrentMonth()) return;
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
-        obj[type] = obj[type] ? 0 : 1;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
-    };
+            function updateParticles() {
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.vx *= DRAG;
+                    p.vy *= DRAG;
+                    p.vy += GRAVITY_BASE * gravityScale * 0.04;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.rot += p.vr;
+                    p.life -= p.decay;
 
-    window.openNote = (day) => {
-        activeDayId = day;
-        document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
-        document.getElementById('noteInput').value = logs[day]?.n || "";
-        document.getElementById('noteOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
-    };
-    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
-    window.saveNote = async () => {
-        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
-        obj.n = document.getElementById('noteInput').value;
-        await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
-        closeNote();
-    };
+                    if (p.life <= 0 || p.y > H + 40) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(p.life, 0);
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot);
+                    ctx.fillStyle = p.color;
+                    
+                    if (p.shape === 'rect') {
+                        ctx.fillRect(-p.size / 2, -p.size * 1.4 / 2, p.size, p.size * 1.4);
+                    } else {
+                        ctx.beginPath();
+                        ctx.moveTo(0, -p.size);
+                        ctx.lineTo(p.size * 0.7, 0);
+                        ctx.lineTo(0, p.size);
+                        ctx.lineTo(-p.size * 0.7, 0);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+            }
 
-    window.openSettings = () => {
-        document.getElementById('setUserName').value = config.name;
-        document.getElementById('setMealPrice').value = config.mealPrice;
-        document.getElementById('setWaterPrice').value = config.waterPrice;
-        document.getElementById('settingsOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
-    };
-    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
-    window.saveSettings = async () => {
-        config.name = document.getElementById('setUserName').value;
-        config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
-        config.waterPrice = parseInt(document.getElementById('setWaterPrice').value);
-        await setDoc(doc(db, "users", user.uid), config, { merge: true });
-        document.getElementById('userLabel').innerText = config.name;
-        calculate(); closeSettings();
-    };
+            function loop() {
+                ctx.clearRect(0, 0, W, H);
+                updateShells();
+                updateParticles();
+                requestAnimationFrame(loop);
+            }
+            requestAnimationFrame(loop);
 
-    function calculate() {
-        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
-        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
-    }
+            let shellInterval = setInterval(function() {
+                if (Math.random() < 0.7) spawnShell();
+            }, 1100);
 
-    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
-</script>
+            function climaxBoost() {
+                gravityScale = 1;
+                spawnScale = 5;
+                burstParticles(400, W / 2, H * 0.4, FESTIVE_PALETTE);
+                clearInterval(shellInterval);
+                shellInterval = setInterval(function() {
+                    spawnShell();
+                    if (Math.random() < 0.5) spawnShell();
+                }, 260);
+            }
+        })();
+    </script>
 </body>
 </html>
