@@ -1,21 +1,18 @@
-vvvv222...000<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>VetTrack Luxe | Premier</title>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <style>/* Minimalist Pulse Loader */
-.loader-wrap { display: flex; align-items: center; justify-content: center; height: 100vh; }
-.pulse-ring {
-    width: 50px; height: 50px;
-    border: 4px solid rgba(255, 140, 0, 0.2);
-    border-top: 4px solid var(--p);
-    border-radius: 50%;
-    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
-}
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
+    
+    <!-- PDF Export Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
         :root { 
             --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
             --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
@@ -35,10 +32,17 @@ vvvv222...000<!DOCTYPE html>
 
         .container { max-width: 480px; margin: 0 auto; padding: 25px; }
 
-        /* Header & Branding */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
+        /* Loader Animation */
+        .loader-overlay { position: fixed; inset: 0; background: rgba(11, 15, 26, 0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .pulse-ring { width: 50px; height: 50px; border: 4px solid rgba(255, 140, 0, 0.2); border-top: 4px solid var(--p); border-radius: 50%; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; margin-bottom: 15px; }
+        .loader-text { font-family: 'Outfit'; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--p); animation: pulseText 1.5s infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
+        #userLabel { font-family: 'Outfit'; font-size: 30px; margin: 0; font-weight: 800; letter-spacing: -1px; }
         .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
         .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); transition: transform 0.2s; }
         .pfp:active { transform: scale(0.95); }
@@ -46,93 +50,55 @@ vvvv222...000<!DOCTYPE html>
         /* Analytics Card */
         .stat-card {
             background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
-            padding: 30px; border-radius: 35px; margin-bottom: 30px;
+            padding: 25px; border-radius: 35px; margin-bottom: 20px;
             box-shadow: 0 20px 40px -10px var(--p-glow);
-            position: relative; overflow: hidden;
             display: flex; justify-content: space-between; align-items: center;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        .stat-left { flex: 1; padding-right: 15px; }
+        .stat-left { flex: 1; }
         .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
-        .total-val { font-family: 'Outfit'; font-size: 46px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 1; margin-bottom: 8px; }
+        .total-val { font-family: 'Outfit'; font-size: 42px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 1; margin-bottom: 8px; }
         
-        /* Visual Expense Bar */
-        .expense-bar-wrap { width: 100%; height: 6px; background: rgba(0,0,0,0.2); border-radius: 3px; display: flex; overflow: hidden; margin-top: 12px; }
-        .expense-bar-meal { background: #FFFFFF; height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
-        .expense-bar-water { background: rgba(255,255,255,0.4); height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
-
-        /* Quick Log Button */
-        .quick-log-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 14px; border-radius: 24px;
-            display: flex; flex-direction: column; align-items: center;
-            font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
-            z-index: 2; min-width: 100px;
-        }
+        .quick-log-btn { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 14px; border-radius: 24px; display: flex; flex-direction: column; align-items: center; font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s; min-width: 90px; }
         .quick-log-btn:active { transform: scale(0.95); }
         .quick-log-btn.done { background: white; color: var(--p); border-color: white; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2); }
-        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); transform: none; }
+        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
         .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
+        /* Export Controls */
+        .export-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .export-btn { background: var(--surface); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 20px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; backdrop-filter: blur(10px); }
+        .export-btn:active { background: var(--p); border-color: var(--p); transform: scale(0.97); }
+
         /* Navigation */
-        .nav-pill { 
-            display: flex; align-items: center; background: var(--card); padding: 8px; 
-            border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
-            backdrop-filter: blur(10px);
-        }
+        .nav-pill { display: flex; align-items: center; background: var(--card); padding: 8px; border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 20px; backdrop-filter: blur(10px); }
         .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; transition: 0.2s; }
         .nav-pill button:active { background: rgba(255,255,255,0.2); }
-        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
+        .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 14px; color: var(--text); }
 
-        .view-only-badge { text-align: center; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 10px; font-weight: 900; padding: 6px; border-radius: 12px; margin-top: -15px; margin-bottom: 25px; display: none; text-transform: uppercase; letter-spacing: 1px; }
+        .view-only-badge { text-align: center; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 10px; font-weight: 900; padding: 6px; border-radius: 12px; margin-top: -10px; margin-bottom: 20px; display: none; text-transform: uppercase; letter-spacing: 1px; }
 
         /* Day Grid Items */
-        .day-item { 
-            display: grid; grid-template-columns: 75px 1fr 1fr 1fr; gap: 10px; align-items: center; 
-            padding: 16px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
-            border: 1px solid var(--surface); backdrop-filter: blur(10px);
-            transition: border-color 0.3s, background 0.3s;
-        }
-        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.08); box-shadow: 0 10px 30px -10px rgba(255, 140, 0, 0.15); }
+        .day-item { display: grid; grid-template-columns: 60px 1fr 1fr 1fr 1fr; gap: 8px; align-items: center; padding: 16px 12px; background: var(--card); border-radius: 25px; margin-bottom: 12px; border: 1px solid var(--surface); backdrop-filter: blur(10px); transition: border-color 0.3s, background 0.3s; position: relative; }
+        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.08); }
         
-        .date-circ { display: flex; flex-direction: column; justify-content: center; position: relative; }
-        .date-circ .n { font-family: 'Outfit'; font-size: 32px; font-weight: 800; color: var(--text); display: block; line-height: 1; margin-bottom: 2px; }
+        .date-circ { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .date-circ .n { font-family: 'Outfit'; font-size: 26px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 2px; }
         .day-item.is-today .date-circ .n { color: var(--p); }
-        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; }
+        .date-circ .d { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
         
-        /* Explicit Note Button - Replaces buggy long-press */
-        .add-note-btn { position: absolute; top: 0; right: 5px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--sub); cursor: pointer; transition: 0.2s; }
+        .add-note-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: var(--sub); cursor: pointer; transition: 0.2s; }
         .add-note-btn:active { background: var(--p); color: white; border-color: var(--p); transform: scale(0.9); }
         .add-note-btn svg { width: 10px; height: 10px; }
 
-        .item-pill { 
-            height: 60px; border-radius: 20px; border: 1px solid var(--surface); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.03); cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .item-pill.active { 
-            background: var(--p); border-color: var(--p); color: white; 
-            box-shadow: 0 8px 25px -5px rgba(255, 140, 0, 0.5), inset 0 2px 4px rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-        }
+        .item-pill { height: 50px; border-radius: 16px; border: 1px solid var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); cursor: pointer; transition: all 0.2s; }
+        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 4px 15px -5px rgba(255, 140, 0, 0.5); }
+        .item-pill.gym-active { background: #38bdf8; border-color: #38bdf8; color: white; box-shadow: 0 4px 15px -5px rgba(56, 189, 248, 0.5); }
         .item-pill.disabled { cursor: not-allowed; opacity: 0.4; }
-        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+        .item-pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; margin-top: 3px; letter-spacing: 0.5px; }
+        .item-pill svg { width: 16px; height: 16px; opacity: 0.8; }
 
-        /* Notes Tag */
-        .note-tag {
-            grid-column: 1 / -1; 
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-size: 12px;
-            color: var(--text);
-            border-left: 3px solid var(--p);
-            margin-top: 4px;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .note-tag { grid-column: 1 / -1; background: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 10px 14px; font-size: 11px; color: var(--text); border-left: 3px solid var(--p); display: flex; align-items: center; gap: 8px; margin-top: 4px; }
 
         /* Modals / Sheets */
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: flex-end; opacity: 0; transition: opacity 0.4s ease; }
@@ -141,17 +107,27 @@ vvvv222...000<!DOCTYPE html>
         .sheet.up { transform: translateY(0); }
         
         .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .form-group input, textarea { width: 100%; padding: 18px; background: rgba(0,0,0,0.3); border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; transition: border-color 0.3s; }
+        .form-group input, textarea { width: 100%; padding: 16px; background: rgba(0,0,0,0.3); border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
         .form-group input:focus, textarea:focus { border-color: var(--p); }
         
-        .btn-prime { background: var(--p); color: white; padding: 20px; border-radius: 22px; border: none; font-weight: 800; font-size: 15px; width: 100%; cursor: pointer; transition: 0.2s; }
+        .btn-prime { background: var(--p); color: white; padding: 18px; border-radius: 22px; border: none; font-weight: 800; font-size: 15px; width: 100%; cursor: pointer; transition: 0.2s; }
         .btn-prime:active { transform: scale(0.97); }
         
         #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* PDF Helper Container (Hidden from view) */
+        #exportHelper { display: none; position: absolute; top: -9999px; left: -9999px; width: 800px; padding: 60px; background: #ffffff; color: #000000; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
+<!-- Loading Overlay -->
+<div class="loader-overlay" id="loader">
+    <div class="pulse-ring"></div>
+    <div class="loader-text">Processing</div>
+</div>
+
+<!-- Welcome/Login -->
 <div id="welcomeScreen">
     <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900; letter-spacing: -2px;">VetTrack<span style="color:var(--p)">.</span></h1>
     <p style="color: var(--sub); font-weight: 600; margin-top: -20px; margin-bottom: 40px;">Luxe Edition</p>
@@ -168,7 +144,7 @@ vvvv222...000<!DOCTYPE html>
             <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
         </div>
         <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:25px; font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing: 1px; cursor: pointer;">Sign Out securely</button>
+        <button onclick="logout()" style="background:none; border:none; color:#ef4444; width:100%; margin-top:25px; font-weight:800; font-size:12px; text-transform:uppercase; cursor: pointer;">Sign Out securely</button>
     </div>
 </div>
 
@@ -176,11 +152,12 @@ vvvv222...000<!DOCTYPE html>
 <div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
     <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
         <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0; font-size: 28px;">Log Details</h2>
-        <textarea id="noteInput" rows="4" placeholder="Add guest details, special expenses, or notes..."></textarea>
+        <textarea id="noteInput" rows="4" placeholder="Add clinical notes, special expenses..."></textarea>
         <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
     </div>
 </div>
 
+<!-- Main App Container -->
 <div class="container">
     <div class="header">
         <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
@@ -189,25 +166,20 @@ vvvv222...000<!DOCTYPE html>
 
     <div class="stat-card">
         <div class="stat-left">
-            <div class="label">Total Bill</div>
+            <div class="label">Net Total</div>
             <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9;">0 Meals • 0 Water Units</div>
-            
-            <!-- Replaced EOM with Visual Expense Bar -->
-            <div class="expense-bar-wrap">
-                <div id="mealBar" class="expense-bar-meal"></div>
-                <div id="waterBar" class="expense-bar-water"></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 9px; font-weight: 800; margin-top: 6px; text-transform: uppercase; color: rgba(255,255,255,0.7);">
-                <span>Meals</span>
-                <span>Water</span>
-            </div>
+            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9;">Avg: ₹0/day</div>
         </div>
-        
         <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
             <i id="quickIcon">⚡</i>
             <span id="quickText">Loading...</span>
         </div>
+    </div>
+
+    <!-- PDF Export Controls -->
+    <div class="export-controls">
+        <button class="export-btn" onclick="exportPDF('meal')">📄 Export Meals Bill</button>
+        <button class="export-btn" onclick="exportPDF('water')">💧 Export Water Bill</button>
     </div>
 
     <div class="nav-pill">
@@ -220,6 +192,9 @@ vvvv222...000<!DOCTYPE html>
 
     <div id="logsGrid"></div>
 </div>
+
+<!-- Hidden PDF Generator Container -->
+<div id="exportHelper"></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -234,7 +209,7 @@ vvvv222...000<!DOCTYPE html>
 
     const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
     let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
-    let config = { name: "", mealPrice: 50, waterPrice: 30 };
+    let config = { name: "Veterinary Resident", mealPrice: 50, waterPrice: 30 };
 
     window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
     window.logout = () => signOut(auth).then(() => location.reload());
@@ -245,15 +220,13 @@ vvvv222...000<!DOCTYPE html>
             document.getElementById('userPfp').src = u.photoURL;
             const userDoc = await getDoc(doc(db, "users", u.uid));
             if (userDoc.exists()) config = { ...config, ...userDoc.data() };
-            else { config.name = u.displayName; await setDoc(doc(db, "users", u.uid), config); }
+            else { config.name = u.displayName || config.name; await setDoc(doc(db, "users", u.uid), config); }
             document.getElementById('userLabel').innerText = config.name;
             updateGreet(); syncData(); 
         } else { document.getElementById('welcomeScreen').style.display = 'flex'; }
     });
 
-    function isCurrentMonth() {
-        return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear();
-    }
+    function isCurrentMonth() { return viewDate.getMonth() === todayDate.getMonth() && viewDate.getFullYear() === todayDate.getFullYear(); }
 
     function updateGreet() {
         const h = new Date().getHours();
@@ -268,10 +241,10 @@ vvvv222...000<!DOCTYPE html>
 
     window.quickLog = async () => {
         if (!isCurrentMonth()) return;
-        if (navigator.vibrate) navigator.vibrate(50); // Haptic feedback
+        if (navigator.vibrate) navigator.vibrate(50);
         
         const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
+        const obj = logs[day] || { l: 0, d: 0, w: 0, g: 0, n: "" };
         if(obj[type] === 1) return;
         obj[type] = 1;
         await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
@@ -299,28 +272,32 @@ vvvv222...000<!DOCTYPE html>
             document.getElementById('quickText').innerText = 'Archived';
         }
 
-        // Generate Card Elements
         for (let i = 1; i <= daysCount; i++) {
-            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
+            const d = logs[i] || { l: 0, d: 0, w: 0, g: 0, n: "" };
             const card = document.createElement('div');
             card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
             
-            // Explicit SVG Note button replaces complex touch/long-press logic
             const noteBtnHTML = current ? `
                 <div class="add-note-btn" onclick="openNote(${i})" title="Add Note">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
                 </div>
             ` : '';
+
+            // SVG Icons for aesthetic pills
+            const iconMeal = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
+            const iconWater = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
+            const iconGym = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5h11M6.5 17.5h11M4 6.5V17.5M20 6.5V17.5M2 9v6M22 9v6M8 4v16M16 4v16"/></svg>`;
 
             card.innerHTML = `
                 <div class="date-circ">
                     <span class="n">${i}</span>
                     <span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span>
-                    ${noteBtnHTML}
                 </div>
-                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'l')"><span>Lunch</span></div>
-                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'd')"><span>Dinner</span></div>
-                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'w')"><span>Water</span></div>
+                ${noteBtnHTML}
+                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'l')">${iconMeal}<span>Lunch</span></div>
+                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'd')">${iconMeal}<span>Dinner</span></div>
+                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'w')">${iconWater}<span>Water</span></div>
+                <div class="item-pill ${d.g?'gym-active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'g')">${iconGym}<span>Gym</span></div>
                 ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
             `;
             grid.appendChild(card);
@@ -332,7 +309,7 @@ vvvv222...000<!DOCTYPE html>
         if (!isCurrentMonth()) return;
         if (navigator.vibrate) navigator.vibrate(20); 
 
-        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
+        const obj = logs[day] || { l: 0, d: 0, w: 0, g: 0, n: "" };
         obj[type] = obj[type] ? 0 : 1;
         await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
     };
@@ -342,22 +319,13 @@ vvvv222...000<!DOCTYPE html>
         activeDayId = day;
         document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
         document.getElementById('noteInput').value = logs[day]?.n || "";
-        
-        const overlay = document.getElementById('noteOverlay');
-        const sheet = document.getElementById('noteSheet');
-        overlay.style.display = 'flex';
-        // Tiny delay to allow display:flex to apply before adding transition classes
-        setTimeout(() => { overlay.classList.add('show'); sheet.classList.add('up'); }, 10); 
+        const overlay = document.getElementById('noteOverlay'), sheet = document.getElementById('noteSheet');
+        overlay.style.display = 'flex'; setTimeout(() => { overlay.classList.add('show'); sheet.classList.add('up'); }, 10); 
     };
-    
-    window.closeNote = () => { 
-        document.getElementById('noteSheet').classList.remove('up'); 
-        document.getElementById('noteOverlay').classList.remove('show');
-        setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); 
-    };
+    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); document.getElementById('noteOverlay').classList.remove('show'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
     
     window.saveNote = async () => {
-        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
+        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, g: 0, n: "" };
         obj.n = document.getElementById('noteInput').value.trim();
         await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
         closeNote();
@@ -367,18 +335,10 @@ vvvv222...000<!DOCTYPE html>
         document.getElementById('setUserName').value = config.name;
         document.getElementById('setMealPrice').value = config.mealPrice;
         document.getElementById('setWaterPrice').value = config.waterPrice;
-        
-        const overlay = document.getElementById('settingsOverlay');
-        const sheet = document.getElementById('settingsSheet');
-        overlay.style.display = 'flex';
-        setTimeout(() => { overlay.classList.add('show'); sheet.classList.add('up'); }, 10);
+        const overlay = document.getElementById('settingsOverlay'), sheet = document.getElementById('settingsSheet');
+        overlay.style.display = 'flex'; setTimeout(() => { overlay.classList.add('show'); sheet.classList.add('up'); }, 10);
     };
-    
-    window.closeSettings = () => { 
-        document.getElementById('settingsSheet').classList.remove('up'); 
-        document.getElementById('settingsOverlay').classList.remove('show');
-        setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); 
-    };
+    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); document.getElementById('settingsOverlay').classList.remove('show'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
     
     window.saveSettings = async () => {
         config.name = document.getElementById('setUserName').value;
@@ -391,49 +351,134 @@ vvvv222...000<!DOCTYPE html>
 
     function calculate() {
         let m = 0, w = 0; 
-        Object.values(logs).forEach(v => { 
-            if(v.l) m++; 
-            if(v.d) m++; 
-            if(v.w) w++; 
-        });
-
-        const mealCost = m * config.mealPrice;
-        const waterCost = w * config.waterPrice;
-        const currentTotal = mealCost + waterCost;
+        Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
+        const currentTotal = (m * config.mealPrice) + (w * config.waterPrice);
         
-        // Update Stats UI
+        // Dynamic Average Calculation
+        const isCurrent = isCurrentMonth();
+        const daysDivider = isCurrent ? Math.max(1, todayDate.getDate()) : new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+        const avgDaily = currentTotal / daysDivider;
+        
         document.getElementById('totalValue').innerText = `₹${currentTotal.toLocaleString('en-IN')}`;
-        document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
-        
-        // Update Visual Expense Bar
-        if (currentTotal > 0) {
-            document.getElementById('mealBar').style.width = `${(mealCost / currentTotal) * 100}%`;
-            document.getElementById('waterBar').style.width = `${(waterCost / currentTotal) * 100}%`;
-        } else {
-            document.getElementById('mealBar').style.width = '0%';
-            document.getElementById('waterBar').style.width = '0%';
-        }
+        document.getElementById('statsSub').innerText = `Avg: ₹${Math.round(avgDaily)}/day • ${m} Meals • ${w} Water`;
     }
 
     window.changeMonth = (dir) => { 
-        viewDate.setDate(1); // Crucial fix for 31st overflow bug
-        viewDate.setMonth(viewDate.getMonth() + dir); 
-        syncData(); 
+        viewDate.setDate(1); viewDate.setMonth(viewDate.getMonth() + dir); syncData(); 
     };
-async function exportData(type) {
-    // 1. Show the loader
-    const loader = document.createElement('div');
-    loader.className = 'loader-wrap';
-    loader.innerHTML = '<div class="pulse-ring"></div>';
-    document.body.appendChild(loader);
 
-    // 2. Perform the async work (Location + PDF generation)
-    // ... existing export logic ...
+    // --- PDF Generation Engine with Geolocation & Timestamp ---
+    window.exportPDF = async (type) => {
+        // 1. Show Pulse Loader
+        document.getElementById('loader').style.display = 'flex';
 
-    // 3. Remove loader once done
-    document.body.removeChild(loader);
-}
-    
+        // 2. Fetch Location silently
+        let locationText = "GPS Offline";
+        try {
+            const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {timeout: 4000}));
+            locationText = `Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)}`;
+        } catch(e) { console.log("Location skipped or denied"); }
+
+        // 3. Prepare Data
+        const { jsPDF } = window.jspdf;
+        const helper = document.getElementById('exportHelper');
+        const reportMonth = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+        const downloadDate = new Date();
+        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+        
+        // Build Table Rows
+        let tableRows = '';
+        let totalUnits = 0;
+        let totalCost = 0;
+
+        for (let i = 1; i <= daysCount; i++) {
+            const d = logs[i] || { l: 0, d: 0, w: 0 };
+            let status = '';
+            
+            if(type === 'meal') {
+                let meals = 0; if(d.l) meals++; if(d.d) meals++;
+                status = meals > 0 ? `${meals} Meal(s)` : '-';
+                totalUnits += meals;
+                totalCost += (meals * config.mealPrice);
+            } else {
+                status = d.w ? '1 Unit' : '-';
+                if(d.w) { totalUnits++; totalCost += config.waterPrice; }
+            }
+            
+            // Only add rows that have data to keep the bill clean, OR show all? Let's show all for strict clinical logging
+            tableRows += `
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 10px; font-weight: bold;">${i} ${viewDate.toLocaleDateString('en-IN', {month:'short'})}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px;">${status}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px;">${d.n ? d.n : '-'}</td>
+                </tr>`;
+        }
+
+        // 4. Construct Clinical HTML Bill
+        helper.style.display = 'block';
+        helper.innerHTML = `
+            <div style="position:relative; width: 100%; height: 100%; z-index: 1;">
+                <!-- Watermark -->
+                <div style="text-align:center; opacity: 0.04; font-size: 80px; font-weight:900; position:absolute; top:35%; left:0; right:0; transform: rotate(-45deg); z-index: -1;">
+                    VETTRACK LUXE<br>ORIGINAL
+                </div>
+                
+                <h1 style="border-bottom: 3px solid #FF8C00; padding-bottom: 10px; margin-bottom: 30px; font-size: 34px;">
+                    ${type === 'meal' ? 'MEAL EXPENDITURE BILL' : 'WATER DISPENSATION BILL'}
+                </h1>
+                
+                <div style="display:flex; justify-content: space-between; margin-bottom: 30px; font-size: 16px;">
+                    <div>
+                        <p style="margin: 5px 0;"><strong>Diner / Resident:</strong> ${config.name}</p>
+                        <p style="margin: 5px 0;"><strong>Report Month:</strong> ${reportMonth}</p>
+                        <p style="margin: 5px 0;"><strong>Base Rate:</strong> ₹${type === 'meal' ? config.mealPrice : config.waterPrice} per unit</p>
+                    </div>
+                    <div style="text-align: right; background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #eee;">
+                        <p style="margin: 0; font-size: 12px; color: #666; text-transform: uppercase;">Total Bill Amount</p>
+                        <p style="margin: 5px 0 0 0; font-size: 28px; font-weight: 900; color: #000;">₹${totalCost.toLocaleString('en-IN')}</p>
+                    </div>
+                </div>
+
+                <table style="width:100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
+                    <tr style="background:#222; color: #fff;">
+                        <th style="padding:12px; text-align: left;">Date</th>
+                        <th style="padding:12px; text-align: left;">Consumption Status</th>
+                        <th style="padding:12px; text-align: left;">Clinical Notes</th>
+                    </tr>
+                    ${tableRows}
+                </table>
+                
+                <div style="margin-top: 50px; padding-top: 20px; border-top: 1px dashed #ccc; font-size: 12px; color: #444; line-height: 1.6;">
+                    <strong>SYSTEM METADATA (DO NOT ALTER)</strong><br>
+                    <strong>Downloaded on:</strong> ${downloadDate.toLocaleDateString('en-IN')} at ${downloadDate.toLocaleTimeString('en-IN')}<br>
+                    <strong>Geo-Tag Signature:</strong> ${locationText}<br>
+                    <strong>Total Units Logged:</strong> ${totalUnits}
+                </div>
+            </div>
+        `;
+
+        // 5. Convert to PDF
+        try {
+            const canvas = await html2canvas(helper, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Calculate aspect ratio to fit A4
+            const imgProps = doc.getImageProperties(imgData);
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            
+            doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            doc.save(`VetTrack_${type}_Bill_${reportMonth.replace(' ', '_')}.pdf`);
+        } catch (error) {
+            console.error("PDF Export Failed", error);
+            alert("Export failed. Please try again.");
+        } finally {
+            // Clean up
+            helper.style.display = 'none';
+            document.getElementById('loader').style.display = 'none';
+        }
+    };
 </script>
 </body>
 </html>
