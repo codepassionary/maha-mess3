@@ -1,5 +1,4 @@
-update in progress. . .
-<!DOCTYPE html>
+vvvv222...000<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -26,12 +25,15 @@ update in progress. . .
 
         .container { max-width: 480px; margin: 0 auto; padding: 25px; }
 
+        /* Header & Branding */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; }
         #greetLabel { margin: 0; font-size: 12px; color: var(--p); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
         #userLabel { font-family: 'Outfit'; font-size: 34px; margin: 0; font-weight: 800; letter-spacing: -1.5px; }
         .pfp-wrap { position: relative; padding: 3px; border-radius: 20px; background: linear-gradient(135deg, var(--p), transparent); }
-        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); }
+        .pfp { width: 54px; height: 54px; border-radius: 18px; cursor: pointer; object-fit: cover; display: block; border: 2px solid var(--bg); transition: transform 0.2s; }
+        .pfp:active { transform: scale(0.95); }
 
+        /* Analytics Card */
         .stat-card {
             background: linear-gradient(135deg, #FF8C00 0%, #FF5F1F 100%);
             padding: 30px; border-radius: 35px; margin-bottom: 30px;
@@ -40,10 +42,16 @@ update in progress. . .
             display: flex; justify-content: space-between; align-items: center;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        
+        .stat-left { flex: 1; padding-right: 15px; }
         .label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.9); margin-bottom: 5px; }
-        .total-val { font-family: 'Outfit'; font-size: 52px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 0.9; }
+        .total-val { font-family: 'Outfit'; font-size: 46px; font-weight: 900; color: white; letter-spacing: -2px; line-height: 1; margin-bottom: 8px; }
         
+        /* Visual Expense Bar */
+        .expense-bar-wrap { width: 100%; height: 6px; background: rgba(0,0,0,0.2); border-radius: 3px; display: flex; overflow: hidden; margin-top: 12px; }
+        .expense-bar-meal { background: #FFFFFF; height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .expense-bar-water { background: rgba(255,255,255,0.4); height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+
+        /* Quick Log Button */
         .quick-log-btn {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -51,66 +59,83 @@ update in progress. . .
             color: white; padding: 14px; border-radius: 24px;
             display: flex; flex-direction: column; align-items: center;
             font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s;
-            z-index: 2; min-width: 110px;
+            z-index: 2; min-width: 100px;
         }
-        .quick-log-btn.done { background: white; color: var(--p); border-color: white; }
-        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .quick-log-btn:active { transform: scale(0.95); }
+        .quick-log-btn.done { background: white; color: var(--p); border-color: white; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2); }
+        .quick-log-btn.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); transform: none; }
         .quick-log-btn i { font-style: normal; font-size: 22px; margin-bottom: 4px; }
 
+        /* Navigation */
         .nav-pill { 
             display: flex; align-items: center; background: var(--card); padding: 8px; 
             border-radius: 24px; border: 1px solid var(--surface); margin-bottom: 25px;
             backdrop-filter: blur(10px);
         }
-        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; }
+        .nav-pill button { border: none; background: var(--surface); color: white; width: 42px; height: 42px; border-radius: 16px; cursor: pointer; font-size: 18px; transition: 0.2s; }
+        .nav-pill button:active { background: rgba(255,255,255,0.2); }
         .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; color: var(--text); }
 
-        .view-only-badge { text-align: center; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 4px; border-radius: 8px; margin-top: -20px; margin-bottom: 20px; display: none; text-transform: uppercase; }
+        .view-only-badge { text-align: center; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 10px; font-weight: 900; padding: 6px; border-radius: 12px; margin-top: -15px; margin-bottom: 25px; display: none; text-transform: uppercase; letter-spacing: 1px; }
 
+        /* Day Grid Items */
         .day-item { 
-            display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 12px; align-items: center; 
-            padding: 18px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
+            display: grid; grid-template-columns: 75px 1fr 1fr 1fr; gap: 10px; align-items: center; 
+            padding: 16px; background: var(--card); border-radius: 30px; margin-bottom: 16px;
             border: 1px solid var(--surface); backdrop-filter: blur(10px);
-            user-select: none;
+            transition: border-color 0.3s, background 0.3s;
         }
-        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.05); }
+        .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.08); box-shadow: 0 10px 30px -10px rgba(255, 140, 0, 0.15); }
         
-        .date-circ .n { font-family: 'Outfit'; font-size: 28px; font-weight: 800; color: var(--p); display: block; line-height: 1; }
-        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
+        .date-circ { display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .date-circ .n { font-family: 'Outfit'; font-size: 32px; font-weight: 800; color: var(--text); display: block; line-height: 1; margin-bottom: 2px; }
+        .day-item.is-today .date-circ .n { color: var(--p); }
+        .date-circ .d { font-size: 11px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Explicit Note Button - Replaces buggy long-press */
+        .add-note-btn { position: absolute; top: 0; right: 5px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--sub); cursor: pointer; transition: 0.2s; }
+        .add-note-btn:active { background: var(--p); color: white; border-color: var(--p); transform: scale(0.9); }
+        .add-note-btn svg { width: 10px; height: 10px; }
 
         .item-pill { 
-            height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
+            height: 60px; border-radius: 20px; border: 1px solid var(--surface); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02); cursor: pointer; 
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            background: rgba(255,255,255,0.03); cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .item-pill.active { 
             background: var(--p); border-color: var(--p); color: white; 
             box-shadow: 0 8px 25px -5px rgba(255, 140, 0, 0.5), inset 0 2px 4px rgba(255,255,255,0.2);
             transform: translateY(-2px);
         }
-        .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
-        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
+        .item-pill.disabled { cursor: not-allowed; opacity: 0.4; }
+        .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
 
+        /* Notes Tag */
         .note-tag {
             grid-column: 1 / -1; 
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 12px;
             padding: 12px 16px;
-            font-size: 11px;
-            color: var(--sub);
+            font-size: 12px;
+            color: var(--text);
             border-left: 3px solid var(--p);
-            margin-top: 2px;
-            font-style: italic;
-            letter-spacing: 0.5px;
+            margin-top: 4px;
+            display: flex; align-items: center; gap: 8px;
         }
 
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
-        .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
+        /* Modals / Sheets */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: flex-end; opacity: 0; transition: opacity 0.4s ease; }
+        .sheet-overlay.show { opacity: 1; }
+        .sheet { background: #161B29; width: 100%; border-radius: 40px 40px 0 0; padding: 40px 30px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1); box-shadow: 0 -20px 40px rgba(0,0,0,0.5); }
         .sheet.up { transform: translateY(0); }
-        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 10px; text-transform: uppercase; }
-        .form-group input, textarea { width: 100%; padding: 18px; background: #0B0F1A; border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; }
-        .btn-prime { background: var(--p); color: white; padding: 22px; border-radius: 25px; border: none; font-weight: 800; width: 100%; cursor: pointer; }
+        
+        .form-group label { display: block; font-size: 11px; font-weight: 800; color: var(--p); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input, textarea { width: 100%; padding: 18px; background: rgba(0,0,0,0.3); border: 1px solid var(--surface); border-radius: 20px; color: white; font-size: 16px; margin-bottom: 20px; font-family: inherit; transition: border-color 0.3s; }
+        .form-group input:focus, textarea:focus { border-color: var(--p); }
+        
+        .btn-prime { background: var(--p); color: white; padding: 20px; border-radius: 22px; border: none; font-weight: 800; font-size: 15px; width: 100%; cursor: pointer; transition: 0.2s; }
+        .btn-prime:active { transform: scale(0.97); }
         
         #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
@@ -118,27 +143,30 @@ update in progress. . .
 <body>
 
 <div id="welcomeScreen">
-    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900;">VetTrack<span style="color:var(--p)">.</span></h1>
-    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Luxe</button>
+    <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900; letter-spacing: -2px;">VetTrack<span style="color:var(--p)">.</span></h1>
+    <p style="color: var(--sub); font-weight: 600; margin-top: -20px; margin-bottom: 40px;">Luxe Edition</p>
+    <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Dashboard</button>
 </div>
 
+<!-- Settings Sheet -->
 <div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
     <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
-        <h2 style="font-family:'Outfit'; margin-top:0;">Profile Settings</h2>
+        <h2 style="font-family:'Outfit'; margin-top:0; font-size: 28px;">Profile Settings</h2>
         <div class="form-group"><label>Display Name</label><input type="text" id="setUserName"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             <div class="form-group"><label>Meal (₹)</label><input type="number" id="setMealPrice"></div>
             <div class="form-group"><label>Water (₹)</label><input type="number" id="setWaterPrice"></div>
         </div>
         <button class="btn-prime" onclick="saveSettings()">Save Luxe Profile</button>
-        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:20px; font-weight:800; font-size:12px; text-transform:uppercase;">Sign Out</button>
+        <button onclick="logout()" style="background:none; border:none; color:#ff4757; width:100%; margin-top:25px; font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing: 1px; cursor: pointer;">Sign Out securely</button>
     </div>
 </div>
 
+<!-- Notes Sheet -->
 <div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
     <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
-        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0;">Log Details</h2>
-        <textarea id="noteInput" rows="4" placeholder="Guests or special notes..."></textarea>
+        <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0; font-size: 28px;">Log Details</h2>
+        <textarea id="noteInput" rows="4" placeholder="Add guest details, special expenses, or notes..."></textarea>
         <button id="noteBtn" class="btn-prime" onclick="saveNote()">Save Note</button>
     </div>
 </div>
@@ -153,9 +181,19 @@ update in progress. . .
         <div class="stat-left">
             <div class="label">Total Bill</div>
             <div class="total-val" id="totalValue">₹0</div>
-            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
-            <div id="forecastSub" style="font-size:11px; font-weight:800; color: rgba(255,255,255,0.7); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;">Projected EOM: ₹0</div>
+            <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9;">0 Meals • 0 Water Units</div>
+            
+            <!-- Replaced EOM with Visual Expense Bar -->
+            <div class="expense-bar-wrap">
+                <div id="mealBar" class="expense-bar-meal"></div>
+                <div id="waterBar" class="expense-bar-water"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 9px; font-weight: 800; margin-top: 6px; text-transform: uppercase; color: rgba(255,255,255,0.7);">
+                <span>Meals</span>
+                <span>Water</span>
+            </div>
         </div>
+        
         <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
             <i id="quickIcon">⚡</i>
             <span id="quickText">Loading...</span>
@@ -164,10 +202,11 @@ update in progress. . .
 
     <div class="nav-pill">
         <button onclick="changeMonth(-1)">‹</button>
-        <span id="monthLabel">Current</span>
+        <span id="monthLabel">Current Month</span>
         <button onclick="changeMonth(1)">›</button>
     </div>
-    <div id="lockBadge" class="view-only-badge">Read Only: Logging Disabled for this Month</div>
+    
+    <div id="lockBadge" class="view-only-badge">Read-Only Mode: Past Month</div>
 
     <div id="logsGrid"></div>
 </div>
@@ -186,11 +225,6 @@ update in progress. . .
     const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app), provider = new GoogleAuthProvider();
     let user = null, logs = {}, viewDate = new Date(), todayDate = new Date(), activeDayId = null;
     let config = { name: "", mealPrice: 50, waterPrice: 30 };
-    
-    // SCROLL GUARD VARIABLES
-    let longPressTimer;
-    let startY = 0;
-    let isScrolling = false;
 
     window.login = () => setPersistence(auth, browserLocalPersistence).then(() => signInWithPopup(auth, provider));
     window.logout = () => signOut(auth).then(() => location.reload());
@@ -224,7 +258,6 @@ update in progress. . .
 
     window.quickLog = async () => {
         if (!isCurrentMonth()) return;
-        
         if (navigator.vibrate) navigator.vibrate(50); // Haptic feedback
         
         const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
@@ -238,7 +271,7 @@ update in progress. . .
         const current = isCurrentMonth();
         document.getElementById('lockBadge').style.display = current ? 'none' : 'block';
         document.getElementById('quickBtn').className = `quick-log-btn ${!current ? 'disabled' : ''}`;
-        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+        document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
         
         const grid = document.getElementById('logsGrid'); grid.innerHTML = '';
         const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
@@ -253,40 +286,28 @@ update in progress. . .
             else document.getElementById('quickBtn').classList.remove('done');
         } else {
             document.getElementById('quickIcon').innerText = '🔒';
-            document.getElementById('quickText').innerText = 'Locked';
+            document.getElementById('quickText').innerText = 'Archived';
         }
 
+        // Generate Card Elements
         for (let i = 1; i <= daysCount; i++) {
             const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
             const card = document.createElement('div');
             card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
             
-            if (current) {
-                // IMPROVED TOUCH HANDLING (SCROLL GUARD)
-                card.addEventListener('touchstart', (e) => {
-                    startY = e.touches[0].clientY;
-                    isScrolling = false;
-                    longPressTimer = setTimeout(() => {
-                        if (!isScrolling) openNote(i);
-                    }, 650);
-                }, { passive: true });
+            // Explicit SVG Note button replaces complex touch/long-press logic
+            const noteBtnHTML = current ? `
+                <div class="add-note-btn" onclick="openNote(${i})" title="Add Note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                </div>
+            ` : '';
 
-                card.addEventListener('touchmove', (e) => {
-                    let moveY = e.touches[0].clientY;
-                    if (Math.abs(moveY - startY) > 10) { 
-                        isScrolling = true;
-                        clearTimeout(longPressTimer);
-                    }
-                }, { passive: true });
-
-                card.addEventListener('touchend', () => {
-                    clearTimeout(longPressTimer);
-                });
-            }
-
-            // Note: onclick now passes 'event' to prevent long-press misfires
             card.innerHTML = `
-                <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
+                <div class="date-circ">
+                    <span class="n">${i}</span>
+                    <span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span>
+                    ${noteBtnHTML}
+                </div>
                 <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'l')"><span>Lunch</span></div>
                 <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'd')"><span>Dinner</span></div>
                 <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'w')"><span>Water</span></div>
@@ -298,10 +319,8 @@ update in progress. . .
     }
 
     window.toggle = async (event, day, type) => {
-        event.stopPropagation(); // Prevents long-press interference
         if (!isCurrentMonth()) return;
-
-        if (navigator.vibrate) navigator.vibrate(20); // Quick tactile click
+        if (navigator.vibrate) navigator.vibrate(20); 
 
         const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
         obj[type] = obj[type] ? 0 : 1;
@@ -309,19 +328,27 @@ update in progress. . .
     };
 
     window.openNote = (day) => {
-        if (navigator.vibrate) navigator.vibrate([10, 30, 10]); // Distinct pop for notes
+        if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
         activeDayId = day;
         document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
         document.getElementById('noteInput').value = logs[day]?.n || "";
-        document.getElementById('noteOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
+        
+        const overlay = document.getElementById('noteOverlay');
+        const sheet = document.getElementById('noteSheet');
+        overlay.style.display = 'flex';
+        // Tiny delay to allow display:flex to apply before adding transition classes
+        setTimeout(() => { overlay.classList.add('show'); sheet.classList.add('up'); }, 10); 
     };
     
-    window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
+    window.closeNote = () => { 
+        document.getElementById('noteSheet').classList.remove('up'); 
+        document.getElementById('noteOverlay').classList.remove('show');
+        setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); 
+    };
     
     window.saveNote = async () => {
         const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
-        obj.n = document.getElementById('noteInput').value;
+        obj.n = document.getElementById('noteInput').value.trim();
         await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
         closeNote();
     };
@@ -330,10 +357,18 @@ update in progress. . .
         document.getElementById('setUserName').value = config.name;
         document.getElementById('setMealPrice').value = config.mealPrice;
         document.getElementById('setWaterPrice').value = config.waterPrice;
-        document.getElementById('settingsOverlay').style.display = 'flex';
-        setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
+        
+        const overlay = document.getElementById('settingsOverlay');
+        const sheet = document.getElementById('settingsSheet');
+        overlay.style.display = 'flex';
+        setTimeout(() => { overlay.classList.add('show'); sheet.classList.add('up'); }, 10);
     };
-    window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
+    
+    window.closeSettings = () => { 
+        document.getElementById('settingsSheet').classList.remove('up'); 
+        document.getElementById('settingsOverlay').classList.remove('show');
+        setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); 
+    };
     
     window.saveSettings = async () => {
         config.name = document.getElementById('setUserName').value;
@@ -346,39 +381,32 @@ update in progress. . .
 
     function calculate() {
         let m = 0, w = 0; 
-        
-        // Determine days passed vs total days
-        const currentDay = isCurrentMonth() ? todayDate.getDate() : new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-        const totalDaysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-
         Object.values(logs).forEach(v => { 
             if(v.l) m++; 
             if(v.d) m++; 
             if(v.w) w++; 
         });
 
-        const currentTotal = (m * config.mealPrice) + (w * config.waterPrice);
+        const mealCost = m * config.mealPrice;
+        const waterCost = w * config.waterPrice;
+        const currentTotal = mealCost + waterCost;
         
-        // Run Rate / Forecast Engine
-        const dailyAverage = currentDay > 0 ? currentTotal / currentDay : 0;
-        const projectedTotal = Math.round(dailyAverage * totalDaysInMonth);
-
-        // Update Standard UI
+        // Update Stats UI
         document.getElementById('totalValue').innerText = `₹${currentTotal.toLocaleString('en-IN')}`;
         document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
         
-        // Update Forecast UI
-        const forecastEl = document.getElementById('forecastSub');
-        if (isCurrentMonth()) {
-            forecastEl.style.display = 'block';
-            forecastEl.innerText = `Projected EOM: ₹${projectedTotal.toLocaleString('en-IN')}`;
+        // Update Visual Expense Bar
+        if (currentTotal > 0) {
+            document.getElementById('mealBar').style.width = `${(mealCost / currentTotal) * 100}%`;
+            document.getElementById('waterBar').style.width = `${(waterCost / currentTotal) * 100}%`;
         } else {
-            forecastEl.style.display = 'none'; // Not needed for past months
+            document.getElementById('mealBar').style.width = '0%';
+            document.getElementById('waterBar').style.width = '0%';
         }
     }
 
     window.changeMonth = (dir) => { 
-        viewDate.setDate(1); // Prevents the 31st overflow bug
+        viewDate.setDate(1); // Crucial fix for 31st overflow bug
         viewDate.setMonth(viewDate.getMonth() + dir); 
         syncData(); 
     };
