@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>VetTrack Luxe | Premier</title>
     
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- PDF Export Dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
@@ -79,7 +77,7 @@
         .view-only-badge { text-align: center; background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 10px; font-weight: 900; padding: 6px; border-radius: 12px; margin-top: -10px; margin-bottom: 20px; display: none; text-transform: uppercase; letter-spacing: 1px; }
 
         /* Day Grid Items */
-        .day-item { display: grid; grid-template-columns: 60px 1fr 1fr 1fr 1fr; gap: 8px; align-items: center; padding: 16px 12px; background: var(--card); border-radius: 25px; margin-bottom: 12px; border: 1px solid var(--surface); backdrop-filter: blur(10px); transition: border-color 0.3s, background 0.3s; position: relative; }
+        .day-item { display: grid; grid-template-columns: 70px 1fr 1fr 1fr; gap: 8px; align-items: center; padding: 16px 12px; background: var(--card); border-radius: 25px; margin-bottom: 12px; border: 1px solid var(--surface); backdrop-filter: blur(10px); transition: border-color 0.3s, background 0.3s; position: relative; }
         .day-item.is-today { border-color: var(--p); background: rgba(255,140,0,0.08); }
         
         .date-circ { display: flex; flex-direction: column; justify-content: center; align-items: center; }
@@ -93,7 +91,6 @@
 
         .item-pill { height: 50px; border-radius: 16px; border: 1px solid var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); cursor: pointer; transition: all 0.2s; }
         .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 4px 15px -5px rgba(255, 140, 0, 0.5); }
-        .item-pill.gym-active { background: #38bdf8; border-color: #38bdf8; color: white; box-shadow: 0 4px 15px -5px rgba(56, 189, 248, 0.5); }
         .item-pill.disabled { cursor: not-allowed; opacity: 0.4; }
         .item-pill span { font-size: 9px; font-weight: 800; text-transform: uppercase; margin-top: 3px; letter-spacing: 0.5px; }
         .item-pill svg { width: 16px; height: 16px; opacity: 0.8; }
@@ -116,25 +113,34 @@
         #welcomeScreen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
         /* PDF Helper Container (Hidden from view) */
-        #exportHelper { display: none; position: absolute; top: -9999px; left: -9999px; width: 800px; padding: 60px; background: #ffffff; color: #000000; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; }
+        #exportHelper { display: none; position: absolute; top: -9999px; left: -9999px; width: 800px; padding: 50px; background: #ffffff; color: #000000; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; }
+        
+        /* CSS Hologram Seal for the Bill */
+        .hologram-seal {
+            position: absolute; top: 40px; right: 40px; width: 90px; height: 90px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), transparent), 
+                        linear-gradient(135deg, rgba(255,215,0,0.9), rgba(255,140,0,0.7), rgba(0,255,255,0.4), rgba(255,215,0,0.9));
+            box-shadow: 0 0 15px rgba(255,140,0,0.4), inset 0 0 10px rgba(255,255,255,0.8);
+            border: 2px dashed #B8860B; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; transform: rotate(-15deg); z-index: 10;
+        }
+        .hologram-seal span { font-size: 11px; font-weight: 900; color: #8B6508; text-transform: uppercase; letter-spacing: 1px; line-height: 1.2; text-shadow: 1px 1px 0px rgba(255,255,255,0.8); }
+        .hologram-seal .sub { font-size: 7px; color: #555; }
     </style>
 </head>
 <body>
 
-<!-- Loading Overlay -->
 <div class="loader-overlay" id="loader">
     <div class="pulse-ring"></div>
-    <div class="loader-text">Processing</div>
+    <div class="loader-text">Processing Data</div>
 </div>
 
-<!-- Welcome/Login -->
 <div id="welcomeScreen">
     <h1 style="font-family:'Outfit'; font-size:50px; font-weight:900; letter-spacing: -2px;">VetTrack<span style="color:var(--p)">.</span></h1>
     <p style="color: var(--sub); font-weight: 600; margin-top: -20px; margin-bottom: 40px;">Luxe Edition</p>
     <button class="btn-prime" onclick="login()" style="width: 220px; border-radius: 50px;">Enter Dashboard</button>
 </div>
 
-<!-- Settings Sheet -->
 <div class="sheet-overlay" id="settingsOverlay" onclick="closeSettings()">
     <div class="sheet" id="settingsSheet" onclick="event.stopPropagation()">
         <h2 style="font-family:'Outfit'; margin-top:0; font-size: 28px;">Profile Settings</h2>
@@ -148,7 +154,6 @@
     </div>
 </div>
 
-<!-- Notes Sheet -->
 <div class="sheet-overlay" id="noteOverlay" onclick="closeNote()">
     <div class="sheet" id="noteSheet" onclick="event.stopPropagation()">
         <h2 id="noteTitle" style="font-family:'Outfit'; margin-top:0; font-size: 28px;">Log Details</h2>
@@ -157,7 +162,6 @@
     </div>
 </div>
 
-<!-- Main App Container -->
 <div class="container">
     <div class="header">
         <div><p id="greetLabel">Welcome</p><h1 id="userLabel">Diner</h1></div>
@@ -176,7 +180,6 @@
         </div>
     </div>
 
-    <!-- PDF Export Controls -->
     <div class="export-controls">
         <button class="export-btn" onclick="exportPDF('meal')">📄 Export Meals Bill</button>
         <button class="export-btn" onclick="exportPDF('water')">💧 Export Water Bill</button>
@@ -193,7 +196,6 @@
     <div id="logsGrid"></div>
 </div>
 
-<!-- Hidden PDF Generator Container -->
 <div id="exportHelper"></div>
 
 <script type="module">
@@ -244,7 +246,7 @@
         if (navigator.vibrate) navigator.vibrate(50);
         
         const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
-        const obj = logs[day] || { l: 0, d: 0, w: 0, g: 0, n: "" };
+        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
         if(obj[type] === 1) return;
         obj[type] = 1;
         await setDoc(doc(db, "users", user.uid, "logs", `${todayDate.getFullYear()}_${todayDate.getMonth()}`), { [day]: obj }, { merge: true });
@@ -273,7 +275,7 @@
         }
 
         for (let i = 1; i <= daysCount; i++) {
-            const d = logs[i] || { l: 0, d: 0, w: 0, g: 0, n: "" };
+            const d = logs[i] || { l: 0, d: 0, w: 0, n: "" };
             const card = document.createElement('div');
             card.className = `day-item ${current && i === todayDate.getDate() ? 'is-today' : ''}`;
             
@@ -283,10 +285,8 @@
                 </div>
             ` : '';
 
-            // SVG Icons for aesthetic pills
             const iconMeal = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
             const iconWater = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
-            const iconGym = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5h11M6.5 17.5h11M4 6.5V17.5M20 6.5V17.5M2 9v6M22 9v6M8 4v16M16 4v16"/></svg>`;
 
             card.innerHTML = `
                 <div class="date-circ">
@@ -297,7 +297,6 @@
                 <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'l')">${iconMeal}<span>Lunch</span></div>
                 <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'd')">${iconMeal}<span>Dinner</span></div>
                 <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'w')">${iconWater}<span>Water</span></div>
-                <div class="item-pill ${d.g?'gym-active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'g')">${iconGym}<span>Gym</span></div>
                 ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
             `;
             grid.appendChild(card);
@@ -309,7 +308,7 @@
         if (!isCurrentMonth()) return;
         if (navigator.vibrate) navigator.vibrate(20); 
 
-        const obj = logs[day] || { l: 0, d: 0, w: 0, g: 0, n: "" };
+        const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
         obj[type] = obj[type] ? 0 : 1;
         await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
     };
@@ -325,7 +324,7 @@
     window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); document.getElementById('noteOverlay').classList.remove('show'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
     
     window.saveNote = async () => {
-        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, g: 0, n: "" };
+        const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
         obj.n = document.getElementById('noteInput').value.trim();
         await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [activeDayId]: obj }, { merge: true });
         closeNote();
@@ -354,7 +353,6 @@
         Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
         const currentTotal = (m * config.mealPrice) + (w * config.waterPrice);
         
-        // Dynamic Average Calculation
         const isCurrent = isCurrentMonth();
         const daysDivider = isCurrent ? Math.max(1, todayDate.getDate()) : new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
         const avgDaily = currentTotal / daysDivider;
@@ -367,92 +365,119 @@
         viewDate.setDate(1); viewDate.setMonth(viewDate.getMonth() + dir); syncData(); 
     };
 
-    // --- PDF Generation Engine with Geolocation & Timestamp ---
+    // --- Dynamic Calendar PDF Engine ---
     window.exportPDF = async (type) => {
-        // 1. Show Pulse Loader
         document.getElementById('loader').style.display = 'flex';
 
-        // 2. Fetch Location silently
-        let locationText = "GPS Offline";
+        // 1. Fetch GPS Location
+        let locationText = "GPS Offline / Permission Denied";
         try {
             const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {timeout: 4000}));
-            locationText = `Lat: ${pos.coords.latitude.toFixed(4)}, Lon: ${pos.coords.longitude.toFixed(4)}`;
+            locationText = `Lat: ${pos.coords.latitude.toFixed(5)}, Lon: ${pos.coords.longitude.toFixed(5)}`;
         } catch(e) { console.log("Location skipped or denied"); }
 
-        // 3. Prepare Data
         const { jsPDF } = window.jspdf;
         const helper = document.getElementById('exportHelper');
-        const reportMonth = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-        const downloadDate = new Date();
-        const daysCount = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
         
-        // Build Table Rows
-        let tableRows = '';
+        // 2. Exact Timestamping
+        const printDate = new Date();
+        const printDay = printDate.toLocaleDateString('en-IN', { weekday: 'long' });
+        const printDateStr = printDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
+        const printTime = printDate.toLocaleTimeString('en-IN');
+        
+        const reportMonth = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+        
+        // 3. Calendar Grid Calculation
+        const year = viewDate.getFullYear();
+        const month = viewDate.getMonth();
+        const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0 = Sun, 1 = Mon...
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
         let totalUnits = 0;
         let totalCost = 0;
 
-        for (let i = 1; i <= daysCount; i++) {
+        // Construct Calendar HTML
+        let calendarGrid = `<div style="display:grid; grid-template-columns: repeat(7, 1fr); background: #000; border: 2px solid #000; gap: 1px;">`;
+        
+        // Headers
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        days.forEach(d => calendarGrid += `<div style="background:#333; color:#fff; text-align:center; padding: 8px 0; font-size: 11px; font-weight:bold;">${d}</div>`);
+        
+        // Blank cells before month starts
+        for(let i = 0; i < firstDayOfWeek; i++) {
+            calendarGrid += `<div style="background:#f9f9f9;"></div>`;
+        }
+        
+        // Day cells
+        for (let i = 1; i <= daysInMonth; i++) {
             const d = logs[i] || { l: 0, d: 0, w: 0 };
-            let status = '';
+            let contentHTML = '';
             
             if(type === 'meal') {
                 let meals = 0; if(d.l) meals++; if(d.d) meals++;
-                status = meals > 0 ? `${meals} Meal(s)` : '-';
-                totalUnits += meals;
-                totalCost += (meals * config.mealPrice);
+                totalUnits += meals; totalCost += (meals * config.mealPrice);
+                contentHTML = `
+                    <div style="font-size: 10px; font-weight: bold; margin-top: 10px; color: ${d.l ? '#059669' : '#ef4444'};">L: ${d.l ? '✔' : '✖'}</div>
+                    <div style="font-size: 10px; font-weight: bold; margin-top: 2px; color: ${d.d ? '#059669' : '#ef4444'};">D: ${d.d ? '✔' : '✖'}</div>
+                `;
             } else {
-                status = d.w ? '1 Unit' : '-';
                 if(d.w) { totalUnits++; totalCost += config.waterPrice; }
+                contentHTML = `<div style="font-size: 12px; font-weight: bold; margin-top: 15px; color: ${d.w ? '#059669' : '#ef4444'};">W: ${d.w ? '✔' : '✖'}</div>`;
             }
             
-            // Only add rows that have data to keep the bill clean, OR show all? Let's show all for strict clinical logging
-            tableRows += `
-                <tr>
-                    <td style="border: 1px solid #ddd; padding: 10px; font-weight: bold;">${i} ${viewDate.toLocaleDateString('en-IN', {month:'short'})}</td>
-                    <td style="border: 1px solid #ddd; padding: 10px;">${status}</td>
-                    <td style="border: 1px solid #ddd; padding: 10px;">${d.n ? d.n : '-'}</td>
-                </tr>`;
+            calendarGrid += `
+                <div style="background:#fff; height: 75px; position: relative; padding: 6px; text-align: left;">
+                    <div style="position:absolute; top:4px; right:6px; font-size:12px; font-weight:900; color:#555;">${i}</div>
+                    ${contentHTML}
+                </div>
+            `;
         }
+        
+        // Blank cells to finish the grid row
+        const totalCellsFilled = firstDayOfWeek + daysInMonth;
+        const remainder = totalCellsFilled % 7;
+        if(remainder !== 0) {
+            for(let i = 0; i < (7 - remainder); i++) {
+                calendarGrid += `<div style="background:#f9f9f9;"></div>`;
+            }
+        }
+        calendarGrid += `</div>`;
 
-        // 4. Construct Clinical HTML Bill
+        // 4. Construct Final Document HTML
         helper.style.display = 'block';
         helper.innerHTML = `
             <div style="position:relative; width: 100%; height: 100%; z-index: 1;">
-                <!-- Watermark -->
-                <div style="text-align:center; opacity: 0.04; font-size: 80px; font-weight:900; position:absolute; top:35%; left:0; right:0; transform: rotate(-45deg); z-index: -1;">
-                    VETTRACK LUXE<br>ORIGINAL
+                
+                <div class="hologram-seal">
+                    <span>ORIGINAL<br>SEAL</span>
+                    <div class="sub">VETTRACK</div>
                 </div>
                 
-                <h1 style="border-bottom: 3px solid #FF8C00; padding-bottom: 10px; margin-bottom: 30px; font-size: 34px;">
-                    ${type === 'meal' ? 'MEAL EXPENDITURE BILL' : 'WATER DISPENSATION BILL'}
+                <h1 style="border-bottom: 3px solid #FF8C00; padding-bottom: 10px; margin: 0 0 20px 0; font-size: 32px; font-family: 'Helvetica Neue', sans-serif;">
+                    ${type === 'meal' ? 'MEAL EXPENDITURE CALENDAR' : 'WATER DISPENSATION CALENDAR'}
                 </h1>
                 
-                <div style="display:flex; justify-content: space-between; margin-bottom: 30px; font-size: 16px;">
+                <div style="display:flex; justify-content: space-between; margin-bottom: 25px; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
                     <div>
-                        <p style="margin: 5px 0;"><strong>Diner / Resident:</strong> ${config.name}</p>
-                        <p style="margin: 5px 0;"><strong>Report Month:</strong> ${reportMonth}</p>
-                        <p style="margin: 5px 0;"><strong>Base Rate:</strong> ₹${type === 'meal' ? config.mealPrice : config.waterPrice} per unit</p>
+                        <p style="margin: 3px 0;"><strong>Diner / Resident:</strong> ${config.name}</p>
+                        <p style="margin: 3px 0;"><strong>Report Month:</strong> ${reportMonth}</p>
+                        <p style="margin: 3px 0;"><strong>Base Rate:</strong> ₹${type === 'meal' ? config.mealPrice : config.waterPrice} per unit</p>
                     </div>
-                    <div style="text-align: right; background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #eee;">
-                        <p style="margin: 0; font-size: 12px; color: #666; text-transform: uppercase;">Total Bill Amount</p>
-                        <p style="margin: 5px 0 0 0; font-size: 28px; font-weight: 900; color: #000;">₹${totalCost.toLocaleString('en-IN')}</p>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-size: 11px; color: #666; text-transform: uppercase;">Total Bill Amount</p>
+                        <p style="margin: 2px 0 0 0; font-size: 26px; font-weight: 900; color: #000;">₹${totalCost.toLocaleString('en-IN')}</p>
                     </div>
                 </div>
 
-                <table style="width:100%; border-collapse: collapse; margin-top: 20px; font-size: 14px;">
-                    <tr style="background:#222; color: #fff;">
-                        <th style="padding:12px; text-align: left;">Date</th>
-                        <th style="padding:12px; text-align: left;">Consumption Status</th>
-                        <th style="padding:12px; text-align: left;">Clinical Notes</th>
-                    </tr>
-                    ${tableRows}
-                </table>
+                ${calendarGrid}
                 
-                <div style="margin-top: 50px; padding-top: 20px; border-top: 1px dashed #ccc; font-size: 12px; color: #444; line-height: 1.6;">
-                    <strong>SYSTEM METADATA (DO NOT ALTER)</strong><br>
-                    <strong>Downloaded on:</strong> ${downloadDate.toLocaleDateString('en-IN')} at ${downloadDate.toLocaleTimeString('en-IN')}<br>
-                    <strong>Geo-Tag Signature:</strong> ${locationText}<br>
-                    <strong>Total Units Logged:</strong> ${totalUnits}
+                <div style="margin-top: 35px; padding-top: 15px; border-top: 1.5px solid #000; font-size: 11px; color: #333; line-height: 1.7; font-family: monospace;">
+                    <strong>[ SYSTEM METADATA VERIFICATION ]</strong><br>
+                    <strong>Issued Day  :</strong> ${printDay}<br>
+                    <strong>Issued Date :</strong> ${printDateStr}<br>
+                    <strong>Issued Time :</strong> ${printTime}<br>
+                    <strong>Geo-Location:</strong> ${locationText}<br>
+                    <strong>Total Units :</strong> ${totalUnits} valid log(s) detected.
                 </div>
             </div>
         `;
@@ -463,18 +488,16 @@
             const imgData = canvas.toDataURL('image/png');
             const doc = new jsPDF('p', 'mm', 'a4');
             
-            // Calculate aspect ratio to fit A4
             const imgProps = doc.getImageProperties(imgData);
             const pdfWidth = doc.internal.pageSize.getWidth();
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
             
             doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            doc.save(`VetTrack_${type}_Bill_${reportMonth.replace(' ', '_')}.pdf`);
+            doc.save(`VetTrack_${type}_Calendar_${reportMonth.replace(' ', '_')}.pdf`);
         } catch (error) {
             console.error("PDF Export Failed", error);
             alert("Export failed. Please try again.");
         } finally {
-            // Clean up
             helper.style.display = 'none';
             document.getElementById('loader').style.display = 'none';
         }
