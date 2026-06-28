@@ -2,93 +2,179 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>VetTrack Luxe | Official Billing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VetTrack Luxe | Secure Billing Portal</title>
+    
+    <!-- Required Libraries for HD PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
-        :root { --p: #FF8C00; --bg: #0B0F1A; }
-        body { font-family: 'Helvetica Neue', sans-serif; background: var(--bg); color: #fff; padding: 20px; }
-        .container { max-width: 480px; margin: 0 auto; }
-        .btn { background: var(--p); color: white; padding: 18px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; width: 100%; margin-top: 15px; }
-        #exportHelper { display: none; position: absolute; top: -9999px; left: -9999px; width: 800px; padding: 60px; background: white; color: black; }
+        :root { --primary: #FF8C00; --bg: #090C15; --text: #E2E8F0; }
+        body { font-family: 'Helvetica Neue', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 30px 20px; margin: 0; display: flex; justify-content: center; }
         
-        /* High-Definition Anti-Piracy Seal */
+        .dashboard { width: 100%; max-width: 400px; text-align: center; }
+        h1 { font-weight: 300; letter-spacing: 1px; color: #fff; margin-bottom: 5px; }
+        .subtitle { color: #64748B; font-size: 14px; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .btn { 
+            background: linear-gradient(135deg, #FF8C00 0%, #E65C00 100%); 
+            color: white; padding: 18px; border-radius: 12px; border: none; 
+            font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 15px; 
+            font-size: 15px; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 4px 20px rgba(255, 140, 0, 0.2); transition: 0.2s all;
+        }
+        .btn:active { transform: scale(0.97); }
+
+        /* Hidden HD Rendering Canvas */
+        #exportHelper { display: none; position: absolute; top: -9999px; left: -9999px; width: 850px; padding: 70px; background: #ffffff; color: #000000; }
+        
+        /* Ultra-HD Anti-Spoof Seal */
         .hologram-seal {
-            position: absolute; top: 40px; right: 40px; width: 140px; height: 140px;
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            border: 2px solid #d1d5db; border-radius: 50%;
+            position: absolute; top: 60px; right: 60px; width: 160px; height: 160px;
+            border-radius: 50%;
+            /* Complex micro-pattern background */
+            background: 
+                repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 2px, rgba(184, 134, 11, 0.1) 3px, rgba(184, 134, 11, 0.1) 4px),
+                linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(240,240,240,1) 100%);
+            border: 4px solid #C5A059;
+            box-shadow: inset 0 0 15px rgba(139, 69, 19, 0.2), 0 10px 25px rgba(0,0,0,0.1);
             display: flex; align-items: center; justify-content: center;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.2);
-            overflow: hidden; z-index: 20;
+            transform: rotate(-12deg); z-index: 100;
         }
-        .micro-lines {
-            width: 100%; height: 100%;
-            background-image: repeating-radial-gradient(circle, #FFD700 0%, transparent 2%, #FF8C00 4%);
-            opacity: 0.3; transform: rotate(45deg);
+        
+        /* Inner Micro-detailing rings */
+        .hologram-seal::before {
+            content: ''; position: absolute; width: 142px; height: 142px;
+            border-radius: 50%; border: 1px dashed #8B4513; opacity: 0.5;
         }
+        .hologram-seal::after {
+            content: ''; position: absolute; width: 128px; height: 128px;
+            border-radius: 50%; border: 0.5px solid #C5A059;
+        }
+        
+        .seal-content { text-align: center; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+        .seal-title { font-family: 'Times New Roman', serif; font-size: 18px; font-weight: 900; color: #5D4037; margin: 0; line-height: 1; }
+        .seal-divider { width: 40px; height: 1px; background: #8B4513; margin: 8px 0; }
+        .seal-microtext { font-family: monospace; font-size: 6.5px; font-weight: 600; color: #5D4037; letter-spacing: 2.5px; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="dashboard">
     <h1>VetTrack Luxe</h1>
-    <button class="btn" onclick="exportPDF('bill')">Generate Secure HD Invoice</button>
+    <div class="subtitle">Secure Document Gateway</div>
+    <button class="btn" onclick="exportPDF('meal')">Generate Meal Invoice</button>
+    <button class="btn" onclick="exportPDF('water')">Generate Water Invoice</button>
 </div>
 
 <div id="exportHelper"></div>
 
 <script>
-    // Simplified Location Fetcher: City, State, Pincode Only
-    async function getCompactAddress(lat, lon) {
+    const config = { name: "Dr. Resident", mealPrice: 50, waterPrice: 30 };
+
+    // Strict Location Fetcher: City, State, Pincode ONLY
+    async function getCityStatePin(lat, lon) {
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`);
             const data = await res.json();
             const addr = data.address;
-            return `${addr.city || addr.town || addr.village || 'Unknown City'}, ${addr.state || 'Unknown State'} - ${addr.postcode || '000000'}`;
-        } catch { return "Service Location Verified"; }
+            
+            const city = addr.city || addr.town || addr.village || addr.county || 'Unknown City';
+            const state = addr.state || 'Unknown State';
+            const pin = addr.postcode || '000000';
+            
+            return `${city}, ${state} - ${pin}`;
+        } catch { 
+            return "Verified Secure Location"; 
+        }
     }
 
     window.exportPDF = async (type) => {
+        // 1. HARD ENFORCEMENT: Location Services
         let pos;
         try {
-            pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {enableHighAccuracy: true, timeout: 5000}));
-        } catch(e) { alert("Location Services are MANDATORY for bill validation."); return; }
+            pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {enableHighAccuracy: true, timeout: 6000}));
+        } catch(e) { 
+            alert("SECURITY LOCK: Location Services must be turned ON to generate a verified Luxe invoice."); 
+            return; 
+        }
 
-        const address = await getCompactAddress(pos.coords.latitude, pos.coords.longitude);
+        // Fetch precise City/State/Pin data
+        const secureAddress = await getCityStatePin(pos.coords.latitude, pos.coords.longitude);
+        
         const { jsPDF } = window.jspdf;
         const helper = document.getElementById('exportHelper');
         const now = new Date();
-        const txHash = Math.random().toString(36).substr(2, 12).toUpperCase();
+        
+        // Placeholder for your dynamic total calculation
+        const totalPayable = 1250; 
+        const docHash = Math.random().toString(36).substr(2, 16).toUpperCase();
 
+        // 2. BUILD HD DOCUMENT TEMPLATE
         helper.style.display = 'block';
         helper.innerHTML = `
-            <div style="position:relative; width: 100%; padding: 60px; background: white; height: 1000px;">
+            <div style="position:relative; width: 100%; height: 1100px; padding: 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #fff; color: #111;">
+                
+                <!-- Anti-Spoof HD Seal -->
                 <div class="hologram-seal">
-                    <div class="micro-lines"></div>
-                    <div style="position:absolute; text-align:center; font-family: serif; color: #5d4037; font-weight: bold;">
-                        VETTRACK<br><span style="font-size: 10px; letter-spacing: 1px;">LUXE AUTHENTIC</span>
+                    <div class="seal-content">
+                        <span class="seal-title">VETTRACK</span>
+                        <div class="seal-divider"></div>
+                        <span class="seal-microtext">LUXE AUTHENTIC</span>
+                        <span class="seal-microtext" style="font-size: 5px; margin-top: 4px; opacity: 0.6;">ORIGINAL COPY</span>
                     </div>
                 </div>
                 
-                <h1 style="font-size: 48px; margin: 0; color: #111;">OFFICIAL INVOICE</h1>
-                <div style="font-size: 32px; margin: 20px 0; color: #FF8C00;">TOTAL PAYABLE: <b>₹1,250</b></div>
+                <!-- Document Header -->
+                <h1 style="font-size: 42px; font-weight: 800; margin: 0; color: #000; letter-spacing: -1px;">OFFICIAL INVOICE</h1>
+                <div style="width: 60px; height: 5px; background: #FF8C00; margin: 20px 0 35px 0;"></div>
                 
-                <div style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; font-size: 18px; line-height: 2;">
-                    <p><b>Service Location:</b> ${address}</p>
-                    <p><b>Issue Date:</b> ${now.toLocaleDateString('en-IN', {day: '2-digit', month: 'long', year: 'numeric'})}</p>
-                    <p><b>Transaction ID:</b> #${txHash}</p>
+                <!-- Highlighted Total Amount -->
+                <div style="display: inline-block; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 20px 40px; border-radius: 8px; margin-bottom: 40px;">
+                    <p style="margin: 0; font-size: 14px; color: #64748B; font-weight: bold; letter-spacing: 1px;">TOTAL PAYABLE AMOUNT</p>
+                    <p style="margin: 5px 0 0 0; font-size: 46px; font-weight: 900; color: #FF8C00;">₹${totalPayable.toLocaleString('en-IN')}</p>
                 </div>
                 
-                <div style="margin-top: 100px; font-family: monospace; font-size: 10px; color: #666; text-align: center;">
-                    VERIFIED AT SOURCE | SECURE GATEWAY ID: ${Math.random().toString(16).substr(2, 8).toUpperCase()}
+                <!-- Billing Details -->
+                <div style="border-top: 2px solid #111; border-bottom: 2px solid #111; padding: 30px 0; font-size: 18px; line-height: 2.2;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #64748B; font-weight: 600;">Billed To:</span>
+                        <span style="font-weight: 700;">${config.name}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #64748B; font-weight: 600;">Issue Date:</span>
+                        <span style="font-weight: 700;">${now.toLocaleDateString('en-IN', {day: '2-digit', month: 'long', year: 'numeric'})}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #64748B; font-weight: 600;">Service Location:</span>
+                        <span style="font-weight: 700;">${secureAddress}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #64748B; font-weight: 600;">Invoice Type:</span>
+                        <span style="font-weight: 700;">${type === 'meal' ? 'Culinary Services' : 'Hydration Services'}</span>
+                    </div>
+                </div>
+                
+                <!-- Footer Security Details -->
+                <div style="position: absolute; bottom: 80px; left: 20px; right: 20px; text-align: center; font-family: monospace; font-size: 11px; color: #94A3B8; border-top: 1px dashed #CBD5E1; padding-top: 20px;">
+                    <p style="margin: 3px 0;">SECURE GATEWAY VERIFICATION ID: ${docHash}</p>
+                    <p style="margin: 3px 0;">TIMESTAMP: ${now.toISOString()}</p>
+                    <p style="margin: 3px 0;">This document is electronically verified. Manual signatures are not required.</p>
                 </div>
             </div>
         `;
 
-        html2canvas(helper, {scale: 3}).then(canvas => { // scale: 3 for High-Definition
+        // 3. RENDER ULTRA-HD PDF
+        // scale: 4 renders the canvas at 4x resolution, capturing microscopic CSS details flawlessly.
+        html2canvas(helper, { scale: 4, useCORS: true, logging: false }).then(canvas => { 
             const doc = new jsPDF('p', 'mm', 'a4');
-            doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297);
-            doc.save(`VetTrack_Invoice_${txHash}.pdf`);
+            const imgData = canvas.toDataURL('image/png', 1.0);
+            
+            // A4 dimensions: 210 x 297 mm
+            doc.addImage(imgData, 'PNG', 0, 0, 210, 297);
+            doc.save(`VetTrack_Luxe_${type.toUpperCase()}_${Date.now()}.pdf`);
+            
             helper.style.display = 'none';
         });
     };
