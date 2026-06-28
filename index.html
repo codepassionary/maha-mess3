@@ -1,3 +1,4 @@
+update in progress. . .
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,11 +81,29 @@
         .item-pill { 
             height: 58px; border-radius: 22px; border: 1px solid var(--surface); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
+            background: rgba(255,255,255,0.02); cursor: pointer; 
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; box-shadow: 0 10px 20px -5px var(--p-glow); }
+        .item-pill.active { 
+            background: var(--p); border-color: var(--p); color: white; 
+            box-shadow: 0 8px 25px -5px rgba(255, 140, 0, 0.5), inset 0 2px 4px rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
         .item-pill.disabled { cursor: not-allowed; opacity: 0.6; }
         .item-pill span { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 3px; }
+
+        .note-tag {
+            grid-column: 1 / -1; 
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 11px;
+            color: var(--sub);
+            border-left: 3px solid var(--p);
+            margin-top: 2px;
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
 
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: flex-end; }
         .sheet { background: #161B29; width: 100%; border-radius: 45px 45px 0 0; padding: 40px; border-top: 1px solid var(--surface); transform: translateY(100%); transition: 0.5s cubic-bezier(0.32, 0.72, 0, 1); }
@@ -135,6 +154,7 @@
             <div class="label">Total Bill</div>
             <div class="total-val" id="totalValue">₹0</div>
             <div id="statsSub" style="font-size:12px; font-weight:700; opacity:0.9; margin-top: 8px;">0 Units</div>
+            <div id="forecastSub" style="font-size:11px; font-weight:800; color: rgba(255,255,255,0.7); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;">Projected EOM: ₹0</div>
         </div>
         <div id="quickBtn" class="quick-log-btn" onclick="quickLog()">
             <i id="quickIcon">⚡</i>
@@ -204,6 +224,9 @@
 
     window.quickLog = async () => {
         if (!isCurrentMonth()) return;
+        
+        if (navigator.vibrate) navigator.vibrate(50); // Haptic feedback
+        
         const day = todayDate.getDate(), type = todayDate.getHours() < 16 ? 'l' : 'd';
         const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
         if(obj[type] === 1) return;
@@ -250,7 +273,7 @@
 
                 card.addEventListener('touchmove', (e) => {
                     let moveY = e.touches[0].clientY;
-                    if (Math.abs(moveY - startY) > 10) { // If finger moves more than 10px, it's a scroll
+                    if (Math.abs(moveY - startY) > 10) { 
                         isScrolling = true;
                         clearTimeout(longPressTimer);
                     }
@@ -261,11 +284,12 @@
                 });
             }
 
+            // Note: onclick now passes 'event' to prevent long-press misfires
             card.innerHTML = `
                 <div class="date-circ"><span class="n">${i}</span><span class="d">${new Date(viewDate.getFullYear(), viewDate.getMonth(), i).toLocaleDateString('en-IN',{weekday:'short'})}</span></div>
-                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'l')"><span>Lunch</span></div>
-                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'d')"><span>Dinner</span></div>
-                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(${i},'w')"><span>Water</span></div>
+                <div class="item-pill ${d.l?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'l')"><span>Lunch</span></div>
+                <div class="item-pill ${d.d?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'd')"><span>Dinner</span></div>
+                <div class="item-pill ${d.w?'active':''} ${!current?'disabled':''}" onclick="toggle(event, ${i}, 'w')"><span>Water</span></div>
                 ${d.n ? `<div class="note-tag">📝 ${d.n}</div>` : ''}
             `;
             grid.appendChild(card);
@@ -273,21 +297,28 @@
         calculate();
     }
 
-    window.toggle = async (day, type) => {
+    window.toggle = async (event, day, type) => {
+        event.stopPropagation(); // Prevents long-press interference
         if (!isCurrentMonth()) return;
+
+        if (navigator.vibrate) navigator.vibrate(20); // Quick tactile click
+
         const obj = logs[day] || { l: 0, d: 0, w: 0, n: "" };
         obj[type] = obj[type] ? 0 : 1;
         await setDoc(doc(db, "users", user.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`), { [day]: obj }, { merge: true });
     };
 
     window.openNote = (day) => {
+        if (navigator.vibrate) navigator.vibrate([10, 30, 10]); // Distinct pop for notes
         activeDayId = day;
         document.getElementById('noteTitle').innerText = `Day ${day} Notes`;
         document.getElementById('noteInput').value = logs[day]?.n || "";
         document.getElementById('noteOverlay').style.display = 'flex';
         setTimeout(() => document.getElementById('noteSheet').classList.add('up'), 10);
     };
+    
     window.closeNote = () => { document.getElementById('noteSheet').classList.remove('up'); setTimeout(() => document.getElementById('noteOverlay').style.display = 'none', 400); };
+    
     window.saveNote = async () => {
         const obj = logs[activeDayId] || { l: 0, d: 0, w: 0, n: "" };
         obj.n = document.getElementById('noteInput').value;
@@ -303,6 +334,7 @@
         setTimeout(() => document.getElementById('settingsSheet').classList.add('up'), 10);
     };
     window.closeSettings = () => { document.getElementById('settingsSheet').classList.remove('up'); setTimeout(() => document.getElementById('settingsOverlay').style.display = 'none', 400); };
+    
     window.saveSettings = async () => {
         config.name = document.getElementById('setUserName').value;
         config.mealPrice = parseInt(document.getElementById('setMealPrice').value);
@@ -313,12 +345,44 @@
     };
 
     function calculate() {
-        let m=0, w=0; Object.values(logs).forEach(v => { if(v.l) m++; if(v.d) m++; if(v.w) w++; });
-        document.getElementById('totalValue').innerText = `₹${(m * config.mealPrice + w * config.waterPrice).toLocaleString('en-IN')}`;
+        let m = 0, w = 0; 
+        
+        // Determine days passed vs total days
+        const currentDay = isCurrentMonth() ? todayDate.getDate() : new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+        const totalDaysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+
+        Object.values(logs).forEach(v => { 
+            if(v.l) m++; 
+            if(v.d) m++; 
+            if(v.w) w++; 
+        });
+
+        const currentTotal = (m * config.mealPrice) + (w * config.waterPrice);
+        
+        // Run Rate / Forecast Engine
+        const dailyAverage = currentDay > 0 ? currentTotal / currentDay : 0;
+        const projectedTotal = Math.round(dailyAverage * totalDaysInMonth);
+
+        // Update Standard UI
+        document.getElementById('totalValue').innerText = `₹${currentTotal.toLocaleString('en-IN')}`;
         document.getElementById('statsSub').innerText = `${m} Meals • ${w} Water Units`;
+        
+        // Update Forecast UI
+        const forecastEl = document.getElementById('forecastSub');
+        if (isCurrentMonth()) {
+            forecastEl.style.display = 'block';
+            forecastEl.innerText = `Projected EOM: ₹${projectedTotal.toLocaleString('en-IN')}`;
+        } else {
+            forecastEl.style.display = 'none'; // Not needed for past months
+        }
     }
 
-    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); syncData(); };
+    window.changeMonth = (dir) => { 
+        viewDate.setDate(1); // Prevents the 31st overflow bug
+        viewDate.setMonth(viewDate.getMonth() + dir); 
+        syncData(); 
+    };
+
 </script>
 </body>
 </html>
