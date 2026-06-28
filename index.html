@@ -5,7 +5,17 @@ vvvv222...000<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>VetTrack Luxe | Premier</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <style>
+    <style>/* Minimalist Pulse Loader */
+.loader-wrap { display: flex; align-items: center; justify-content: center; height: 100vh; }
+.pulse-ring {
+    width: 50px; height: 50px;
+    border: 4px solid rgba(255, 140, 0, 0.2);
+    border-top: 4px solid var(--p);
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         :root { 
             --p: #FF8C00; --p-glow: rgba(255, 140, 0, 0.4);
             --bg: #0B0F1A; --card: rgba(30, 41, 59, 0.7); --surface: rgba(51, 65, 85, 0.5);
@@ -410,7 +420,20 @@ vvvv222...000<!DOCTYPE html>
         viewDate.setMonth(viewDate.getMonth() + dir); 
         syncData(); 
     };
+async function exportData(type) {
+    // 1. Show the loader
+    const loader = document.createElement('div');
+    loader.className = 'loader-wrap';
+    loader.innerHTML = '<div class="pulse-ring"></div>';
+    document.body.appendChild(loader);
 
+    // 2. Perform the async work (Location + PDF generation)
+    // ... existing export logic ...
+
+    // 3. Remove loader once done
+    document.body.removeChild(loader);
+}
+    
 </script>
 </body>
 </html>
