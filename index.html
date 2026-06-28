@@ -8,41 +8,46 @@
     <style>
         :root { --p: #FF8C00; --bg: #0B0F1A; }
         body { font-family: 'Helvetica Neue', sans-serif; background: var(--bg); color: #fff; padding: 20px; }
-        .btn { background: var(--p); color: white; padding: 15px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; width: 100%; margin-top: 10px; }
+        .container { max-width: 480px; margin: 0 auto; }
+        .btn { background: var(--p); color: white; padding: 18px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; width: 100%; margin-top: 15px; font-size: 16px; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
         #exportHelper { display: none; position: absolute; top: -9999px; left: -9999px; width: 800px; padding: 60px; background: white; color: black; }
-        /* Anti-Spoof Seal Styling */
         .hologram-seal {
-            position: absolute; top: 50px; right: 50px; width: 130px; height: 130px;
+            position: absolute; top: 40px; right: 40px; width: 130px; height: 130px;
             background: radial-gradient(circle, #fff 10%, #FFD700 30%, #FF8C00 70%);
             border: 5px double #B8860B; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            transform: rotate(-15deg); box-shadow: 0 0 25px rgba(0,0,0,0.3);
-            overflow: hidden;
+            transform: rotate(-15deg); box-shadow: 0 0 25px rgba(0,0,0,0.3); z-index: 10;
         }
     </style>
 </head>
 <body>
 
-<div style="max-width:480px; margin:0 auto;">
-    <h2>VetTrack Luxe Billing</h2>
-    <button class="btn" onclick="exportPDF('meal')">Generate Official Meal Bill</button>
+<div class="container">
+    <h1 style="font-family:'Outfit', sans-serif;">VetTrack Luxe</h1>
+    <p style="color:#94A3B8;">Official Billing Portal</p>
+    <button class="btn" onclick="exportPDF('meal')">Generate Secure Bill (Meal)</button>
+    <button class="btn" onclick="exportPDF('water')">Generate Secure Bill (Water)</button>
 </div>
 
 <div id="exportHelper"></div>
 
 <script>
-    const config = { name: "Dr. Resident", mealPrice: 50 };
+    const config = { name: "Dr. Resident" };
 
+    // Function to get landmark-based address
     async function getAddress(lat, lon) {
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=16&addressdetails=1`);
             const data = await res.json();
             const addr = data.address;
-            return `${addr.suburb || addr.neighbourhood || ''}, ${addr.city || addr.town || ''}, ${addr.state || ''} - ${addr.postcode || 'N/A'}`;
-        } catch { return "Location Data Unavailable"; }
+            const landmark = addr.suburb || addr.neighbourhood || addr.village || addr.town || "Primary Area";
+            const cityState = `${addr.city || addr.town || ''}, ${addr.state || ''}`;
+            const zip = addr.postcode ? ` - ${addr.postcode}` : '';
+            return `Area: ${landmark} | ${cityState}${zip}`;
+        } catch { return "Area: Local Service Point"; }
     }
 
     window.exportPDF = async (type) => {
-        // 1. Force Location
         let pos;
         try {
             pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {enableHighAccuracy: true, timeout: 5000}));
@@ -52,27 +57,31 @@
         const { jsPDF } = window.jspdf;
         const helper = document.getElementById('exportHelper');
         const now = new Date();
-        const total = 1250; // Dynamic total
+        const total = 1250; // Replace with dynamic calculation
 
         helper.style.display = 'block';
         helper.innerHTML = `
-            <div style="position:relative; width: 100%; height: 100%; padding: 40px;">
+            <div style="position:relative; width: 100%; padding: 60px; background: white;">
                 <div class="hologram-seal">
-                    <div style="text-align:center; font-family: serif; color: #8B4513; padding: 10px;">
+                    <div style="text-align:center; font-family: serif; color: #8B4513;">
                         <b style="font-size: 14px;">VETTRACK</b><br>
-                        <hr style="border: 0.5px solid #8B4513;">
-                        <span style="font-size: 8px; letter-spacing: 2px;">AUTHENTICATED</span>
+                        <hr style="border: 0.5px solid #8B4513; width: 80%;">
+                        <span style="font-size: 7px; letter-spacing: 2px;">SECURE • LUXE</span>
                     </div>
                 </div>
-                <h1 style="font-size: 45px; margin: 0;">OFFICIAL INVOICE</h1>
-                <div style="margin-top: 20px; font-size: 24px;">TOTAL PAYABLE: <b>₹${total}</b></div>
-                <div style="margin-top: 30px; line-height: 1.8; font-size: 14px;">
+                
+                <h1 style="font-size: 45px; margin: 0 0 10px 0; color: #000;">OFFICIAL INVOICE</h1>
+                <div style="font-size: 28px; margin-bottom: 30px;">TOTAL PAYABLE: <b>₹${total}</b></div>
+                
+                <div style="border-top: 2px solid #FF8C00; padding-top: 20px; line-height: 2; font-size: 16px;">
                     <p><b>Diner Name:</b> ${config.name}</p>
                     <p><b>Issue Date:</b> ${now.toDateString()}</p>
                     <p><b>Service Point:</b> ${address}</p>
                 </div>
-                <footer style="margin-top:100px; font-size: 12px; border-top: 1px solid #000; padding-top: 10px;">
-                    Digital Signature: ${Math.random().toString(36).substr(2, 12).toUpperCase()} | Time: ${now.toLocaleTimeString()}
+                
+                <footer style="margin-top:100px; font-size: 12px; border-top: 1px solid #ccc; padding-top: 10px; font-family: monospace;">
+                    TRANSACTION HASH: ${Math.random().toString(36).substr(2, 16).toUpperCase()}<br>
+                    GENERATED AT: ${now.toLocaleTimeString()}
                 </footer>
             </div>
         `;
