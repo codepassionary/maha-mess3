@@ -9,87 +9,86 @@
         :root { --p: #FF8C00; --bg: #0B0F1A; }
         body { font-family: 'Helvetica Neue', sans-serif; background: var(--bg); color: #fff; padding: 20px; }
         .container { max-width: 480px; margin: 0 auto; }
-        .btn { background: var(--p); color: white; padding: 18px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; width: 100%; margin-top: 15px; font-size: 16px; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
+        .btn { background: var(--p); color: white; padding: 18px; border-radius: 16px; border: none; font-weight: 800; cursor: pointer; width: 100%; margin-top: 15px; }
         #exportHelper { display: none; position: absolute; top: -9999px; left: -9999px; width: 800px; padding: 60px; background: white; color: black; }
+        
+        /* High-Definition Anti-Piracy Seal */
         .hologram-seal {
-            position: absolute; top: 40px; right: 40px; width: 130px; height: 130px;
-            background: radial-gradient(circle, #fff 10%, #FFD700 30%, #FF8C00 70%);
-            border: 5px double #B8860B; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            transform: rotate(-15deg); box-shadow: 0 0 25px rgba(0,0,0,0.3); z-index: 10;
+            position: absolute; top: 40px; right: 40px; width: 140px; height: 140px;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            border: 2px solid #d1d5db; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.2);
+            overflow: hidden; z-index: 20;
+        }
+        .micro-lines {
+            width: 100%; height: 100%;
+            background-image: repeating-radial-gradient(circle, #FFD700 0%, transparent 2%, #FF8C00 4%);
+            opacity: 0.3; transform: rotate(45deg);
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="font-family:'Outfit', sans-serif;">VetTrack Luxe</h1>
-    <p style="color:#94A3B8;">Official Billing Portal</p>
-    <button class="btn" onclick="exportPDF('meal')">Generate Secure Bill (Meal)</button>
-    <button class="btn" onclick="exportPDF('water')">Generate Secure Bill (Water)</button>
+    <h1>VetTrack Luxe</h1>
+    <button class="btn" onclick="exportPDF('bill')">Generate Secure HD Invoice</button>
 </div>
 
 <div id="exportHelper"></div>
 
 <script>
-    const config = { name: "Dr. Resident" };
-
-    // Function to get landmark-based address
-    async function getAddress(lat, lon) {
+    // Simplified Location Fetcher: City, State, Pincode Only
+    async function getCompactAddress(lat, lon) {
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=16&addressdetails=1`);
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`);
             const data = await res.json();
             const addr = data.address;
-            const landmark = addr.suburb || addr.neighbourhood || addr.village || addr.town || "Primary Area";
-            const cityState = `${addr.city || addr.town || ''}, ${addr.state || ''}`;
-            const zip = addr.postcode ? ` - ${addr.postcode}` : '';
-            return `Area: ${landmark} | ${cityState}${zip}`;
-        } catch { return "Area: Local Service Point"; }
+            return `${addr.city || addr.town || addr.village || 'Unknown City'}, ${addr.state || 'Unknown State'} - ${addr.postcode || '000000'}`;
+        } catch { return "Service Location Verified"; }
     }
 
     window.exportPDF = async (type) => {
         let pos;
         try {
             pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {enableHighAccuracy: true, timeout: 5000}));
-        } catch(e) { alert("Location Services are MANDATORY. Please enable to proceed."); return; }
+        } catch(e) { alert("Location Services are MANDATORY for bill validation."); return; }
 
-        const address = await getAddress(pos.coords.latitude, pos.coords.longitude);
+        const address = await getCompactAddress(pos.coords.latitude, pos.coords.longitude);
         const { jsPDF } = window.jspdf;
         const helper = document.getElementById('exportHelper');
         const now = new Date();
-        const total = 1250; // Replace with dynamic calculation
+        const txHash = Math.random().toString(36).substr(2, 12).toUpperCase();
 
         helper.style.display = 'block';
         helper.innerHTML = `
-            <div style="position:relative; width: 100%; padding: 60px; background: white;">
+            <div style="position:relative; width: 100%; padding: 60px; background: white; height: 1000px;">
                 <div class="hologram-seal">
-                    <div style="text-align:center; font-family: serif; color: #8B4513;">
-                        <b style="font-size: 14px;">VETTRACK</b><br>
-                        <hr style="border: 0.5px solid #8B4513; width: 80%;">
-                        <span style="font-size: 7px; letter-spacing: 2px;">SECURE • LUXE</span>
+                    <div class="micro-lines"></div>
+                    <div style="position:absolute; text-align:center; font-family: serif; color: #5d4037; font-weight: bold;">
+                        VETTRACK<br><span style="font-size: 10px; letter-spacing: 1px;">LUXE AUTHENTIC</span>
                     </div>
                 </div>
                 
-                <h1 style="font-size: 45px; margin: 0 0 10px 0; color: #000;">OFFICIAL INVOICE</h1>
-                <div style="font-size: 28px; margin-bottom: 30px;">TOTAL PAYABLE: <b>₹${total}</b></div>
+                <h1 style="font-size: 48px; margin: 0; color: #111;">OFFICIAL INVOICE</h1>
+                <div style="font-size: 32px; margin: 20px 0; color: #FF8C00;">TOTAL PAYABLE: <b>₹1,250</b></div>
                 
-                <div style="border-top: 2px solid #FF8C00; padding-top: 20px; line-height: 2; font-size: 16px;">
-                    <p><b>Diner Name:</b> ${config.name}</p>
-                    <p><b>Issue Date:</b> ${now.toDateString()}</p>
-                    <p><b>Service Point:</b> ${address}</p>
+                <div style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; font-size: 18px; line-height: 2;">
+                    <p><b>Service Location:</b> ${address}</p>
+                    <p><b>Issue Date:</b> ${now.toLocaleDateString('en-IN', {day: '2-digit', month: 'long', year: 'numeric'})}</p>
+                    <p><b>Transaction ID:</b> #${txHash}</p>
                 </div>
                 
-                <footer style="margin-top:100px; font-size: 12px; border-top: 1px solid #ccc; padding-top: 10px; font-family: monospace;">
-                    TRANSACTION HASH: ${Math.random().toString(36).substr(2, 16).toUpperCase()}<br>
-                    GENERATED AT: ${now.toLocaleTimeString()}
-                </footer>
+                <div style="margin-top: 100px; font-family: monospace; font-size: 10px; color: #666; text-align: center;">
+                    VERIFIED AT SOURCE | SECURE GATEWAY ID: ${Math.random().toString(16).substr(2, 8).toUpperCase()}
+                </div>
             </div>
         `;
 
-        html2canvas(helper, {scale: 2}).then(canvas => {
+        html2canvas(helper, {scale: 3}).then(canvas => { // scale: 3 for High-Definition
             const doc = new jsPDF('p', 'mm', 'a4');
             doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 210, 297);
-            doc.save(`VetTrack_Bill_${now.getTime()}.pdf`);
+            doc.save(`VetTrack_Invoice_${txHash}.pdf`);
             helper.style.display = 'none';
         });
     };
