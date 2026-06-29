@@ -22,9 +22,10 @@
             overflow: hidden; 
             height: 100vh; 
             width: 100vw;
+            user-select: none;
         }
 
-        /* Continuous slow cinematic pulse background movement */
+        /* Ambient animated cinematic background */
         .stage { 
             height: 100vh; 
             width: 100vw; 
@@ -33,56 +34,88 @@
             justify-content: center; 
             position: relative; 
             background: radial-gradient(circle 80% at 50% 50%, var(--void-glow) 0%, var(--void) 100%);
-            animation: bgShift 20s ease-in-out infinite alternate;
+            animation: bgShift 15s ease-in-out infinite alternate;
         }
 
         @keyframes bgShift {
             0% { background-size: 100% 100%; background-position: 50% 50%; }
-            100% { background-size: 130% 130%; background-position: 52% 48%; }
+            100% { background-size: 140% 140%; background-position: 45% 55%; }
         }
 
-        canvas#fxCanvas { position: fixed; inset: 0; z-index: 50; pointer-events: none; }
+        /* Fixed Canvas for Fireworks & Ambient Dust */
+        canvas#fxCanvas { position: absolute; inset: 0; z-index: 50; pointer-events: none; }
 
-        /* Highly Premium glassmorphism with dynamic ambient float animation */
+        /* Full Screen Toggle Button */
+        #fsBtn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: var(--gold-mid);
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+        }
+
+        #fsBtn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--gold-bright);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
+            transform: translateY(-2px);
+        }
+
+        #fsBtn.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-10px);
+        }
+
+        /* Premium Glassmorphism Card */
         .glass {
             width: 92vw; 
-            max-width: 700px; 
-            padding: clamp(40px, 6vh, 70px) clamp(20px, 5vw, 60px);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(212, 175, 55, 0.25); 
-            border-radius: 32px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8), 
-                        inset 0 0 50px rgba(212, 175, 55, 0.08);
+            max-width: 750px; 
+            padding: clamp(50px, 8vh, 80px) clamp(30px, 6vw, 70px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(212, 175, 55, 0.2); 
+            border-radius: 24px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9), 
+                        inset 0 0 60px rgba(212, 175, 55, 0.05),
+                        0 0 40px rgba(212, 175, 55, 0.1);
             text-align: center; 
             position: relative; 
             z-index: 10;
-            animation: floatFrame 8s ease-in-out infinite alternate;
+            animation: floatFrame 10s ease-in-out infinite alternate;
         }
 
         @keyframes floatFrame {
-            0% { transform: translateY(0px) rotate(0deg); }
-            100% { transform: translateY(-10px) rotate(0.5deg); }
+            0% { transform: translateY(0px); box-shadow: 0 40px 100px rgba(0,0,0,0.9), inset 0 0 60px rgba(212,175,55,0.05), 0 0 40px rgba(212,175,55,0.1); }
+            100% { transform: translateY(-12px); box-shadow: 0 60px 120px rgba(0,0,0,0.95), inset 0 0 80px rgba(212,175,55,0.08), 0 0 60px rgba(212,175,55,0.15); }
         }
 
-        /* Ornamental corners that scale perfectly on big displays */
+        /* Ornamental Corners */
         .corner {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border: 2px solid transparent;
-            pointer-events: none;
+            position: absolute; width: 45px; height: 45px; border: 2px solid transparent; pointer-events: none;
         }
-        .tl { top: 20px; left: 20px; border-top-color: var(--gold-mid); border-left-color: var(--gold-mid); }
-        .tr { top: 20px; right: 20px; border-top-color: var(--gold-mid); border-right-color: var(--gold-mid); }
-        .bl { bottom: 20px; left: 20px; border-bottom-color: var(--gold-mid); border-left-color: var(--gold-mid); }
-        .br { bottom: 20px; right: 20px; border-bottom-color: var(--gold-mid); border-right-color: var(--gold-mid); }
+        .tl { top: 25px; left: 25px; border-top-color: var(--gold-mid); border-left-color: var(--gold-mid); }
+        .tr { top: 25px; right: 25px; border-top-color: var(--gold-mid); border-right-color: var(--gold-mid); }
+        .bl { bottom: 25px; left: 25px; border-bottom-color: var(--gold-mid); border-left-color: var(--gold-mid); }
+        .br { bottom: 25px; right: 25px; border-bottom-color: var(--gold-mid); border-right-color: var(--gold-mid); }
 
         .gold-text { 
             color: var(--gold-mid); 
             text-transform: uppercase; 
-            letter-spacing: 7px; 
+            letter-spacing: 8px; 
             font-size: clamp(0.75rem, 2vw, 0.95rem); 
             font-weight: 600;
         }
@@ -90,88 +123,131 @@
         .title { 
             font-family: 'Cinzel Decorative', serif; 
             font-weight: 900;
-            font-size: clamp(2.2rem, 6vw, 4.2rem); 
-            margin: 25px 0; 
+            font-size: clamp(2.4rem, 6vw, 4.5rem); 
+            margin: 30px 0; 
             line-height: 1.15; 
-            text-shadow: 0 0 35px rgba(212, 175, 55, 0.4);
+            text-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
             background: linear-gradient(90deg, #aa771c, #fcf6ba, #d4af37, #fff5cc, #aa771c);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shine 6s linear infinite;
+            animation: shine 5s linear infinite;
         }
 
-        @keyframes shine {
-            to { background-position: 200% center; }
-        }
+        @keyframes shine { to { background-position: 200% center; } }
         
         .unveil-btn {
             background: transparent; 
             color: var(--gold-bright); 
             border: 1.5px solid var(--gold-mid);
-            padding: 18px 48px; 
+            padding: 20px 55px; 
             cursor: pointer; 
-            letter-spacing: 5px; 
+            letter-spacing: 6px; 
             font-weight: 700; 
-            font-size: clamp(0.85rem, 2vw, 1.05rem);
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
             text-transform: uppercase;
             position: relative;
             outline: none;
+            overflow: hidden;
         }
+
+        .unveil-btn::before {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,245,204,0.4), transparent);
+            transition: all 0.5s ease;
+        }
+
         .unveil-btn:hover { 
             background: var(--gold-mid); 
             color: var(--void); 
-            box-shadow: 0 0 50px rgba(212, 175, 55, 0.6); 
-            transform: scale(1.06); 
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.7); 
+            transform: scale(1.05); 
         }
+        
+        .unveil-btn:hover::before { left: 100%; transition: all 0.8s ease; }
 
         #invitation { display: none; opacity: 0; }
-        .show { display: block !important; animation: premiumReveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .show { display: block !important; animation: premiumReveal 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
         @keyframes premiumReveal { 
-            0% { opacity: 0; transform: scale(0.92) translateY(30px); filter: blur(10px); }
+            0% { opacity: 0; transform: scale(0.9) translateY(40px); filter: blur(15px); }
             100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); } 
         }
 
+        /* Cinematic White Flash Overlay */
         #flashOverlay {
-            position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 99;
+            position: fixed; inset: 0; background: #fffdf6; opacity: 0; pointer-events: none; z-index: 99;
         }
-        .flash-active { animation: explosiveFlash 0.6s ease-out forwards; }
-        @keyframes explosiveFlash { 0% { opacity: 0.8; } 100% { opacity: 0; } }
+        .flash-active { animation: explosiveFlash 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes explosiveFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
     </style>
 </head>
 <body>
 
+<button id="fsBtn">Enter Full Screen</button>
+
 <div class="stage" id="stageMain">
     <canvas id="fxCanvas"></canvas>
+    
     <div class="glass" id="card">
         <div class="corner tl"></div><div class="corner tr"></div>
         <div class="corner bl"></div><div class="corner br"></div>
 
-        <!-- COVER PANEL -->
+        <!-- STAGE 1: COVER -->
         <div id="cover">
             <div class="gold-text">Requesting Your Honorable Presence</div>
             <h1 class="title">The Grand<br>Farewell</h1>
             <button class="unveil-btn" id="unveilBtn">UNVEIL INVITATION</button>
         </div>
 
-        <!-- REVEALED INVITATION DETAILS -->
+        <!-- STAGE 2: INVITATION -->
         <div id="invitation">
-            <div class="gold-text" style="margin-bottom: 15px;">In Clear Honor Of</div>
-            <h1 class="title" style="font-size: clamp(1.8rem, 5vw, 3.2rem); margin: 15px 0;">Dr. Upendra Singh<br>Narwaria Sir</h1>
-            <p style="font-size: clamp(1rem, 2.5vw, 1.35rem); opacity: 0.95; font-weight: 300; letter-spacing: 1px; line-height: 1.5;">
+            <div class="gold-text" style="margin-bottom: 15px;">In Grand Honor Of</div>
+            <h1 class="title" style="font-size: clamp(2rem, 5.5vw, 3.8rem); margin: 15px 0;">Dr. Upendra Singh<br>Narwaria Sir</h1>
+            <p style="font-size: clamp(1.1rem, 2.5vw, 1.4rem); opacity: 0.95; font-weight: 300; letter-spacing: 1px; line-height: 1.6;">
                 Department of Livestock Production Management
             </p>
-            <div style="margin-top: 35px; border-top: 1px solid rgba(212,175,55,0.2); padding-top: 20px;">
-                <span class="gold-text" style="font-size: 0.8rem; letter-spacing: 3px;">June 26th · 11:00 AM · First Year Classroom</span>
+            <div style="margin-top: 40px; border-top: 1px solid rgba(212,175,55,0.25); padding-top: 25px;">
+                <span class="gold-text" style="font-size: 0.85rem; letter-spacing: 4px; color: var(--gold-bright);">
+                    29th June 2026 · 7:00 PM · First Year Classroom
+                </span>
             </div>
         </div>
     </div>
 </div>
+
 <div id="flashOverlay"></div>
 
 <script>
+    /* ====================================================================
+       FULL SCREEN LOGIC
+    ==================================================================== */
+    const fsBtn = document.getElementById('fsBtn');
+
+    fsBtn.addEventListener('click', () => {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) docEl.requestFullscreen();
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+        else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
+    });
+
+    document.addEventListener('fullscreenchange', handleFSChange);
+    document.addEventListener('webkitfullscreenchange', handleFSChange);
+
+    function handleFSChange() {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            fsBtn.classList.add('hidden'); // Hide gracefully
+        } else {
+            fsBtn.classList.remove('hidden'); // Show if user exits manually
+        }
+    }
+
+    /* ====================================================================
+       HIGH-PERFORMANCE PARTICLE PHYSICS & RENDERER
+    ==================================================================== */
     const canvas = document.getElementById('fxCanvas');
     const ctx = canvas.getContext('2d');
     let W, H;
@@ -185,40 +261,61 @@
     let particles = [];
     let ambientParticles = [];
 
-    // Particle Object Supporting Shapes, Gravity, and Spinning
     class Particle {
         constructor(x, y, vx, vy, color, sizeMultiplier = 1) {
             this.x = x; this.y = y; this.vx = vx; this.vy = vy;
             this.color = color; 
             this.life = 1;
-            this.decay = Math.random() * 0.007 + 0.005;
-            this.size = (Math.random() * 5 + 3) * sizeMultiplier;
+            this.decay = Math.random() * 0.005 + 0.003; 
+            this.size = (Math.random() * 6 + 4) * sizeMultiplier;
             this.rotation = Math.random() * Math.PI * 2;
-            this.rotSpeed = (Math.random() - 0.5) * 0.2;
-            this.type = Math.random() < 0.4 ? 'circle' : Math.random() < 0.7 ? 'rect' : 'triangle';
+            this.rotSpeed = (Math.random() - 0.5) * 0.3;
+            this.type = Math.random() < 0.3 ? 'circle' : Math.random() < 0.65 ? 'rect' : 'triangle';
+            this.history = []; // For smooth motion trails
         }
+        
         update() { 
+            this.history.push({x: this.x, y: this.y, rot: this.rotation});
+            if (this.history.length > 6) this.history.shift(); // Keep trail short
+
             this.x += this.vx; this.y += this.vy; 
-            this.vy += 0.14; // Gravity weight
-            this.vx *= 0.98; // Natural air drag
+            this.vy += 0.18; // Stronger Gravity 
+            this.vx *= 0.97; // Air drag
             this.rotation += this.rotSpeed;
             this.life -= this.decay; 
         }
+
         draw() { 
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = this.color; 
+            ctx.strokeStyle = this.color;
+
+            // Draw Premium Motion Trail
+            if (this.history.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(this.history[0].x, this.history[0].y);
+                for(let i=1; i<this.history.length; i++) {
+                    ctx.lineTo(this.history[i].x, this.history[i].y);
+                }
+                ctx.lineWidth = this.size * 0.4;
+                ctx.globalAlpha = this.life * 0.4;
+                ctx.stroke();
+            }
+
+            // Draw Particle Head
+            ctx.globalAlpha = this.life;
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.rotate(this.rotation);
-            ctx.fillStyle = this.color; 
-            ctx.globalAlpha = this.life;
             ctx.beginPath();
             if(this.type === 'circle') {
                 ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
             } else if (this.type === 'rect') {
-                ctx.fillRect(-this.size / 2, -this.size / 4, this.size, this.size / 2);
+                ctx.fillRect(-this.size / 2, -this.size / 3, this.size, this.size / 1.5);
             } else {
-                ctx.moveTo(0, -this.size / 2);
-                ctx.lineTo(this.size / 2, this.size / 2);
-                ctx.lineTo(-this.size / 2, this.size / 2);
+                ctx.moveTo(0, -this.size / 1.5);
+                ctx.lineTo(this.size / 1.5, this.size / 1.5);
+                ctx.lineTo(-this.size / 1.5, this.size / 1.5);
             }
             ctx.closePath();
             ctx.fill();
@@ -226,16 +323,16 @@
         }
     }
 
-    // Slow drifting premium dust overlay background loop
+    // Gentle floating dust for extreme luxury feel
     function createAmbientFloaters() {
-        if(ambientParticles.length < 60) {
+        if(ambientParticles.length < 80) {
             ambientParticles.push({
                 x: Math.random() * W,
-                y: H + 20,
-                vx: (Math.random() - 0.5) * 0.4,
-                vy: -Math.random() * 0.6 - 0.2,
-                size: Math.random() * 2.5 + 0.5,
-                alpha: Math.random() * 0.5 + 0.2
+                y: H + 30,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: -Math.random() * 0.8 - 0.3,
+                size: Math.random() * 3 + 1,
+                alpha: Math.random() * 0.4 + 0.1
             });
         }
     }
@@ -243,42 +340,53 @@
     function triggerGrandExplosion() {
         const vibrantColors = ['#FFD700', '#FFA500', '#FF2E93', '#FF8A00', '#00E5FF', '#8600FF', '#7FFF00', '#FFFFFF'];
         
-        // Stage 1 Corners Cannons (Shooting High Inward)
-        for(let i=0; i < 220; i++) {
-            particles.push(new Particle(0, H * 0.9, Math.random() * 22 + 8, -Math.random() * 28 - 10, vibrantColors[i % vibrantColors.length], 1.4));
-            particles.push(new Particle(W, H * 0.9, -Math.random() * 22 - 8, -Math.random() * 28 - 10, vibrantColors[i % vibrantColors.length], 1.4));
+        // Massive Corner Cannons
+        for(let i=0; i < 300; i++) {
+            particles.push(new Particle(0, H, Math.random() * 25 + 10, -Math.random() * 35 - 15, vibrantColors[i % vibrantColors.length], 1.5));
+            particles.push(new Particle(W, H, -Math.random() * 25 - 10, -Math.random() * 35 - 15, vibrantColors[i % vibrantColors.length], 1.5));
         }
 
-        // Stage 2 Radial Center Shockwave (Dopamine Spike outward pop)
-        for(let j=0; j < 180; j++) {
+        // Center Outward Starburst
+        for(let j=0; j < 200; j++) {
             let angle = Math.random() * Math.PI * 2;
-            let speed = Math.random() * 16 + 4;
-            particles.push(new Particle(W / 2, H / 2, Math.cos(angle) * speed, Math.sin(angle) * speed, '#fcf6ba', 1));
+            let speed = Math.random() * 20 + 5;
+            particles.push(new Particle(W / 2, H / 2, Math.cos(angle) * speed, Math.sin(angle) * speed, '#fcf6ba', 1.2));
         }
     }
 
+    /* ====================================================================
+       UNVEIL TRIGGER
+    ==================================================================== */
     document.getElementById('unveilBtn').onclick = () => {
-        // Digital display hardware trigger option: Requests browser absolute Fullscreen layout safely
-        const docEl = document.documentElement;
-        if (docEl.requestFullscreen) docEl.requestFullscreen();
-        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+        // Force full screen if not already
+        if (!document.fullscreenElement) {
+            const docEl = document.documentElement;
+            if (docEl.requestFullscreen) docEl.requestFullscreen();
+            else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+        }
+        
+        fsBtn.classList.add('hidden'); // Ensure button is hidden
 
-        // White screen flash transition
+        // Cinematic Flash
         document.getElementById('flashOverlay').classList.add('flash-active');
 
+        // Reveal Sequence
         setTimeout(() => {
             document.getElementById('cover').style.display = 'none';
             document.getElementById('invitation').classList.add('show');
             triggerGrandExplosion();
-        }, 100);
+        }, 150);
     };
 
+    /* ====================================================================
+       ANIMATION LOOP
+    ==================================================================== */
     function animate() {
         ctx.clearRect(0, 0, W, H);
         
-        // Handle background slow movement
+        // Render Ambient Dust
         createAmbientFloaters();
-        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'screen'; // Creates a beautiful glow
         ambientParticles.forEach((p, index) => {
             p.x += p.vx; p.y += p.vy;
             ctx.fillStyle = '#d4af37';
@@ -286,17 +394,20 @@
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             ctx.fill();
-            if(p.y < -20) ambientParticles.splice(index, 1);
+            if(p.y < -30) ambientParticles.splice(index, 1);
         });
 
-        // Handle Active Celebration Confetti
+        // Render Celebration Physics
         particles.forEach((p, i) => {
             p.update(); p.draw();
-            if(p.life <= 0 || p.x < -50 || p.x > W + 50) particles.splice(i, 1);
+            if(p.life <= 0 || p.x < -100 || p.x > W + 100) particles.splice(i, 1);
         });
-
+        
+        ctx.globalCompositeOperation = 'source-over'; // Reset blending
         requestAnimationFrame(animate);
     }
+    
+    // Start engine
     animate();
 </script>
 </body>
