@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VetTrack Super Admin</title>
+    <title>VetTrack Luxe | Super Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { 
-            --p: #2563EB; --p-glow: rgba(37, 99, 235, 0.4);
+            --p: #2563EB; --p-glow: rgba(37, 99, 235, 0.35);
             --bg: #F8FAFC; --card: #FFFFFF; --surface: #F1F5F9;
             --text: #0F172A; --sub: #64748B; --border: #E2E8F0;
-            --danger: #EF4444; --warn: #F59E0B;
+            --danger: #EF4444; --warn: #F59E0B; --success: #10B981;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
@@ -19,121 +19,150 @@
         body { 
             background: var(--bg); color: var(--text); 
             font-family: 'Plus Jakarta Sans', sans-serif;
-            padding-bottom: 80px; padding-top: env(safe-area-inset-top);
+            padding-bottom: 90px; padding-top: env(safe-area-inset-top);
         }
 
+        /* Login Screen */
+        #loginScreen {
+            position: fixed; inset: 0; background: var(--bg); z-index: 10000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; text-align: center;
+        }
+        .btn-prime {
+            background: var(--p); color: white; padding: 18px 30px; border-radius: 50px;
+            border: none; font-weight: 800; font-size: 16px; cursor: pointer;
+            box-shadow: 0 10px 25px -5px var(--p-glow); transition: 0.2s;
+        }
+        .btn-prime:active { transform: scale(0.96); }
+
+        /* Top Bar */
         .navbar {
             background: var(--card); padding: 16px 20px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
         }
-        .brand { font-family: 'Outfit'; font-size: 24px; font-weight: 900; color: var(--p); letter-spacing: -0.5px; }
-        
-        .lang-btn { background: var(--surface); color: var(--p); border: none; padding: 10px 18px; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; }
+        .brand { font-family: 'Outfit'; font-size: 22px; font-weight: 900; color: var(--p); letter-spacing: -0.5px; }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .lang-btn { background: var(--surface); color: var(--p); border: none; padding: 8px 14px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; }
+        .logout-btn { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: none; padding: 8px 12px; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer; }
 
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
 
+        /* Stats Card */
         .stat-card {
             background: linear-gradient(135deg, var(--p) 0%, #1D4ED8 100%);
-            padding: 25px; border-radius: 24px; margin-bottom: 25px;
-            color: white; box-shadow: 0 10px 25px -5px var(--p-glow);
+            padding: 25px; border-radius: 26px; margin-bottom: 25px;
+            color: white; box-shadow: 0 15px 30px -8px var(--p-glow);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .stat-val { font-family: 'Outfit'; font-size: 42px; font-weight: 900; line-height: 1; }
-        .stat-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; margin-bottom: 5px; }
+        .stat-val { font-family: 'Outfit'; font-size: 46px; font-weight: 900; line-height: 1; }
+        .stat-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.9; margin-bottom: 6px; }
 
-        .section-title { font-size: 14px; font-weight: 800; margin-bottom: 15px; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; }
+        .section-title { font-size: 13px; font-weight: 800; margin-bottom: 14px; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; }
 
         /* User List */
         .user-card {
             background: var(--card); border: 1px solid var(--border);
-            border-radius: 20px; padding: 18px; margin-bottom: 15px;
+            border-radius: 20px; padding: 18px; margin-bottom: 12px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); cursor: pointer;
-            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02); cursor: pointer; transition: 0.2s;
         }
-        .user-card:active { transform: scale(0.98); }
-        .user-info h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+        .user-card:active { transform: scale(0.98); background: var(--surface); }
+        .user-info h3 { font-size: 17px; font-weight: 800; margin-bottom: 4px; color: var(--text); }
         .user-info p { font-size: 13px; color: var(--sub); font-weight: 600; }
-        .open-icon { background: var(--surface); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--p); }
+        .open-icon { background: var(--surface); width: 40px; height: 40px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; color: var(--p); }
 
-        /* Overlay & Bottom Sheet */
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 2000; display: none; flex-direction: column; justify-content: flex-end; }
-        .sheet { background: var(--bg); width: 100%; max-width: 600px; margin: 0 auto; height: 90vh; border-radius: 30px 30px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
+        /* Bottom Sheet */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(5px); z-index: 2000; display: none; flex-direction: column; justify-content: flex-end; }
+        .sheet { background: var(--bg); width: 100%; max-width: 600px; margin: 0 auto; height: 92vh; border-radius: 32px 32px 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
         .sheet.up { transform: translateY(0); }
         
-        .sheet-header { padding: 20px 25px; background: var(--card); border-radius: 30px 30px 0 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
-        .sheet-title { font-family: 'Outfit'; font-size: 24px; font-weight: 800; }
-        .close-btn { background: var(--surface); border: none; width: 36px; height: 36px; border-radius: 18px; font-size: 18px; font-weight: bold; color: var(--text); cursor: pointer; }
+        .sheet-header { padding: 20px 24px; background: var(--card); border-radius: 32px 32px 0 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        .sheet-title { font-family: 'Outfit'; font-size: 22px; font-weight: 800; }
+        .close-btn { background: var(--surface); border: none; width: 36px; height: 36px; border-radius: 18px; font-size: 16px; font-weight: bold; color: var(--text); cursor: pointer; }
 
         .sheet-content { padding: 20px; overflow-y: auto; flex: 1; }
 
         /* Actions Grid */
-        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
-        .btn-action { padding: 15px; border-radius: 16px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
+        .btn-action { padding: 14px; border-radius: 16px; border: none; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.2s; }
+        .btn-action:active { transform: scale(0.96); }
         .btn-action i { font-size: 20px; font-style: normal; }
         .btn-bill { background: var(--p); color: white; }
-        .btn-edit { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-        .btn-warn { background: rgba(245, 158, 11, 0.1); color: var(--warn); border: 1px solid var(--warn); }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-edit { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+        .btn-warn { background: rgba(245, 158, 11, 0.12); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .btn-danger { background: rgba(239, 68, 68, 0.12); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
 
-        /* Calendar Grid (Inspired by Luxe) */
-        .nav-pill { display: flex; align-items: center; background: var(--card); padding: 8px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .nav-pill button { border: none; background: var(--surface); color: var(--text); width: 40px; height: 40px; border-radius: 14px; cursor: pointer; font-size: 18px; }
+        /* Calendar Grid */
+        .nav-pill { display: flex; align-items: center; background: var(--card); padding: 6px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 18px; }
+        .nav-pill button { border: none; background: var(--surface); color: var(--text); width: 38px; height: 38px; border-radius: 14px; cursor: pointer; font-size: 18px; font-weight: bold; }
         .nav-pill span { flex: 1; text-align: center; font-weight: 800; font-size: 15px; }
 
         .day-item { 
             display: grid; grid-template-columns: 60px 1fr 1fr 1fr; gap: 8px; align-items: center; 
-            padding: 12px; background: var(--card); border-radius: 20px; margin-bottom: 12px;
+            padding: 12px 14px; background: var(--card); border-radius: 18px; margin-bottom: 10px;
             border: 1px solid var(--border);
         }
-        .date-circ .n { font-family: 'Outfit'; font-size: 24px; font-weight: 800; color: var(--text); display: block; line-height: 1; }
+        .date-circ .n { font-family: 'Outfit'; font-size: 22px; font-weight: 800; color: var(--text); display: block; line-height: 1; }
         .date-circ .d { font-size: 10px; font-weight: 700; color: var(--sub); text-transform: uppercase; }
         
         .item-pill { 
-            height: 45px; border-radius: 14px; border: 1px solid var(--surface); 
+            height: 42px; border-radius: 12px; border: 1px solid var(--surface); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            background: var(--bg); color: var(--sub); font-size: 10px; font-weight: 800; text-transform: uppercase;
+            background: var(--surface); color: var(--sub); font-size: 11px; font-weight: 800;
         }
-        .item-pill.active { background: var(--p); border-color: var(--p); color: white; }
+        .item-pill.active { background: #FF8C00; border-color: #FF8C00; color: white; }
+        .item-pill.active-w { background: var(--p); border-color: var(--p); color: white; }
         
-        /* Edit Rates Modal */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: var(--card); width: 100%; max-width: 400px; padding: 25px; border-radius: 24px; }
-        .modal-content input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; font-family: inherit; font-size: 16px; font-weight: 600; }
-        .modal-content label { display: block; font-size: 11px; font-weight: 800; color: var(--sub); text-transform: uppercase; margin-bottom: 8px; }
-        .btn-save { background: var(--p); color: white; width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; }
-
+        /* Edit Modal */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--card); width: 100%; max-width: 380px; padding: 25px; border-radius: 26px; border: 1px solid var(--border); }
+        .modal-content input { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 16px; font-family: inherit; font-size: 16px; font-weight: 700; color: var(--text); background: var(--bg); }
+        .modal-content label { display: block; font-size: 11px; font-weight: 800; color: var(--sub); text-transform: uppercase; margin-bottom: 6px; }
+        
+        #errorBox { display: none; background: rgba(239,68,68,0.1); border: 1px solid var(--danger); color: var(--danger); padding: 15px; border-radius: 16px; margin: 15px 0; font-size: 13px; font-weight: 700; text-align: center; }
         #pdf-render-zone { display: none; }
     </style>
 </head>
 <body>
 
+    <div id="loginScreen">
+        <h1 style="font-family:'Outfit'; font-size:38px; font-weight:900; margin-bottom: 8px;">VetTrack <span style="color:var(--p)">Admin</span></h1>
+        <p style="color:var(--sub); font-size:14px; font-weight:600; margin-bottom:30px;" id="t-log-sub">Sign in to load diner records</p>
+        <button class="btn-prime" onclick="adminLogin()" id="t-log-btn">🔐 Admin Sign In</button>
+    </div>
+
     <nav class="navbar">
         <div class="brand">VetTrack<span style="color:var(--text)">Admin</span></div>
-        <button class="lang-btn" onclick="toggleLang()" id="langToggle">ENG / हिंदी</button>
+        <div class="nav-right">
+            <button class="lang-btn" onclick="toggleLang()" id="langBtn">ENG / हिंदी</button>
+            <button class="logout-btn" onclick="adminLogout()">Sign Out</button>
+        </div>
     </nav>
 
     <div class="container">
+        <div id="errorBox"></div>
+
         <div class="stat-card">
             <div>
-                <div class="stat-label" id="t-total-diners">Active Diners</div>
+                <div class="stat-label" id="t-total-diners">Registered Diners</div>
                 <div class="stat-val" id="totalUsersCount">0</div>
             </div>
-            <div style="font-size: 40px; opacity: 0.5;">👨‍🍳</div>
+            <div style="font-size: 42px;">👨‍🍳</div>
         </div>
 
-        <div class="section-title" id="t-list-title">Registered Users</div>
+        <div class="section-title" id="t-list-title">Diner Directory</div>
         <div id="usersList">
-            <div style="text-align:center; padding: 40px; color: var(--sub); font-weight: 600;" id="t-loading">Loading users from Firebase...</div>
+            <div style="text-align:center; padding: 40px; color: var(--sub); font-weight: 700;" id="t-loading">Connecting to Firebase...</div>
         </div>
     </div>
 
     <div class="sheet-overlay" id="userSheetOverlay" onclick="closeUserSheet()">
         <div class="sheet" id="userSheet" onclick="event.stopPropagation()">
             <div class="sheet-header">
-                <div class="sheet-title" id="sheetUserName">User Name</div>
+                <div>
+                    <div class="sheet-title" id="sheetUserName">User Name</div>
+                    <div style="font-size:12px; color:var(--sub); font-weight:600;" id="sheetUserRates">₹0 Meal • ₹0 Water</div>
+                </div>
                 <button class="close-btn" onclick="closeUserSheet()">✕</button>
             </div>
             
@@ -145,11 +174,11 @@
                     <button class="btn-action btn-danger" onclick="deleteUser()"><i>🗑️</i> <span class="t-delete">Delete User</span></button>
                 </div>
 
-                <div class="section-title" id="t-logs-title">Eating Layout</div>
+                <div class="section-title" id="t-logs-title">Monthly Eating Layout</div>
                 
                 <div class="nav-pill">
                     <button onclick="changeMonth(-1)">‹</button>
-                    <span id="monthLabel">Month</span>
+                    <span id="monthLabel">Current Month</span>
                     <button onclick="changeMonth(1)">›</button>
                 </div>
 
@@ -160,12 +189,12 @@
 
     <div class="modal" id="ratesModal" onclick="closeRatesModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="margin-bottom: 20px; font-family:'Outfit';" class="t-edit-rates">Edit Rates</h3>
+            <h3 style="margin-bottom: 18px; font-family:'Outfit';" class="t-edit-rates">Edit Rates</h3>
             <label class="t-meal-rate">Meal Rate (₹)</label>
             <input type="number" id="inpMealPrice">
             <label class="t-water-rate">Water Rate (₹)</label>
             <input type="number" id="inpWaterPrice">
-            <button class="btn-save" onclick="saveRates()" class="t-save">Save Changes</button>
+            <button class="btn-prime" style="width:100%; border-radius:16px;" onclick="saveRates()"><span class="t-save">Save Changes</span></button>
         </div>
     </div>
 
@@ -173,9 +202,10 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, onSnapshot, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Reusing the configuration from your user app
+    // Reusing exact Firebase config from VetTrack Luxe
     const firebaseConfig = { 
         apiKey: "AIzaSyBfQcQbrs6m7euc6twcKeHMBH8GJkoM76g", authDomain: "vettrack-1c65e.firebaseapp.com", 
         projectId: "vettrack-1c65e", storageBucket: "vettrack-1c65e.firebasestorage.app", 
@@ -183,7 +213,9 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
 
     let usersData = [];
     let selectedUser = null;
@@ -191,20 +223,26 @@
     let viewDate = new Date();
     let logsUnsubscribe = null;
 
-    // --- MULTILINGUAL DICTIONARY ---
+    // --- DICTIONARY ---
     let lang = 'en';
     const dict = {
         en: {
-            totalDiners: "Active Diners", listTitle: "Registered Users", loading: "Loading users...",
+            logSub: "Sign in to load diner records", logBtn: "🔐 Admin Sign In",
+            totalDiners: "Registered Diners", listTitle: "Diner Directory", loading: "Loading users from Firebase...",
+            noUsers: "No diners found yet. Users will appear here once they log into VetTrack Luxe.",
             genBill: "Generate Bill", editRates: "Edit Rates", forceOut: "Force Logout", del: "Delete User",
-            logsTitle: "Eating Layout (Read-Only)", mealRate: "Meal Rate (₹)", waterRate: "Water Rate (₹)", save: "Save Changes",
-            billTitle: "Official Mess Bill", genBy: "Admin Portal Generation", confirmDel: "Are you sure you want to permanently delete this user?"
+            logsTitle: "Monthly Eating Layout", mealRate: "Meal Rate (₹)", waterRate: "Water Rate (₹)", save: "Save Changes",
+            billTitle: "Official Mess Bill", genBy: "Verified Admin Receipt", confirmDel: "Permanently delete this user from database?",
+            errAuth: "Firestore Permission Error: Make sure your Firebase Security Rules allow authenticated reads."
         },
         hi: {
-            totalDiners: "सक्रिय भोजनकर्ता", listTitle: "पंजीकृत ग्राहक", loading: "ग्राहक लोड हो रहे हैं...",
+            logSub: "ग्राहक सूची देखने के लिए साइन इन करें", logBtn: "🔐 एडमिन साइन इन",
+            totalDiners: "पंजीकृत भोजनकर्ता", listTitle: "ग्राहक सूची", loading: "डेटाबेस से ग्राहक लोड हो रहे हैं...",
+            noUsers: "अभी तक कोई ग्राहक नहीं मिला। जब ग्राहक ऐप में लॉग इन करेंगे तो वे यहाँ दिखाई देंगे।",
             genBill: "बिल बनाएं", editRates: "दर बदलें", forceOut: "लॉगआउट करें", del: "ग्राहक हटाएं",
-            logsTitle: "भोजन विवरण (केवल देखने के लिए)", mealRate: "भोजन दर (₹)", waterRate: "पानी दर (₹)", save: "सेव करें",
-            billTitle: "आधिकारिक मेस बिल", genBy: "एडमिन द्वारा जनरेट किया गया", confirmDel: "क्या आप वाकई इस ग्राहक को स्थायी रूप से हटाना चाहते हैं?"
+            logsTitle: "मासिक भोजन विवरण", mealRate: "भोजन दर (₹)", waterRate: "पानी दर (₹)", save: "सेव करें",
+            billTitle: "आधिकारिक मेस बिल", genBy: "प्रमाणित एडमिन रसीद", confirmDel: "क्या आप वाकई इस ग्राहक को डेटाबेस से स्थायी रूप से हटाना चाहते हैं?",
+            errAuth: "फायरबेस अनुमति त्रुटि: कृपया सुनिश्चित करें कि डेटाबेस नियम पढ़ने की अनुमति देते हैं।"
         }
     };
 
@@ -214,9 +252,10 @@
     };
 
     function applyLang() {
+        document.getElementById('t-log-sub').innerText = dict[lang].logSub;
+        document.getElementById('t-log-btn').innerText = dict[lang].logBtn;
         document.getElementById('t-total-diners').innerText = dict[lang].totalDiners;
         document.getElementById('t-list-title').innerText = dict[lang].listTitle;
-        document.getElementById('t-loading') && (document.getElementById('t-loading').innerText = dict[lang].loading);
         document.getElementById('t-logs-title').innerText = dict[lang].logsTitle;
         document.querySelectorAll('.t-gen-bill').forEach(e => e.innerText = dict[lang].genBill);
         document.querySelectorAll('.t-edit-rates').forEach(e => e.innerText = dict[lang].editRates);
@@ -224,24 +263,53 @@
         document.querySelectorAll('.t-delete').forEach(e => e.innerText = dict[lang].del);
         document.querySelectorAll('.t-meal-rate').forEach(e => e.innerText = dict[lang].mealRate);
         document.querySelectorAll('.t-water-rate').forEach(e => e.innerText = dict[lang].waterRate);
+        document.querySelectorAll('.t-save').forEach(e => e.innerText = dict[lang].save);
     }
 
-    // --- FIREBASE DATA FETCHING ---
-    onSnapshot(collection(db, "users"), (snapshot) => {
-        usersData = [];
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            if (!data.deleted) { // Hide deleted users
-                usersData.push({ uid: doc.id, ...data });
-            }
-        });
-        document.getElementById('totalUsersCount').innerText = usersData.length;
-        renderUsers();
+    // --- AUTHENTICATION ---
+    window.adminLogin = () => signInWithPopup(auth, provider).catch(err => showError(err.message));
+    window.adminLogout = () => signOut(auth).then(() => location.reload());
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('loginScreen').style.display = 'none';
+            fetchUsers();
+        } else {
+            document.getElementById('loginScreen').style.display = 'flex';
+        }
     });
+
+    function showError(msg) {
+        const eb = document.getElementById('errorBox');
+        eb.style.display = 'block';
+        eb.innerText = msg;
+    }
+
+    // --- FETCH USERS ---
+    function fetchUsers() {
+        document.getElementById('t-loading') && (document.getElementById('t-loading').innerText = dict[lang].loading);
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            document.getElementById('errorBox').style.display = 'none';
+            usersData = [];
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                usersData.push({ uid: docSnap.id, ...data });
+            });
+            document.getElementById('totalUsersCount').innerText = usersData.length;
+            renderUsers();
+        }, (err) => {
+            console.error("Firestore error:", err);
+            showError(dict[lang].errAuth);
+        });
+    }
 
     function renderUsers() {
         const list = document.getElementById('usersList');
         list.innerHTML = '';
+        if (usersData.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--sub); font-weight: 600;">${dict[lang].noUsers}</div>`;
+            return;
+        }
         usersData.forEach(u => {
             const card = document.createElement('div');
             card.className = 'user-card';
@@ -249,7 +317,7 @@
             card.innerHTML = `
                 <div class="user-info">
                     <h3>${u.name || 'Unnamed Diner'}</h3>
-                    <p>Meal: ₹${u.mealPrice || 0} • Water: ₹${u.waterPrice || 0}</p>
+                    <p>Meal: ₹${u.mealPrice || 50} • Water: ₹${u.waterPrice || 30}</p>
                 </div>
                 <div class="open-icon">›</div>
             `;
@@ -257,11 +325,12 @@
         });
     }
 
-    // --- USER DETAIL SHEET & LOGS ---
+    // --- USER DETAIL & LOGS ---
     window.openUserSheet = (user) => {
         selectedUser = user;
         viewDate = new Date();
-        document.getElementById('sheetUserName').innerText = user.name;
+        document.getElementById('sheetUserName').innerText = user.name || 'Unnamed Diner';
+        document.getElementById('sheetUserRates').innerText = `₹${user.mealPrice||50} Meal • ₹${user.waterPrice||30} Water`;
         document.getElementById('userSheetOverlay').style.display = 'flex';
         setTimeout(() => document.getElementById('userSheet').classList.add('up'), 10);
         fetchLogs();
@@ -269,22 +338,19 @@
 
     window.closeUserSheet = () => {
         document.getElementById('userSheet').classList.remove('up');
-        setTimeout(() => document.getElementById('userSheetOverlay').style.display = 'none', 400);
+        setTimeout(() => document.getElementById('userSheetOverlay').style.display = 'none', 350);
         if(logsUnsubscribe) logsUnsubscribe();
     };
 
-    window.changeMonth = (dir) => { 
-        viewDate.setMonth(viewDate.getMonth() + dir); 
-        fetchLogs(); 
-    };
+    window.changeMonth = (dir) => { viewDate.setMonth(viewDate.getMonth() + dir); fetchLogs(); };
 
     function fetchLogs() {
         if(logsUnsubscribe) logsUnsubscribe();
         document.getElementById('monthLabel').innerText = viewDate.toLocaleDateString(lang === 'en'?'en-IN':'hi-IN', { month: 'long', year: 'numeric' });
         
         const docRef = doc(db, "users", selectedUser.uid, "logs", `${viewDate.getFullYear()}_${viewDate.getMonth()}`);
-        logsUnsubscribe = onSnapshot(docRef, (d) => {
-            selectedLogs = d.exists() ? d.data() : {};
+        logsUnsubscribe = onSnapshot(docRef, (docSnap) => {
+            selectedLogs = docSnap.exists() ? docSnap.data() : {};
             renderLogsGrid();
         });
     }
@@ -302,46 +368,44 @@
             card.className = 'day-item';
             card.innerHTML = `
                 <div class="date-circ"><span class="n">${i}</span><span class="d">${dayName}</span></div>
-                <div class="item-pill ${d.l?'active':''}">L</div>
-                <div class="item-pill ${d.d?'active':''}">D</div>
-                <div class="item-pill ${d.w?'active':''}">W</div>
+                <div class="item-pill ${d.l?'active':''}">LUNCH</div>
+                <div class="item-pill ${d.d?'active':''}">DINNER</div>
+                <div class="item-pill ${d.w?'active-w':''}">WATER</div>
             `;
             grid.appendChild(card);
         }
     }
 
-    // --- ADMIN ACTIONS ---
+    // --- ACTIONS ---
     window.openRatesModal = () => {
-        document.getElementById('inpMealPrice').value = selectedUser.mealPrice || 0;
-        document.getElementById('inpWaterPrice').value = selectedUser.waterPrice || 0;
+        document.getElementById('inpMealPrice').value = selectedUser.mealPrice || 50;
+        document.getElementById('inpWaterPrice').value = selectedUser.waterPrice || 30;
         document.getElementById('ratesModal').style.display = 'flex';
     };
-    
     window.closeRatesModal = () => document.getElementById('ratesModal').style.display = 'none';
 
     window.saveRates = async () => {
-        const newMeal = parseInt(document.getElementById('inpMealPrice').value);
-        const newWater = parseInt(document.getElementById('inpWaterPrice').value);
+        const newMeal = parseInt(document.getElementById('inpMealPrice').value) || 0;
+        const newWater = parseInt(document.getElementById('inpWaterPrice').value) || 0;
         await updateDoc(doc(db, "users", selectedUser.uid), { mealPrice: newMeal, waterPrice: newWater });
         selectedUser.mealPrice = newMeal; selectedUser.waterPrice = newWater;
+        document.getElementById('sheetUserRates').innerText = `₹${newMeal} Meal • ₹${newWater} Water`;
         closeRatesModal(); renderUsers();
     };
 
     window.forceLogout = async () => {
-        // Appends a flag that the user app should listen to for forcing a signOut()
         await updateDoc(doc(db, "users", selectedUser.uid), { forceLogout: true });
-        alert(lang === 'en' ? "Logout signal sent to user device." : "उपयोगकर्ता डिवाइस पर लॉगआउट सिग्नल भेजा गया।");
+        alert(lang === 'en' ? "Force logout signal sent to diner's device." : "ग्राहक के डिवाइस पर लॉगआउट सिग्नल भेजा गया।");
     };
 
     window.deleteUser = async () => {
         if(confirm(dict[lang].confirmDel)) {
-            // Soft delete to prevent orphaned data crashes, user app auth rules should block access if deleted=true
-            await updateDoc(doc(db, "users", selectedUser.uid), { deleted: true, forceLogout: true });
+            await deleteDoc(doc(db, "users", selectedUser.uid));
             closeUserSheet();
         }
     };
 
-    // --- ADMIN PDF GENERATION ---
+    // --- PDF GENERATION ---
     window.generateBill = () => {
         let mCount = 0, wCount = 0;
         const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
@@ -351,38 +415,44 @@
             if(d) { if(d.l) mCount++; if(d.d) mCount++; if(d.w) wCount++; }
         }
 
-        const mealTotal = mCount * (selectedUser.mealPrice || 0);
-        const waterTotal = wCount * (selectedUser.waterPrice || 0);
+        const mealRate = selectedUser.mealPrice || 50;
+        const waterRate = selectedUser.waterPrice || 30;
+        const mealTotal = mCount * mealRate;
+        const waterTotal = wCount * waterRate;
         const grandTotal = mealTotal + waterTotal;
 
         const now = new Date();
         const dateStr = now.toLocaleDateString('en-IN');
         const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-        const monthName = viewDate.toLocaleDateString(lang==='en'?'en-IN':'hi-IN', { month: 'long', year: 'numeric' });
+        const monthName = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
 
         let htmlContent = `
             <div style="font-family:'Plus Jakarta Sans', sans-serif; background:#fff; color:#000; padding:40px; width:800px; box-sizing:border-box; border: 2px solid #000;">
                 <div style="text-align:center; border-bottom:3px solid #000; padding-bottom:20px; margin-bottom:30px;">
-                    <h1 style="margin:0; font-family:'Outfit'; font-size:38px; text-transform:uppercase;">${dict[lang].billTitle}</h1>
-                    <h2 style="margin:10px 0 0 0; font-size:22px; color:#444;">${monthName}</h2>
+                    <h1 style="margin:0; font-family:'Outfit'; font-size:36px; text-transform:uppercase;">${dict[lang].billTitle}</h1>
+                    <h2 style="margin:8px 0 0 0; font-size:20px; color:#444;">Billing Period: ${monthName}</h2>
                 </div>
                 
-                <div style="display:flex; justify-content:space-between; margin-bottom:40px; font-size:18px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:35px; font-size:16px;">
                     <div>
-                        <p style="margin:5px 0;"><strong>Name:</strong> ${selectedUser.name}</p>
-                        <p style="margin:5px 0;"><strong>Meals (${mCount}):</strong> ${mCount} x ₹${selectedUser.mealPrice} = ₹${mealTotal}</p>
-                        <p style="margin:5px 0;"><strong>Water (${wCount}):</strong> ${wCount} x ₹${selectedUser.waterPrice} = ₹${waterTotal}</p>
+                        <p style="margin:6px 0;"><strong>Diner Name:</strong> ${selectedUser.name || 'Diner'}</p>
+                        <p style="margin:6px 0;"><strong>Meals Logged (${mCount}):</strong> ${mCount} x ₹${mealRate} = ₹${mealTotal}</p>
+                        <p style="margin:6px 0;"><strong>Water Units (${wCount}):</strong> ${wCount} x ₹${waterRate} = ₹${waterTotal}</p>
                     </div>
                     <div style="text-align:right;">
-                        <p style="margin:5px 0;"><strong>Gen Date:</strong> ${dateStr}</p>
-                        <p style="margin:5px 0;"><strong>Gen Time:</strong> ${timeStr}</p>
-                        <p style="margin:5px 0; color:#555;"><em>${dict[lang].genBy}</em></p>
+                        <p style="margin:6px 0;"><strong>Generated On:</strong> ${dateStr}</p>
+                        <p style="margin:6px 0;"><strong>Time:</strong> ${timeStr}</p>
+                        <p style="margin:6px 0; color:#555;"><em>${dict[lang].genBy}</em></p>
                     </div>
                 </div>
 
-                <div style="background:#f1f5f9; padding:30px; border: 2px dashed #000; text-align:center; margin-bottom: 40px;">
-                    <h3 style="margin:0; font-size:20px; text-transform:uppercase; color:#64748b;">Grand Total</h3>
-                    <h1 style="margin:10px 0 0 0; font-family:'Outfit'; font-size:55px;">₹${grandTotal.toLocaleString('en-IN')}</h1>
+                <div style="background:#f8fafc; padding:25px; border: 2px dashed #000; text-align:center; margin-bottom: 30px;">
+                    <h3 style="margin:0; font-size:18px; text-transform:uppercase; color:#64748b;">Total Amount Payable</h3>
+                    <h1 style="margin:8px 0 0 0; font-family:'Outfit'; font-size:52px;">₹${grandTotal.toLocaleString('en-IN')}</h1>
+                </div>
+
+                <div style="font-size:12px; color:#64748b; text-align:center; border-top:1px solid #e2e8f0; padding-top:15px;">
+                    Official Receipt generated via VetTrack Luxe Super Admin Portal.
                 </div>
             </div>
         `;
@@ -392,7 +462,7 @@
 
         const opt = {
             margin:       0.2,
-            filename:     `Admin_Bill_${selectedUser.name.replace(" ", "_")}_${monthName.replace(" ", "_")}.pdf`,
+            filename:     `Mess_Bill_${(selectedUser.name||'Diner').replace(/ /g, "_")}_${monthName.replace(/ /g, "_")}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true },
             jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -401,7 +471,7 @@
         html2pdf().set(opt).from(renderZone.firstElementChild).save().then(() => {
             renderZone.innerHTML = '';
         });
-    }
+    };
 
     applyLang();
 </script>
